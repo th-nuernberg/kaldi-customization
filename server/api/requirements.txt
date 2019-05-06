@@ -1,0 +1,11 @@
+Flask
+Flask-Bcrypt
+Flask-Gravatar
+Flask-Limiter
+Flask-Mail
+Flask-RESTful
+Flask-SQLAlchemy
+Flask-SocketIO
+Flask-Testing
+gevent-websocket
+redis

@@ -1,0 +1,3 @@
+[submodule "worker/kaldi-worker/digits/data_audio"]
+	path = worker/kaldi-worker/digits/data_audio
+	url = https://github.com/Jakobovski/free-spoken-digit-dataset.git
