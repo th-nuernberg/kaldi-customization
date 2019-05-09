@@ -105,7 +105,7 @@ prepareSoundProjectFolder()
     echo "Preparing sound folder structure."
     if [ ! -d $audioSpeakerHome ]
     then
-        mkdir $audioSpeakerHome
+        mkdir -p $audioSpeakerHome
     fi
 
         if [ ! -d $audioSpeakerOneHome ]
@@ -170,8 +170,11 @@ ceateProjectFiles()
     projectDataLocalHome=$5
     projectDataLocalDictHome=$6
 
+    kaldicustom=$(echo $KALDICUSTOM)
+    templates="$kaldicustom/helper/templates"
+
     # copies prepared bash scripts
-    bashHome="/home/flo/kaldi/prepare_it_project/templates/bash/"
+    bashHome="$templates/bash/"
     cmdShellPath="$bashHome/cmd.sh"
     pathShellPath="$bashHome/path.sh"
     runShellPath="$bashHome/run.sh"
@@ -180,7 +183,7 @@ ceateProjectFiles()
     cp -v  $runShellPath $projectHome
 
     #copies prepared config files
-    configHome="/home/flo/kaldi/prepare_it_project/templates/config/"
+    configHome="$templates/config/"
     mfccConfigPath="$configHome/mfcc.conf"
     decodeConfigPath="$configHome/decode.config"
     cp -v  $mfccConfigPath $projectConfHome
@@ -199,7 +202,7 @@ ceateProjectFiles()
     touch "$projectDataTestHome/utt2spk"
 
     # copies prepared local home files
-    textHome="/home/flo/kaldi/prepare_it_project/templates/text"
+    textHome="$templates/text"
     corpusTextPath="$textHome/corpus.txt"
     cp -v  $corpusTextPath $projectDataLocalHome
 
@@ -369,8 +372,10 @@ copyConfiguredTools()
     kaldiProjectHome="$kaldiHome/egs/$projectName"
     projectLocalHome="$kaldiProjectHome/local/"
 
-    bashHome="/home/flo/kaldi/prepare_it_project/templates/bash"
-    folderHome="/home/flo/kaldi/prepare_it_project/templates/folders"
+    kaldicustom=$(echo $KALDICUSTOM)
+    templates="$kaldicustom/helper/templates"
+    bashHome="$templates/bash"
+    folderHome="$templates/folders"
 
     cp -r "$folderHome/utils" $kaldiProjectHome
     cp -r "$folderHome/steps" $kaldiProjectHome
@@ -378,18 +383,16 @@ copyConfiguredTools()
 }
 
 # set home folder of kaldi and sound recordings => TODO must be set once on the server!
-userName=$(eval echo ~$USER)
-helperWorkspace="$userName/kaldi/checkout/kaldi-customization/helper"
+# IMPORTANT: set env var for kaldi and kaldi custom repo!
+kaldi=$(echo $KALDI)
+kaldicustom=$(echo $KALDICUSTOM)
+
+helperWorkspace="$kaldicustom/helper"
 
 #kaldiHome="$userName/kaldi/kaldi"
-kaldiHome="$helperWorkspace/dummy"
-soundHome="$userName/kaldi/checkout/kaldi-customization/worker/kaldi-worker/digits/data_audio/dummy"
-projectName="digits"
-
-# for testing only -> needs to be adapted!!!!
-mkdir -p "$kaldiHome/egs/$projectName"
-mkdir -p "$soundHome"
-
+kaldiHome="$(echo $KALDI)"
+soundHome="$kaldicustom/worker/kaldi-worker/digits/data_audio/temp"
+projectName="foobar"
 
 # prepare tasks
 prepareDirectories $kaldiHome $soundHome $projectName
