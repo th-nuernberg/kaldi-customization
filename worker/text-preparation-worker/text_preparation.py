@@ -27,8 +27,9 @@ def report_status_to_API(queue_status):
 
 
 '''
-    This function saves the extracted text into a temp-file.
-    The created temp-file will be processed afterwards
+    This function saves the unique word list into the file system as a txt-file.
+    The following directory will be used to save the unique world list:
+        /text-preparation/out/<model_id>/<id>
 '''
 def save_textfile(text_list):
     f = open(os.getcwd() + "/out/unique_word_list.txt", "a")
@@ -99,7 +100,7 @@ def word_parser(file_path):
 
 
 def html_parser(file_handler):
-    # remove these tags, complete with contents.
+    # Blacklisted tags which will be ignored and extracted from the HTML-files
     blacklist = ["script", "style"]
 
     soup = BeautifulSoup(file_handler, features="html.parser")
@@ -109,14 +110,14 @@ def html_parser(file_handler):
         if tag.name.lower() in blacklist:
             tag.extract()
 
-    # Strips all HTML-comments
+    # Retrieves all comments from the HTML-file and removes them
     comments = soup.findAll(text=lambda text:isinstance(text, Comment))
     for comment in comments:
         comment.extract()
 
     # Retrieves the visible text of the web page
     webpage_text = soup.body.getText().encode("utf8")
-    
+        
     word_list = retrieve_all_words(webpage_text)
     unique_list = create_unique_list(word_list)
     
@@ -134,7 +135,7 @@ def text_parser(file_handler):
 
 '''
     This function is called, in order to open the received filename of the API.
-    All files which need to be processed will be stored within:
+    All files which need to be processed are saved within:
         /text-preparation/in/<model_id>/<id>
 '''
 def process_file(file_path):
