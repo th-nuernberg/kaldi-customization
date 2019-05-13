@@ -5,20 +5,9 @@
 #   - creates a folder structure inside of $KaldiInstallation/egs/
 #   - renames recording files
 #   - moves recording files into new structure for training and testing
-#   -
 ##########################################################################################
 
 prepareDirectories()
-{
-    kaldiHome=$1
-    audioHome=$2
-    projectName=$3
-
-    prepareKaldiEgsProjectFolder $kaldiHome $projectName
-    prepareSoundProjectFolder $audioHome $projectName
-}
-
-prepareKaldiEgsProjectFolder()
 {
     kaldiHome=$1
     projectName=$2
@@ -26,6 +15,7 @@ prepareKaldiEgsProjectFolder()
     # creates and prepares project folder structure in kaldi home egs directory
     kaldiProjectHome="$kaldiHome/egs/$projectName"
     projectSoundHome="$kaldiProjectHome/${projectName}_audio"
+    projectSoundTestHome="$projectSoundHome/test"
     projectDataHome="$kaldiProjectHome/data"
     projectDataTrainHome="$projectDataHome/train"
     projectDataTestHome="$projectDataHome/test"
@@ -45,6 +35,10 @@ prepareKaldiEgsProjectFolder()
         then
             mkdir $projectSoundHome
         fi
+            if [ ! -d $projectSoundTestHome ]
+            then
+                mkdir $projectSoundTestHome
+            fi
 
         if [ ! -d $projectDataHome ]
         then
@@ -80,83 +74,6 @@ prepareKaldiEgsProjectFolder()
         fi
 
     ceateProjectFiles $kaldiProjectHome $projectConfHome $projectDataTrainHome $projectDataTestHome $projectDataLocalHome $projectDataLocalDictHome
-
-    echo "Finished..."
-}
-
-prepareSoundProjectFolder()
-{
-    audioHome=$1
-    projectName=$2
-    
-    audioSpeakerHome="$audioHome/speaker"
-    audioSpeakerOneHome="$audioSpeakerHome/jackson"
-    audioSpeakerTwoHome="$audioSpeakerHome/theo"
-    audioSpeakerThreeHome="$audioSpeakerHome/nicolas"
-    audioSpeakerFourHome="$audioSpeakerHome/yweweler"
-    audioSpeakerTestHome="$audioHome/test"
-    audioSpeakerTestOneHome="$audioSpeakerTestHome/jackson"
-    audioSpeakerTrainHome="$audioHome/train"
-    audioSpeakerTrainTwoHome="$audioHome/train/theo"
-    audioSpeakerTrainThreeHome="$audioHome/train/nicolas"
-    audioSpeakerTrainFourHome="$audioHome/train/yweweler"
-
-    rm -rf $audioSpeakerHome
-    echo "Preparing sound folder structure."
-    if [ ! -d $audioSpeakerHome ]
-    then
-        mkdir -p $audioSpeakerHome
-    fi
-
-        if [ ! -d $audioSpeakerOneHome ]
-        then
-            mkdir $audioSpeakerOneHome
-        fi
-
-        if [ ! -d $audioSpeakerTwoHome ]
-        then
-            mkdir $audioSpeakerTwoHome
-        fi
-
-        if [ ! -d $audioSpeakerThreeHome ]
-        then
-            mkdir $audioSpeakerThreeHome
-        fi
-
-        if [ ! -d $audioSpeakerFourHome ]
-        then
-            mkdir $audioSpeakerFourHome
-        fi
-
-    if [ ! -d $audioSpeakerTestHome ]
-    then
-        mkdir $audioSpeakerTestHome
-    fi
-
-        if [ ! -d $audioSpeakerTestOneHome ]
-        then
-            mkdir $audioSpeakerTestOneHome
-        fi
-
-    if [ ! -d $audioSpeakerTrainHome ]
-    then
-        mkdir $audioSpeakerTrainHome
-    fi
-
-        if [ ! -d $audioSpeakerTrainTwoHome ]
-        then
-            mkdir $audioSpeakerTrainTwoHome
-        fi
-
-        if [ ! -d $audioSpeakerTrainThreeHome ]
-        then
-            mkdir $audioSpeakerTrainThreeHome
-        fi
-
-        if [ ! -d $audioSpeakerTrainFourHome ]
-        then
-            mkdir $audioSpeakerTrainFourHome
-        fi
 
     echo "Finished..."
 }
@@ -219,154 +136,31 @@ ceateProjectFiles()
 
 prepareRecordings()
 {
-    speakerNameOne="jackson"
-    speakerNameTwo="theo"
-    speakerNameThree="nicolas"
-    speakerNameFour="yweweler"
-
-    audioHome=$1
-    cd $audioHome
-
-    speakerHome="$audioHome/speaker"
-    speakerHomeOne="$speakerHome/$speakerNameOne"
-    speakerHomeTwo="$speakerHome/$speakerNameTwo"
-    speakerHomeThree="$speakerHome/$speakerNameThree"
-    speakerHomeFour="$speakerHome/$speakerNameFour"
-
-    speakerOneCount=0
-    speakerTwoCount=0
-    speakerThreeCount=0
-    speakerFourCount=0 
-
-    echo $PWD
-    cd "../recordings"
-
-    for i in *.wav
-    do
-        if [[ "$i" =~ $speakerNameOne ]]
-        then
-            speakerOneCount=$[$speakerOneCount+1]
-            cp -v $i $speakerHomeOne
-        elif [[ "$i" =~ $speakerNameTwo ]]
-        then
-            speakerTwoCount=$[$speakerTwoCount+1]
-            cp -v $i $speakerHomeTwo
-        elif [[ "$i" =~ $speakerNameThree ]]
-        then
-            speakerThreeCount=$[$speakerThreeCount+1]
-            cp -v $i $speakerHomeThree
-        elif [[ "$i" =~ $speakerNameFour ]]
-        then
-            speakerFourCount=$[$speakerFourCount+1]
-            cp -v $i $speakerHomeFour
-        fi
-    done
-
-    echo "Number of recordings from speaker one: $speakerOneCount"
-    echo "Number of recordings from speaker two: $speakerTwoCount"
-    echo "Number of recordings from speaker three: $speakerThreeCount"
-    echo "Number of recordings from speaker four: $speakerFourCount"
-
-    cd "$audioHome"
-}
-
-structureRecordings()
-{
-    audioHome=$1
-    speaker="speaker"
-    test="test"
-    train="train"
-    
-    # Sortiert die im Directory vorkommenden Files nach ihrer Nummerierung
-    iterateOverAllFiles "$speaker/jackson" "$test/jackson" $audioHome
-    iterateOverAllFiles "$speaker/yweweler" "$train/yweweler" $audioHome
-    iterateOverAllFiles "$speaker/nicolas" "$train/nicolas" $audioHome
-    iterateOverAllFiles "$speaker/theo" "$train/theo" $audioHome
-
-    echo "Renaming files..."
-    renameRecordingFiles "$audioHome/test/jackson"
-    renameRecordingFiles "$audioHome/train/nicolas"
-    renameRecordingFiles "$audioHome/train/theo"
-    renameRecordingFiles "$audioHome/train/yweweler"
-    echo "Finished renaming.."
-}
-
-iterateOverAllFiles()
-{
-    speakerDir=$1
-    destinationDir=$2
-    audioHome=$3
-
-    cd $speakerDir 
-    for file in *.wav
-    do
-        cp -v $file "$audioHome/$destinationDir"        
-    done
-
-    cd $audioHome
-}
-
-renameRecordingFiles()
-{
-    # Aktueller Name: {number}_{speaker}_{0-49}.wav
-    # Bevorzugter Name: {speaker}_{number}_{0-*}.wav
-    dirToRename=$1
-    cd "$dirToRename"
-
-    record=0
-
-    for file in *.wav
-    do
-        number=0
-        speaker=""
-        count=0
-        IFS='_' read -ra ADDR <<< "$file"
-        for part in "${ADDR[@]}"; do
-            if [ $count -eq 0 ]
-            then
-                number=$part
-            elif [ $count -eq 1 ]
-            then
-                speaker=$part
-            fi
-            count=$[$count+1]
-        done
-        record=$[$record+1]
-        count=0
-        mv "$dirToRename/$file" "$dirToRename/$speaker""_""$number""_""$record"".wav"
-        
-    done
-}
-
-cleanupRecordings()
-{
-    soundHome=$1
-    speakerHome="$soundHome/speaker"
-    recordingHome="$soundHome/recordings"
-    echo "Cleaning up not needed recording files..."
-    rm -rf $soundHome
-    # rm -rf recordings
-    echo "Finished clean up..."
-}
-
-moveRecordingsToKaldi()
-{
+    speakerCount=0
     kaldiHome=$1
     projectName=$2
-    soundHome=$3
+    audioHome=$3
+
     kaldiProjectHome="$kaldiHome/egs/$projectName"
     projectSoundHome="$kaldiProjectHome/${projectName}_audio"
     test="test"
-    train="train"
 
-    cd $soundHome
-    mv -v $test $projectSoundHome
-    mv -v $train $projectSoundHome
+    cd "$audioHome/recordings"
+    
+    echo "Starting to prepare recording files..."
+    for i in *.wav
+    do
+        speakerCount=$[$speakerCount+1]
+        cp -v $i "$projectSoundHome/$test/speaker_${speakerCount}.wav"
+    done
+
+    echo "Number of recordings: $speakerCount !"
+    echo "Finished to prepare recording files!"
+    cd "$audioHome"
 }
 
 copyConfiguredTools()
 {
-    
     kaldiHome=$1
     projectName=$2
     kaldiProjectHome="$kaldiHome/egs/$projectName"
@@ -382,22 +176,20 @@ copyConfiguredTools()
     cp "$bashHome/score.sh" $projectLocalHome
 }
 
-# set home folder of kaldi and sound recordings => TODO must be set once on the server!
 # IMPORTANT: set env var for kaldi and kaldi custom repo!
 kaldi=$(echo $KALDI)
 kaldicustom=$(echo $KALDICUSTOM)
-
 helperWorkspace="$kaldicustom/helper"
 
-#kaldiHome="$userName/kaldi/kaldi"
-kaldiHome="$(echo $KALDI)"
-soundHome="$kaldicustom/worker/kaldi-worker/digits/data_audio/temp"
-projectName="foobar"
+# test!!!
+soundHome="/home/flo/kaldi/checkout/GER/"
+projectName="digitsGER"
 
 # prepare tasks
-prepareDirectories $kaldiHome $soundHome $projectName
-prepareRecordings $soundHome
-structureRecordings $soundHome
-moveRecordingsToKaldi $kaldiHome $projectName $soundHome
-cleanupRecordings $soundHome
+prepareDirectories $kaldi $projectName
+
+# copies recording files into egs project directory
+prepareRecordings $kaldi $projectName $soundHome 
+
+# copy template files into project folder
 copyConfiguredTools $kaldiHome $projectName
