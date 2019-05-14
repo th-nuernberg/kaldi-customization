@@ -1,11 +1,16 @@
 #!/bin/bash
 
-##########################################################################################
-# This bash prepares the sound recordings for Kaldi.
-#   - creates a folder structure inside of $KaldiInstallation/egs/
-#   - renames recording files
-#   - moves recording files into new structure for training and testing
-##########################################################################################
+#################################################################################################
+# prepare_user_strcture.sh  creates the expected folder and file structure for the execution
+# of Kaldi as a user (without the training session) while using the existing kaldi
+# trained model
+#################################################################################################
+# Methods of the shell script:
+# prepareDirectories(); creates the folder structure inside the Kaldi egs folder
+# createProjectFiles(): creates and copies project files for data, config and shell scripts
+# prepareRecordings(): copies and renames recording files into the created project structure
+# copyConfiguredTools(): copies pre-configured tools e.g. utils, steps to the project structure
+#################################################################################################
 
 prepareDirectories()
 {
@@ -24,6 +29,7 @@ prepareDirectories()
 
     rm -rf $kaldiProjectHome
 
+    # creates the project structure
     echo "Preparing project folder inside of Kaldi egs installation."
     if [ ! -d $kaldiProjectHome ]
     then
@@ -121,10 +127,12 @@ prepareRecordings()
 
     cd "$audioHome/recordings"
     
+    # copies and renames the recordings files to the kaldi/egs/project/audio folders
     echo "Starting to prepare recording files..."
     for i in *.wav
     do
         speakerCount=$[$speakerCount+1]
+        # copies and renames recording files
         cp -v $i "$projectSoundHome/$test/speaker_${speakerCount}.wav"
     done
 
@@ -155,7 +163,7 @@ kaldi=$(echo $KALDI)
 kaldicustom=$(echo $KALDICUSTOM)
 helperWorkspace="$kaldicustom/helper"
 
-# test!!!
+# TODO needs to be adjusted!!!!
 soundHome="/home/flo/kaldi/checkout/GER/"
 projectName="digits_user"
 
