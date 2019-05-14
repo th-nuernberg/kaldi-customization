@@ -30,7 +30,7 @@ fillSpk2Gender()
     echo "Finished setup of spk2gender!"
 }
 
-projectName="digitsGER"
+projectName="digits_developer"
 
 kaldi=$(echo $KALDI)
 kaldiProjectHome="$kaldi/egs/$projectName"
@@ -39,8 +39,8 @@ kaldiProjectDataHome="$kaldiProjectHome/data"
 
 # fills utt2spk and wav.scp files!
 fillTestData "$kaldiProjectAudioHome/test/" "$kaldiProjectDataHome/test/" "speaker"
+fillTestData "$kaldiProjectAudioHome/train/" "$kaldiProjectDataHome/train/" "speaker"
 
 # sets spk2gender with a single speaker (male)
 fillSpk2Gender "$kaldiProjectDataHome/test/spk2gender"
-
-# todo: fill text file
+fillSpk2Gender "$kaldiProjectDataHome/train/spk2gender"
