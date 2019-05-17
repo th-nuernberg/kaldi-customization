@@ -1,11 +1,16 @@
 #!/bin/bash
 
-##########################################################################################
-# This bash prepares the sound recordings for Kaldi.
-#   - creates a folder structure inside of $KaldiInstallation/egs/
-#   - renames recording files
-#   - moves recording files into new structure for training and testing
-##########################################################################################
+#################################################################################################
+# prepare_developer_strcture.sh creates the expected folder and file structure for the execution
+# of Kaldi as a developer with the posibility to extend the pretrained kaldi model
+#################################################################################################
+# Methods of the shell script:
+# prepareDirectories(); creates the folder structure inside the Kaldi egs folder
+# createProjectFiles(): creates and copies project files for data, config and shell scripts
+# prepareRecordings(): copies and renames recording files into the created project structure
+# prepareRecordings(): copies and renames recording files into the created project structure
+# copyConfiguredTools(): copies pre-configured tools e.g. utils, steps to the project structure
+#################################################################################################
 
 prepareDirectories()
 {
@@ -16,6 +21,7 @@ prepareDirectories()
     kaldiProjectHome="$kaldiHome/egs/$projectName"
     projectSoundHome="$kaldiProjectHome/${projectName}_audio"
     projectSoundTestHome="$projectSoundHome/test"
+    projectSoundTrainHome="$projectSoundHome/train"
     projectDataHome="$kaldiProjectHome/data"
     projectDataTrainHome="$projectDataHome/train"
     projectDataTestHome="$projectDataHome/test"
@@ -26,6 +32,7 @@ prepareDirectories()
 
     rm -rf $kaldiProjectHome
 
+    # creates the project structure
     echo "Preparing project folder inside of Kaldi egs installation."
     if [ ! -d $kaldiProjectHome ]
     then
@@ -38,6 +45,11 @@ prepareDirectories()
             if [ ! -d $projectSoundTestHome ]
             then
                 mkdir $projectSoundTestHome
+            fi
+            
+            if [ ! -d $projectSoundTrainHome ]
+            then
+                mkdir $projectSoundTrainHome
             fi
 
         if [ ! -d $projectDataHome ]
@@ -136,7 +148,6 @@ ceateProjectFiles()
 
 prepareRecordings()
 {
-    speakerCount=0
     kaldiHome=$1
     projectName=$2
     audioHome=$3
@@ -144,19 +155,33 @@ prepareRecordings()
     kaldiProjectHome="$kaldiHome/egs/$projectName"
     projectSoundHome="$kaldiProjectHome/${projectName}_audio"
     test="test"
+    train="train"
 
     cd "$audioHome/recordings"
     
-    echo "Starting to prepare recording files..."
+    # copies and renames the recordings files to the kaldi/egs/project/audio folders
+    copySoundFiles $test $projectSoundHome
+    copySoundFiles $train $projectSoundHome
+
+    cd "$audioHome"
+}
+
+copySoundFiles()
+{
+    speakerCount=0
+    target=$1
+    projectSoundHome=$2
+
+    echo "Starting to prepare $target recording files..."
     for i in *.wav
     do
         speakerCount=$[$speakerCount+1]
-        cp -v $i "$projectSoundHome/$test/speaker_${speakerCount}.wav"
+        # copies and renames recording files
+        cp -v $i "$projectSoundHome/$target/speaker_${speakerCount}.wav"
     done
 
-    echo "Number of recordings: $speakerCount !"
-    echo "Finished to prepare recording files!"
-    cd "$audioHome"
+    echo "Number of $target recordings: $speakerCount !"
+    echo "Finished to prepare $target recording files!"
 }
 
 copyConfiguredTools()
@@ -181,9 +206,9 @@ kaldi=$(echo $KALDI)
 kaldicustom=$(echo $KALDICUSTOM)
 helperWorkspace="$kaldicustom/helper"
 
-# test!!!
+# TODO needs to be adjusted!!!!
 soundHome="/home/flo/kaldi/checkout/GER/"
-projectName="digitsGER"
+projectName="digits_developer"
 
 # prepare tasks
 prepareDirectories $kaldi $projectName
