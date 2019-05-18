@@ -16,10 +16,13 @@ services:
 
   db:
     image: "mariadb"
+    ports:
+      - 3307:3306
     environment:
       MYSQL_ROOT_PASSWORD: kalditproject
-    volumes:
-      - ./dfs/mariadb:/var/lib/mysql
+      MYSQL_USER: api
+      MYSQL_PASSWORD: api-server-password
+      MYSQL_DATABASE: api
     networks:
       - frontend
     restart: always

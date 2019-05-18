@@ -8,4 +8,5 @@ Flask-SQLAlchemy
 Flask-SocketIO
 Flask-Testing
 gevent-websocket
+mysqlclient
 redis
