@@ -7,6 +7,6 @@ EXPOSE 4200
 ADD src /www
 
 WORKDIR /www/frontend
-RUN npm install -g @angular/cli && npm install
+RUN npm install -g @angular/cli && npm install --only=dev && npm build:prod && rm -rf node_modules && npm install --only=prod
 
-CMD ["ng", "serve", "--host", "0.0.0.0", "--disable-host-check"]
+CMD ["ng", "server", "--host", "0.0.0.0", "--disable-host-check"]

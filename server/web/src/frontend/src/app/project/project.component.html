@@ -1,0 +1,36 @@
+<div class="page-header" fxLayout="row">
+  <h1>Projekt {{uuid}}</h1>
+  <mat-tab-group>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Übersicht
+        </ng-template>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Modell
+        </ng-template>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Texte
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+</div>
+
+<mat-sidenav-container fxFlexFill>
+  <mat-sidenav color="primary" #sidenav fxLayout="row" mode="side" opened="true" position="start">
+    <div fxLayout="column">
+      <a mat-button routerLink="/">Home</a>
+      <a mat-button routerLink="/dashboard">Dashboard</a>
+      <a mat-button routerLink="/account">Account</a>
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content fxFlexFill>
+    <!-- page content -->
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
