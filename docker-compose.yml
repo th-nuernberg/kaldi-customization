@@ -20,7 +20,9 @@ services:
       - type: bind
         source: ./dfs/texts/out
         target: /text_prep_worker/out
-    restart: on-failure
+    restart: always
+    depends_on:
+      - redis
 
   redis:
     image: "redis:alpine"

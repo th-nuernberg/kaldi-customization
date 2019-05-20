@@ -1,6 +1,6 @@
 beautifulsoup4==4.5.3
 redis
 pypdf2
-docx
+python-docx
 lxml
 pytesseract

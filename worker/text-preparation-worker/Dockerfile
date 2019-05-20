@@ -11,5 +11,6 @@ RUN apk add build-base libffi-dev openssl-dev tesseract-ocr-data-deu zlib-dev li
     apk del build-base
 
 ADD src/text_preparation.py /text_prep_worker
+ADD wait-for.sh /tools/wait-for.sh
 
-CMD ["python3", "/text_prep_worker/text_preparation.py"]
+CMD ["/bin/sh", "/tools/wait-for.sh", "redis:6379", "--", "python3", "/text_prep_worker/text_preparation.py"]

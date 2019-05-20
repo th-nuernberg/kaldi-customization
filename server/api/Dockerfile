@@ -16,4 +16,4 @@ ADD wait-for.sh /tools/wait-for.sh
 
 ENV FLASK_APP=/www/app.py
 
-CMD ["/bin/sh", "/tools/wait-for.sh", "db:3306", "--","python", "-m", "flask", "run", "--host=0.0.0.0"]
+CMD ["/bin/sh", "/tools/wait-for.sh", "db:3306", "--", "python", "-m", "flask", "run", "--host=0.0.0.0"]
