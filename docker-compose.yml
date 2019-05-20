@@ -8,6 +8,19 @@ services:
     restart: always
     depends_on:
       - redis
+    
+  text-prep-worker:
+    build: ./worker/text-preparation-worker
+    networks:
+      - backend
+    volumes:
+      - type: bind
+        source: ./dfs/texts/in
+        target: /text_prep_worker/in
+      - type: bind
+        source: ./dfs/texts/out
+        target: /text_prep_worker/out
+    restart: on-failure
 
   redis:
     image: "redis:alpine"

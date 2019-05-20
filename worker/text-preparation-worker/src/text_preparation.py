@@ -4,6 +4,11 @@ import re
 import PyPDF2 
 import docx
 from bs4 import BeautifulSoup, Comment
+try:
+    from PIL import Image
+except ImportError:
+    import Image
+import pytesseract
 
 
 '''
@@ -52,11 +57,6 @@ def create_unique_list(word_list):
 '''
     The following 5 functions are different kinds of parsers, depending on the given file type.
 '''
-def xml_parser(file_handler):
-    #TODO: Check whether this function is really necessary for us.
-    raise NotImplementedError("Function is currently not implemented")
-
-
 def pdf_parser(binary_file_handle):
     pdfReader = PyPDF2.PdfFileReader(binary_file_handle)
 
@@ -133,10 +133,22 @@ def text_parser(file_handler):
     return unique_words
 
 
+def ocr_parser(file_path):
+    # Open image and extract text into pdf
+    text = pytesseract.image_to_string(Image.open(file_path), lang="deu")
+
+    # Extracted text is a string. Therefore, it is possible to retrieve all words
+    # and after that create the unique_word_list
+    word_list = retrieve_all_words(text)
+    unique_word_list = create_unique_list(word_list)
+
+    return unique_word_list
+
+
 '''
     This function is called, in order to open the received filename of the API.
     All files which need to be processed are saved within:
-        /text-preparation/in/<model_id>/<id>
+        /text-preparation/in/<project_id>/<model_id>/<id>
 '''
 def process_file(file_path):
 
@@ -144,7 +156,7 @@ def process_file(file_path):
         normal_file_handle = open(file_path, "r")
         binary_file_handle = open(file_path, "rb")
     except:
-        raise NotImplementedError("File could not be opened, because it could not be located within the working directory")
+        raise OSError("File not found within the given directory!")
 
     parsed_text = []
 
@@ -156,8 +168,8 @@ def process_file(file_path):
         parsed_text = html_parser(normal_file_handle)
     elif file_path.endswith(".txt"):
         parsed_text = text_parser(normal_file_handle)
-    elif file_path.endswith(".xml"):
-        parsed_text = xml_parser(normal_file_handle)
+    elif file_path.endswith(".png") or file_path.endswith(".jpg"):
+        parsed_text = ocr_parser(file_path)
     else:
         print("Given file is not supported. Finishing processing")
         exit(1)
@@ -182,3 +194,11 @@ working_dir = os.getcwd()
 # Testing Word-files
 # process_file(working_dir + "/test-files/word/kafka.docx")
 # process_file(working_dir + "/test-files/word/text_generator.docx")
+
+# Testing PNG-files
+# process_file(working_dir + "/test-files/png/bild.png")
+# process_file(working_dir + "/test-files/png/dokument.png")
+
+# Testing JPG-files
+# process_file(working_dir + "/test-files/jpg/bild.jpg")
+# process_file(working_dir + "/test-files/jpg/dokument.jpg")
