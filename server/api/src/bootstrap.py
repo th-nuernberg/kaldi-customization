@@ -8,3 +8,4 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 from db import *
+app.config['UPLOAD_FOLDER'] = '/www/data'
