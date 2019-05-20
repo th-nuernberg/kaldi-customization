@@ -38,6 +38,9 @@ services:
     networks:
       - frontend
     restart: always
+    depends_on:
+      - api
+      - web
 
   api:
     build: ./server/api
