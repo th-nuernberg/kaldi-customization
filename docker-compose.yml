@@ -5,7 +5,9 @@ services:
     build: ./worker/kaldi-worker
     networks:
       - backend
-    restart: on-failure
+    restart: always
+    depends_on:
+      - redis
 
   redis:
     image: "redis:alpine"
@@ -42,19 +44,22 @@ services:
     networks:
       - frontend
       - backend
-    env_file:
-      - './server/api/config/dev.env'
     volumes:
       - type: bind
         source: ./dfs/asr
         target: /www/data
-    restart: on-failure
+    restart: always
+    depends_on:
+      - db
+      - redis
 
   web:
     build: ./server/web
     networks:
       - frontend
-    restart: on-failure
+    restart: always
+    depends_on:
+      - api
 
 networks:
   frontend:

@@ -7,11 +7,12 @@ VOLUME ["/www/data"]
 ADD requirements.txt /www/requirements.txt
 WORKDIR /www
 
-RUN apk add build-base libffi-dev openssl-dev --no-cache && \
+RUN apk add build-base libffi-dev openssl-dev mariadb-connector-c-dev --no-cache && \
     pip install -r requirements.txt && \
     apk del build-base
 
 ADD src /www
-ADD run.sh /www
 
-CMD ["/bin/sh", "-c", "/www/run.sh"]
+ENV FLASK_APP=/www/app.py
+
+CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]
