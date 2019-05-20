@@ -10,6 +10,6 @@ RUN apk add build-base libffi-dev openssl-dev tesseract-ocr-data-deu zlib-dev li
     pip install -r requirements.txt && \
     apk del build-base
 
-ADD text_preparation.py /text_prep_worker
+ADD src/text_preparation.py /text_prep_worker
 
 CMD ["python3", "/text_prep_worker/text_preparation.py"]
