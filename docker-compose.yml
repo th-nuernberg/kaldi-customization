@@ -26,6 +26,8 @@ services:
 
   redis:
     image: "redis:alpine"
+    ports:
+      - 6380:6379
     command: redis-server --requirepass kalditproject
     networks:
       - backend
