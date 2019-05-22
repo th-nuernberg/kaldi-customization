@@ -48,7 +48,7 @@ def save_textfile(text_list):
 def retrieve_all_words(text):
     regex = r"[^a-zA-ZäöüÄÖÜß]+"
     all_words = re.split(regex, text)
-    return all_words[:-1]
+    return all_words
 
 
 def create_unique_list(word_list):
