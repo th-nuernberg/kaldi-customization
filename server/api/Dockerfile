@@ -2,7 +2,7 @@ FROM python:3.7-alpine3.9
 MAINTAINER Tobias Kruse <***REMOVED***>
 
 EXPOSE 5000
-VOLUME ["/www/data"]
+VOLUME ["/www/asr", "/www/texts"]
 
 ADD requirements.txt /www/requirements.txt
 WORKDIR /www

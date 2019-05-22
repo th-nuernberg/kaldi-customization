@@ -67,7 +67,10 @@ services:
     volumes:
       - type: bind
         source: ./dfs/asr
-        target: /www/data
+        target: /www/asr
+      - type: bind
+        source: ./dfs/texts
+        target: /www/texts
     restart: always
     depends_on:
       - db
