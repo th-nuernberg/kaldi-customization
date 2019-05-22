@@ -201,10 +201,22 @@ def infinite_loop():
         if data:
             print("Received the following task from Text-Prep-Queue: ")
             print(data)
-            json_data = json.loads(data[1])
-            print("Starting to process received data")
-            return_value = process_file("/text_prep_worker/in/" + json_data["text"], json_data["type"])
-            print(return_value[1])
+            try:
+                json_data = json.loads(data[1])
+                print("Starting to process received data")
+                if "text" in json_data and "type" in json_data:
+                    return_value = process_file("/text_prep_worker/in/" + json_data["text"], json_data["type"])
+                    print(return_value[1])
+                else:
+                    if "text" not in json_data and "type" in json_data:
+                        print("text key is missing or misspelled within the JSON.")
+                    elif "type" not in json_data and "text" in json_data:
+                        print("type key is missing or misspelled within the JSON.")
+                    else:
+                        print("Both keys are not correct")
+            except:
+                print("Data is not valid JSON. Processing cancelled")
+            
 
 if __name__ == "__main__":
     print("Text-Prep-Worker is running")
