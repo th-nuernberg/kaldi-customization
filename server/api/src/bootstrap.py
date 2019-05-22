@@ -8,4 +8,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 from db import *
-app.config['UPLOAD_FOLDER'] = '/www/data'
+
+import redis
+redis_conn = redis.Redis(host='redis', port=6379, password='kalditproject')

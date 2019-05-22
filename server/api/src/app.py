@@ -1,7 +1,6 @@
 #!/usr/local/bin/python3
 from bootstrap import *
 
-'''
 root_project = Project(uuid='root', name='Test Project')
 db.session.add(root_project)
 root_model = Model(project=root_project)
@@ -24,42 +23,46 @@ db.session.commit()
 
 print(root_model.children)
 print(derived_model0.parent.project.name)
-'''
+
 import os
 from flask import Flask, flash, request, redirect, url_for
 from werkzeug.utils import secure_filename
 import logging
+import json
+
+TEXT_PREP_UPLOAD_FOLDER = '/www/texts/in'
+TEXT_PREP_FINISHED_FOLDER = '/www/texts/out'
+TEXT_PREP_QUEUE = 'Text-Prep-Queue'
 
 @app.route('/')
 def hello():
-    return 'Hello World!'
+    return 'API-Server'
 
-def allowed_file(filename):
-    ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+def allowed_file_for_textprep(filename):
+    '''
+    Returns true if the given filetype can be processed by the text preperation worker.
+    '''
+    text_prep_extensions = set(['txt', 'pdf', 'png', 'jpg', 'html'])
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        filename.rsplit('.', 1)[1].lower() in text_prep_extensions
 
-@app.route('/uploads', methods=['GET', 'POST'])
-def upload_file():
-    if request.method == 'POST':
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            app.logger.info(request.url)
-            return redirect(request.url)
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit an empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            app.logger.info(request.url)
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            app.logger.info(url_for('uploaded_file', filename=filename))
-            return redirect(url_for('uploaded_file', filename=filename))
-    return '''
+def create_textprep_job(filename):
+    entry = {
+        "text" : filename,
+        "type" : filename.rsplit('.')[1].lower()
+    }
+    redis_conn.rpush(TEXT_PREP_QUEUE, json.dumps(entry))
+    return
+
+@app.route('/texts/in', methods=['GET', 'POST'])
+def upload_file_for_textprep():
+    '''
+    Implements a POST-request for uploading files.
+    After storing the file in the DFS a job for the text preperation worker will be created. 
+    '''
+    # a simple upload form will be returned if no file was attached
+    # replace this later with a status code
+    upload_form = '''
     <!doctype html>
     <title>Upload new File</title>
     <h1>Upload new File</h1>
@@ -68,9 +71,35 @@ def upload_file():
       <input type=submit value=Upload>
     </form>
     '''
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return upload_form
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit an empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return upload_form
+        if file and allowed_file_for_textprep(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(TEXT_PREP_UPLOAD_FOLDER, filename))
+            create_textprep_job(filename)
+            return 'ok'
+    return upload_form
 
 from flask import send_from_directory
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+@app.route('/texts/in/<filename>')
+def download_texts_in_file(filename):
+    return send_from_directory(TEXT_PREP_UPLOAD_FOLDER, filename)
+    
+@app.route('/texts/out/<filename>')
+def download_texts_out_file(filename):
+    return send_from_directory(TEXT_PREP_FINISHED_FOLDER, 'unique_word_list.txt') # filename)
+
+if __name__ == "__main__":
+    print("API-Server is running")
+    #infinite_loop()
+    print("API-Server stops running")
