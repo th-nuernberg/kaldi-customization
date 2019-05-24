@@ -42,7 +42,7 @@ def allowed_file_for_textprep(filename):
     '''
     Returns true if the given filetype can be processed by the text preperation worker.
     '''
-    text_prep_extensions = set(['txt', 'pdf', 'png', 'jpg', 'html'])
+    text_prep_extensions = set(['txt', 'pdf', 'png', 'jpg', 'html', 'docx'])
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in text_prep_extensions
 
