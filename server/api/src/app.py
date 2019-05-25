@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 from bootstrap import *
+from flask import logging
 
 root_project = Project(uuid='root', name='Test Project')
 db.session.add(root_project)
@@ -9,9 +10,9 @@ db.session.add(root_model)
 project1 = Project(uuid='project#1', name='Test Project')
 db.session.add(project1)
 
-resource1 = Resource(model=root_model, file_name='res0', file_type=ResourceTypeEnum.PNG, status=ResourceStateEnum.Upload_InProgress)
+resource1 = Resource(model=root_model, file_name='res0', file_type=ResourceTypeEnum.png, status=ResourceStateEnum.Upload_InProgress)
 db.session.add(resource1)
-print(resource1)
+app.logger.info(resource1)
 
 derived_model0 = Model(project=project1, parent=root_model)
 db.session.add(derived_model0)
@@ -21,13 +22,12 @@ db.session.add(derived_model1)
 
 db.session.commit()
 
-print(root_model.children)
-print(derived_model0.parent.project.name)
+app.logger.info(root_model.children)
+app.logger.info(derived_model0.parent.project.name)
 
 import os
 from flask import Flask, flash, request, redirect, url_for
 from werkzeug.utils import secure_filename
-import logging
 import json
 
 TEXT_PREP_UPLOAD_FOLDER = '/www/texts/in'
@@ -38,18 +38,23 @@ TEXT_PREP_QUEUE = 'Text-Prep-Queue'
 def hello():
     return 'API-Server'
 
-def allowed_file_for_textprep(filename):
+def get_filetype(filename):
     '''
-    Returns true if the given filetype can be processed by the text preperation worker.
+    Returns the filetype or None, if it cannot be processed by the text preperation worker.
     '''
-    text_prep_extensions = set(['txt', 'pdf', 'png', 'jpg', 'html', 'docx'])
-    return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in text_prep_extensions
+    if '.' in filename:
+        filetype = filename.rsplit('.', 1)[1].lower()
+        if filetype in ResourceTypeEnum.__members__:
+            return ResourceTypeEnum[filetype]
+    return None
 
-def create_textprep_job(filename):
+def create_textprep_job(filename, filetype):
+    '''
+    Creates a new job in the queue for a text preperation worker.
+    '''
     entry = {
         "text" : filename,
-        "type" : filename.rsplit('.')[1].lower()
+        "type" : filetype.name
     }
     redis_conn.rpush(TEXT_PREP_QUEUE, json.dumps(entry))
     return
@@ -82,11 +87,27 @@ def upload_file_for_textprep():
         if file.filename == '':
             flash('No selected file')
             return upload_form
-        if file and allowed_file_for_textprep(file.filename):
+        filetype = get_filetype(file.filename)
+        if file and filetype is not None:
+            # file is okay: create db entry, store to dfs and create textprep job
             filename = secure_filename(file.filename)
+            app.logger.info("new file arrived!")
+            app.logger.info(filename)
+            app.logger.info(filetype)
+
+            new_resource = filename
+            #new_resource = Resource(model=root_model, file_name=filename, file_type=filetype, status=ResourceStateEnum.Upload_InProgress)
+            #db.session.add(new_resource)
+            #db.session.commit()
+            app.logger.info("db entry created")
+
+            # store file with original file name to dfs.
+            #TODO: Change it to db key
             file.save(os.path.join(TEXT_PREP_UPLOAD_FOLDER, filename))
-            create_textprep_job(filename)
-            return 'ok'
+            app.logger.info("file saved")
+
+            create_textprep_job(filename, filetype)
+            return str(new_resource)
     return upload_form
 
 from flask import send_from_directory
@@ -100,6 +121,8 @@ def download_texts_out_file(filename):
     return send_from_directory(TEXT_PREP_FINISHED_FOLDER, 'unique_word_list.txt') # filename)
 
 if __name__ == "__main__":
-    print("API-Server is running")
+    app.logger.info("API-Server is running")
     #infinite_loop()
-    print("API-Server stops running")
+    # listen for finished jobs (pub_sub)
+    app.logger.info("API-Server stops running")
+    

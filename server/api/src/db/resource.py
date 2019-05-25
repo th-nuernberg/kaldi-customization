@@ -26,16 +26,16 @@ def status_to_string(status):
 
 
 class ResourceTypeEnum(enum.IntEnum):
-    HTML = 1
-    Word = 2
-    Text = 3
-    PDF = 4
-    PNG = 5
-    JPEG = 6
+    html = 1
+    docx = 2
+    txt = 3
+    pdf = 4
+    png = 5
+    jpg = 6
 
 
 def type_to_string(t):
-    return (None, 'HTML', 'Word', 'Text', 'PDF', 'PNG', 'JPEG')[t]
+    return (None, 'html', 'docx', 'txt', 'pdf', 'png', 'jpg')[t]
 
 
 class Resource(db.Model):
