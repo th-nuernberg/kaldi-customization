@@ -36,10 +36,10 @@ def report_status_to_API(queue_status):
 '''
     This function saves the unique word list into the file system as a txt-file.
     The following directory will be used to save the unique world list:
-        /text-preparation/out/<model_id>/<id>
+        /text-preparation/out/<filename>.txt
 '''
-def save_textfile(text_list):
-    f = open(os.getcwd() + "/out/unique_word_list.txt", "a")
+def save_textfile(text_list, filename):
+    f = open("/text_prep_worker/out/" + filename + ".txt", "w")
     for sentence in text_list:
         f.write(sentence + "\n")
     f.close()
@@ -60,6 +60,12 @@ def create_unique_list(word_list):
     The following 5 functions are different kinds of parsers, depending on the given file type.
 '''
 def pdf_parser(file_path):
+
+    ''' TODO: New goal is to process the received PDF-files in a different way
+        1) Use the PyPDF2 library to open the PDF-file
+        2) Convert the PDF into images
+        3) Extract the text within the images by using Google's PyTesseract OCR scan                
+    '''
     with open(file_path, "rb") as file_handler:
         pdfReader = PyPDF2.PdfFileReader(file_handler)
 
@@ -68,12 +74,10 @@ def pdf_parser(file_path):
         count = 0
         text = ""
 
-        #The while loop will read each page
-        #Important note: Some lines of the PDF-files are read incorect. 
-        #TODO: Search for different PDF reader libraries and test whether they achieve better results
+        # The while loop will read each page                
         while count < num_pages:
             pageObj = pdfReader.getPage(count)
-            count +=1
+            count += 1
             text += pageObj.extractText()
 
         word_list = retrieve_all_words(text)
@@ -153,17 +157,17 @@ def ocr_parser(file_path):
 '''
     This function is called, in order to open the received filename of the API.
     All files which need to be processed are saved within:
-        /text-preparation/in/<project_id>/<model_id>/<id>
+        /text-preparation/in/<filename>
+    The following file types are supported:
+        - PDF
+        - Docx
+        - HTML
+        - txt
+        - PNG or JPG
 '''
-def process_file(file_path, file_type):
-    '''
-        try:
-            normal_file_handle = open(file_path, "r", encoding="ISO-8859-1")
-            binary_file_handle = open(file_path, "rb")
-        except:
-            return (False, "File not found within given directory")
-    '''
+def process_file(file_type, filename):
     parsed_text = []
+    file_path = "/text_prep_worker/in/" + filename
 
     try:
         if file_type == "pdf":
@@ -182,22 +186,19 @@ def process_file(file_path, file_type):
         print(e)
         return (False, "Failed to parse given file")
 
-
     try:
-        save_textfile(parsed_text)
+        save_textfile(parsed_text, filename)
     except:
         return (False, "Failed to save word list")
     return (True, "Processing of data has finished successfully")
 
 
 def infinite_loop():
-    working_dir = os.getcwd()
-
     conn = redis.Redis(host='redis', port=6379, db=0, password="kalditproject")
     pubsub = conn.pubsub()
     while True:
 
-        data = conn.blpop('Text-Prep-Queue', 1)        
+        data = conn.blpop('Text-Prep-Queue', 1)      
         if data:
             print("Received the following task from Text-Prep-Queue: ")
             print(data)
@@ -205,7 +206,7 @@ def infinite_loop():
                 json_data = json.loads(data[1])
                 print("Starting to process received data")
                 if "text" in json_data and "type" in json_data:
-                    return_value = process_file("/text_prep_worker/in/" + json_data["text"], json_data["type"])
+                    return_value = process_file(json_data["type"], json_data["text"])
                     print(return_value[1])
                 else:
                     if "text" not in json_data and "type" in json_data:
