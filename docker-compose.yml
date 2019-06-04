@@ -33,6 +33,21 @@ services:
       - backend
     restart: always
 
+  minio:
+    image: "minio/minio"
+    volumes:
+      - ./dfs/data:/data
+      - ./config/.minio:/root/.minio
+    ports:
+      - 9001:9000
+    command: server /data
+    environment:
+      MINIO_ACCESS_KEY: AKIAIOSFODNN7EXAMPLE
+      MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    networks:
+      - backend
+    restart: always
+
   db:
     image: "mariadb"
     ports:
