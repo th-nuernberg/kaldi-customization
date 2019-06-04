@@ -39,7 +39,7 @@ def report_status_to_API(queue_status):
         /text-preparation/out/<filename>.txt
 '''
 def save_textfile(text_list, filename):
-    f = open("/text_prep_worker/out/" + filename + ".txt", "w")
+    f = open("/text_prep_worker/out/" + filename, "w")
     for sentence in text_list:
         f.write(sentence + "\n")
     f.close()
