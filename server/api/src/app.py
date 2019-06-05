@@ -48,16 +48,25 @@ def get_filetype(filename):
             return ResourceTypeEnum[filetype]
     return None
 
-def create_textprep_job(filename, filetype):
+def create_textprep_job(resourcename, filetype):
     '''
     Creates a new job in the queue for a text preperation worker.
     '''
     entry = {
-        "text" : filename,
+        "text" : resourcename,
         "type" : filetype.name
     }
     redis_conn.rpush(TEXT_PREP_QUEUE, json.dumps(entry))
     return
+
+def get_basename(filename):
+    '''
+    Returns the basename of a filename, i.e. without extension.
+    '''
+    if '.' in filename:
+        filename = filename.rsplit('.', 1)[0].lower()
+    return filename
+
 
 @app.route('/texts/in', methods=['GET', 'POST'])
 def upload_file_for_textprep():
@@ -95,7 +104,7 @@ def upload_file_for_textprep():
             app.logger.info(filename)
             app.logger.info(filetype)
 
-            new_resource = filename
+            new_resource = get_basename(filename) #TODO change to DB key
             #new_resource = Resource(model=root_model, file_name=filename, file_type=filetype, status=ResourceStateEnum.Upload_InProgress)
             #db.session.add(new_resource)
             #db.session.commit()
@@ -103,10 +112,10 @@ def upload_file_for_textprep():
 
             # store file with original file name to dfs.
             #TODO: Change it to db key
-            file.save(os.path.join(TEXT_PREP_UPLOAD_FOLDER, filename))
+            file.save(os.path.join(TEXT_PREP_UPLOAD_FOLDER, new_resource))
             app.logger.info("file saved")
 
-            create_textprep_job(filename, filetype)
+            create_textprep_job(new_resource, filetype)
             return str(new_resource)
     return upload_form
 
@@ -114,11 +123,16 @@ from flask import send_from_directory
 
 @app.route('/texts/in/<filename>')
 def download_texts_in_file(filename):
+    #TODO add original filename with extension
     return send_from_directory(TEXT_PREP_UPLOAD_FOLDER, filename)
     
 @app.route('/texts/out/<filename>')
 def download_texts_out_file(filename):
-    return send_from_directory(TEXT_PREP_FINISHED_FOLDER, 'unique_word_list.txt') # filename)
+    #TODO add original filename with extension
+    file_path = TEXT_PREP_FINISHED_FOLDER + '/' + filename
+    with open(file_path, "r") as file_handler:
+        return file_handler.read()
+    return "Error at file " + filename
 
 if __name__ == "__main__":
     app.logger.info("API-Server is running")
