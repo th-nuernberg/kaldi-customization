@@ -25,6 +25,8 @@ db.session.commit()
 app.logger.info(root_model.children)
 app.logger.info(derived_model0.parent.project.name)
 
+db.session.close()
+
 import os
 from flask import Flask, flash, request, redirect, url_for
 from werkzeug.utils import secure_filename
@@ -105,9 +107,11 @@ def upload_file_for_textprep():
             app.logger.info(filetype)
 
             new_resource = get_basename(filename) #TODO change to DB key
-            #new_resource = Resource(model=root_model, file_name=filename, file_type=filetype, status=ResourceStateEnum.Upload_InProgress)
-            #db.session.add(new_resource)
-            #db.session.commit()
+
+            db_resource = Resource(model=root_model, file_name=filename, file_type=filetype, status=ResourceStateEnum.Upload_InProgress)
+            db.session.add(db_resource)
+            db.session.commit()
+            db.session.close()
             app.logger.info("db entry created")
 
             # store file with original file name to dfs.
@@ -118,6 +122,12 @@ def upload_file_for_textprep():
             create_textprep_job(new_resource, filetype)
             return str(new_resource)
     return upload_form
+
+@app.route('/db/resources')
+def dbquery():
+    app.logger.info("resource query")
+    app.logger.info(Resource.query.all())
+    return Resource.query.first().__repr__()
 
 from flask import send_from_directory
 
