@@ -6,7 +6,8 @@ VOLUME ["/text_prep_worker/in", "/text_prep_worker/out"]
 ADD requirements.txt /text_prep_worker/requirements.txt
 WORKDIR /text_prep_worker
 
-RUN apk add build-base libffi-dev openssl-dev tesseract-ocr-data-deu zlib-dev libxml2-dev libjpeg-turbo-dev libxslt-dev --no-cache && \
+RUN apk add build-base libffi-dev openssl-dev tesseract-ocr-data-deu zlib-dev libxml2-dev --no-cache && \
+    apk add libjpeg-turbo-dev libxslt-dev poppler-utils --no-cache && \
     pip install -r requirements.txt && \
     apk del build-base
 

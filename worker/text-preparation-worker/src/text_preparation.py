@@ -6,11 +6,19 @@ import PyPDF2
 import docx
 import json
 from bs4 import BeautifulSoup, Comment
+
 try:
     from PIL import Image
 except ImportError:
     import Image
 import pytesseract
+
+from pdf2image import convert_from_path, convert_from_bytes
+from pdf2image.exceptions import (
+    PDFInfoNotInstalledError,
+    PDFPageCountError,
+    PDFSyntaxError
+)
 
 
 '''
@@ -52,38 +60,42 @@ def retrieve_all_words(text):
 
 
 def create_unique_list(word_list):
-    unique_list = sorted(list(set(word_list)))
-    return unique_list
+    unique_word_list = sorted(list(set(word_list)))
+    return unique_word_list
 
 
 '''
     The following 5 functions are different kinds of parsers, depending on the given file type.
 '''
 def pdf_parser(file_path):
+    # Converts all pages of the PDF-file into PNG-files
+    print("Starting to transform the received PDF-file into PNG-files")
+    images = convert_from_path(file_path,
+                               dpi=300, fmt=".png")
+    print("Finished transforming the PDF-file into PNG-files")
 
-    ''' TODO: New goal is to process the received PDF-files in a different way
-        1) Use the PyPDF2 library to open the PDF-file
-        2) Convert the PDF into images
-        3) Extract the text within the images by using Google's PyTesseract OCR scan                
-    '''
-    with open(file_path, "rb") as file_handler:
-        pdfReader = PyPDF2.PdfFileReader(file_handler)
+    # Iterates through all images and retrieves the word list
+    print("Starting to process the PNG-files with the OCR-scanner")
+    complete_word_list = []
+    for image in images:        
 
-        # These variables are needed in order to parse the whole PDF-file
-        num_pages = pdfReader.numPages
-        count = 0
-        text = ""
+        print("Starting to process : " + str(image))
+        text = pytesseract.image_to_string(image, lang="deu")
+        print("Finished retrieving text from " + str(image))
 
-        # The while loop will read each page                
-        while count < num_pages:
-            pageObj = pdfReader.getPage(count)
-            count += 1
-            text += pageObj.extractText()
-
+        print("Starting to create the word_list for the text")
         word_list = retrieve_all_words(text)
-        unique_list = create_unique_list(word_list)
+        print("Finished finished processing of " + str(image))
 
-    return unique_list
+        for word in word_list:
+            complete_word_list.append(word)
+        print("--------------------------------------")
+
+    # After retrieving all words, the unique word list is created
+    print("Creating unique word list")
+    unique_word_list = create_unique_list(complete_word_list)
+
+    return unique_word_list
 
 
 def word_parser(file_path):
@@ -101,9 +113,9 @@ def word_parser(file_path):
         words = retrieve_all_words(paragraph)
         for word in words:
             word_list.append(word)
-    unique_list = create_unique_list(word_list)
+    unique_word_list = create_unique_list(word_list)
 
-    return unique_list
+    return unique_word_list
 
 
 def html_parser(file_path):
@@ -127,9 +139,9 @@ def html_parser(file_path):
         webpage_text = soup.body.getText()
 
         word_list = retrieve_all_words(webpage_text)
-        unique_list = create_unique_list(word_list)
+        unique_word_list = create_unique_list(word_list)
     
-    return unique_list
+    return unique_word_list
 
 
 def text_parser(file_path):    
@@ -137,9 +149,9 @@ def text_parser(file_path):
         text = file_handler.read()
 
         all_words = retrieve_all_words(text)
-        unique_words = create_unique_list(all_words)
+        unique_word_list = create_unique_list(all_words)
 
-    return unique_words
+    return unique_word_list
 
 
 def ocr_parser(file_path):
@@ -221,5 +233,5 @@ def infinite_loop():
 
 if __name__ == "__main__":
     print("Text-Prep-Worker is running")
-    infinite_loop()
+    infinite_loop()    
     print("text-Prep-Worker stops running")

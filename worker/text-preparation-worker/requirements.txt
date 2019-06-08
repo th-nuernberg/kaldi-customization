@@ -4,3 +4,4 @@ pypdf2
 python-docx
 lxml
 pytesseract
+pdf2image
