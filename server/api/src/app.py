@@ -163,6 +163,9 @@ def upload_file_for_textprep():
 
 @app.route('/db/resources')
 def dbquery():
+    '''
+    For debugging: shows all resources.
+    '''
     app.logger.info("resource query")
     Response.content_type = "text/plain"
     def generate():
@@ -172,17 +175,42 @@ def dbquery():
 
 @app.route('/texts/in/<filename>')
 def download_texts_in_file(filename):
+    '''
+    Returns the raw input file.
+    '''
+    if '/' in filename:
+        error_msg = "Do not place / in file names!"
+        app.logger.warning(error_msg)
+        return (error_msg, 404)
     #TODO add original filename with extension
-    response.content_type = "text/plain"
+    Response.content_type = "text/plain"
     return send_from_directory(TEXT_PREP_UPLOAD_FOLDER, filename)
     
 @app.route('/texts/out/<filename>')
 def download_texts_out_file(filename):
-    response.content_type = "text/plain"
+    '''
+    Returns the list of words from a processed file.
+    '''
+    if '/' in filename:
+        error_msg = "Do not place / in file names!"
+        app.logger.warning(error_msg)
+        return (error_msg, 404)
     file_path = TEXT_PREP_FINISHED_FOLDER + '/' + filename
-    with open(file_path, "r") as file_handler:
-        return file_handler.read()
-    return "Error at file " + filename
+
+    try:
+        with open(file_path, "r") as file_handler:
+            Response.content_type = "application/json"
+            words = file_handler.read().split('\n')
+            return json.dumps(list(filter(bool, words)))
+    except FileNotFoundError:
+        error_msg = "File not found: " + filename
+        app.logger.warning(error_msg)
+        return (error_msg, 404)
+    except IOError as e:
+        error_msg = "Error while reading file: " + filename
+        app.logger.error(error_msg)
+        app.logger.error(e)
+        return (error_msg, 500)
 
 # It is not possible to run a endless loop here...
 # There is a thread for this task
