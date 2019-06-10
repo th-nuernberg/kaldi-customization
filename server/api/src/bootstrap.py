@@ -5,6 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqldb://api:api-server-password@db:3306/api'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
+app.config['SQLALCHEMY_POOL_RECYCLE'] = 50
 db = SQLAlchemy(app)
 
 from logging.config import dictConfig

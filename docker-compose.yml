@@ -52,6 +52,8 @@ services:
     image: "mariadb"
     ports:
       - 3307:3306
+    command:
+      - --interactive_timeout=28800
     environment:
       MYSQL_ROOT_PASSWORD: kalditproject
       MYSQL_USER: api
