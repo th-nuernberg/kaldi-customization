@@ -28,13 +28,51 @@ app.logger.info(derived_model0.parent.project.name)
 db.session.close()
 
 import os
-from flask import Flask, flash, request, redirect, url_for
+from flask import Flask, flash, request, Response, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 import json
+import threading
 
 TEXT_PREP_UPLOAD_FOLDER = '/www/texts/in'
 TEXT_PREP_FINISHED_FOLDER = '/www/texts/out'
 TEXT_PREP_QUEUE = 'Text-Prep-Queue'
+STATUS_QUEUE = 'Status-Queue'
+
+def handle_statue_queue():
+    '''
+    Listens to STATUS_QUEUE and handle the messages.
+    '''
+    pubsub = redis_conn.pubsub(ignore_subscribe_messages=True)
+    pubsub.subscribe(STATUS_QUEUE)
+
+    for message in pubsub.listen():
+        app.logger.info("new pubsub message:")
+        app.logger.info(message)
+        if message['type'] == 'message':
+            try:
+                msg_data = json.loads(message['data'])
+            except ValueError as e:
+                app.logger.info(e)
+                continue
+            
+            if msg_data and "type" in msg_data and "text" in msg_data and "status" in msg_data and "msg" in msg_data:
+                if msg_data['type'] == 'text-prep':
+                    this_resource = Resource.query.filter_by(file_name=msg_data['text']).first()
+                    app.logger.info('found resource in db: ' + this_resource.__repr__())
+                    if msg_data['status'] == True:
+                        this_resource.status = ResourceStateEnum.Success
+                    else:
+                        this_resource.status = ResourceStateEnum.TextPreparation_Failure
+
+                    app.logger.info('after update: ' + this_resource.__repr__())
+                    db.session.add(this_resource)
+                    db.session.commit()
+                    db.session.close()
+                else:
+                    app.logger.info('unknown type!')
+
+redis_handler_thread = threading.Thread(target=handle_statue_queue, name="Redis-Handler")
+redis_handler_thread.start()
 
 @app.route('/')
 def hello():
@@ -108,7 +146,7 @@ def upload_file_for_textprep():
 
             new_resource = get_basename(filename) #TODO change to DB key
 
-            db_resource = Resource(model=root_model, file_name=filename, file_type=filetype, status=ResourceStateEnum.Upload_InProgress)
+            db_resource = Resource(model=root_model, file_name=new_resource, file_type=filetype, status=ResourceStateEnum.TextPreparation_Pending)
             db.session.add(db_resource)
             db.session.commit()
             db.session.close()
@@ -126,27 +164,26 @@ def upload_file_for_textprep():
 @app.route('/db/resources')
 def dbquery():
     app.logger.info("resource query")
-    app.logger.info(Resource.query.all())
-    return Resource.query.first().__repr__()
-
-from flask import send_from_directory
+    Response.content_type = "text/plain"
+    def generate():
+        for r in Resource.query.all():
+            yield r.__repr__() + '<br>'
+    return Response(generate())
 
 @app.route('/texts/in/<filename>')
 def download_texts_in_file(filename):
     #TODO add original filename with extension
+    response.content_type = "text/plain"
     return send_from_directory(TEXT_PREP_UPLOAD_FOLDER, filename)
     
 @app.route('/texts/out/<filename>')
 def download_texts_out_file(filename):
-    #TODO add original filename with extension
+    response.content_type = "text/plain"
     file_path = TEXT_PREP_FINISHED_FOLDER + '/' + filename
     with open(file_path, "r") as file_handler:
         return file_handler.read()
     return "Error at file " + filename
 
-if __name__ == "__main__":
-    app.logger.info("API-Server is running")
-    #infinite_loop()
-    # listen for finished jobs (pub_sub)
-    app.logger.info("API-Server stops running")
-    
+# It is not possible to run a endless loop here...
+# There is a thread for this task
+app.logger.info("API-Server is running and listening to status queue")

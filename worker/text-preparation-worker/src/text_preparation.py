@@ -207,7 +207,6 @@ def process_file(file_type, filename):
 
 def infinite_loop():
     conn = redis.Redis(host='redis', port=6379, db=0, password="kalditproject")
-    pubsub = conn.pubsub()
     while True:
 
         data = conn.blpop('Text-Prep-Queue', 1)      
@@ -219,6 +218,12 @@ def infinite_loop():
                 print("Starting to process received data")
                 if "text" in json_data and "type" in json_data:
                     return_value = process_file(json_data["type"], json_data["text"])
+                    conn.publish('Status-Queue', json.dumps({
+                        "type" : "text-prep",
+                        "text" : json_data["text"],
+                        "status" : return_value[0],
+                        "msg" : return_value[1]
+                    }))
                     print(return_value[1])
                 else:
                     if "text" not in json_data and "type" in json_data:
