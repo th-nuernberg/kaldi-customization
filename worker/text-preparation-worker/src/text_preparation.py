@@ -239,9 +239,9 @@ def infinite_loop():
                     # Otherwise, the status queue is updated to: failure
                     if return_value[0]:
                         file_path = "/text_prep_worker/out/" + json_data["type"]
-                        report_status_to_API(queue_status=200, conn=conn, file_path=file_path)
+                        report_status_to_API(queue_status=200, conn=conn, file_path=json_data["text"])
                     else:
-                        report_status_to_API(queue_status=12, conn=conn)
+                        report_status_to_API(queue_status=12, conn=conn, file_path=json_data["text"])
                     
                     print(return_value[1])
                 else:

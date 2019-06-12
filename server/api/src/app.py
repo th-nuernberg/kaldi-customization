@@ -52,24 +52,32 @@ def handle_statue_queue():
             try:
                 msg_data = json.loads(message['data'])
             except ValueError as e:
-                app.logger.info(e)
+                app.logger.warning(e)
                 continue
             
             if msg_data and "type" in msg_data and "text" in msg_data and "status" in msg_data and "msg" in msg_data:
                 if msg_data['type'] == 'text-prep':
                     this_resource = Resource.query.filter_by(file_name=msg_data['text']).first()
-                    app.logger.info('found resource in db: ' + this_resource.__repr__())
-                    if msg_data['status'] == True:
-                        this_resource.status = ResourceStateEnum.Success
-                    else:
-                        this_resource.status = ResourceStateEnum.TextPreparation_Failure
+                    if this_resource is not None:
+                        app.logger.info('found resource in db: ' + this_resource.__repr__())
+                        try:
+                            resource_status = ResourceStateEnum(msg_data['status'])
+                        except ValueError as e:
+                            app.logger.warning("status is not valid!")
+                            app.logger.warning(e)
+                            resource_status = ResourceStateEnum.TextPreparation_Failure
+                        
+                        this_resource.status = resource_status
 
-                    app.logger.info('after update: ' + this_resource.__repr__())
-                    db.session.add(this_resource)
-                    db.session.commit()
-                    db.session.close()
+                        app.logger.info('after update: ' + this_resource.__repr__())
+                        db.session.add(this_resource)
+                        db.session.commit()
+                        db.session.close()
+                    else:
+                        app.logger.warning('did not found resource in db: ' + msg_data['text'] + '!')
                 else:
-                    app.logger.info('unknown type!')
+                    app.logger.warning('unknown type in status queue!')
+
 
 redis_handler_thread = threading.Thread(target=handle_statue_queue, name="Redis-Handler")
 redis_handler_thread.start()
