@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 from bootstrap import *
+from db import Project, Model, Resource, ResourceStateEnum, ResourceTypeEnum
 from flask import logging
 
 root_project = Project(uuid='root', name='Test Project')
@@ -25,7 +26,7 @@ db.session.commit()
 app.logger.info(root_model.children)
 app.logger.info(derived_model0.parent.project.name)
 
-db.session.close()
+# db.session.close()
 
 import os
 from flask import Flask, flash, request, Response, redirect, url_for, send_from_directory
@@ -52,24 +53,38 @@ def handle_statue_queue():
             try:
                 msg_data = json.loads(message['data'])
             except ValueError as e:
-                app.logger.info(e)
+                app.logger.warning(e)
                 continue
             
             if msg_data and "type" in msg_data and "text" in msg_data and "status" in msg_data and "msg" in msg_data:
                 if msg_data['type'] == 'text-prep':
-                    this_resource = Resource.query.filter_by(file_name=msg_data['text']).first()
-                    app.logger.info('found resource in db: ' + this_resource.__repr__())
-                    if msg_data['status'] == True:
-                        this_resource.status = ResourceStateEnum.Success
-                    else:
-                        this_resource.status = ResourceStateEnum.TextPreparation_Failure
-
-                    app.logger.info('after update: ' + this_resource.__repr__())
-                    db.session.add(this_resource)
-                    db.session.commit()
-                    db.session.close()
+                    handle_text_prep_status(msg_data)
                 else:
-                    app.logger.info('unknown type!')
+                    app.logger.warning('unknown type in status queue!')
+
+def handle_text_prep_status(msg_data):
+    if msg_data['text'] == 'failure':
+        app.logger.error('Failure at Text-Prep-Worker: ' + msg_data['msg'])
+    else:
+        this_resource = Resource.query.filter_by(file_name=msg_data['text']).first()
+        if this_resource is not None:
+            app.logger.info('found resource in db: ' + this_resource.__repr__())
+            try:
+                resource_status = ResourceStateEnum(msg_data['status'])
+            except ValueError as e:
+                app.logger.warning("status is not valid!")
+                app.logger.warning(e)
+                resource_status = ResourceStateEnum.TextPreparation_Failure
+            
+            this_resource.status = resource_status
+
+            app.logger.info('after update: ' + this_resource.__repr__())
+            db.session.add(this_resource)
+            db.session.commit()
+            db.session.close()
+        else:
+            app.logger.warning('did not found resource in db: ' + msg_data['text'] + '!')
+
 
 redis_handler_thread = threading.Thread(target=handle_statue_queue, name="Redis-Handler")
 redis_handler_thread.start()
@@ -149,7 +164,7 @@ def upload_file_for_textprep():
             db_resource = Resource(model=root_model, file_name=new_resource, file_type=filetype, status=ResourceStateEnum.TextPreparation_Pending)
             db.session.add(db_resource)
             db.session.commit()
-            db.session.close()
+            # db.session.close()
             app.logger.info("db entry created")
 
             # store file with original file name to dfs.

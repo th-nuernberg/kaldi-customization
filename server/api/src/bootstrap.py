@@ -26,7 +26,7 @@ dictConfig({
     }
 })
 
-from db import *
+# from db import *
 
 import redis
 redis_conn = redis.Redis(host='redis', port=6379, password='kalditproject')

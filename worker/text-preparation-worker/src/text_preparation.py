@@ -22,32 +22,50 @@ from pdf2image.exceptions import (
 )
 
 
-'''
+def report_status_to_API(queue_status, conn, file_path=None):
+    '''
     By calling this function the status queue is updated.
     Possible updates for the status queue are:
-        - Pending
         - InProgress
         - Success
-        - Warning
-        - Failure            
-    Before a task is started by the text-preparation-worder, its status
-    within the status queue is pending.
-    After starting the task, the status of the task changes into InProgress.
-    Depending on the outcome of the procession, the status of the task may change into:
+        - Failure       
+    As soon as the Text-Preparation-Worker receives a new task, its entry
+    within the Status-Queue is updated to: In-Progress.
+    Depending on the processing result, the status of the task can change into:
         - Success
-        - Warning
         - Failure        
-'''
-def report_status_to_API(queue_status):
-    pass
+    '''
+    if queue_status == 11:
+        message = "Task in progress"
+    elif queue_status == 12:
+        message == "Task has failed"
+    elif queue_status == 200:
+        message = "Task finished successfully"
 
+    # If the task was processed successfully, this statement is called.
+    # Otherwise the user will be notified, that something went wrong.
+    if queue_status == 200:
+        conn.publish('Status-Queue', json.dumps({
+        "type": "text-prep",
+        "text": file_path,
+        "status": queue_status,
+        "msg": message
+        }))
+    else:
+        # TODO: If task has failed, add a reason why.
+        conn.publish('Status-Queue', json.dumps({
+        "type": "text-prep",
+        "status": queue_status,
+        "msg": message   
+        }))
 
-'''
+def save_textfile(text_list, filename):
+    '''
     This function saves the unique word list into the file system as a txt-file.
     The following directory will be used to save the unique world list:
         /text-preparation/out/<filename>.txt
-'''
-def save_textfile(text_list, filename):
+    '''
+
     f = open("/text_prep_worker/out/" + filename, "w")
     for sentence in text_list:
         f.write(sentence + "\n")
@@ -55,8 +73,9 @@ def save_textfile(text_list, filename):
 
 
 def retrieve_all_words(text):
+    remove_newline_after_minus = re.sub("[--–—−]\n[a-z]+", "", text)
     regex = r"[^a-zA-ZäöüÄÖÜß]+"
-    all_words = re.split(regex, text)
+    all_words = re.split(regex, remove_newline_after_minus)
     return all_words
 
 
@@ -65,9 +84,6 @@ def create_unique_list(word_list):
     return unique_word_list
 
 
-'''
-    The following 5 functions are different kinds of parsers, depending on the given file type.
-'''
 def pdf_parser(file_path):
     # Converts all pages of the PDF-file into PNG-files
     print("Starting to transform the received PDF-file into PNG-files")
@@ -169,7 +185,8 @@ def ocr_parser(file_path):
     return unique_word_list
 
 
-'''
+def process_file(file_type, filename):
+    '''
     This function is called, in order to open the received filename of the API.
     All files which need to be processed are saved within:
         /text-preparation/in/<filename>
@@ -179,8 +196,7 @@ def ocr_parser(file_path):
         - HTML
         - txt
         - PNG or JPG
-'''
-def process_file(file_type, filename):
+    '''
     parsed_text = []
     file_path = "/text_prep_worker/in/" + filename
 
@@ -220,13 +236,16 @@ def infinite_loop():
                 json_data = json.loads(data[1])
                 print("Starting to process received data")
                 if "text" in json_data and "type" in json_data:
-                    return_value = process_file(json_data["type"], json_data["text"])
-                    conn.publish('Status-Queue', json.dumps({
-                        "type" : "text-prep",
-                        "text" : json_data["text"],
-                        "status" : return_value[0],
-                        "msg" : return_value[1]
-                    }))
+                    return_value = process_file(json_data["type"], json_data["text"])    
+
+                    # If the task was successfully processed, the if-statement is executed
+                    # Otherwise, the status queue is updated to: failure
+                    if return_value[0]:
+                        file_path = "/text_prep_worker/out/" + json_data["type"]
+                        report_status_to_API(queue_status=200, conn=conn, file_path=json_data["text"])
+                    else:
+                        report_status_to_API(queue_status=12, conn=conn, file_path=json_data["text"])
+                    
                     print(return_value[1])
                 else:
                     if "text" not in json_data and "type" in json_data:
@@ -235,8 +254,12 @@ def infinite_loop():
                         print("type key is missing or misspelled within the JSON.")
                     else:
                         print("Both keys are not correct")
+                    # Received parameters are wrong --> Update status queue and set task processing to: failure
+                    report_status_to_API(queue_status=12, conn=conn)
             except:
                 print("Data is not valid JSON. Processing cancelled")
+                # Received parameters are wrong --> Update status queue and set task processing to: failure
+                report_status_to_API(queue_status=12, conn=conn)
             
 
 if __name__ == "__main__":
