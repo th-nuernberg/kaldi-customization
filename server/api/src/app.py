@@ -26,7 +26,7 @@ db.session.commit()
 app.logger.info(root_model.children)
 app.logger.info(derived_model0.parent.project.name)
 
-# db.session.close()
+db.session.close()
 
 import os
 from flask import Flask, flash, request, Response, redirect, url_for, send_from_directory
@@ -164,7 +164,7 @@ def upload_file_for_textprep():
             db_resource = Resource(model=root_model, file_name=new_resource, file_type=filetype, status=ResourceStateEnum.TextPreparation_Pending)
             db.session.add(db_resource)
             db.session.commit()
-            # db.session.close()
+            db.session.close()
             app.logger.info("db entry created")
 
             # store file with original file name to dfs.
