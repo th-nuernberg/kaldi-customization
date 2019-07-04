@@ -22,7 +22,7 @@ from pdf2image.exceptions import (
 )
 
 
-def report_status_to_API(queue_status, conn, file_path=None):
+def report_status_to_API(queue_status, conn, filename=None, message=None):
     '''
     By calling this function the status queue is updated.
     Possible updates for the status queue are:
@@ -35,29 +35,19 @@ def report_status_to_API(queue_status, conn, file_path=None):
         - Success
         - Failure        
     '''
-    if queue_status == 11:
+    if queue_status == 11 and not message:
         message = "Task in progress"
-    elif queue_status == 12:
+    elif queue_status == 12 and not message:
         message == "Task has failed"
-    elif queue_status == 200:
+    elif queue_status == 200 and not message:
         message = "Task finished successfully"
 
-    # If the task was processed successfully, this statement is called.
-    # Otherwise the user will be notified, that something went wrong.
-    if queue_status == 200:
-        conn.publish('Status-Queue', json.dumps({
-        "type": "text-prep",
-        "text": file_path,
-        "status": queue_status,
-        "msg": message
-        }))
-    else:
-        # TODO: If task has failed, add a reason why.
-        conn.publish('Status-Queue', json.dumps({
-        "type": "text-prep",
-        "status": queue_status,
-        "msg": message   
-        }))
+    conn.publish('Status-Queue', json.dumps({
+    "type": "text-prep",
+    "text": filename,
+    "status": queue_status,
+    "msg": message
+    }))
 
 def save_textfile(text_list, filename):
     '''
@@ -236,30 +226,29 @@ def infinite_loop():
                 json_data = json.loads(data[1])
                 print("Starting to process received data")
                 if "text" in json_data and "type" in json_data:
+                    report_status_to_API(queue_status=11, conn=conn, filename=json_data["text"])
+
                     return_value = process_file(json_data["type"], json_data["text"])    
 
                     # If the task was successfully processed, the if-statement is executed
                     # Otherwise, the status queue is updated to: failure
                     if return_value[0]:
-                        file_path = "/text_prep_worker/out/" + json_data["type"]
-                        report_status_to_API(queue_status=200, conn=conn, file_path=json_data["text"])
+                        report_status_to_API(queue_status=200, conn=conn, filename=json_data["text"])
                     else:
-                        report_status_to_API(queue_status=12, conn=conn, file_path=json_data["text"])
+                        report_status_to_API(queue_status=12, conn=conn, filename=json_data["text"], message=return_value[1])
                     
                     print(return_value[1])
                 else:
-                    if "text" not in json_data and "type" in json_data:
-                        print("text key is missing or misspelled within the JSON.")
-                    elif "type" not in json_data and "text" in json_data:
-                        print("type key is missing or misspelled within the JSON.")
-                    else:
-                        print("Both keys are not correct")
                     # Received parameters are wrong --> Update status queue and set task processing to: failure
-                    report_status_to_API(queue_status=12, conn=conn)
+                    if "text" not in json_data and "type" in json_data:
+                        report_status_to_API(queue_status=12, conn=conn, filename="failure", message="text key is missing or misspelled within the JSON.")
+                    elif "type" not in json_data and "text" in json_data:
+                        report_status_to_API(queue_status=12, conn=conn, filename="failure", message="type key is missing or misspelled within the JSON.")
+                    else:
+                        report_status_to_API(queue_status=12, conn=conn, filename="failure", message="Both keys are not correct")                                        
             except:
-                print("Data is not valid JSON. Processing cancelled")
                 # Received parameters are wrong --> Update status queue and set task processing to: failure
-                report_status_to_API(queue_status=12, conn=conn)
+                report_status_to_API(queue_status=12, conn=conn, filename="failure", message="Data is not valid JSON. Processing cancelled")
             
 
 if __name__ == "__main__":
