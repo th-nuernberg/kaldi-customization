@@ -1,10 +1,11 @@
 # -*- encoding: utf-8 -*-
-import os
-import re
-import redis
-import PyPDF2 
 import docx
 import json
+import os
+import PyPDF2
+import re
+import redis
+import tempfile
 from bs4 import BeautifulSoup, Comment
 
 try:
@@ -76,15 +77,17 @@ def create_unique_list(word_list):
 def pdf_parser(file_path):
     # Converts all pages of the PDF-file into PNG-files
     print("Starting to transform the received PDF-file into PNG-files")
-    images = convert_from_path(file_path,
-                               dpi=300, fmt=".png")
-    print("Finished transforming the PDF-file into PNG-files")
+    with tempfile.TemporaryDirectory() as path:
+        images = convert_from_path(file_path,
+                                output_folder=path,
+                                dpi=300, fmt=".jpg")
+
+    print("Finished transforming the PDF-file into image-files")
 
     # Iterates through all images and retrieves the word list
-    print("Starting to process the PNG-files with the OCR-scanner")
+    print("Starting to process the image-files with the OCR-scanner")
     complete_word_list = []
-    for image in images:        
-
+    for image in images:
         print("Starting to process : " + str(image))
         text = pytesseract.image_to_string(image, lang="deu")
         print("Finished retrieving text from " + str(image))

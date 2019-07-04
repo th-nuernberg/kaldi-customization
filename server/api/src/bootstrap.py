@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqldb://api:api-server-password@db:3306/api'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 app.config['SQLALCHEMY_POOL_RECYCLE'] = 50
 db = SQLAlchemy(app)
 
@@ -26,7 +26,7 @@ dictConfig({
     }
 })
 
-from db import *
+# from db import *
 
 import redis
 redis_conn = redis.Redis(host='redis', port=6379, password='kalditproject')
