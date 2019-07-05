@@ -10,3 +10,4 @@ Flask-Testing
 gevent-websocket
 mysqlclient
 redis
+minio
