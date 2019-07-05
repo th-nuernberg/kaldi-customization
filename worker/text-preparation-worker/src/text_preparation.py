@@ -149,7 +149,8 @@ def infinite_loop():
                     else:
                         report_status_to_API(queue_status=12, conn=conn, filename=json_data["text"], message=return_value[1])
 
-                    print(return_value[1])
+                    if return_value[1]:
+                        print("Processing finished successfully")
                 else:
                     # Received parameters are wrong --> Update status queue and set task processing to: failure
                     if "text" not in json_data and "type" in json_data:
@@ -158,9 +159,10 @@ def infinite_loop():
                         report_status_to_API(queue_status=12, conn=conn, filename="failure", message="type key is missing or misspelled within the JSON.")
                     else:
                         report_status_to_API(queue_status=12, conn=conn, filename="failure", message="Both keys are not correct")
-            except:
+            except Exception as e:
                 # Received parameters are wrong --> Update status queue and set task processing to: failure
                 report_status_to_API(queue_status=12, conn=conn, filename="failure", message="Data is not valid JSON. Processing cancelled")
+                raise e
 
 
 if __name__ == "__main__":
