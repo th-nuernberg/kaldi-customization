@@ -85,7 +85,7 @@ def parse_args(name, task_queue,
                                conf.minio_access_key, conf.minio_secret_key,
                                conf.minio_secure)
 
-    return conf, task_queue.process(), status_queue, minio_client
+    return conf, task_queue, status_queue, minio_client
 
 
 class TaskQueue:
@@ -93,7 +93,7 @@ class TaskQueue:
         self._redis = redis
         self._key = key
 
-    def process(self):
+    def listen(self):
         continued = False
 
         while True:
@@ -134,6 +134,9 @@ class TaskQueue:
 
         return command
 
+    def submit(self, task):
+        self._redis.rpush(self._key, json.dumps(task))
+
 
 class StatusQueue:
     def __init__(self, redis, key):
@@ -142,3 +145,10 @@ class StatusQueue:
 
     def submit(self, status):
         self._redis.publish(self._key, json.dumps(status))
+
+    def listen(self):
+        pubsub = self._redis.pubsub(ignore_subscribe_messages=True)
+        pubsub.subscribe(self._key)
+
+        for status in pubsub.listen():
+            yield(json.loads(status))

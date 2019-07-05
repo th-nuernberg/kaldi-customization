@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
         logger.debug(conf)
 
-        for task in tasks:
+        for task in tasks.listen():
             print(task)
             # TODO: process task
             status.submit({'test': 'MyTestStatus'})
