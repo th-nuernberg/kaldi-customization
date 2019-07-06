@@ -1,0 +1,7 @@
+beautifulsoup4==4.5.3
+redis
+pypdf2
+python-docx
+lxml
+pytesseract
+pdf2image
