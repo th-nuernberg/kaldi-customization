@@ -143,9 +143,10 @@ def generate_corpus(text):
         sentence = sentence.lower()
 
         sentence = re.sub("\n", "", sentence)
-        # sentence = re.sub("ä", "ae", sentence)
-        # sentence = re.sub("ö", "oe", sentence)
-        # sentence = re.sub("ü", "ue", sentence)
+        sentence = re.sub("ä", "\"a", sentence)
+        sentence = re.sub("ö", "\"o", sentence)
+        sentence = re.sub("ü", "\"u", sentence)
+        sentence = re.sub("ß", "\"s", sentence)
         sentence = re.sub("1", "eins ", sentence)
         sentence = re.sub("2", "zwei ", sentence)
         sentence = re.sub("3", "drei ", sentence)
@@ -155,8 +156,8 @@ def generate_corpus(text):
         sentence = re.sub("7", "sieben ", sentence)
         sentence = re.sub("8", "acht ", sentence)
         sentence = re.sub("9", "neun ", sentence)
-        sentence = re.sub(r"[^a-zäöüß\s]+", "", sentence)
+        sentence = re.sub(r"[^a-z\s]+", "", sentence)
 
         clean_sentences.append(sentence)
 
-        return clean_sentences
+    return clean_sentences
