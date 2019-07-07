@@ -49,9 +49,8 @@ TEXTS_OUT_BUCKET = 'texts-out'
 G2P_IN_BUCKET  = 'g2p-in'
 G2P_OUT_BUCKET = 'g2p-out'
 
-# kaldi-worker
-KALDI_IN_BUCKET  = 'kaldi-in'
-KALDI_OUT_BUCKET = 'kaldi-out'
+# models for kaldi worker
+MODEL_BUCKET  = 'models'
 
 def createMinioBucket(minio_client, bucket_name):
     '''
@@ -71,5 +70,4 @@ createMinioBucket(minio_client=minioClient, bucket_name=TEXTS_IN_BUCKET)
 createMinioBucket(minio_client=minioClient, bucket_name=TEXTS_OUT_BUCKET)
 createMinioBucket(minio_client=minioClient, bucket_name=G2P_IN_BUCKET)
 createMinioBucket(minio_client=minioClient, bucket_name=G2P_OUT_BUCKET)
-createMinioBucket(minio_client=minioClient, bucket_name=KALDI_IN_BUCKET)
-createMinioBucket(minio_client=minioClient, bucket_name=KALDI_OUT_BUCKET)
+createMinioBucket(minio_client=minioClient, bucket_name=MODEL_BUCKET)
