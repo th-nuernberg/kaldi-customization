@@ -9,6 +9,10 @@ class ResourceStateEnum(enum.IntEnum):
     TextPreparation_InProgress = 11
     TextPreparation_Failure = 12
 
+    G2P_Pending = 20
+    G2P_InProgress = 21
+    G2P_Failure = 22
+
     Success = 200
 
 def status_to_string(status):

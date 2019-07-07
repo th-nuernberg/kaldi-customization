@@ -37,6 +37,7 @@ import threading
 TEXT_PREP_UPLOAD_FOLDER = '/www/texts/in'
 TEXT_PREP_FINISHED_FOLDER = '/www/texts/out'
 TEXT_PREP_QUEUE = 'Text-Prep-Queue'
+G2P_QUEUE = 'G2P-Queue'
 STATUS_QUEUE = 'Status-Queue'
 
 def handle_statue_queue():
@@ -56,7 +57,7 @@ def handle_statue_queue():
                 app.logger.warning(e)
                 continue
             
-            if msg_data and "type" in msg_data and "text" in msg_data and "status" in msg_data and "msg" in msg_data:
+            if msg_data and "type" in msg_data and "text" in msg_data and "status" in msg_data:
                 if msg_data['type'] == 'text-prep':
                     handle_text_prep_status(msg_data)
                 else:
@@ -64,22 +65,32 @@ def handle_statue_queue():
 
 def handle_text_prep_status(msg_data):
     if msg_data['text'] == 'failure':
-        app.logger.error('Failure at Text-Prep-Worker: ' + msg_data['msg'])
+        app.logger.error('Failure at Text-Prep-Worker: ')
+        if "msg" in msg_data:
+            app.logger.error("Error message: " + msg_data['msg'])
     else:
         this_resource = Resource.query.filter_by(name=msg_data['text']).first()
         if this_resource is not None:
             app.logger.info('found resource in db: ' + this_resource.__repr__())
             try:
                 resource_status = ResourceStateEnum(msg_data['status'])
+                app.logger.info("resource status: " + resource_status)
             except ValueError as e:
                 app.logger.warning("status is not valid!")
                 app.logger.warning(e)
                 resource_status = ResourceStateEnum.TextPreparation_Failure
             
             this_resource.status = resource_status
-
             app.logger.info('after update: ' + this_resource.__repr__())
             db.session.add(this_resource)
+
+            if resource_status == ResourceStateEnum.Success:
+                # add new db entry for g2p resource file
+                db_resource = Resource(model=this_resource.model, resource_type=ResourceTypeEnum.textprep, name=this_resource.name, status=ResourceStateEnum.G2P_Pending)
+                app.logger.info('added db entry for g2p resource file: ' + db_resource.__repr__())
+                db.session.add(db_resource)
+                db.session.commit()
+
             db.session.commit()
             db.session.close()
         else:
@@ -112,6 +123,19 @@ def create_textprep_job(resourcename, filetype):
         "type" : filetype.name
     }
     redis_conn.rpush(TEXT_PREP_QUEUE, json.dumps(entry))
+    return
+
+def create_g2p_job(lexicon, uniquewordlists):
+    '''
+    Creates a new job in the queue for a g2p worker.
+    '''
+    entry = {
+        "bucket-in" : G2P_IN_BUCKET,
+        "bucket-out" : G2P_OUT_BUCKET,
+        "lexicon" : lexicon,
+        "uniquewordlists" : [wl.name for wl in uniquewordlists]
+    }
+    redis_conn.rpush(G2P_QUEUE, json.dumps(entry))
     return
 
 def get_basename(filename):
@@ -161,7 +185,7 @@ def upload_file_for_textprep():
 
             new_resource = get_basename(filename) #TODO change to DB key
 
-            db_resource = Resource(model=root_model, name=new_resource, file_type=filetype, status=ResourceStateEnum.TextPreparation_Pending)
+            db_resource = Resource(model=root_model, resource_type=ResourceTypeEnum.upload, name=new_resource, file_type=filetype, status=ResourceStateEnum.TextPreparation_Pending)
             db.session.add(db_resource)
             db.session.commit()
             db.session.close()
@@ -235,6 +259,33 @@ def download_texts_out_file(filename):
         app.logger.error(error_msg)
         app.logger.error(e)
         return (error_msg, 500)
+
+@app.route('/g2p')
+def start_g2p():
+    '''
+    Enqueues a g2p worker task.
+    '''
+
+    app.logger.info("Starts g2p...")
+
+    # copy text-prep-worker results
+    unique_word_lists = Resource.query.filter_by(resource_type=ResourceTypeEnum.prepworker).all()
+    for uwl in unique_word_lists:
+        app.logger.info("copy resoure to g2p bucket: " + uwl.name)
+        minioClient.copy_object(bucket_name=G2P_IN_BUCKET, object_name=uwl.name, object_source=uwl.name, copy_conditions=None, metadata=None)
+
+    # upload lexicon
+    lexicon_name = "fancy_lexicon"
+    lexicon_path = TEXT_PREP_UPLOAD_FOLDER + "/verbmobil_complete_syllable.lex"
+    app.logger.info("upload lexicon to MinIO...")
+    resource_key = minioClient.fput_object(bucket_name=G2P_IN_BUCKET, object_name=lexicon_name,
+                        file_path=lexicon_path)
+    app.logger.info("uploaded files to MinIO")
+
+    app.logger.info("Create task for g2p-worker")
+    create_g2p_job(lexicon=lexicon_name, uniquewordlists=unique_word_lists)
+
+    return "OK"
 
 # It is not possible to run a endless loop here...
 # There is a thread for this task
