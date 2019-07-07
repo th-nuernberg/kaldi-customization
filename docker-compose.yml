@@ -23,6 +23,21 @@ services:
     restart: always
     depends_on:
       - redis
+  
+  g2p-worker:
+    build: ./worker/g2p-worker
+    networks:
+      - backend
+    volumes:
+      - type: bind
+        source: ./dfs/texts/in
+        target: /g2p_worker/in
+      - type: bind
+        source: ./dfs/texts/out
+        target: /g2p_worker/out
+    restart: always
+    depends_on:
+      - redis
 
   redis:
     image: "redis:alpine"
