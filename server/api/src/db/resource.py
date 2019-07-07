@@ -54,4 +54,10 @@ class Resource(db.Model):
     file_type = db.Column(db.Enum(ResourceFileTypeEnum))
 
     def __repr__(self):
-        return '<Resource "{}" {}#{} (type: {}, status: {}))>'.format(self.name, self.model_id, self.id, type_to_string(self.file_type), file_type_to_string(self.file_type), status_to_string(self.status))
+        return '<Resource "{}" {}#{} (type: {}, {}, status: {}))>'.format(
+            self.name, 
+            self.model_id, 
+            self.id, 
+            type_to_string(self.resource_type), 
+            file_type_to_string(self.file_type), 
+            status_to_string(self.status))

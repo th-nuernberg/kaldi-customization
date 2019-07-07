@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 from bootstrap import *
-from db import Project, Model, Resource, ResourceStateEnum, ResourceFileTypeEnum
+from db import Project, Model, Resource, ResourceStateEnum, ResourceFileTypeEnum, ResourceTypeEnum
 from flask import logging
 
 root_project = Project(uuid='root', name='Test Project')
@@ -11,7 +11,7 @@ db.session.add(root_model)
 project1 = Project(uuid='project#1', name='Test Project')
 db.session.add(project1)
 
-resource1 = Resource(model=root_model, name='res0', file_type=ResourceFileTypeEnum.png, status=ResourceStateEnum.Upload_InProgress)
+resource1 = Resource(model=root_model, name='res0', resource_type=ResourceTypeEnum.modelresult , file_type=ResourceFileTypeEnum.png, status=ResourceStateEnum.Upload_InProgress)
 db.session.add(resource1)
 app.logger.info(resource1)
 
