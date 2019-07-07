@@ -173,12 +173,6 @@ def upload_file_for_textprep():
             app.logger.info("file saved to file system")
 
             try:
-                # put_object: length is required
-                #             file.content_length is set by the browser and not reliable
-                # fput_object: from file system, no length
-
-                #resource_key = minioClient.put_object(bucket_name=TEXTS_IN_BUCKET, object_name=new_resource,
-                #                    data=file, length=file.content_length, content_type=file.content_type)
                 resource_key = minioClient.fput_object(bucket_name=TEXTS_IN_BUCKET, object_name=new_resource,
                                     file_path=file_path, content_type=file.content_type)
                 app.logger.info(resource_key)
@@ -186,8 +180,6 @@ def upload_file_for_textprep():
                 app.logger.error("Error at saving file to MinIO:")
                 app.logger.error(e)
             app.logger.info("file saved to MinIO")
-
-            #TODO: store MinIO key in database
 
             create_textprep_job(new_resource, filetype)
             return str(new_resource)
