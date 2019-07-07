@@ -1,5 +1,5 @@
 from bootstrap import db
-from .resource import Resource, ResourceStateEnum, ResourceTypeEnum
+from .resource import Resource, ResourceStateEnum, ResourceFileTypeEnum
 from .project import Project
 from .model import Model
 

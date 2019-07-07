@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 from bootstrap import *
-from db import Project, Model, Resource, ResourceStateEnum, ResourceTypeEnum
+from db import Project, Model, Resource, ResourceStateEnum, ResourceFileTypeEnum
 from flask import logging
 
 root_project = Project(uuid='root', name='Test Project')
@@ -11,7 +11,7 @@ db.session.add(root_model)
 project1 = Project(uuid='project#1', name='Test Project')
 db.session.add(project1)
 
-resource1 = Resource(model=root_model, file_name='res0', file_type=ResourceTypeEnum.png, status=ResourceStateEnum.Upload_InProgress)
+resource1 = Resource(model=root_model, name='res0', file_type=ResourceFileTypeEnum.png, status=ResourceStateEnum.Upload_InProgress)
 db.session.add(resource1)
 app.logger.info(resource1)
 
@@ -66,7 +66,7 @@ def handle_text_prep_status(msg_data):
     if msg_data['text'] == 'failure':
         app.logger.error('Failure at Text-Prep-Worker: ' + msg_data['msg'])
     else:
-        this_resource = Resource.query.filter_by(file_name=msg_data['text']).first()
+        this_resource = Resource.query.filter_by(name=msg_data['text']).first()
         if this_resource is not None:
             app.logger.info('found resource in db: ' + this_resource.__repr__())
             try:
@@ -99,8 +99,8 @@ def get_filetype(filename):
     '''
     if '.' in filename:
         filetype = filename.rsplit('.', 1)[1].lower()
-        if filetype in ResourceTypeEnum.__members__:
-            return ResourceTypeEnum[filetype]
+        if filetype in ResourceFileTypeEnum.__members__:
+            return ResourceFileTypeEnum[filetype]
     return None
 
 def create_textprep_job(resourcename, filetype):
@@ -161,7 +161,7 @@ def upload_file_for_textprep():
 
             new_resource = get_basename(filename) #TODO change to DB key
 
-            db_resource = Resource(model=root_model, file_name=new_resource, file_type=filetype, status=ResourceStateEnum.TextPreparation_Pending)
+            db_resource = Resource(model=root_model, name=new_resource, file_type=filetype, status=ResourceStateEnum.TextPreparation_Pending)
             db.session.add(db_resource)
             db.session.commit()
             db.session.close()

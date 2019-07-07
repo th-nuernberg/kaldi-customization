@@ -1,7 +1,6 @@
 from bootstrap import db
 import enum
 
-
 class ResourceStateEnum(enum.IntEnum):
     Upload_InProgress = 0
     Upload_Failure = 1
@@ -11,7 +10,6 @@ class ResourceStateEnum(enum.IntEnum):
     TextPreparation_Failure = 12
 
     Success = 200
-
 
 def status_to_string(status):
     return {
@@ -24,8 +22,7 @@ def status_to_string(status):
 
         200: 'Success'}[status]
 
-
-class ResourceTypeEnum(enum.IntEnum):
+class ResourceFileTypeEnum(enum.IntEnum):
     html = 1
     docx = 2
     txt = 3
@@ -33,20 +30,28 @@ class ResourceTypeEnum(enum.IntEnum):
     png = 5
     jpg = 6
 
-
-def type_to_string(t):
+def file_type_to_string(t):
     return (None, 'html', 'docx', 'txt', 'pdf', 'png', 'jpg')[t]
 
+class ResourceTypeEnum(enum.IntEnum):
+    upload = 1
+    prepworker = 2
+    g2pworker = 3
+    modelresult = 4
+
+def type_to_string(t):
+    return (None, 'upload', 'prepworker', 'g2pworker', 'modelresult')[t]
 
 class Resource(db.Model):
     __tablename__ = 'resources'
 
     model_id = db.Column(db.Integer, db.ForeignKey('models.id'), nullable=False, primary_key=True)
     id = db.Column(db.Integer, primary_key=True, nullable=True)
-
-    file_name = db.Column(db.String(255))
-    file_type = db.Column(db.Enum(ResourceTypeEnum))
     status = db.Column(db.Enum(ResourceStateEnum))
+    resource_type = db.Column(db.Enum(ResourceTypeEnum))
+
+    name = db.Column(db.String(255))
+    file_type = db.Column(db.Enum(ResourceFileTypeEnum))
 
     def __repr__(self):
-        return '<Resource "{}" {}#{} (type: {}, status: {}))>'.format(self.file_name, self.model_id, self.id, type_to_string(self.file_type), status_to_string(self.status))
+        return '<Resource "{}" {}#{} (type: {}, status: {}))>'.format(self.name, self.model_id, self.id, type_to_string(self.file_type), file_type_to_string(self.file_type), status_to_string(self.status))
