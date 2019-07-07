@@ -39,14 +39,14 @@ RUN git clone https://github.com/mitlm/mitlm.git && \
     cd
 
 
-RUN mkdir example && \
-    cd example && \
-    wget https://raw.githubusercontent.com/cmusphinx/cmudict/master/cmudict.dict && \
-    cat cmudict.dict | perl -pe 's/\([0-9]+\)//; s/\s+/ /g; s/^\s+//; s/\s+$//; @_ = split (/\s+/); $w = shift (@_); $_ = $w."\t".join (" ", @_)."\n";' > cmudict.formatted.dict
+# RUN mkdir example && \
+#     cd example && \
+#     wget https://raw.githubusercontent.com/cmusphinx/cmudict/master/cmudict.dict && \
+#     cat cmudict.dict | perl -pe 's/\([0-9]+\)//; s/\s+/ /g; s/^\s+//; s/\s+$//; @_ = split (/\s+/); $w = shift (@_); $_ = $w."\t".join (" ", @_)."\n";' > cmudict.formatted.dict
 
 
-RUN phonetisaurus-train --lexicon example/cmudict.formatted.dict --seq2_del 
-ADD requirements.txt /g2p-worker/requirements.txt
-RUN phonetisaurus-apply --model train/model.fst --word_list requirements.txt
+ADD g2p.py /g2p-worker/
+ADD wait-for.sh /g2p-worker/
+ADD requirements.txt /g2p-worker/
 
-# CMD ["/bin/sh", "/tools/wait-for.sh", "redis:6379", "--", "python", "-u", "/text_prep_worker/text_preparation.py"]
+CMD ["/bin/sh", "/g2p-worker/wait-for.sh", "redis:6379", "--", "python", "-u", "/g2p-worker/g2p.py"]
