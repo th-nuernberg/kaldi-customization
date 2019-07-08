@@ -15,16 +15,16 @@ class ResourceStateEnum(enum.IntEnum):
 
     Success = 200
 
-def status_to_string(status):
-    return {
-        0: 'Upload_InProgress',
-        1: 'Upload_Failure',
+    def status_to_string(status):
+        return {
+            0: 'Upload_InProgress',
+            1: 'Upload_Failure',
 
-        10: 'TextPreparation_Pending',
-        11: 'TextPreparation_InProgress',
-        12: 'TextPreparation_Failure',
+            10: 'TextPreparation_Pending',
+            11: 'TextPreparation_InProgress',
+            12: 'TextPreparation_Failure',
 
-        200: 'Success'}[status]
+            200: 'Success'}[status]
 
 class ResourceFileTypeEnum(enum.IntEnum):
     html = 1
@@ -64,4 +64,4 @@ class Resource(db.Model):
             self.id, 
             type_to_string(self.resource_type), 
             file_type_to_string(self.file_type), 
-            status_to_string(self.status))
+            ResourceStateEnum.status_to_string(self.status))

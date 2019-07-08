@@ -47,21 +47,26 @@ def handle_statue_queue():
     pubsub = redis_conn.pubsub(ignore_subscribe_messages=True)
     pubsub.subscribe(STATUS_QUEUE)
 
-    for message in pubsub.listen():
-        app.logger.info("new pubsub message:")
-        app.logger.info(message)
-        if message['type'] == 'message':
-            try:
-                msg_data = json.loads(message['data'])
-            except ValueError as e:
-                app.logger.warning(e)
-                continue
-            
-            if msg_data and "type" in msg_data and "text" in msg_data and "status" in msg_data:
-                if msg_data['type'] == 'text-prep':
-                    handle_text_prep_status(msg_data)
-                else:
-                    app.logger.warning('unknown type in status queue!')
+    try:
+        for message in pubsub.listen():
+            app.logger.info("new pubsub message:")
+            app.logger.info(message)
+            if message['type'] == 'message':
+                try:
+                    msg_data = json.loads(message['data'])
+                except ValueError as e:
+                    app.logger.warning(e)
+                    continue
+                
+                if msg_data and "type" in msg_data and "text" in msg_data and "status" in msg_data:
+                    if msg_data['type'] == 'text-prep':
+                        handle_text_prep_status(msg_data)
+                    else:
+                        app.logger.warning('unknown type in status queue!')
+    except Exception as e:
+        app.logger.error("In handle_status_queue: " + e)
+        app.logger.error(e)
+        print(e)
 
 def handle_text_prep_status(msg_data):
     if msg_data['text'] == 'failure':
@@ -74,7 +79,7 @@ def handle_text_prep_status(msg_data):
             app.logger.info('found resource in db: ' + this_resource.__repr__())
             try:
                 resource_status = ResourceStateEnum(msg_data['status'])
-                app.logger.info("resource status: " + resource_status)
+                app.logger.info("resource status: " + ResourceStateEnum.status_to_string(resource_status))
             except ValueError as e:
                 app.logger.warning("status is not valid!")
                 app.logger.warning(e)
