@@ -45,8 +45,12 @@ RUN git clone https://github.com/mitlm/mitlm.git && \
 #     cat cmudict.dict | perl -pe 's/\([0-9]+\)//; s/\s+/ /g; s/^\s+//; s/\s+$//; @_ = split (/\s+/); $w = shift (@_); $_ = $w."\t".join (" ", @_)."\n";' > cmudict.formatted.dict
 
 
-ADD src/g2p.py /g2p-worker/
-ADD wait-for.sh /g2p-worker/
+ADD src/g2p.py /g2p-worker/ 
+ADD wait-for.sh /g2p-worker/ 
+ADD src/minio_communication.py /g2p-worker/ 
 ADD requirements.txt /g2p-worker/
+
+RUN apk add libxml2-dev libxslt-dev&& \
+    pip install -r requirements.txt
 
 CMD ["/bin/sh", "/g2p-worker/wait-for.sh", "redis:6379", "--", "python", "-u", "/g2p-worker/g2p.py"]
