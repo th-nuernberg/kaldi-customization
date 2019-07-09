@@ -3,10 +3,16 @@ VOLUME ["/g2p_worker/in", "/g2p_worker/out"]
 WORKDIR /g2p-worker
 
 
+ADD src/g2p.py /g2p-worker/ 
+ADD wait-for.sh /g2p-worker/ 
+ADD src/minio_communication.py /g2p-worker/ 
+ADD requirements.txt /g2p-worker/
+
 RUN apk update && \
     apk upgrade && \
-    apk add autoconf-archive automake gfortran git g++ libtool make perl python3-dev py-setuptools tar wget python2-dev python3 python2
-
+    apk add autoconf-archive automake gfortran git g++ libtool libxml2-dev libxslt-dev && \
+            make perl python3 python3-dev python2-dev python2 py-setuptools tar wget   && \
+    pip install -r requirements.txt
 
 # Download and Install OpenFST
 RUN wget http://www.openfst.org/twiki/pub/FST/FstDownload/openfst-1.6.2.tar.gz && \
@@ -37,20 +43,5 @@ RUN git clone https://github.com/mitlm/mitlm.git && \
     make && \
     make install && \
     cd
-
-
-# RUN mkdir example && \
-#     cd example && \
-#     wget https://raw.githubusercontent.com/cmusphinx/cmudict/master/cmudict.dict && \
-#     cat cmudict.dict | perl -pe 's/\([0-9]+\)//; s/\s+/ /g; s/^\s+//; s/\s+$//; @_ = split (/\s+/); $w = shift (@_); $_ = $w."\t".join (" ", @_)."\n";' > cmudict.formatted.dict
-
-
-ADD src/g2p.py /g2p-worker/ 
-ADD wait-for.sh /g2p-worker/ 
-ADD src/minio_communication.py /g2p-worker/ 
-ADD requirements.txt /g2p-worker/
-
-RUN apk add libxml2-dev libxslt-dev&& \
-    pip install -r requirements.txt
 
 CMD ["/bin/sh", "/g2p-worker/wait-for.sh", "redis:6379", "--", "python", "-u", "/g2p-worker/g2p.py"]
