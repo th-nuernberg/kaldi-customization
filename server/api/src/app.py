@@ -47,8 +47,8 @@ def handle_statue_queue():
     pubsub = redis_conn.pubsub(ignore_subscribe_messages=True)
     pubsub.subscribe(STATUS_QUEUE)
 
-    try:
-        for message in pubsub.listen():
+    for message in pubsub.listen():
+        try:
             app.logger.info("new pubsub message:")
             app.logger.info(message)
             if message['type'] == 'message':
@@ -60,15 +60,19 @@ def handle_statue_queue():
                 
                 if msg_data and "type" in msg_data and "text" in msg_data and "status" in msg_data:
                     if msg_data['type'] == 'text-prep':
+                        app.logger.info("handle text prep status...")
                         handle_text_prep_status(msg_data)
+                        app.logger.info("...handled text prep status")
                     else:
                         app.logger.warning('unknown type in status queue!')
-    except Exception as e:
-        app.logger.error("In handle_status_queue: " + e)
-        app.logger.error(e)
-        print(e)
+        except Exception as e:
+            app.logger.error("Exception at status queue: {}".format(type(e).__name__))
+            app.logger.error(e.__str__())
 
 def handle_text_prep_status(msg_data):
+    '''
+    Handle a status message from a text preparation worker.
+    '''
     if msg_data['text'] == 'failure':
         app.logger.error('Failure at Text-Prep-Worker: ')
         if "msg" in msg_data:
@@ -91,10 +95,16 @@ def handle_text_prep_status(msg_data):
 
             if resource_status == ResourceStateEnum.Success:
                 # add new db entry for g2p resource file
-                db_resource = Resource(model=this_resource.model, resource_type=ResourceTypeEnum.textprep, name=this_resource.name, status=ResourceStateEnum.G2P_Pending)
-                app.logger.info('added db entry for g2p resource file: ' + db_resource.__repr__())
-                db.session.add(db_resource)
-                db.session.commit()
+                try:
+                    db_resource = Resource(model=this_resource.model,
+                                            name=this_resource.name,
+                                            resource_type=ResourceTypeEnum.prepworker,
+                                            status=ResourceStateEnum.G2P_InProgress)
+                    app.logger.info('added db entry for g2p resource file: ' + db_resource.__repr__())
+                    db.session.add(db_resource)
+                except Exception as e:
+                    app.logger.error("Error at adding entry for g2p!")
+                    raise e
 
             db.session.commit()
             db.session.close()
@@ -277,7 +287,11 @@ def start_g2p():
     unique_word_lists = Resource.query.filter_by(resource_type=ResourceTypeEnum.prepworker).all()
     for uwl in unique_word_lists:
         app.logger.info("copy resoure to g2p bucket: " + uwl.name)
-        minioClient.copy_object(bucket_name=G2P_IN_BUCKET, object_name=uwl.name, object_source=uwl.name, copy_conditions=None, metadata=None)
+        minioClient.copy_object(bucket_name=G2P_IN_BUCKET,
+                                object_name=uwl.name,
+                                object_source= "/" + TEXTS_OUT_BUCKET + "/" + uwl.name,
+                                conditions=None,
+                                metadata=None)
 
     # upload lexicon
     lexicon_name = "fancy_lexicon"

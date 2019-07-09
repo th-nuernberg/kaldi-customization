@@ -24,6 +24,10 @@ class ResourceStateEnum(enum.IntEnum):
             11: 'TextPreparation_InProgress',
             12: 'TextPreparation_Failure',
 
+            20: 'G2P_Pending',
+            21: 'G2P_InProgress',
+            22: 'G2P_Failure',
+
             200: 'Success'}[status]
 
 class ResourceFileTypeEnum(enum.IntEnum):
@@ -34,8 +38,8 @@ class ResourceFileTypeEnum(enum.IntEnum):
     png = 5
     jpg = 6
 
-def file_type_to_string(t):
-    return (None, 'html', 'docx', 'txt', 'pdf', 'png', 'jpg')[t]
+    def file_type_to_string(t):
+        return (None, 'html', 'docx', 'txt', 'pdf', 'png', 'jpg')[t]
 
 class ResourceTypeEnum(enum.IntEnum):
     upload = 1
@@ -43,8 +47,8 @@ class ResourceTypeEnum(enum.IntEnum):
     g2pworker = 3
     modelresult = 4
 
-def type_to_string(t):
-    return (None, 'upload', 'prepworker', 'g2pworker', 'modelresult')[t]
+    def type_to_string(t):
+        return (None, 'upload', 'prepworker', 'g2pworker', 'modelresult')[t]
 
 class Resource(db.Model):
     __tablename__ = 'resources'
@@ -55,13 +59,21 @@ class Resource(db.Model):
     resource_type = db.Column(db.Enum(ResourceTypeEnum))
 
     name = db.Column(db.String(255))
-    file_type = db.Column(db.Enum(ResourceFileTypeEnum))
+    file_type = db.Column(db.Enum(ResourceFileTypeEnum), nullable=True)
 
     def __repr__(self):
-        return '<Resource "{}" {}#{} (type: {}, {}, status: {}))>'.format(
-            self.name, 
-            self.model_id, 
-            self.id, 
-            type_to_string(self.resource_type), 
-            file_type_to_string(self.file_type), 
-            ResourceStateEnum.status_to_string(self.status))
+        if self.resource_type == ResourceTypeEnum.upload:
+            return '{{Resource {} "{}"."{}" {}#{} (status: {})}}'.format(
+                ResourceTypeEnum.type_to_string(self.resource_type),
+                self.name,
+                ResourceFileTypeEnum.file_type_to_string(self.file_type),
+                self.model_id,
+                self.id,
+                ResourceStateEnum.status_to_string(self.status))
+        else:
+            return '{{Resource {} "{}" {}#{} (status: {})}}'.format(
+                ResourceTypeEnum.type_to_string(self.resource_type),
+                self.name,
+                self.model_id,
+                self.id,
+                ResourceStateEnum.status_to_string(self.status))
