@@ -2,20 +2,33 @@ import re
 import subprocess
 
 
-def execute_phonetisaurus(lexicon, word_list):
+def execute_phonetisaurus(lexicon):
+    '''
+    This function executes two Phonetisaurus commands:
+        1) phonetisaurus-train
+        2) phonetisaurus-apply
+    These calls are used to create a word list with all their phones. 
+
+    This function saves two files:
+        1) model.fst --> This file is a graph which was created with the phonetisaurus-train command
+        2) word list with phones --> This file consists of all words and their phones
+    All these files are saved locally and are afterwards uploaded to their corresponding MinIO-Bucket
+
+    Loading lexicon from: /data_prep_worker/in/
+    Loading final_word_list from: /data/prep_worker/out/
+    Saving all files to: /data_prep_worker/out/
+    '''
+    # Trains a new graph with the base lexicon
     subprocess.call(["phonetisaurus-train", "-l", "/data_prep_worker/in/" + lexicon, "-s2d", "-g", "-o", "8"])
     
-    # Write the new file into the out directory of the data_prep_worker
-    with open("/data_prep_worker/out/" + word_list, "w") as file_handler:            
-        # Applies the previously trained graph onto the wordlist and creates phones for all words
-        # Phone list is saved within /data_prep_worker/out/
-        subprocess.call(["phonetisaurus-apply", "--model", "train/model.fst", "--word_list", "/data_prep_worker/in/" + word_list, "-n", "2", "-l", lexicon, "--beam", "10000", "-g", "-t", "10000"], stdout=file_handler)
+    with open("/data_prep_worker/out/final_word_list_with_phones", "w") as file_handler:            
+        # Applies the previously trained graph onto the word list and creates phones for all words
+        subprocess.call(["phonetisaurus-apply", "--model", "train/model.fst", "--word_list", "/data_prep_worker/out/final_word_list", "-n", "2", "-l", lexicon, "--beam", "10000", "-g", "-t", "10000"], stdout=file_handler)
 
     # Moves the created graph into /data_prep_worker/out/
     subprocess.call(["mv", "train/model.fst", "/data_prep_worker/out/model.fst"])
 
 
-#TODO: Save the final word list within the correct directory
 def merge_word_lists(unique_words):
     '''
     This function merges multiple word lists into one.
@@ -24,25 +37,29 @@ def merge_word_lists(unique_words):
     use the same words. The final word list is an unique list. Therefore, all words occur only
     once. In order to achieve this behavior, the lists are converted into sets and these sets 
     are combined.
+
+    The final word list is locally saved and afterwards uploaded into the corresponding MinIO-Bucket
+
+    Loading all files from: /data_prep_worker/in/
+    Saving final word list into: /data_prep_worker/out/
     '''
-    first_list = open(unique_words[0], "r").read().lower()
+    first_list = open("/data_prep_worker/in/" + unique_words[0], "r").read().lower()
     first_word_list = re.split("\n", first_list)
 
-    for wl in range(1, len(unique_words), 1):
-        second_list = open(unique_words[wl], "r").read().lower()
+    for word_list in range(1, len(unique_words), 1):
+        second_list = open("/data_prep_worker/in/" + unique_words[word_list], "r").read().lower()
         second_word_list = re.split("\n", second_list)
         first_word_list = set(first_word_list).union(set(second_word_list))
-    
+
     first_word_list = sorted(first_word_list)
     first_word_list.remove("")
-    
-    with open("final_word_list.txt", "w") as file_writer:
+
+    with open("/data_prep_worker/out/final_word_list", "w") as file_writer:
         for word in first_word_list:
             file_writer.write(word + "\n")
 
 
-#TODO: Save the final corpus within the correct directory
-def merge_corpuses(corpus_list):
+def merge_corpus_list(corpus_list):
     '''
     This function merges multiple corpuses into one file. In order to do so, the first corpus of 
     the list is extended with the remaining ones. 
@@ -51,23 +68,22 @@ def merge_corpuses(corpus_list):
     multiple times. Every sentence is appended.
 
     The final corpus is locally saved and afterwards uploaded into the corresponding MinIO-Bucket
+
+    Loading all files from: /data_prep_worker/in/
+    Saving merged corpus into: /data_prep_worker/out/
     '''
-    first_corpus = open(corpus_list[0], "r").read()
+    first_corpus = open("/data_prep_worker/in/" + corpus_list[0], "r").read()
     first_corpus_list = re.split("\n", first_corpus)    
 
     for corpus in range(1, len(corpus_list), 1):
-        second_corpus = open(corpus_list[corpus], "r").read()
+        second_corpus = open("/data_prep_worker/in/" + corpus_list[corpus], "r").read()
         second_corpus_list = re.split("\n", second_corpus)
 
-        # Appends the sentences of the second corpus to the first one
+        # Appends all sentences of the second corpus to the first one
         for sentence in second_corpus_list:
             first_corpus_list.append(sentence)    
 
-    with open("final_corpus.txt", "w") as file_writer:
+    with open("/data_prep_worker/out/final_corpus.txt", "w") as file_writer:
         for sentence in first_corpus_list:
             if sentence != "":
                 file_writer.write(sentence + "\n")
-
-
-#merge_word_lists(["playground/voc.tmp", "playground/blah.txt", "playground/gamestar", "playground/kafka", "playground/test"])
-#merge_corpuses(["playground/kafka_corpus", "playground/second_corpus", "playground/test"])

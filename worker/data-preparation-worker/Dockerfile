@@ -2,11 +2,6 @@ FROM python:2.7-alpine3.10
 VOLUME ["/data_prep_worker/in", "/data_prep_worker/out"]
 WORKDIR /data-preparation-worker
 
-
-ADD src/data_preparation.py /data-preparation-worker/ 
-ADD src/minio_communication.py /data-preparation-worker/ 
-ADD src/data_processing.py /data-preparation-worker/
-ADD wait-for.sh /data-preparation-worker/ 
 ADD requirements.txt /data-preparation-worker/
 
 
@@ -45,5 +40,10 @@ RUN git clone https://github.com/mitlm/mitlm.git && \
     make && \
     make install && \
     cd
+
+ADD src/data_preparation.py /data-preparation-worker/ 
+ADD src/minio_communication.py /data-preparation-worker/ 
+ADD src/data_processing.py /data-preparation-worker/
+ADD wait-for.sh /data-preparation-worker/ 
 
 CMD ["/bin/sh", "/data-preparation-worker/wait-for.sh", "redis:6379", "--", "python", "-u", "/data-preparation-worker/data_preparation.py"]
