@@ -1,12 +1,14 @@
 FROM python:2.7-alpine3.10
-VOLUME ["/g2p_worker/in", "/g2p_worker/out"]
-WORKDIR /g2p-worker
+VOLUME ["/data_prep_worker/in", "/data_prep_worker/out"]
+WORKDIR /data-preparation-worker
 
 
-ADD src/g2p.py /g2p-worker/ 
-ADD wait-for.sh /g2p-worker/ 
-ADD src/minio_communication.py /g2p-worker/ 
-ADD requirements.txt /g2p-worker/
+ADD src/data_preparation.py /data-preparation-worker/ 
+ADD src/minio_communication.py /data-preparation-worker/ 
+ADD src/data_processing.py /data-preparation-worker/
+ADD wait-for.sh /data-preparation-worker/ 
+ADD requirements.txt /data-preparation-worker/
+
 
 RUN apk update && \
     apk upgrade && \
@@ -28,7 +30,7 @@ RUN wget http://www.openfst.org/twiki/pub/FST/FstDownload/openfst-1.6.2.tar.gz &
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/lib/fst
 
 
-# Download and build G2P
+# Download and build Phonetisaurus
 RUN git clone https://github.com/AdolfVonKleist/Phonetisaurus.git && \
     cd Phonetisaurus && \
     ./configure && \
@@ -44,4 +46,4 @@ RUN git clone https://github.com/mitlm/mitlm.git && \
     make install && \
     cd
 
-CMD ["/bin/sh", "/g2p-worker/wait-for.sh", "redis:6379", "--", "python", "-u", "/g2p-worker/g2p.py"]
+CMD ["/bin/sh", "/data-preparation-worker/wait-for.sh", "redis:6379", "--", "python", "-u", "/data-preparation-worker/data_preparation.py"]

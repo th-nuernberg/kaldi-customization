@@ -3,16 +3,16 @@ import subprocess
 
 
 def execute_phonetisaurus(lexicon, word_list):
-    subprocess.call(["phonetisaurus-train", "-l", "/g2p_worker/in/" + lexicon, "-s2d", "-g", "-o", "8"])
+    subprocess.call(["phonetisaurus-train", "-l", "/data_prep_worker/in/" + lexicon, "-s2d", "-g", "-o", "8"])
     
-    # Write the new file into the out directory of the g2p_worker
-    with open("/g2p_worker/out/" + word_list, "w") as file_handler:            
+    # Write the new file into the out directory of the data_prep_worker
+    with open("/data_prep_worker/out/" + word_list, "w") as file_handler:            
         # Applies the previously trained graph onto the wordlist and creates phones for all words
-        # Phone list is saved within /g2p_worker/out/
-        subprocess.call(["phonetisaurus-apply", "--model", "train/model.fst", "--word_list", "/g2p_worker/in/" + word_list, "-n", "2", "-l", lexicon, "--beam", "10000", "-g", "-t", "10000"], stdout=file_handler)
+        # Phone list is saved within /data_prep_worker/out/
+        subprocess.call(["phonetisaurus-apply", "--model", "train/model.fst", "--word_list", "/data_prep_worker/in/" + word_list, "-n", "2", "-l", lexicon, "--beam", "10000", "-g", "-t", "10000"], stdout=file_handler)
 
-    # Moves the created graph into /g2p_worker/out/
-    subprocess.call(["mv", "train/model.fst", "/g2p_worker/out/model.fst"])
+    # Moves the created graph into /data_prep_worker/out/
+    subprocess.call(["mv", "train/model.fst", "/data_prep_worker/out/model.fst"])
 
 
 #TODO: Save the final word list within the correct directory
