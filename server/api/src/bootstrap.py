@@ -49,8 +49,10 @@ TEXTS_OUT_BUCKET = 'texts-out'
 G2P_IN_BUCKET  = 'g2p-in'
 G2P_OUT_BUCKET = 'g2p-out'
 
-# models for kaldi worker
-MODEL_BUCKET  = 'models'
+# acoustic models that are trained by users
+ACOUSTIC_MODELS_BUCKET  = 'acoustic-models'
+# predefined models and stuff for kaldi like vocabular
+LANGUAGE_MODELS_BUCKET  = 'language-models'
 
 def createMinioBucket(minio_client, bucket_name):
     '''
@@ -70,4 +72,5 @@ createMinioBucket(minio_client=minioClient, bucket_name=TEXTS_IN_BUCKET)
 createMinioBucket(minio_client=minioClient, bucket_name=TEXTS_OUT_BUCKET)
 createMinioBucket(minio_client=minioClient, bucket_name=G2P_IN_BUCKET)
 createMinioBucket(minio_client=minioClient, bucket_name=G2P_OUT_BUCKET)
-createMinioBucket(minio_client=minioClient, bucket_name=MODEL_BUCKET)
+createMinioBucket(minio_client=minioClient, bucket_name=ACOUSTIC_MODELS_BUCKET)
+createMinioBucket(minio_client=minioClient, bucket_name=LANGUAGE_MODELS_BUCKET)

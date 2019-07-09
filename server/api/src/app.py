@@ -96,10 +96,11 @@ def handle_text_prep_status(msg_data):
             if resource_status == ResourceStateEnum.Success:
                 # add new db entry for g2p resource file
                 try:
+                    #TODO handle corpus and uwl!
                     db_resource = Resource(model=this_resource.model,
                                             name=this_resource.name,
-                                            resource_type=ResourceTypeEnum.prepworker,
-                                            status=ResourceStateEnum.G2P_InProgress)
+                                            resource_type=ResourceTypeEnum.unique_word_list,
+                                            status=ResourceStateEnum.G2P_Ready)
                     app.logger.info('added db entry for g2p resource file: ' + db_resource.__repr__())
                     db.session.add(db_resource)
                 except Exception as e:
@@ -140,14 +141,14 @@ def create_textprep_job(resourcename, filetype):
     redis_conn.rpush(TEXT_PREP_QUEUE, json.dumps(entry))
     return
 
-def create_g2p_job(lexicon, uniquewordlists):
+def create_g2p_job(uniquewordlists, language_model='Voxforge'):
     '''
     Creates a new job in the queue for a g2p worker.
     '''
     entry = {
         "bucket-in" : G2P_IN_BUCKET,
         "bucket-out" : G2P_OUT_BUCKET,
-        "lexicon" : lexicon,
+        "language_model" : language_model,
         "uniquewordlists" : [wl.name for wl in uniquewordlists]
     }
     redis_conn.rpush(G2P_QUEUE, json.dumps(entry))
@@ -284,7 +285,10 @@ def start_g2p():
     app.logger.info("Starts g2p...")
 
     # copy text-prep-worker results
-    unique_word_lists = Resource.query.filter_by(resource_type=ResourceTypeEnum.prepworker).all()
+    unique_word_lists = Resource.query.filter_by(
+        resource_type=ResourceTypeEnum.unique_word_list, 
+        status=ResourceStateEnum.G2P_Ready).all()
+
     for uwl in unique_word_lists:
         app.logger.info("copy resoure to g2p bucket: " + uwl.name)
         minioClient.copy_object(bucket_name=G2P_IN_BUCKET,
@@ -292,17 +296,14 @@ def start_g2p():
                                 object_source= "/" + TEXTS_OUT_BUCKET + "/" + uwl.name,
                                 conditions=None,
                                 metadata=None)
-
-    # upload lexicon
-    lexicon_name = "fancy_lexicon"
-    lexicon_path = TEXT_PREP_UPLOAD_FOLDER + "/verbmobil_complete_syllable.lex"
-    app.logger.info("upload lexicon to MinIO...")
-    resource_key = minioClient.fput_object(bucket_name=G2P_IN_BUCKET, object_name=lexicon_name,
-                        file_path=lexicon_path)
-    app.logger.info("uploaded files to MinIO")
+        uwl.status = ResourceStateEnum.G2P_Pending
+        db.session.add(uwl)
 
     app.logger.info("Create task for g2p-worker")
-    create_g2p_job(lexicon=lexicon_name, uniquewordlists=unique_word_lists)
+    create_g2p_job(uniquewordlists=unique_word_lists, language_model='Voxforge')
+    
+    db.session.commit()
+    db.session.close()
 
     return "OK"
 

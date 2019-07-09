@@ -4,14 +4,17 @@ import enum
 class ResourceStateEnum(enum.IntEnum):
     Upload_InProgress = 0
     Upload_Failure = 1
+    TextPreparation_Ready = 9
 
     TextPreparation_Pending = 10
     TextPreparation_InProgress = 11
     TextPreparation_Failure = 12
+    G2P_Ready = 19
 
     G2P_Pending = 20
     G2P_InProgress = 21
     G2P_Failure = 22
+    Train_Ready = 29
 
     Success = 200
 
@@ -19,14 +22,17 @@ class ResourceStateEnum(enum.IntEnum):
         return {
             0: 'Upload_InProgress',
             1: 'Upload_Failure',
+            9: 'TextPreparation_Ready',
 
             10: 'TextPreparation_Pending',
             11: 'TextPreparation_InProgress',
             12: 'TextPreparation_Failure',
+            19: 'G2P_Ready',
 
             20: 'G2P_Pending',
             21: 'G2P_InProgress',
             22: 'G2P_Failure',
+            29: 'Train_Ready',
 
             200: 'Success'}[status]
 
@@ -46,9 +52,11 @@ class ResourceTypeEnum(enum.IntEnum):
     prepworker = 2
     g2pworker = 3
     modelresult = 4
+    unique_word_list = 5
+    corpus = 6
 
     def type_to_string(t):
-        return (None, 'upload', 'prepworker', 'g2pworker', 'modelresult')[t]
+        return (None, 'upload', 'prepworker', 'g2pworker', 'modelresult', 'unique_word_list', 'corpus')[t]
 
 class Resource(db.Model):
     __tablename__ = 'resources'
