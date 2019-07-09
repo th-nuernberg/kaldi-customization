@@ -13,7 +13,7 @@ ADD requirements.txt /data-preparation-worker/
 RUN apk update && \
     apk upgrade && \
     apk add autoconf-archive automake gfortran git g++ libtool libxml2-dev libxslt-dev && \
-            make perl python3 python3-dev python2-dev python2 py-setuptools tar wget   && \
+    apk add make perl python3 python3-dev python2-dev python2 py-setuptools tar wget   && \
     pip install -r requirements.txt
 
 # Download and Install OpenFST
