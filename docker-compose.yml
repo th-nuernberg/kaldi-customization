@@ -2,7 +2,11 @@ version: '3.2'
 
 services:
   kaldi-worker:
-    build: ./worker/kaldi-worker
+    env_file:
+      - config/docker.env
+    build:
+      context: .
+      dockerfile: ./worker/kaldi-worker/Dockerfile
     networks:
       - backend
     restart: always
@@ -10,7 +14,9 @@ services:
       - redis
     
   text-prep-worker:
-    build: ./worker/text-preparation-worker
+    build:
+      context: .
+      dockerfile: ./worker/text-preparation-worker/Dockerfile
     networks:
       - backend
     volumes:
@@ -77,7 +83,9 @@ services:
       - web
 
   api:
-    build: ./server/api
+    build:
+      context: .
+      dockerfile: ./server/api/Dockerfile
     networks:
       - frontend
       - backend

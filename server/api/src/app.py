@@ -2,6 +2,7 @@
 from bootstrap import *
 from db import Project, Model, Resource, ResourceStateEnum, ResourceTypeEnum
 from flask import logging
+from connector import *
 
 root_project = Project(uuid='root', name='Test Project')
 db.session.add(root_project)
@@ -38,6 +39,11 @@ TEXT_PREP_UPLOAD_FOLDER = '/www/texts/in'
 TEXT_PREP_FINISHED_FOLDER = '/www/texts/out'
 TEXT_PREP_QUEUE = 'Text-Prep-Queue'
 STATUS_QUEUE = 'Status-Queue'
+
+
+status_queue = StatusQueue(redis=redis_conn, key=STATUS_QUEUE)
+kaldi_task_queue = TaskQueue(redis=redis_conn, key='Kaldi-Queue')
+
 
 def handle_statue_queue():
     '''
@@ -226,6 +232,34 @@ def download_texts_out_file(filename):
         app.logger.error(error_msg)
         app.logger.error(e)
         return (error_msg, 500)
+
+
+@app.route('/test-model')
+def test_model():
+    # model -> root for models
+    # base/german -> workspace/project UUID
+    # OR `base` (base models created by hand)
+    base_bucket_path = 'model-base-german'
+    target_bucket_path = 'model-target-de'
+
+    task = KaldiTask(
+        # zip = project_name + version
+        base_path=base_bucket_path + '/german-1.zip',
+        target_path=target_bucket_path + '/de-1.zip',
+        resources=[
+            KaldiTaskResource('resource-x/corpus', 'resource-x/dict')
+        ])
+
+    if not minio.bucket_exists(target_bucket_path):
+        # this should be done when a new project is created
+        minio.make_bucket(target_bucket_path)
+
+    if minio.bucket_exists(task.target_path):
+        minio.remove_bucket(task.target_path)
+
+    kaldi_task_queue.submit(task)
+
+    return task.toJSON()
 
 # It is not possible to run a endless loop here...
 # There is a thread for this task

@@ -23,9 +23,11 @@ class TestKaldiWorker(unittest.TestCase):
 
     def test_receive_task(self):
         queue = TaskQueue(redis=self._redis, key=self._task_queue)
-        self._redis.rpush(self._task_queue, r'{"message": "Test"}')
-        task = next(queue.process())
+        queue.submit(r'{"message": "Test"}')
+        task = next(queue.listen())
+        print(task)
         self.assertIsNotNone(task)
+
 
 if __name__ == "__main__":
     logger.setLevel(logging.DEBUG)

@@ -30,3 +30,9 @@ dictConfig({
 
 import redis
 redis_conn = redis.Redis(host='redis', port=6379, password='kalditproject')
+
+from minio import Minio
+from minio.error import *
+
+minio = Minio('minio:9000', 'AKIAIOSFODNN7EXAMPLE',
+              'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY', False)

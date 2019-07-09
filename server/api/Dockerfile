@@ -1,18 +1,20 @@
 FROM python:3.7-alpine3.9
-MAINTAINER Tobias Kruse <***REMOVED***>
+LABEL maintainer="Tobias Kruse <***REMOVED***>"
 
 EXPOSE 5000
-VOLUME ["/www/asr", "/www/texts"]
 
-ADD requirements.txt /www/requirements.txt
+ADD server/api/requirements.txt /www/requirements.txt
+ADD shared/connector/requirements.txt /www/connector/requirements.txt
 WORKDIR /www
 
 RUN apk add build-base libffi-dev openssl-dev mariadb-connector-c-dev --no-cache && \
     pip install -r requirements.txt && \
+    pip install -r /www/connector/requirements.txt && \
     apk del build-base
 
-ADD src /www
-ADD wait-for.sh /tools/wait-for.sh
+ADD server/api/src /www
+ADD shared/connector /www/connector
+ADD shared/wait-for.sh /tools/wait-for.sh
 
 ENV FLASK_APP=/www/app.py
 
