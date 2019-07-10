@@ -5,9 +5,9 @@ import redis
 from minio import Minio
 from minio import ResponseError
 
-from file_parser import pdf_parser, html_parser, word_parser
-from file_parser import text_parser, ocr_parser, generate_corpus
-from minio_communication import download_from_bucket, upload_to_bucket
+from file_parser import (pdf_parser, html_parser, word_parser, 
+                         text_parser, ocr_parser, generate_corpus)
+from minio_communication import download_from_bucket, upload_to_bucket, does_bucket_exist
 
 def report_status_to_API(queue_status, conn, filename=None, message=None):
     '''
@@ -29,7 +29,7 @@ def report_status_to_API(queue_status, conn, filename=None, message=None):
     elif queue_status == 200 and not message:
         message = "Task finished successfully"
 
-    conn.publish('Status-Queue', json.dumps({
+    conn.publish("Status-Queue", json.dumps({
                  "type": "text-prep",
                  "text": filename,
                  "status": queue_status,
@@ -50,6 +50,11 @@ def save_textfile(text_list, filename):
     file_handler.close()
 
 
+def remove_local_files(path):
+    text_prep_in_files = os.listdir(path)    
+    for file in text_prep_in_files:
+        os.remove(path + file)
+
 def process_file(file_type, filename, minio_client):
     '''
     This function is called, in order to open the received filename of the API.
@@ -62,33 +67,41 @@ def process_file(file_type, filename, minio_client):
         - txt
         - PNG or JPG
     '''
-    parsed_text = []
-    # Checks whether the requested bucket exists
-    try:
-        print(minio_client.bucket_exists("texts-in"))
-    except ResponseError as err:
-        print(err)
-        return (False, err)
+    unique_word_list = []
+    text_prep_input = "/text_prep_worker/in/"
+    text_prep_output = "/text_prep_worker/out/"
 
-    # Get a full object and prints the original object stat information.
-    download_result = download_from_bucket(minio_client, 'texts-in', filename, 'text_prep_worker/in/')
+    # Step 1: Checks whether the requested buckets exist
+    existance_result_in = does_bucket_exist(minio_client, "texts-in")
+    if not existance_result_in[0]:
+        return existance_result_in
+
+    existance_result_out = does_bucket_exist(minio_client, "texts-out")
+    if not existance_result_out[0]:
+        return existance_result_out
+
+    # Step 2: Downloads the needed file which is located within the texts-in bucket
+    download_result = download_from_bucket(minio_client, "texts-in", filename, text_prep_input)
     if not download_result[0]:
         return download_result
 
-    # Starts to process the downloaded file
-    file_path = "/text_prep_worker/in/" + filename
+    # Step 3: Process the downloaded file
+    #         Results of the processing are: 
+    #           1) unique_word_list
+    #           2) corpus
+    file_path = text_prep_input + filename
     full_text = ""
     try:
         if file_type == "pdf":
-            parsed_text, full_text = pdf_parser(file_path)
+            unique_word_list, full_text = pdf_parser(file_path)
         elif file_type == "docx":
-            parsed_text, full_text = word_parser(file_path)
+            unique_word_list, full_text = word_parser(file_path)
         elif file_type == "html":
-            parsed_text, full_text = html_parser(file_path)
+            unique_word_list, full_text = html_parser(file_path)
         elif file_type == "txt":
-            parsed_text, full_text = text_parser(file_path)
+            unique_word_list, full_text = text_parser(file_path)
         elif file_type == "png" or file_type == "jpg":
-            parsed_text, full_text = ocr_parser(file_path)            
+            unique_word_list, full_text = ocr_parser(file_path)            
         else:
             return (False, "Given file type is not supported. Finishing processing")
 
@@ -99,38 +112,45 @@ def process_file(file_type, filename, minio_client):
         print(e)
         return (False, "Failed to parse given file")
 
+    # Step 4: Save unique_word_list and corpus locally 
     try:
         corpus_name = filename + "_corpus"
-        save_textfile(parsed_text, filename)
+
+        save_textfile(unique_word_list, filename)
         save_textfile(corpus, corpus_name)
     except:
         return (False, "Failed to save word list")
 
-    # Saves the created unique word list
-    file_path = "/text_prep_worker/out/" + filename
-    file_upload_result = upload_to_bucket(minio_client, "texts-out", filename, file_path)
+    # Step 5: Upload unique_word_list and corpus in bucket 
+    # Uploads the created unique word list
+    unique_word_list_path = text_prep_output + filename
+    file_upload_result = upload_to_bucket(minio_client, "texts-out", filename, unique_word_list_path)
     if not file_upload_result[0]:
         return file_upload_result
 
-    # Saves the created corpus
-    corpus_path = "/text_prep_worker/out/" + corpus_name
+    # Uploads the created corpus
+    corpus_path = text_prep_output + corpus_name
     corpus_upload_result = upload_to_bucket(minio_client, "texts-out", corpus_name, corpus_path)
     if not corpus_upload_result[0]:
         return corpus_upload_result
 
+    # Step 6: Remove local files 
+    remove_local_files(text_prep_input)
+    remove_local_files(text_prep_output)
+    
     return (True, "Processing of data has finished successfully")
 
 
 def infinite_loop():
-    conn = redis.Redis(host='redis', port=6379, db=0, password="kalditproject")
-    minio_client = Minio('minio:9000',
-                         access_key='AKIAIOSFODNN7EXAMPLE',
-                         secret_key='wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+    conn = redis.Redis(host="redis", port=6379, db=0, password="kalditproject")
+    minio_client = Minio("minio:9000",
+                         access_key="AKIAIOSFODNN7EXAMPLE",
+                         secret_key="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
                          secure=False)
 
     while True:
 
-        data = conn.blpop('Text-Prep-Queue', 1)
+        data = conn.blpop("Text-Prep-Queue", 1)
         if data:
             print("Received the following task from Text-Prep-Queue: ")
             print(data)
