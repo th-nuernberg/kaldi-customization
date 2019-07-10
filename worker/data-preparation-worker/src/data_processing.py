@@ -1,3 +1,4 @@
+import os
 import re
 import subprocess
 
@@ -81,9 +82,20 @@ def merge_corpus_list(corpus_list):
 
         # Appends all sentences of the second corpus to the first one
         for sentence in second_corpus_list:
-            first_corpus_list.append(sentence)    
+            first_corpus_list.append(sentence)
 
-    with open("/data_prep_worker/out/final_corpus.txt", "w") as file_writer:
+    with open("/data_prep_worker/out/final_corpus", "w") as file_writer:
         for sentence in first_corpus_list:
             if sentence != "":
                 file_writer.write(sentence + "\n")
+
+
+def remove_local_files(path):
+    '''
+    This function removes all files which were created within the 
+    /data_prep_worker/in/ and 
+    /data_prep_worker/out/ directories.
+    '''
+    files = os.listdir(path)
+    for file in files:
+        os.remove(path + file)
