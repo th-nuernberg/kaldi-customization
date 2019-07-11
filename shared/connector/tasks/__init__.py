@@ -1,1 +1,1 @@
-from .kaldi import KaldiTask, KaldiTaskResource
+from .kaldi import KaldiTask, KaldiTaskResource, KaldiStatus, KaldiStatusCode

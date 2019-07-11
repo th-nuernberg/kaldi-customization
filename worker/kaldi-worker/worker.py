@@ -19,21 +19,15 @@ if __name__ == "__main__":
 
             os.makedirs(workspace_path)
 
-            # load base model from minio
-            minio.fget_object(
-                task.base_bucket, task.base_object, base_model_path)
-
+            # TODO: load base model from minio
             # TODO: load resources
             # TODO: train resources
-
-            # put target model to minio
-            minio.fput_object(
-                task.target_bucket, task.target_object, base_model_path)
+            # TODO: unload resources
 
             shutil.rmtree(workspace_path)
 
-            # TODO: process task
-            status.submit({'test': 'MyTestStatus'})
+            # write in status queue
+            status.submit(KaldiStatus(id=KaldiStatusCode.SUCCESS))
 
     except KeyboardInterrupt:
         pass

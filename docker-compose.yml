@@ -3,7 +3,7 @@ version: '3.2'
 services:
   kaldi-worker:
     env_file:
-      - config/docker.env
+      - ./config/docker.env
     build:
       context: .
       dockerfile: ./worker/kaldi-worker/Dockerfile
@@ -12,34 +12,37 @@ services:
     restart: always
     depends_on:
       - redis
-    
+      - minio
+    command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
+              /bin/sh /tools/wait-for.sh redis:6379 -- \
+              python3 -u /kaldi/worker.py \
+                --redis-host=redis --redis-password=$$REDIS_PASSWORD \
+                --minio-host=minio --minio-access-key=$$MINIO_ACCESS_KEY --minio-secret-key=$$MINIO_SECRET_KEY"
+
   text-prep-worker:
     build:
       context: .
       dockerfile: ./worker/text-preparation-worker/Dockerfile
     networks:
       - backend
-    volumes:
-      - type: bind
-        source: ./dfs/texts/in
-        target: /text_prep_worker/in
-      - type: bind
-        source: ./dfs/texts/out
-        target: /text_prep_worker/out
     restart: always
     depends_on:
       - redis
+      - minio
 
   redis:
+    env_file: ./config/docker.env
     image: "redis:alpine"
     ports:
       - 6380:6379
-    command: redis-server --requirepass kalditproject
+    command: redis-server --requirepass "$$REDIS_PASSWORD"
     networks:
       - backend
     restart: always
 
   minio:
+    env_file:
+      - config/docker.env
     image: "minio/minio"
     volumes:
       - ./dfs/data:/data
@@ -47,24 +50,18 @@ services:
     ports:
       - 9001:9000
     command: server /data
-    environment:
-      MINIO_ACCESS_KEY: AKIAIOSFODNN7EXAMPLE
-      MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
     networks:
       - backend
     restart: always
 
   db:
+    env_file:
+      - ./config/docker.env
     image: "mariadb"
     ports:
       - 3307:3306
     command:
       - --interactive_timeout=28800
-    environment:
-      MYSQL_ROOT_PASSWORD: kalditproject
-      MYSQL_USER: api
-      MYSQL_PASSWORD: api-server-password
-      MYSQL_DATABASE: api
     networks:
       - frontend
     restart: always
@@ -89,17 +86,11 @@ services:
     networks:
       - frontend
       - backend
-    volumes:
-      - type: bind
-        source: ./dfs/asr
-        target: /www/asr
-      - type: bind
-        source: ./dfs/texts
-        target: /www/texts
     restart: always
     depends_on:
       - db
       - redis
+      - minio
 
   web:
     build: ./server/web
