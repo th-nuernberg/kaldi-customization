@@ -41,29 +41,36 @@ minioClient = Minio('minio:9000',
                     secure=False)
 
 # Bucket definitions
-# files for the text-prep-worker
-TEXTS_IN_BUCKET = 'texts-in'
-
-# unique word list
+# text-prep-worker
+TEXTS_IN_BUCKET  = 'texts-in'
 TEXTS_OUT_BUCKET = 'texts-out'
-# some other files
-#TEXTS_OUT_BUCKET = 'texts-out'
+
+# G2P-worker
+G2P_IN_BUCKET  = 'g2p-in'
+G2P_OUT_BUCKET = 'g2p-out'
+
+# acoustic models that are trained by users
+ACOUSTIC_MODELS_BUCKET  = 'acoustic-models'
+# predefined models and stuff for kaldi like vocabular
+LANGUAGE_MODELS_BUCKET  = 'language-models'
+
+def createMinioBucket(minio_client, bucket_name):
+    '''
+    Create the given bucket if it does not exist.
+    '''
+    try:
+        minio_client.make_bucket(bucket_name)
+    except BucketAlreadyOwnedByYou:
+        pass
+    except BucketAlreadyExists:
+        pass
+    except ResponseError as e:
+        raise e
 
 # Create buckets if they not exist
-try:
-    minioClient.make_bucket(TEXTS_IN_BUCKET)
-except BucketAlreadyOwnedByYou as err:
-    pass
-except BucketAlreadyExists as err:
-    pass
-except ResponseError as err:
-    raise
-
-try:
-    minioClient.make_bucket(TEXTS_OUT_BUCKET)
-except BucketAlreadyOwnedByYou as err:
-    pass
-except BucketAlreadyExists as err:
-    pass
-except ResponseError as err:
-    raise
+createMinioBucket(minio_client=minioClient, bucket_name=TEXTS_IN_BUCKET)
+createMinioBucket(minio_client=minioClient, bucket_name=TEXTS_OUT_BUCKET)
+createMinioBucket(minio_client=minioClient, bucket_name=G2P_IN_BUCKET)
+createMinioBucket(minio_client=minioClient, bucket_name=G2P_OUT_BUCKET)
+createMinioBucket(minio_client=minioClient, bucket_name=ACOUSTIC_MODELS_BUCKET)
+createMinioBucket(minio_client=minioClient, bucket_name=LANGUAGE_MODELS_BUCKET)
