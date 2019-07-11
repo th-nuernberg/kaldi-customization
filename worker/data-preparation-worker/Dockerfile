@@ -1,12 +1,15 @@
 FROM python:2.7-alpine3.10
-VOLUME ["/g2p_worker/in", "/g2p_worker/out"]
-WORKDIR /g2p-worker
+VOLUME ["/data_prep_worker/in", "/data_prep_worker/out"]
+WORKDIR /data-preparation-worker
+
+ADD requirements.txt /data-preparation-worker/
 
 
 RUN apk update && \
     apk upgrade && \
-    apk add autoconf-archive automake gfortran git g++ libtool make perl python3-dev py-setuptools tar wget python2-dev python3 python2
-
+    apk add autoconf-archive automake gfortran git g++ libtool libxml2-dev libxslt-dev && \
+    apk add make perl python3 python3-dev python2-dev python2 py-setuptools tar wget   && \
+    pip install -r requirements.txt
 
 # Download and Install OpenFST
 RUN wget http://www.openfst.org/twiki/pub/FST/FstDownload/openfst-1.6.2.tar.gz && \
@@ -22,7 +25,7 @@ RUN wget http://www.openfst.org/twiki/pub/FST/FstDownload/openfst-1.6.2.tar.gz &
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/lib/fst
 
 
-# Download and build G2P
+# Download and build Phonetisaurus
 RUN git clone https://github.com/AdolfVonKleist/Phonetisaurus.git && \
     cd Phonetisaurus && \
     ./configure && \
@@ -38,15 +41,9 @@ RUN git clone https://github.com/mitlm/mitlm.git && \
     make install && \
     cd
 
+ADD src/data_preparation.py /data-preparation-worker/ 
+ADD src/minio_communication.py /data-preparation-worker/ 
+ADD src/data_processing.py /data-preparation-worker/
+ADD wait-for.sh /data-preparation-worker/ 
 
-# RUN mkdir example && \
-#     cd example && \
-#     wget https://raw.githubusercontent.com/cmusphinx/cmudict/master/cmudict.dict && \
-#     cat cmudict.dict | perl -pe 's/\([0-9]+\)//; s/\s+/ /g; s/^\s+//; s/\s+$//; @_ = split (/\s+/); $w = shift (@_); $_ = $w."\t".join (" ", @_)."\n";' > cmudict.formatted.dict
-
-
-ADD g2p.py /g2p-worker/
-ADD wait-for.sh /g2p-worker/
-ADD requirements.txt /g2p-worker/
-
-CMD ["/bin/sh", "/g2p-worker/wait-for.sh", "redis:6379", "--", "python", "-u", "/g2p-worker/g2p.py"]
+CMD ["/bin/sh", "/data-preparation-worker/wait-for.sh", "redis:6379", "--", "python", "-u", "/data-preparation-worker/data_preparation.py"]
