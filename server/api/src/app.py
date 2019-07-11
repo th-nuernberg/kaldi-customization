@@ -1,10 +1,14 @@
 #!/usr/local/bin/python3
 from bootstrap import *
-from db import Project, Model, Resource, ResourceStateEnum, ResourceFileTypeEnum, ResourceTypeEnum
+from db import *
 from flask import logging
 
-root_project = Project(uuid='root', name='Test Project')
-db.session.add(root_project)
+german = Language(name="German")
+db.session.add(german)
+
+acoustic_model = AcousticModel(name='Voxforge', language=german.id, model_type=ModelType.HMM_RNN)
+db.session.add(acoustic_model)
+"""
 root_model = Model(project=root_project)
 db.session.add(root_model)
 
@@ -20,11 +24,11 @@ db.session.add(derived_model0)
 
 derived_model1 = Model(project=project1, parent=root_model)
 db.session.add(derived_model1)
-
+"""
 db.session.commit()
 
-app.logger.info(root_model.children)
-app.logger.info(derived_model0.parent.project.name)
+#app.logger.info(root_model.children)
+#app.logger.info(derived_model0.parent.project.name)
 
 db.session.close()
 
