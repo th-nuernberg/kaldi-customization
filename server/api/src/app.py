@@ -2,6 +2,7 @@
 from bootstrap import *
 from db import *
 from flask import logging
+from connector import *
 
 german = Language(name="German")
 db.session.add(german)
@@ -43,6 +44,11 @@ TEXT_PREP_FINISHED_FOLDER = '/www/texts/out'
 TEXT_PREP_QUEUE = 'Text-Prep-Queue'
 G2P_QUEUE = 'G2P-Queue'
 STATUS_QUEUE = 'Status-Queue'
+
+
+status_queue = StatusQueue(redis=redis_conn, key=STATUS_QUEUE)
+kaldi_task_queue = TaskQueue(redis=redis_conn, key='Kaldi-Queue')
+
 
 def handle_statue_queue():
     '''
@@ -311,6 +317,16 @@ def start_g2p():
 
     return "OK"
 
+@app.route('/test-model')
+def test_model():
+    task = KaldiTask(
+        acoustic_model='acoustic_voxforge',
+        base_model='model-1',
+        new_model='model-2')
+
+    kaldi_task_queue.submit(task)
+
+    return task
 # It is not possible to run a endless loop here...
 # There is a thread for this task
 app.logger.info("API-Server is running and listening to status queue")
