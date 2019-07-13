@@ -75,6 +75,8 @@ def parse_args(name, task_queue,
     if conf.verbose:
         logger.setLevel(logging.DEBUG)
 
+    print(conf)
+
     redis_client = redis.Redis(host=conf.redis_host, port=conf.redis_port,
                                db=conf.redis_db, password=conf.redis_password)
 

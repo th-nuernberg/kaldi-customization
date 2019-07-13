@@ -14,7 +14,7 @@ if __name__ == "__main__":
             'Kaldi Worker Connector', task_queue='Kaldi-Queue')
 
         for task in tasks.listen():
-            task = KaldiTask.fromJSON(task)
+            task = KaldiTask(**task)
             print(task)
 
             os.makedirs(workspace_path)

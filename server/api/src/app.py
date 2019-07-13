@@ -236,30 +236,14 @@ def download_texts_out_file(filename):
 
 @app.route('/test-model')
 def test_model():
-    # model -> root for models
-    # base/german -> workspace/project UUID
-    # OR `base` (base models created by hand)
-    base_bucket_path = 'model-base-german'
-    target_bucket_path = 'model-target-de'
-
     task = KaldiTask(
-        # zip = project_name + version
-        base_path=base_bucket_path + '/german-1.zip',
-        target_path=target_bucket_path + '/de-1.zip',
-        resources=[
-            KaldiTaskResource('resource-x/corpus', 'resource-x/dict')
-        ])
-
-    if not minio.bucket_exists(target_bucket_path):
-        # this should be done when a new project is created
-        minio.make_bucket(target_bucket_path)
-
-    if minio.bucket_exists(task.target_path):
-        minio.remove_bucket(task.target_path)
+        acoustic_model='acoustic_voxforge',
+        base_model='model-1',
+        new_model='model-2')
 
     kaldi_task_queue.submit(task)
 
-    return task.toJSON()
+    return task
 
 # It is not possible to run a endless loop here...
 # There is a thread for this task
