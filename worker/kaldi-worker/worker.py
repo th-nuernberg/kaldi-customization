@@ -15,7 +15,6 @@ if __name__ == "__main__":
 
         for task in tasks.listen():
             task = KaldiTask(**task)
-            print(task)
 
             os.makedirs(workspace_path)
 

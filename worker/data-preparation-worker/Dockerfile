@@ -1,14 +1,13 @@
 FROM python:2.7-alpine3.10
-VOLUME ["/data_prep_worker/in", "/data_prep_worker/out"]
+LABEL maintainer="Dino Pehratovic <***REMOVED***>"
+
+ADD worker/data-preparation-worker/requirements.txt /data-preparation-worker/requirements.txt
 WORKDIR /data-preparation-worker
-
-ADD requirements.txt /data-preparation-worker/
-
 
 RUN apk update && \
     apk upgrade && \
-    apk add autoconf-archive automake gfortran git g++ libtool libxml2-dev libxslt-dev && \
-    apk add make perl python3 python3-dev python2-dev python2 py-setuptools tar wget   && \
+    apk add autoconf-archive automake gfortran git g++ libtool libxml2-dev libxslt-dev \
+            make perl python3 python3-dev python2-dev python2 py-setuptools tar wget   && \
     pip install -r requirements.txt
 
 # Download and Install OpenFST
@@ -41,9 +40,7 @@ RUN git clone https://github.com/mitlm/mitlm.git && \
     make install && \
     cd
 
-ADD src/data_preparation.py /data-preparation-worker/ 
-ADD src/minio_communication.py /data-preparation-worker/ 
-ADD src/data_processing.py /data-preparation-worker/
-ADD wait-for.sh /data-preparation-worker/ 
+ADD worker/data-preparation-worker/src /data-preparation-worker/
+ADD shared/wait-for.sh /tools/wait-for.sh
 
-CMD ["/bin/sh", "/data-preparation-worker/wait-for.sh", "redis:6379", "--", "python", "-u", "/data-preparation-worker/data_preparation.py"]
+CMD ["python", "-u", "/data-preparation-worker/data_preparation.py"]

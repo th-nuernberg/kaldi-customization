@@ -28,10 +28,15 @@ services:
     restart: always
     depends_on:
       - redis
-<<<<<<< HEAD
-  
+      - minio
+    command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
+              /bin/sh /tools/wait-for.sh redis:6379 -- \
+              python -u /text_prep_worker/text_preparation.py"
+
   data-preparation-worker:
-    build: ./worker/data-preparation-worker
+    build:
+      context: .
+      dockerfile: ./worker/data-preparation-worker/Dockerfile
     networks:
       - backend
     volumes:
@@ -44,12 +49,10 @@ services:
     restart: always
     depends_on:
       - redis
-=======
       - minio
     command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
               /bin/sh /tools/wait-for.sh redis:6379 -- \
-              python -u /text_prep_worker/text_preparation.py"
->>>>>>> MinIO-Kaldi-Worker
+              python -u /data-preparation-worker/data_preparation.py"
 
   redis:
     env_file:
