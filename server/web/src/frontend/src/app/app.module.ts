@@ -18,11 +18,16 @@ import {
   MatSidenavModule,
   MatListModule,
   MatTabsModule,
+
+  MatDividerModule,
+  MatInputModule,
+  MatTableModule,
 } from '@angular/material';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
 import { ProjectComponent } from './project/project.component';
 import { CoverComponent } from './cover/cover.component';
+import { UploadComponent } from './upload/upload.component';
 import { AccountComponent } from './account/account.component';
 
 @NgModule({
@@ -32,6 +37,7 @@ import { AccountComponent } from './account/account.component';
     WorkspaceComponent,
     ProjectComponent,
     CoverComponent,
+    UploadComponent,
     AccountComponent,
   ],
   imports: [
@@ -49,6 +55,9 @@ import { AccountComponent } from './account/account.component';
     MatCheckboxModule,
     MatListModule,
     MatTabsModule,
+    MatInputModule,
+    MatDividerModule,
+    MatTableModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
