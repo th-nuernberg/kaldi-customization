@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pylint = "*"
 
 [packages]
 gevent-websocket = "*"
@@ -16,6 +17,7 @@ Flask-Mail = "*"
 Flask-RESTful = "*"
 Flask-SQLAlchemy = "*"
 Flask-SocketIO = "*"
+flask-swagger-ui = "*"
 Flask-Testing = "*"
 mysqlclient = "*"
 minio = "*"

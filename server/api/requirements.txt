@@ -6,6 +6,7 @@ Flask-Mail
 Flask-RESTful
 Flask-SQLAlchemy
 Flask-SocketIO
+flask-swagger-ui
 Flask-Testing
 gevent-websocket
 mysqlclient

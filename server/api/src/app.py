@@ -35,6 +35,7 @@ db.session.close()
 
 import os
 from flask import Flask, flash, request, Response, redirect, url_for, send_from_directory
+from flask_swagger_ui import get_swaggerui_blueprint
 from werkzeug.utils import secure_filename
 import json
 import threading
@@ -45,6 +46,8 @@ TEXT_PREP_QUEUE = 'Text-Prep-Queue'
 G2P_QUEUE = 'G2P-Queue'
 STATUS_QUEUE = 'Status-Queue'
 
+SWAGGER_URL = '/api/v1/docs' # URL for exposing Swagger UI (without trailing '/')
+API_URL = 'http://' + request.host + SWAGGER_URL + '/swagger.json' # Our API url (can of course be a local resource)
 
 status_queue = StatusQueue(redis=redis_conn, key=STATUS_QUEUE)
 kaldi_task_queue = TaskQueue(redis=redis_conn, key='Kaldi-Queue')
@@ -125,6 +128,32 @@ def handle_text_prep_status(msg_data):
 
 redis_handler_thread = threading.Thread(target=handle_statue_queue, name="Redis-Handler")
 redis_handler_thread.start()
+
+# Call factory function to create our blueprint
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL, # Swagger UI static files will be mapped to '{SWAGGER_URL}/dist/'
+    API_URL,
+    config={ # Swagger UI config overrides
+    'app_name': "Kaldi Customization API"
+    },
+    # oauth_config={ # OAuth config. See https://github.com/swagger-api/swagger-ui#oauth2-configuration .
+    # 'clientId': "your-client-id",
+    # 'clientSecret': "your-client-secret-if-required",
+    # 'realm': "your-realms",
+    # 'appName': "your-app-name",
+    # 'scopeSeparator': " ",
+    # 'additionalQueryStringParams': {'test': "hello"}
+    # }
+)
+
+# Register blueprint at URL
+# (URL must match the one given to factory function above)
+app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
+@app.route(SWAGGER_URL + '/swagger.json')
+def v1_swagger_json():
+    with open('swagger/swagger/kaldi-customization.json') as f:
+        return f.read()
 
 @app.route('/')
 def hello():
@@ -330,3 +359,4 @@ def test_model():
 # It is not possible to run a endless loop here...
 # There is a thread for this task
 app.logger.info("API-Server is running and listening to status queue")
+app.run(debug=True)
