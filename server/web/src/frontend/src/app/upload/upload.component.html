@@ -1,0 +1,85 @@
+<!-- Upload overview-->
+<div style="height: calc(100vh - 56px);">
+  <div flex fxLayout="row"
+      fxLayoutAlgin="center center"
+      fxLayout.xs="column"
+      fxLayoutAlign.xs="center stretch">
+    <!-- File History panel -->
+    <div class="upload-panel" fxFlex="33">
+      <h2>History</h2>
+      <table mat-table [dataSource]="dataSource"
+            class="mat-elevation-z8">
+        <!-- Checkbox Column -->
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox (change)="$event ? masterToggle() : null"
+                          [checked]="selection.hasValue() && isAllSelected()"
+                          [indeterminate]="selection.hasValue() && !isAllSelected()"
+                          [aria-label]="checkboxLabel()">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row">
+            <mat-checkbox (click)="$event.stopPropagation()"
+                          (change)="$event ? selection.toggle(row) : null"
+                          [checked]="selection.isSelected(row)"
+                          [aria-label]="checkboxLabel(row)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <!-- Position Column -->
+        <ng-container matColumnDef="position">
+          <th mat-header-cell *matHeaderCellDef> No. </th>
+          <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef> Name </th>
+          <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+        </ng-container>
+
+        <!-- Upload Column -->
+        <ng-container matColumnDef="uploaded">
+          <th mat-header-cell *matHeaderCellDef> Uploaded </th>
+          <td mat-cell *matCellDef="let element"> {{element.uploaded}} </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            (click)="selection.toggle(row)">
+        </tr>
+      </table>
+      <div>
+        <button style="float:right; margin:5px" mat-flat-button (click)="copy()">Copy</button>
+      </div>
+    </div>
+
+    <!-- Current File panel -->
+    <div class="upload-panel" fxFlex="33">
+      <h2>Current</h2>
+      <mat-selection-list #files>
+        <mat-list-option *ngFor='let file of currentFiles'>
+        {{file}}
+        </mat-list-option>
+      </mat-selection-list><p>
+      <div>
+        <button type="button" style="float:right; margin:5px" mat-flat-button>Verify</button>
+        <button type="button" style="float:right; margin:5px" mat-flat-button (click)="remove(files.selectedOptions)" [disabled]="isRemoveDisabled(files.selectedOptions)">Remove</button>
+
+        <input #file id="fileInput" type="file" style="display:none" (change)="loadFile(file)" />
+        <button type="button" style="float:right; margin:5px" mat-flat-button onclick="document.getElementById('fileInput').click()">Upload</button>
+      </div>
+    </div>
+
+    <!-- Preview Text Editor -->
+    <div class="upload-panel" fxFlex="33">
+      <h2>Preview</h2>
+      <form class="text-content-form">
+        <mat-form-field class="text-content-full">
+          <textarea matInput cdkTextareaAutosize cdkAutosizeMinRows="23" cdkAutosizeMaxRows="23">{{fileContent}}</textarea>
+        </mat-form-field>
+      </form>
+    </div>
+  </div>
+</div>
