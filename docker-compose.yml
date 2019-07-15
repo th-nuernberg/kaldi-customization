@@ -39,20 +39,13 @@ services:
       dockerfile: ./worker/data-preparation-worker/Dockerfile
     networks:
       - backend
-    volumes:
-      - type: bind
-        source: ./dfs/texts/in
-        target: /data_prep_worker/in
-      - type: bind
-        source: ./dfs/texts/out
-        target: /data_prep_worker/out
     restart: always
     depends_on:
       - redis
       - minio
     command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
               /bin/sh /tools/wait-for.sh redis:6379 -- \
-              python -u /data-preparation-worker/data_preparation.py"
+              python -u /data_prep_worker/data_preparation.py"
 
   redis:
     env_file:

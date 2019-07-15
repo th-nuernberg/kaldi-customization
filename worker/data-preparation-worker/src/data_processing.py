@@ -24,7 +24,8 @@ def execute_phonetisaurus(lexicon):
     
     with open("/data_prep_worker/out/final_word_list_with_phones", "w") as file_handler:            
         # Applies the previously trained graph onto the word list and creates phones for all words
-        subprocess.call(["phonetisaurus-apply", "--model", "train/model.fst", "--word_list", "/data_prep_worker/out/final_word_list", "-n", "2", "-l", lexicon, "--beam", "10000", "-g", "-t", "10000"], stdout=file_handler)
+        subprocess.call(["phonetisaurus-apply", "--model", "train/model.fst", "--word_list", "/data_prep_worker/out/final_word_list", 
+                         "-n", "2", "-l", lexicon, "--beam", "10000", "-g", "-t", "10000"], stdout=file_handler)
 
     # Moves the created graph into /data_prep_worker/out/
     subprocess.call(["mv", "train/model.fst", "/data_prep_worker/out/model.fst"])

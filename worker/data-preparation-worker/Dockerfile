@@ -1,8 +1,13 @@
 FROM python:2.7-alpine3.10
 LABEL maintainer="Dino Pehratovic <***REMOVED***>"
 
-ADD worker/data-preparation-worker/requirements.txt /data-preparation-worker/requirements.txt
-WORKDIR /data-preparation-worker
+RUN mkdir /data_prep_worker/ && \
+    mkdir /data_prep_worker/in/ && \
+    mkdir /data_prep_worker/out/ && \
+    mkdir /tools/
+
+ADD worker/data-preparation-worker/requirements.txt /data_prep_worker/requirements.txt
+WORKDIR /data_prep_worker
 
 RUN apk update && \
     apk upgrade && \
@@ -40,7 +45,7 @@ RUN git clone https://github.com/mitlm/mitlm.git && \
     make install && \
     cd
 
-ADD worker/data-preparation-worker/src /data-preparation-worker/
+ADD worker/data-preparation-worker/src /data_prep_worker/
 ADD shared/wait-for.sh /tools/wait-for.sh
 
-CMD ["python", "-u", "/data-preparation-worker/data_preparation.py"]
+CMD ["python", "-u", "/data_prep_worker/data_preparation.py"]

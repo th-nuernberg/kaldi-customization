@@ -1,6 +1,11 @@
 FROM python:3.7-alpine3.9
 LABEL maintainer="Dino Pehratovic <***REMOVED***>"
 
+RUN mkdir /text_prep_worker/ && \
+    mkdir /text_prep_worker/in/ && \
+    mkdir /text_prep_worker/out/ && \
+    mkdir /tools/
+
 ADD worker/text-preparation-worker/requirements.txt /text_prep_worker/requirements.txt
 WORKDIR /text_prep_worker
 
