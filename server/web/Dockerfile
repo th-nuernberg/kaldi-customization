@@ -7,7 +7,7 @@ EXPOSE 4200
 ADD src /www
 
 WORKDIR /www/frontend
-RUN npm install -g @angular/cli && \
+RUN npm install -g @angular/cli@7.3.8 && \
     npm install && \
     npm run build:prod && \
     rm -rf node_modules && \

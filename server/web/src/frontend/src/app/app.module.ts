@@ -24,6 +24,8 @@ import { WorkspaceComponent } from './workspace/workspace.component';
 import { ProjectComponent } from './project/project.component';
 import { CoverComponent } from './cover/cover.component';
 import { AccountComponent } from './account/account.component';
+import { ApiModule } from 'swagger-client';
+import { IdentityService } from '../identity.service';
 
 @NgModule({
   declarations: [
@@ -35,6 +37,7 @@ import { AccountComponent } from './account/account.component';
     AccountComponent,
   ],
   imports: [
+    ApiModule.forRoot(IdentityService.getApiConfiguration),
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
     AppRoutingModule,
     CommonModule,
