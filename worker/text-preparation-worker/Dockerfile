@@ -17,6 +17,8 @@ RUN apk update && \
     apk del build-base
 
 ADD worker/text-preparation-worker/src/ /text_prep_worker/
+ADD shared/minio_communication.py /text_prep_worker/
+ADD shared/connector/ /text_prep_worker/connector/
 ADD shared/wait-for.sh /tools/wait-for.sh
 
 CMD ["python", "-u", "/text_prep_worker/text_preparation.py"]

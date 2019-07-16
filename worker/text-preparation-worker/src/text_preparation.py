@@ -1,15 +1,14 @@
 # -*- encoding: utf-8 -*-
+#!/usr/bin/python
 import json
 import os
-import redis
-from minio import Minio
-from minio import ResponseError
 
+from connector import *
 from file_parser import (pdf_parser, html_parser, word_parser, 
                          text_parser, ocr_parser, generate_corpus)
 from minio_communication import download_from_bucket, upload_to_bucket, does_bucket_exist
 
-def report_status_to_API(queue_status, conn, filename=None, message=None):
+def report_status_to_API(queue_status, status_queue, filename=None, message=None):
     '''
     By calling this function the status queue is updated.
     Possible updates for the status queue are:
@@ -29,12 +28,7 @@ def report_status_to_API(queue_status, conn, filename=None, message=None):
     elif queue_status == 200 and not message:
         message = "Task finished successfully"
 
-    conn.publish("Status-Queue", json.dumps({
-                 "type": "text-prep",
-                 "text": filename,
-                 "status": queue_status,
-                 "msg": message
-                 }))
+    status_queue.submit({"type": "text-prep", "text": filename, "status": queue_status, "msg": message})
 
 
 def save_textfile(text_list, filename):
@@ -142,47 +136,41 @@ def process_file(file_type, filename, minio_client):
 
 
 def infinite_loop():
-    conn = redis.Redis(host="redis", port=6379, db=0, password="kalditproject")
-    minio_client = Minio("minio:9000",
-                         access_key="AKIAIOSFODNN7EXAMPLE",
-                         secret_key="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-                         secure=False)
 
-    while True:
+    _ , task_queue, status_queue, minio_client = parse_args('Text-Preparation-Worker Connector', task_queue='Text-Prep-Queue')    
+    
+    for data in task_queue.listen():
+        print("Received the following task from Text-Prep-Queue: ")
+        print(data)
+        try:
+            json_data = json.loads(data[1])
+            print("Starting to process received data")
+            if "text" in json_data and "type" in json_data:
+                report_status_to_API(queue_status=11, status_queue=status_queue, filename=json_data["text"])
 
-        data = conn.blpop("Text-Prep-Queue", 1)
-        if data:
-            print("Received the following task from Text-Prep-Queue: ")
-            print(data)
-            try:
-                json_data = json.loads(data[1])
-                print("Starting to process received data")
-                if "text" in json_data and "type" in json_data:
-                    report_status_to_API(queue_status=11, conn=conn, filename=json_data["text"])
+                return_value = process_file(json_data["type"], json_data["text"], minio_client)
 
-                    return_value = process_file(json_data["type"], json_data["text"], minio_client)
-
-                    # If the task was successfully processed, the if-statement is executed
-                    # Otherwise, the status queue is updated to: failure
-                    if return_value[0]:
-                        report_status_to_API(queue_status=200, conn=conn, filename=json_data["text"])
-                    else:
-                        report_status_to_API(queue_status=12, conn=conn, filename=json_data["text"], message=return_value[1])
-
-                    if return_value[1]:
-                        print("Processing finished successfully")
+                # If the task was successfully processed, the if-statement is executed
+                # Otherwise, the status queue is updated to: failure
+                if return_value[0]:
+                    report_status_to_API(queue_status=200, status_queue=status_queue, filename=json_data["text"])
                 else:
-                    # Received parameters are wrong --> Update status queue and set task processing to: failure
-                    if "text" not in json_data and "type" in json_data:
-                        report_status_to_API(queue_status=12, conn=conn, filename="failure", message="text key is missing or misspelled within the JSON.")
-                    elif "type" not in json_data and "text" in json_data:
-                        report_status_to_API(queue_status=12, conn=conn, filename="failure", message="type key is missing or misspelled within the JSON.")
-                    else:
-                        report_status_to_API(queue_status=12, conn=conn, filename="failure", message="Both keys are not correct")
-            except Exception as e:
+                    report_status_to_API(queue_status=12, status_queue=status_queue, filename=json_data["text"], message=return_value[1])
+
+                if return_value[1]:
+                    print("Processing finished successfully")
+            else:
                 # Received parameters are wrong --> Update status queue and set task processing to: failure
-                report_status_to_API(queue_status=12, conn=conn, filename="failure", message="Data is not valid JSON. Processing cancelled")
-                raise e
+                if "text" not in json_data and "type" in json_data:
+                    report_status_to_API(queue_status=12, status_queue=status_queue, filename="failure", message="text key is missing or misspelled within the JSON.")
+                elif "type" not in json_data and "text" in json_data:
+                    report_status_to_API(queue_status=12, status_queue=status_queue, filename="failure", message="type key is missing or misspelled within the JSON.")
+                else:
+                    report_status_to_API(queue_status=12, status_queue=status_queue, filename="failure", message="Both keys are not correct")
+        except Exception as e:
+            # Received parameters are wrong --> Update status queue and set task processing to: failure
+            report_status_to_API(queue_status=12, status_queue=status_queue, filename="failure", message="Data is not valid JSON. Processing cancelled")
+            raise e
 
 
 if __name__ == "__main__":

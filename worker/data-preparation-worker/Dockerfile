@@ -46,6 +46,8 @@ RUN git clone https://github.com/mitlm/mitlm.git && \
     cd
 
 ADD worker/data-preparation-worker/src /data_prep_worker/
+ADD shared/minio_communication.py  /data_prep_worker/
+ADD shared/connector/ /data_prep_worker/connector/
 ADD shared/wait-for.sh /tools/wait-for.sh
 
 CMD ["python", "-u", "/data_prep_worker/data_preparation.py"]

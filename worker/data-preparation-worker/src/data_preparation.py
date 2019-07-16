@@ -1,14 +1,15 @@
+#!/usr/bin/python
 import json
 import os
-import redis
+
+from connector import *
 from data_processing import (execute_phonetisaurus, merge_word_lists,
                              merge_corpus_list, remove_local_files)
 from minio_communication import download_from_bucket, upload_to_bucket
-from minio import Minio
-from minio import ResponseError
 
 
-def report_status_to_API(queue_status, conn, filename=None, message=None):
+
+def report_status_to_API(queue_status, status_queue, filename=None, message=None):
     '''
     By calling this function the status queue is updated.
     Possible updates for the status queue are:
@@ -28,12 +29,7 @@ def report_status_to_API(queue_status, conn, filename=None, message=None):
     elif queue_status == 200 and not message:
         message = "Task finished successfully"
 
-    conn.publish('Status-Queue', json.dumps({
-    "type": "text-prep",
-    "text": filename,
-    "status": queue_status,
-    "msg": message
-    }))
+    status_queue.submit({"type": "text-prep", "text": filename, "status": queue_status, "msg": message})
 
 
 def are_parameters_missing(json_data):
@@ -73,77 +69,72 @@ def are_parameters_missing(json_data):
 
 
 def infinite_loop():
-    conn = redis.Redis(host='redis', port=6379, db=0, password="kalditproject")
-    minio_client = Minio('minio:9000',
-                         access_key='AKIAIOSFODNN7EXAMPLE',
-                         secret_key='wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
-                         secure=False)
-    while True:
-        data = conn.blpop('Data-Prep-Queue', 1)
-        if data:
-            print("Received the following task from Data-Prep-Queue: ")
-            print(data)
-            try:
-                #TODO: Update status queue and set task to: In Progress
-                report_status_to_API(queue_status=21, conn=conn, filename="In-Progress")
+    _ , task_queue, status_queue, minio_client = parse_args('Data-Preparation-Worker Connector', task_queue='Data-Prep-Queue')
 
-                json_data = json.loads(data[1])
-                print("Starting to process received data")
+    for data in task_queue.listen():
+        print("Received the following task from Data-Prep-Queue: ")
+        print(data)
+        try:
+            #TODO: Update status queue and set task to: In Progress
+            report_status_to_API(queue_status=21, status_queue=status_queue, filename="In-Progress")
 
-                missing, message = are_parameters_missing(json_data)
+            json_data = json.loads(data[1])
+            print("Starting to process received data")
 
-                if not missing:
-                    print("All needed parameters are available. Processing continues.")
-                    
-                    bucket_in = json_data["bucket-in"]
-                    bucket_out = json_data["bucket-out"]
-                    lexicon = json_data["lexicon"]
-                    word_lists = json_data["uniquewordlists"]
-                    #TODO: Acoustic bucket is still missing. This bucket is needed in order to retrieve the lexicon file
-                    #TODO: Corpuslist is still missing
-                    corpus_list = json_data["corpuslist"]
+            missing, message = are_parameters_missing(json_data)
 
-                    # Step 1: Download all files which were created by the Text-Preparation-Worker for this task:
-                    # Download of the used lexicon
-                    download_results = []
-                    download_results.append(download_from_bucket(minio_client, bucket_in, lexicon, "/data_prep_worker/in/"))
-                    # Download of all word lists which were created within the TPW
-                    for word_list in word_lists:
-                        download_results.append(download_from_bucket(minio_client, bucket_in, word_list, "/data_prep_worker/in/"))
-                    # Download of all corpuses which were created within the TPW
-                    for corpus in corpus_list:
-                        download_results.append(download_from_bucket(minio_client, bucket_in, corpus, "/data_prep_worker/in/"))
+            if not missing:
+                print("All needed parameters are available. Processing continues.")
+                
+                bucket_in = json_data["bucket-in"]
+                bucket_out = json_data["bucket-out"]
+                lexicon = json_data["lexicon"]
+                word_lists = json_data["uniquewordlists"]
+                #TODO: Acoustic bucket is still missing. This bucket is needed in order to retrieve the lexicon file
+                #TODO: Corpuslist is still missing
+                corpus_list = json_data["corpuslist"]
 
-                    for download in download_results:
-                        if not download[0]:
-                            print("At least one download did not finish successfully.")
-                    # Step 2: Merge all word lists into one 
-                    merge_word_lists(word_lists)
+                # Step 1: Download all files which were created by the Text-Preparation-Worker for this task:
+                # Download of the used lexicon
+                download_results = []
+                download_results.append(download_from_bucket(minio_client, bucket_in, lexicon, "/data_prep_worker/in/"))
+                # Download of all word lists which were created within the TPW
+                for word_list in word_lists:
+                    download_results.append(download_from_bucket(minio_client, bucket_in, word_list, "/data_prep_worker/in/"))
+                # Download of all corpuses which were created within the TPW
+                for corpus in corpus_list:
+                    download_results.append(download_from_bucket(minio_client, bucket_in, corpus, "/data_prep_worker/in/"))
 
-                    # Step 3: Merge all corpuses into one 
-                    merge_corpus_list(corpus_list)
-                    
-                    # Step 4: Execute Phonetisaurus and create phones for the unique word list of all files
-                    execute_phonetisaurus(lexicon)
+                for download in download_results:
+                    if not download[0]:
+                        print("At least one download did not finish successfully.")
+                # Step 2: Merge all word lists into one 
+                merge_word_lists(word_lists)
 
-                    # Step 5: Upload lexicon which was retrieved by phonetisaurus-apply and its graph
-                    #TODO: Check whether the upload is successfull
-                    upload_to_bucket(minio_client, bucket_out, "model.fst", "/data_prep_worker/out/")
-                    upload_to_bucket(minio_client, bucket_out, "final_word_list_with_phones", "/data_prep_worker/out/")
-                    upload_to_bucket(minio_client, bucket_out, "final_corpus", "/data_prep_worker/out/")
+                # Step 3: Merge all corpuses into one 
+                merge_corpus_list(corpus_list)
+                
+                # Step 4: Execute Phonetisaurus and create phones for the unique word list of all files
+                execute_phonetisaurus(lexicon)
 
-                    # Step 6: Delete all files which were downloaded or created for this task
-                    remove_local_files("/data_prep_worker/in/")
-                    remove_local_files("/data_prep_worker/out/")
+                # Step 5: Upload lexicon which was retrieved by phonetisaurus-apply and its graph
+                #TODO: Check whether the upload is successfull
+                upload_to_bucket(minio_client, bucket_out, "model.fst", "/data_prep_worker/out/")
+                upload_to_bucket(minio_client, bucket_out, "final_word_list_with_phones", "/data_prep_worker/out/")
+                upload_to_bucket(minio_client, bucket_out, "final_corpus", "/data_prep_worker/out/")
 
-                    # Step 7: Update status queue to: Successfull if this point is reached
-                    report_status_to_API(queue_status=200, conn=conn, filename="success")
-                else:
-                    # At least one parameter is missing --> Update status queue and set task to: Failure
-                    report_status_to_API(queue_status=22, conn=conn, filename="failure", message=message)
-            except:
-                # Received object is not valid JSONO --> Update status queue and set task to: Failure
-                report_status_to_API(queue_status=22, conn=conn, filename="failure", message="Data is not valid JSON. Processing cancelled")
+                # Step 6: Delete all files which were downloaded or created for this task
+                remove_local_files("/data_prep_worker/in/")
+                remove_local_files("/data_prep_worker/out/")
+
+                # Step 7: Update status queue to: Successfull if this point is reached
+                report_status_to_API(queue_status=200, status_queue=status_queue, filename="success")
+            else:
+                # At least one parameter is missing --> Update status queue and set task to: Failure
+                report_status_to_API(queue_status=22, status_queue=status_queue, filename="failure", message=message)
+        except:
+            # Received object is not valid JSONO --> Update status queue and set task to: Failure
+            report_status_to_API(queue_status=22, status_queue=status_queue, filename="failure", message="Data is not valid JSON. Processing cancelled")
 
 
 if __name__ == "__main__":
