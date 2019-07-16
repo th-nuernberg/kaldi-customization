@@ -46,8 +46,9 @@ TEXT_PREP_QUEUE = 'Text-Prep-Queue'
 G2P_QUEUE = 'G2P-Queue'
 STATUS_QUEUE = 'Status-Queue'
 
-SWAGGER_URL = '/api/v1/docs' # URL for exposing Swagger UI (without trailing '/')
-API_URL = 'http://' + request.host + SWAGGER_URL + '/swagger.json' # Our API url (can of course be a local resource)
+# TODO: provide base path and port for server
+# TODO: provide absolute host path and port
+SWAGGER_URL = '/v1/docs' # URL for exposing Swagger UI (without trailing '/')
 
 status_queue = StatusQueue(redis=redis_conn, key=STATUS_QUEUE)
 kaldi_task_queue = TaskQueue(redis=redis_conn, key='Kaldi-Queue')
@@ -131,8 +132,8 @@ redis_handler_thread.start()
 
 # Call factory function to create our blueprint
 swaggerui_blueprint = get_swaggerui_blueprint(
-    SWAGGER_URL, # Swagger UI static files will be mapped to '{SWAGGER_URL}/dist/'
-    API_URL,
+    '/api' + SWAGGER_URL, # Swagger UI static files will be mapped to '{SWAGGER_URL}/dist/'
+    '/api' + SWAGGER_URL + '/swagger.json', # Our API url (can of course be a local resource)
     config={ # Swagger UI config overrides
     'app_name': "Kaldi Customization API"
     },
