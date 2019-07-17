@@ -1,0 +1,98 @@
+version: '3.2'
+
+services:
+
+  text-prep-worker:
+    build:
+      context: ../../../
+      dockerfile: ./worker/text-preparation-worker/Dockerfile
+    networks:
+      - backend
+    restart: always
+    depends_on:
+      - redis
+      - minio
+    command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
+              /bin/sh /tools/wait-for.sh redis:6379 -- \
+              python -u /text_prep_worker/text_preparation.py \
+                --redis-host=redis --redis-password=${REDIS_PASSWORD} \
+                --minio-host=minio --minio-access-key=${MINIO_ACCESS_KEY} --minio-secret-key=${MINIO_SECRET_KEY}"
+
+  redis:
+    env_file:
+      - ../../../config/.env
+    image: redis
+    ports:
+      - 6380:6379
+    networks:
+      - backend
+    restart: always
+    command: "redis-server --requirepass ${REDIS_PASSWORD}"
+
+  minio:
+    env_file:
+      - ../../../config/.env
+    image: "minio/minio"
+    volumes:
+      - ./dfs/data:/data
+      - ./config/.minio:/root/.minio
+    ports:
+      - 9001:9000
+    command: server /data
+    networks:
+      - backend
+    restart: always
+
+  db:
+    env_file:
+      - ../../../config/.env
+    image: "mariadb"
+    ports:
+      - 3307:3306
+    command:
+      - --interactive_timeout=28800
+    networks:
+      - frontend
+    restart: always
+
+  proxy:
+    image: "nginx:alpine"
+    volumes:
+      - ../../../config/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 8080:80
+    networks:
+      - frontend
+    restart: always
+    depends_on:
+      - api
+      - web
+
+  api:
+    build:
+      context: ../../../
+      dockerfile: ./server/api/Dockerfile
+    networks:
+      - frontend
+      - backend
+    restart: always
+    depends_on:
+      - db
+      - redis
+      - minio
+    command: "/bin/sh /tools/wait-for.sh db:3306 -- \
+              /bin/sh /tools/wait-for.sh minio:9000 -- \
+              /bin/sh /tools/wait-for.sh redis:6379 -- \
+              python -m flask run --host=0.0.0.0"
+
+  web:
+    build: ../../../server/web
+    networks:
+      - frontend
+    restart: always
+    depends_on:
+      - api
+
+networks:
+  frontend:
+  backend:
