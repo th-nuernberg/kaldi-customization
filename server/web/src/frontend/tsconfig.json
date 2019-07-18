@@ -17,6 +17,14 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "swagger-client": [
+        "dist/swagger-client"
+      ],
+      "swagger-client/*": [
+        "dist/swagger-client/*"
+      ]
+    }
   }
 }

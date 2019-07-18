@@ -1,4 +1,4 @@
-from bootstrap import db
+from ._db import db
 import enum
 
 class ModelType(enum.IntEnum):

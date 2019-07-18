@@ -1,4 +1,4 @@
-from bootstrap import db
+from ._db import db
 
 class Resource(db.Model):
     __tablename__ = 'resources'

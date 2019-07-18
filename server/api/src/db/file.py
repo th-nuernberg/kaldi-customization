@@ -1,4 +1,4 @@
-from bootstrap import db
+from ._db import db
 import enum
 
 class FileStateEnum(enum.IntEnum):
@@ -11,6 +11,7 @@ class FileStateEnum(enum.IntEnum):
     TextPreparation_Failure = 12
     TextPreparation_Success = 13
 
+    @staticmethod
     def status_to_string(status):
         return {
             0: 'Upload_InProgress',
@@ -31,6 +32,7 @@ class FileTypeEnum(enum.IntEnum):
     png = 5
     jpg = 6
 
+    @staticmethod
     def file_type_to_string(t):
         return (None, 'html', 'docx', 'txt', 'pdf', 'png', 'jpg')[t]
 
