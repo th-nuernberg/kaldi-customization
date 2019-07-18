@@ -1,4 +1,4 @@
-from db import Resource, FileStateEnum, FileTypeEnum
+from models import Resource, FileStateEnum, FileTypeEnum
 
 
 def handle_text_prep_status(msg_data, db, logger):

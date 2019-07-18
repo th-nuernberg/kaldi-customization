@@ -1,3 +1,6 @@
+import secrets
+
+
 minio_buckets = dict(
     # MinIO Bucket definitions
     # text-prep-worker
@@ -18,10 +21,16 @@ def more_args(parser):
     # webserver
     parser.add_argument(
         '--host', default='0.0.0.0',
-        help='host name/address of webserver [default: 0.0.0.0]')
+        help='host name/address of webserver [default: 0.0.0.0]'
+    )
     parser.add_argument(
         '--port', type=int, default=5000,
-        help='port of webserver host [default: 5000]')
+        help='port of webserver host [default: 5000]'
+    )
+    parser.add_argument(
+        '--secret-key', default=secrets.token_urlsafe(16),
+        help='secret key for user authentication [default is random]'
+    )
 
     # db config
     parser.add_argument(

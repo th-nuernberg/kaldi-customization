@@ -16,4 +16,6 @@ ADD server/api/src /www
 ADD shared/connector /www/connector
 ADD shared/wait-for.sh /tools/wait-for.sh
 
+ENV AUTHLIB_INSECURE_TRANSPORT=true
+
 CMD ["python", "-u", "/www/app.py"]

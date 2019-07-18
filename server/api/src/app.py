@@ -10,8 +10,10 @@ import redis
 import threading
 
 from status_queue.handler import start_status_queue_handler
-from db import *
 from swagger_server import encoder
+from models import *
+from oauth2 import config_oauth
+from routes.auth import bp as auth_bp
 
 
 def setup_minio(minio_client, buckets):
@@ -33,11 +35,6 @@ connex_app.add_api('swagger.yaml', pythonic_params=True, resolver=connexion.reso
 
 app = connex_app.app
 app.json_encoder = encoder.JSONEncoder
-
-
-@app.route('/api/')
-def hello():
-    return '<h1>Kaldi Customization API Server</h1><a href="/api/v1/ui/">API Version 1</a>'
 
 
 ##########################################################################################
@@ -261,6 +258,8 @@ if __name__ == "__main__":
     if conf.verbose:
         print(conf)
 
+    app.config['SECRET_KEY'] = conf.secret_key
+
     logging.config.dictConfig({
         'version': 1,
         'formatters': {'default': {
@@ -297,6 +296,10 @@ if __name__ == "__main__":
         db.create_all()
 
         bootstrap()
+
+    db.init_app(app)
+    config_oauth(app)
+    app.register_blueprint(auth_bp, url_prefix='/api')
 
     start_status_queue_handler(status_queue, db, app.logger)
     setup_minio(minio_client, config.minio_buckets.values())

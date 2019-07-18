@@ -2,6 +2,7 @@ from ._db import db
 from ._bootstrap import bootstrap
 
 from .acousticmodel import *
+from .auth import *
 from .file import *
 from .language import *
 from .project import *

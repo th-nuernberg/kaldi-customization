@@ -9,5 +9,11 @@ class User(db.Model):
     salt = db.Column(db.String(64))
 
 
+    def check_password(self, password):
+        return password == 'valid'
+
+    def get_user_id(self):
+        return self.id
+
     def __repr__(self):
         return '<User #{} (Username: {})>'.format(self.id, self.username)
