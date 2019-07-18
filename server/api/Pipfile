@@ -7,17 +7,13 @@ verify_ssl = true
 pylint = "*"
 
 [packages]
+connexion = "*"
 gevent-websocket = "*"
 redis = "*"
 Flask = "*"
-Flask-Bcrypt = "*"
-Flask-Gravatar = "*"
-Flask-Limiter = "*"
 Flask-Mail = "*"
-Flask-RESTful = "*"
 Flask-SQLAlchemy = "*"
 Flask-SocketIO = "*"
-flask-swagger-ui = "*"
 Flask-Testing = "*"
 mysqlclient = "*"
 minio = "*"

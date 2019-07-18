@@ -10,7 +10,7 @@ logger = logging.getLogger('connector')
 logger.addHandler(logging.StreamHandler(sys.stdout))
 
 
-def parse_args(name, task_queue,
+def parse_args(name, task_queue=None,
                status_queue='Status-Queue', more_args=None):
     """Parses arguments from argv,
         lambda more_args(parser) can be used to extend the default args
@@ -40,10 +40,13 @@ def parse_args(name, task_queue,
         help='database id of redis [default: 0]')
     parser.add_argument(
         '--redis-password', default=None,
-        help='password of the redis server [default: ]')
-    parser.add_argument(
-        '--redis-task-queue', default=task_queue,
-        help='key: list of tasks [default: {}]'.format(task_queue))
+        help='password of the redis server')
+
+    if task_queue:
+        parser.add_argument(
+            '--redis-task-queue', default=task_queue,
+            help='key: list of tasks [default: {}]'.format(task_queue))
+
     parser.add_argument(
         '--redis-status-queue', default=status_queue,
         help='key: pubsub of status updates [default: {}]'.format(status_queue))
@@ -59,11 +62,11 @@ def parse_args(name, task_queue,
     )
     parser.add_argument(
         '--minio-access-key',
-        help='access key of minio [default: ]'
+        help='access key of minio'
     )
     parser.add_argument(
         '--minio-secret-key',
-        help='secret key of minio [default: ]'
+        help='secret key of minio'
     )
     parser.add_argument(
         '--minio-secure', action='store_true',
@@ -78,12 +81,14 @@ def parse_args(name, task_queue,
     redis_client = redis.Redis(host=conf.redis_host, port=conf.redis_port,
                                db=conf.redis_db, password=conf.redis_password)
 
-    task_queue = TaskQueue(redis=redis_client, key=conf.redis_task_queue)
+    if task_queue:
+        task_queue = TaskQueue(redis=redis_client, key=conf.redis_task_queue)
+
     status_queue = StatusQueue(redis=redis_client, key=conf.redis_status_queue)
 
     minio_client = minio.Minio(conf.minio_host + ':' + str(conf.minio_port),
                                conf.minio_access_key, conf.minio_secret_key,
-                               conf.minio_secure)
+                               secure=conf.minio_secure)
 
     return conf, task_queue, status_queue, minio_client
 

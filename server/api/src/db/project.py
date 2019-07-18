@@ -1,4 +1,4 @@
-from bootstrap import db
+from ._db import db
 import enum
 
 class ProjectStateEnum(enum.IntEnum):
@@ -11,7 +11,7 @@ class ProjectStateEnum(enum.IntEnum):
     Train_Success = 300
     Train_Failure = 320
 
-
+    @staticmethod
     def status_to_string(status):
         return {
             100: "Init",
