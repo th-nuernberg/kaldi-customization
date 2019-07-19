@@ -1,134 +1,51 @@
-#!/usr/local/bin/python3
-from bootstrap import *
-from db import *
-from flask import logging
-from connector import *
-
-german = Language(name="German")
-db.session.add(german)
-
-acoustic_model = AcousticModel(name='Voxforge', language=german.id, model_type=ModelType.HMM_RNN)
-db.session.add(acoustic_model)
-"""
-root_model = Model(project=root_project)
-db.session.add(root_model)
-
-project1 = Project(uuid='project#1', name='Test Project')
-db.session.add(project1)
-
-resource1 = Resource(model=root_model, name='res0', resource_type=ResourceTypeEnum.modelresult , file_type=ResourceFileTypeEnum.png, status=ResourceStateEnum.Upload_InProgress)
-db.session.add(resource1)
-app.logger.info(resource1)
-
-derived_model0 = Model(project=project1, parent=root_model)
-db.session.add(derived_model0)
-
-derived_model1 = Model(project=project1, parent=root_model)
-db.session.add(derived_model1)
-"""
-db.session.commit()
-
-#app.logger.info(root_model.children)
-#app.logger.info(derived_model0.parent.project.name)
-
-db.session.close()
-
-import os
-from flask import Flask, flash, request, Response, redirect, url_for, send_from_directory
-from werkzeug.utils import secure_filename
+#!/usr/bin/python
+import config
+import connector
+import connexion
 import json
+import logging.config
+import minio
+import os
+import redis
 import threading
+
+from status_queue.handler import start_status_queue_handler
+from swagger_server import encoder
+from models import *
+from oauth2 import config_oauth
+from routes.auth import bp as auth_bp
+
+
+def setup_minio(minio_client, buckets):
+    '''Create buckets if they do not exist'''
+
+    for bucket_name in buckets:
+        try:
+            minio_client.make_bucket(bucket_name)
+        except (minio.error.BucketAlreadyOwnedByYou, minio.error.BucketAlreadyExists):
+            pass
+        except minio.error.ResponseError as e:
+            raise e
+
+
+connex_app = connexion.FlaskApp(__name__, specification_dir='swagger_server/swagger',  options={
+    'swagger_ui': True
+})
+connex_app.add_api('swagger.yaml', pythonic_params=True, resolver=connexion.resolver.RestyResolver('api'))
+
+app = connex_app.app
+app.json_encoder = encoder.JSONEncoder
+
+
+##########################################################################################
+# TODO: Move to swagger-controllers >>>
+
+from flask import flash, request, Response, redirect, url_for, send_from_directory
+from werkzeug.utils import secure_filename
 
 TEXT_PREP_UPLOAD_FOLDER = '/www/texts/in'
 TEXT_PREP_FINISHED_FOLDER = '/www/texts/out'
-TEXT_PREP_QUEUE = 'Text-Prep-Queue'
-G2P_QUEUE = 'G2P-Queue'
-STATUS_QUEUE = 'Status-Queue'
 
-
-status_queue = StatusQueue(redis=redis_conn, key=STATUS_QUEUE)
-kaldi_task_queue = TaskQueue(redis=redis_conn, key='Kaldi-Queue')
-
-
-def handle_statue_queue():
-    '''
-    Listens to STATUS_QUEUE and handle the messages.
-    '''
-    pubsub = redis_conn.pubsub(ignore_subscribe_messages=True)
-    pubsub.subscribe(STATUS_QUEUE)
-
-    for message in pubsub.listen():
-        try:
-            app.logger.info("new pubsub message:")
-            app.logger.info(message)
-            if message['type'] == 'message':
-                try:
-                    msg_data = json.loads(message['data'])
-                except ValueError as e:
-                    app.logger.warning(e)
-                    continue
-                
-                if msg_data and "type" in msg_data and "text" in msg_data and "status" in msg_data:
-                    if msg_data['type'] == 'text-prep':
-                        app.logger.info("handle text prep status...")
-                        handle_text_prep_status(msg_data)
-                        app.logger.info("...handled text prep status")
-                    else:
-                        app.logger.warning('unknown type in status queue!')
-        except Exception as e:
-            app.logger.error("Exception at status queue: {}".format(type(e).__name__))
-            app.logger.error(e.__str__())
-
-def handle_text_prep_status(msg_data):
-    '''
-    Handle a status message from a text preparation worker.
-    '''
-    if msg_data['text'] == 'failure':
-        app.logger.error('Failure at Text-Prep-Worker: ')
-        if "msg" in msg_data:
-            app.logger.error("Error message: " + msg_data['msg'])
-    else:
-        this_resource = Resource.query.filter_by(name=msg_data['text']).first()
-        if this_resource is not None:
-            app.logger.info('found resource in db: ' + this_resource.__repr__())
-            try:
-                resource_status = ResourceStateEnum(msg_data['status'])
-                app.logger.info("resource status: " + ResourceStateEnum.status_to_string(resource_status))
-            except ValueError as e:
-                app.logger.warning("status is not valid!")
-                app.logger.warning(e)
-                resource_status = ResourceStateEnum.TextPreparation_Failure
-            
-            this_resource.status = resource_status
-            app.logger.info('after update: ' + this_resource.__repr__())
-            db.session.add(this_resource)
-
-            if resource_status == ResourceStateEnum.Success:
-                # add new db entry for g2p resource file
-                try:
-                    #TODO handle corpus and uwl!
-                    db_resource = Resource(model=this_resource.model,
-                                            name=this_resource.name,
-                                            resource_type=ResourceTypeEnum.unique_word_list,
-                                            status=ResourceStateEnum.G2P_Ready)
-                    app.logger.info('added db entry for g2p resource file: ' + db_resource.__repr__())
-                    db.session.add(db_resource)
-                except Exception as e:
-                    app.logger.error("Error at adding entry for g2p!")
-                    raise e
-
-            db.session.commit()
-            db.session.close()
-        else:
-            app.logger.warning('did not found resource in db: ' + msg_data['text'] + '!')
-
-
-redis_handler_thread = threading.Thread(target=handle_statue_queue, name="Redis-Handler")
-redis_handler_thread.start()
-
-@app.route('/')
-def hello():
-    return 'API-Server'
 
 def get_filetype(filename):
     '''
@@ -136,9 +53,10 @@ def get_filetype(filename):
     '''
     if '.' in filename:
         filetype = filename.rsplit('.', 1)[1].lower()
-        if filetype in ResourceFileTypeEnum.__members__:
-            return ResourceFileTypeEnum[filetype]
+        if filetype in FileTypeEnum.__members__:
+            return FileTypeEnum[filetype]
     return None
+
 
 def create_textprep_job(resourcename, filetype):
     '''
@@ -148,8 +66,9 @@ def create_textprep_job(resourcename, filetype):
         "text" : resourcename,
         "type" : filetype.name
     }
-    redis_conn.rpush(TEXT_PREP_QUEUE, json.dumps(entry))
+    redis_conn.rpush(config.minio_buckets.TEXT_PREP_QUEUE, json.dumps(entry))
     return
+
 
 def create_g2p_job(uniquewordlists, language_model='Voxforge'):
     '''
@@ -161,8 +80,9 @@ def create_g2p_job(uniquewordlists, language_model='Voxforge'):
         "language_model" : language_model,
         "uniquewordlists" : [wl.name for wl in uniquewordlists]
     }
-    redis_conn.rpush(G2P_QUEUE, json.dumps(entry))
+    redis_conn.rpush(config.minio_buckets.G2P_QUEUE, json.dumps(entry))
     return
+
 
 def get_basename(filename):
     '''
@@ -173,7 +93,7 @@ def get_basename(filename):
     return filename
 
 
-@app.route('/texts/in', methods=['GET', 'POST'])
+@app.route('/api/texts/in', methods=['GET', 'POST'])
 def upload_file_for_textprep():
     '''
     Implements a POST-request for uploading files.
@@ -211,7 +131,7 @@ def upload_file_for_textprep():
 
             new_resource = get_basename(filename) #TODO change to DB key
 
-            db_resource = Resource(model=root_model, resource_type=ResourceTypeEnum.upload, name=new_resource, file_type=filetype, status=ResourceStateEnum.TextPreparation_Pending)
+            db_resource = Resource(model=root_model, resource_type=FileTypeEnum.upload, name=new_resource, file_type=filetype, status=FileStateEnum.TextPreparation_Pending)
             db.session.add(db_resource)
             db.session.commit()
             db.session.close()
@@ -235,7 +155,8 @@ def upload_file_for_textprep():
             return str(new_resource)
     return upload_form
 
-@app.route('/db/resources')
+
+@app.route('/api/db/resources')
 def dbquery():
     '''
     For debugging: shows all resources.
@@ -247,7 +168,8 @@ def dbquery():
             yield r.__repr__() + '<br>'
     return Response(generate())
 
-@app.route('/texts/in/<filename>')
+
+@app.route('/api/texts/in/<filename>')
 def download_texts_in_file(filename):
     '''
     Returns the raw input file.
@@ -259,8 +181,9 @@ def download_texts_in_file(filename):
     #TODO add original filename with extension
     Response.content_type = "text/plain"
     return send_from_directory(TEXT_PREP_UPLOAD_FOLDER, filename)
-    
-@app.route('/texts/out/<filename>')
+
+
+@app.route('/api/texts/out/<filename>')
 def download_texts_out_file(filename):
     '''
     Returns the list of words from a processed file.
@@ -286,7 +209,8 @@ def download_texts_out_file(filename):
         app.logger.error(e)
         return (error_msg, 500)
 
-@app.route('/g2p')
+
+@app.route('/api/g2p')
 def start_g2p():
     '''
     Enqueues a g2p worker task.
@@ -296,8 +220,8 @@ def start_g2p():
 
     # copy text-prep-worker results
     unique_word_lists = Resource.query.filter_by(
-        resource_type=ResourceTypeEnum.unique_word_list, 
-        status=ResourceStateEnum.G2P_Ready).all()
+        resource_type=FileTypeEnum.unique_word_list, 
+        status=FileStateEnum.G2P_Ready).all()
 
     for uwl in unique_word_lists:
         app.logger.info("copy resoure to g2p bucket: " + uwl.name)
@@ -306,7 +230,7 @@ def start_g2p():
                                 object_source= "/" + TEXTS_OUT_BUCKET + "/" + uwl.name,
                                 conditions=None,
                                 metadata=None)
-        uwl.status = ResourceStateEnum.G2P_Pending
+        uwl.status = FileStateEnum.G2P_Pending
         db.session.add(uwl)
 
     app.logger.info("Create task for g2p-worker")
@@ -317,16 +241,67 @@ def start_g2p():
 
     return "OK"
 
-@app.route('/test-model')
-def test_model():
-    task = KaldiTask(
-        acoustic_model='acoustic_voxforge',
-        base_model='model-1',
-        new_model='model-2')
 
-    kaldi_task_queue.submit(task)
+@app.route('/api/stats')
+def show_stats():
+    return 'TODO: stats'
 
-    return task
-# It is not possible to run a endless loop here...
-# There is a thread for this task
-app.logger.info("API-Server is running and listening to status queue")
+
+# <<< TODO: Move to swagger-controllers
+##########################################################################################
+
+
+if __name__ == "__main__":
+    conf, _, status_queue, minio_client = connector.parse_args(
+        'Kaldi Customization API Server', more_args=config.more_args)
+
+    if conf.verbose:
+        print(conf)
+
+    app.config['SECRET_KEY'] = conf.secret_key
+
+    logging.config.dictConfig({
+        'version': 1,
+        'formatters': {'default': {
+            'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+        }},
+        'handlers': {'wsgi': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'default'
+        }},
+        'root': {
+            'level': 'DEBUG' if conf.verbose else 'INFO',
+            'handlers': ['wsgi']
+        }
+    })
+
+    # configure databse connection
+    if conf.db_type == 'mysql':
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqldb://{}:{}@{}:{}/{}'.format(
+            conf.db_user, conf.db_password, conf.db_host, conf.db_port, conf.db)
+    elif conf.db_type == 'sqlite':
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://{}'.format(conf.db)
+    else:
+        raise Exception('Invalid database type given')
+
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
+    app.config['SQLALCHEMY_POOL_RECYCLE'] = 50
+
+    db.init_app(app)
+
+    with app.app_context():
+        # for test purposes:
+        db.drop_all()
+        db.create_all()
+
+        bootstrap()
+
+    db.init_app(app)
+    config_oauth(app)
+    app.register_blueprint(auth_bp, url_prefix='/api')
+
+    start_status_queue_handler(status_queue, db, app.logger)
+    setup_minio(minio_client, config.minio_buckets.values())
+
+    connex_app.run(host=conf.host, port=conf.port, debug=conf.verbose)
