@@ -3,8 +3,7 @@ import { Configuration } from './configuration';
 import { HttpClient } from '@angular/common/http';
 
 
-import { PetService } from './api/pet.service';
-import { StoreService } from './api/store.service';
+import { ProjectService } from './api/project.service';
 import { UserService } from './api/user.service';
 
 @NgModule({
@@ -12,8 +11,7 @@ import { UserService } from './api/user.service';
   declarations: [],
   exports:      [],
   providers: [
-    PetService,
-    StoreService,
+    ProjectService,
     UserService ]
 })
 export class ApiModule {

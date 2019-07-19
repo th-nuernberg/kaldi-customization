@@ -6,6 +6,11 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.acoustic_model import AcousticModel  # noqa: F401,E501
+from swagger_server.models.project import Project  # noqa: F401,E501
+from swagger_server.models.training_status import TrainingStatus  # noqa: F401,E501
+from swagger_server.models.user import User  # noqa: F401,E501
+java.io.File  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -14,25 +19,50 @@ class Project(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, uuid: str=None, name: str=None):  # noqa: E501
+    def __init__(self, uuid: str=None, name: str=None, owner: User=None, acoustic_model: AcousticModel=None, parent: Project=None, status: TrainingStatus=None, resources: List[File]=None):  # noqa: E501
         """Project - a model defined in Swagger
 
         :param uuid: The uuid of this Project.  # noqa: E501
         :type uuid: str
         :param name: The name of this Project.  # noqa: E501
         :type name: str
+        :param owner: The owner of this Project.  # noqa: E501
+        :type owner: User
+        :param acoustic_model: The acoustic_model of this Project.  # noqa: E501
+        :type acoustic_model: AcousticModel
+        :param parent: The parent of this Project.  # noqa: E501
+        :type parent: Project
+        :param status: The status of this Project.  # noqa: E501
+        :type status: TrainingStatus
+        :param resources: The resources of this Project.  # noqa: E501
+        :type resources: List[File]
         """
         self.swagger_types = {
             'uuid': str,
-            'name': str
+            'name': str,
+            'owner': User,
+            'acoustic_model': AcousticModel,
+            'parent': Project,
+            'status': TrainingStatus,
+            'resources': List[File]
         }
 
         self.attribute_map = {
             'uuid': 'uuid',
-            'name': 'name'
+            'name': 'name',
+            'owner': 'owner',
+            'acoustic_model': 'acoustic_model',
+            'parent': 'parent',
+            'status': 'status',
+            'resources': 'resources'
         }
         self._uuid = uuid
         self._name = name
+        self._owner = owner
+        self._acoustic_model = acoustic_model
+        self._parent = parent
+        self._status = status
+        self._resources = resources
 
     @classmethod
     def from_dict(cls, dikt) -> 'Project':
@@ -63,8 +93,6 @@ class Project(Model):
         :param uuid: The uuid of this Project.
         :type uuid: str
         """
-        if uuid is None:
-            raise ValueError("Invalid value for `uuid`, must not be `None`")  # noqa: E501
 
         self._uuid = uuid
 
@@ -90,3 +118,112 @@ class Project(Model):
             raise ValueError("Invalid value for `name`, must not be `None`")  # noqa: E501
 
         self._name = name
+
+    @property
+    def owner(self) -> User:
+        """Gets the owner of this Project.
+
+
+        :return: The owner of this Project.
+        :rtype: User
+        """
+        return self._owner
+
+    @owner.setter
+    def owner(self, owner: User):
+        """Sets the owner of this Project.
+
+
+        :param owner: The owner of this Project.
+        :type owner: User
+        """
+        if owner is None:
+            raise ValueError("Invalid value for `owner`, must not be `None`")  # noqa: E501
+
+        self._owner = owner
+
+    @property
+    def acoustic_model(self) -> AcousticModel:
+        """Gets the acoustic_model of this Project.
+
+
+        :return: The acoustic_model of this Project.
+        :rtype: AcousticModel
+        """
+        return self._acoustic_model
+
+    @acoustic_model.setter
+    def acoustic_model(self, acoustic_model: AcousticModel):
+        """Sets the acoustic_model of this Project.
+
+
+        :param acoustic_model: The acoustic_model of this Project.
+        :type acoustic_model: AcousticModel
+        """
+        if acoustic_model is None:
+            raise ValueError("Invalid value for `acoustic_model`, must not be `None`")  # noqa: E501
+
+        self._acoustic_model = acoustic_model
+
+    @property
+    def parent(self) -> Project:
+        """Gets the parent of this Project.
+
+
+        :return: The parent of this Project.
+        :rtype: Project
+        """
+        return self._parent
+
+    @parent.setter
+    def parent(self, parent: Project):
+        """Sets the parent of this Project.
+
+
+        :param parent: The parent of this Project.
+        :type parent: Project
+        """
+
+        self._parent = parent
+
+    @property
+    def status(self) -> TrainingStatus:
+        """Gets the status of this Project.
+
+
+        :return: The status of this Project.
+        :rtype: TrainingStatus
+        """
+        return self._status
+
+    @status.setter
+    def status(self, status: TrainingStatus):
+        """Sets the status of this Project.
+
+
+        :param status: The status of this Project.
+        :type status: TrainingStatus
+        """
+
+        self._status = status
+
+    @property
+    def resources(self) -> List[File]:
+        """Gets the resources of this Project.
+
+
+        :return: The resources of this Project.
+        :rtype: List[File]
+        """
+        return self._resources
+
+    @resources.setter
+    def resources(self, resources: List[File]):
+        """Sets the resources of this Project.
+
+
+        :param resources: The resources of this Project.
+        :type resources: List[File]
+        """
+
+        self._resources = resources

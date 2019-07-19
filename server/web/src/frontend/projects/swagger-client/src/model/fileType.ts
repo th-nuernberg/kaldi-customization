@@ -10,7 +10,13 @@
  * Do not edit the class manually.
  */
 
-export interface User { 
-    id?: number;
-    username: string;
-}
+export type FileType = 1 | 2 | 3 | 4 | 5 | 6;
+
+export const FileType = {
+    NUMBER_1: 1 as FileType,
+    NUMBER_2: 2 as FileType,
+    NUMBER_3: 3 as FileType,
+    NUMBER_4: 4 as FileType,
+    NUMBER_5: 5 as FileType,
+    NUMBER_6: 6 as FileType
+};

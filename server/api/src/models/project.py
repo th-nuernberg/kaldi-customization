@@ -31,12 +31,15 @@ class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     api_token = db.Column(db.String(64), unique=True)
     name = db.Column(db.String(255))
-    #owner = db.relationship('User')#, backref=db.backref('project', remote_side=[id], lazy=True, cascade='all,delete'))
-    owner = db.Column(db.Integer,db.ForeignKey("users.id"))
-    #acoustic_model = db.relationship('AcousticModel')
-    acoustic_model = db.Column(db.Integer,db.ForeignKey("acousticmodels.id"))
-    #parent = db.relationship('Project')
-    parent = db.Column(db.Integer,db.ForeignKey("projects.id"))
+
+    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    owner = db.relationship('User')
+
+    acoustic_model_id = db.Column(db.Integer, db.ForeignKey("acousticmodels.id"))
+    acoustic_model = db.relationship('AcousticModel')
+
+    parent_id = db.Column(db.Integer, db.ForeignKey("projects.id"), nullable=True)
+    parent = db.relationship('Project')
 
     status = db.Column(db.Enum(ProjectStateEnum), nullable=True)
 

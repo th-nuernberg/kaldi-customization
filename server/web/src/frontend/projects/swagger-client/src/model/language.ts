@@ -10,7 +10,7 @@
  * Do not edit the class manually.
  */
 
-export interface User { 
+export interface Language { 
     id?: number;
-    username: string;
+    name: string;
 }

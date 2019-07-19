@@ -10,7 +10,10 @@
  * Do not edit the class manually.
  */
 
-export interface User { 
-    id?: number;
-    username: string;
-}
+export type AcousticModelType = 100 | 200 | 300;
+
+export const AcousticModelType = {
+    NUMBER_100: 100 as AcousticModelType,
+    NUMBER_200: 200 as AcousticModelType,
+    NUMBER_300: 300 as AcousticModelType
+};
