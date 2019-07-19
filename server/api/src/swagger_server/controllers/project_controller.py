@@ -1,5 +1,8 @@
 import connexion
 import six
+import redis
+import json
+import config
 
 from swagger_server.models.binary import Binary  # noqa: E501
 from swagger_server.models.project import Project  # noqa: E501
@@ -58,7 +61,14 @@ def train_project(projectUuid):  # noqa: E501
 
     :rtype: TrainingStatus
     """
-    return 'do some magic!'
+    entry = {
+        "acoustic-model-bucket" : config.minio_buckets.ACOUSTIC_MODELS_BUCKET,
+        "acoustic-model-id" : 1,
+        "project-bucket" : config.minio_buckets.LANGUAGE_MODELS_BUCKET,
+        "project-uuid" : projectUuid
+    }
+    redis_conn.rpush("QUEUE", json.dumps(entry))
+    return TrainingStatus._210
 
 
 def update_project(body):  # noqa: E501

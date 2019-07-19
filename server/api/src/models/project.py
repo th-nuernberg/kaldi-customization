@@ -31,6 +31,7 @@ class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     api_token = db.Column(db.String(64), unique=True)
     name = db.Column(db.String(255))
+    uuid = db.Column(db.String(32))
 
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     owner = db.relationship('User')

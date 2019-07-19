@@ -1,18 +1,18 @@
 #!/bin/bash
 . ./path.sh || exit 1
 
-[[ $# -ge 3 ]] && { echo "Usage: create_new_graph.sh <lexicon file> <corpus file>"; exit 1; }
+[[ $# -ge 6 ]] && { echo "Usage: create_new_graph.sh <lexicon file> <corpus file> <acoustic model folder> <new graph dir> <temporary dir>"; exit 1; }
 
 lex_file=$1
 corp_file=$2
+acoustic_model=$3
 lm_order=3
+new_graph_dir=$4
+tmp_dir=$5
 
-tmp_dir=tmp
 new_lang_dir=$tmp_dir/lang
 new_local_dir=$tmp_dir/local
-new_graph_dir=new_graph
 
-mkdir $tmp_dir
 mkdir $new_local_dir
 mkdir $new_local_dir/dict
 
@@ -54,5 +54,5 @@ ngram-count -order $lm_order -write-vocab $new_lang_dir/tmp/vocab-full.txt -wbdi
 echo "making G.fst"
 arpa2fst --disambig-symbol=#0 --read-symbol-table=$new_lang_dir/words.txt $new_lang_dir/tmp/lm.arpa $new_lang_dir/G.fst
 
-./utils/mkgraph.sh $new_lang_dir exp/tri5 $new_graph_dir
+./utils/mkgraph.sh $new_lang_dir $acoustic_model $new_graph_dir
 
