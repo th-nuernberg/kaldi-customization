@@ -24,41 +24,44 @@ minio_client = minio.Minio("localhost:9001",access_key=MINIO_ACCESS_KEY,secret_k
 app = Flask('__APP')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://{}:{}@{}:{}/{}'.format(MYSQL_USER, MYSQL_PASSWORD, "127.0.0.1", 3307, MYSQL_DATABASE)
 
-db = SQLAlchemy(app= app)
-db.init_app(app)
+#db = SQLAlchemy(app= app)
+with app.app_context():
+    db.init_app(app)
+    db.drop_all()
+    db.create_all()
+    #db.init_app(app)
+    #db.session.commit()
 
-db.drop_all()
-db.create_all()
-
-#Setup dummy stuff for database
-german = Language(name="German")
-db.session.add(german)
+    exit()
+    #Setup dummy stuff for database
+    german = Language(name="German")
+    db.session.add(german)
 
 
 
 
-acoustic_model = AcousticModel(name='Voxforge-RNN', language=german.id, model_type=ModelType.HMM_RNN)
-db.session.add(acoustic_model)
-"""
-    root_model = Model(project=root_project)
-    db.session.add(root_model)
-
-    project1 = Project(uuid='project#1', name='Test Project')
-    db.session.add(project1)
-
-    resource1 = Resource(model=root_model, name='res0', resource_type=FileTypeEnum.modelresult , file_type=FileTypeEnum.png, status=FileStateEnum.Upload_InProgress)
-    db.session.add(resource1)
-    app.logger.info(resource1)
-
-    derived_model0 = Model(project=project1, parent=root_model)
-    db.session.add(derived_model0)
-
-    derived_model1 = Model(project=project1, parent=root_model)
-    db.session.add(derived_model1)
+    acoustic_model = AcousticModel(name='Voxforge-RNN', language=german.id, model_type=ModelType.HMM_RNN)
+    db.session.add(acoustic_model)
     """
-db.session.commit()
+        root_model = Model(project=root_project)
+        db.session.add(root_model)
 
-    #app.logger.info(root_model.children)
-    #app.logger.info(derived_model0.parent.project.name)
+        project1 = Project(uuid='project#1', name='Test Project')
+        db.session.add(project1)
 
-db.session.close()
+        resource1 = Resource(model=root_model, name='res0', resource_type=FileTypeEnum.modelresult , file_type=FileTypeEnum.png, status=FileStateEnum.Upload_InProgress)
+        db.session.add(resource1)
+        app.logger.info(resource1)
+
+        derived_model0 = Model(project=project1, parent=root_model)
+        db.session.add(derived_model0)
+
+        derived_model1 = Model(project=project1, parent=root_model)
+        db.session.add(derived_model1)
+        """
+    db.session.commit()
+
+        #app.logger.info(root_model.children)
+        #app.logger.info(derived_model0.parent.project.name)
+
+    db.session.close()
