@@ -1,5 +1,8 @@
 import connexion
 import six
+import redis
+import json
+import config
 
 from openapi_server.models.project import Project  # noqa: E501
 from openapi_server.models.training_status import TrainingStatus  # noqa: E501
@@ -57,7 +60,14 @@ def train_project(project_uuid):  # noqa: E501
 
     :rtype: TrainingStatus
     """
-    return 'do some magic!'
+    entry = {
+        "acoustic-model-bucket" : config.minio_buckets.ACOUSTIC_MODELS_BUCKET,
+        "acoustic-model-id" : 1,
+        "project-bucket" : config.minio_buckets.LANGUAGE_MODELS_BUCKET,
+        "project-uuid" : project_uuid
+    }
+    redis_conn.rpush("QUEUE", json.dumps(entry))
+    return TrainingStatus.Training_Pending
 
 
 def update_project(body):  # noqa: E501
