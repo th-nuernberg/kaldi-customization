@@ -1,28 +1,49 @@
 # coding: utf-8
 
 from __future__ import absolute_import
+import unittest
 
 from flask import json
 from six import BytesIO
 
-from swagger_server.models.user import User  # noqa: E501
-from swagger_server.test import BaseTestCase
+from openapi_server.models.user import User  # noqa: E501
+from openapi_server.test import BaseTestCase
 
 
 class TestUserController(BaseTestCase):
     """UserController integration test stubs"""
 
+    @unittest.skip("*/* not supported by Connexion. Use application/json instead. See https://github.com/zalando/connexion/pull/760")
     def test_create_user(self):
         """Test case for create_user
 
         Create user
         """
-        body = User()
+        body = {}
+        headers = { 
+            'Content-Type': 'application/json',
+        }
         response = self.client.open(
             '/api/v1/user',
             method='POST',
+            headers=headers,
             data=json.dumps(body),
-            content_type='*/*')
+            content_type='application/json')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_get_user(self):
+        """Test case for get_user
+
+        Get current user
+        """
+        headers = { 
+            'Authorization': 'Bearer special-key',
+        }
+        response = self.client.open(
+            '/api/v1/user',
+            method='GET',
+            headers=headers)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -33,9 +54,13 @@ class TestUserController(BaseTestCase):
         """
         query_string = [('username', 'username_example'),
                         ('password', 'password_example')]
+        headers = { 
+            'Accept': 'application/json',
+        }
         response = self.client.open(
             '/api/v1/user/login',
             method='GET',
+            headers=headers,
             query_string=query_string)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -45,13 +70,15 @@ class TestUserController(BaseTestCase):
 
         Logs out current logged in user session
         """
+        headers = { 
+        }
         response = self.client.open(
             '/api/v1/user/logout',
-            method='GET')
+            method='GET',
+            headers=headers)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
 
 if __name__ == '__main__':
-    import unittest
     unittest.main()

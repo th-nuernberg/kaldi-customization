@@ -10,7 +10,7 @@ import redis
 import threading
 
 from status_queue.handler import start_status_queue_handler
-from swagger_server import encoder
+from openapi_server import encoder
 from models import *
 from oauth2 import config_oauth
 from routes.auth import bp as auth_bp
@@ -28,10 +28,10 @@ def setup_minio(minio_client, buckets):
             raise e
 
 
-connex_app = connexion.FlaskApp(__name__, specification_dir='swagger_server/swagger',  options={
+connex_app = connexion.FlaskApp(__name__, specification_dir='openapi_server/openapi',  options={
     'swagger_ui': True
 })
-connex_app.add_api('swagger.yaml', pythonic_params=True, resolver=connexion.resolver.RestyResolver('api'))
+connex_app.add_api('openapi.yaml', pythonic_params=True, resolver=connexion.resolver.RestyResolver('api'))
 
 app = connex_app.app
 app.json_encoder = encoder.JSONEncoder

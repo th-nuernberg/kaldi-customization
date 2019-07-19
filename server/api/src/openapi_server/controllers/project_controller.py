@@ -1,8 +1,9 @@
 import connexion
 import six
 
-from swagger_server.models.project import Project  # noqa: E501
-from swagger_server import util
+from openapi_server.models.project import Project  # noqa: E501
+from openapi_server.models.training_status import TrainingStatus  # noqa: E501
+from openapi_server import util
 
 
 def create_project(body):  # noqa: E501
@@ -20,17 +21,15 @@ def create_project(body):  # noqa: E501
     return 'do some magic!'
 
 
-def delete_project(project_uuid, api_key=None):  # noqa: E501
-    """Deletes a project
+def download_training_result(project_uuid):  # noqa: E501
+    """Find project training results by UUID
 
-     # noqa: E501
+    Returns an archive # noqa: E501
 
-    :param project_uuid: Project UUID to delete
+    :param project_uuid: UUID of project training result to return
     :type project_uuid: str
-    :param api_key: 
-    :type api_key: str
 
-    :rtype: None
+    :rtype: file
     """
     return 'do some magic!'
 
@@ -44,6 +43,19 @@ def get_project_by_uuid(project_uuid):  # noqa: E501
     :type project_uuid: str
 
     :rtype: Project
+    """
+    return 'do some magic!'
+
+
+def train_project(project_uuid):  # noqa: E501
+    """Train current project
+
+     # noqa: E501
+
+    :param project_uuid: Project object that needs to be trained
+    :type project_uuid: str
+
+    :rtype: TrainingStatus
     """
     return 'do some magic!'
 
