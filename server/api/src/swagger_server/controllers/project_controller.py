@@ -67,7 +67,7 @@ def train_project(projectUuid):  # noqa: E501
         "project-bucket" : config.minio_buckets.LANGUAGE_MODELS_BUCKET,
         "project-uuid" : projectUuid
     }
-    redis_conn.rpush("QUEUE", json.dumps(entry))
+    redis_conn.rpush(, json.dumps(entry))
     return TrainingStatus._210
 
 

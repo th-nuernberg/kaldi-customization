@@ -1,0 +1,4 @@
+minio
+flask_sqlalchemy
+authlibs
+mysqlclient
