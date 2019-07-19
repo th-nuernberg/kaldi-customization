@@ -5,6 +5,7 @@ import shutil
 
 import subprocess
 from minio_communication import download_from_bucket, upload_to_bucket
+import redis_config
 import json
 
 print("starting")
@@ -47,7 +48,7 @@ downloaded_acoustic_models = set()
 os.makedirs(acoustic_model_folder)
 if __name__ == "__main__":
     try:
-        conf, tasks, status, minio_client = parse_args('Kaldi Worker Connector', task_queue='Kaldi-Queue')
+        conf, tasks, status, minio_client = parse_args('Kaldi Worker Connector', task_queue=redis_config.redis_queues.KALDI_QUEUE)
 
         shutil.make_archive('/home/code/test_dicoms',
                     'zip',

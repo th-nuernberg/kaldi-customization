@@ -289,15 +289,6 @@ if __name__ == "__main__":
     app.config['SQLALCHEMY_POOL_RECYCLE'] = 50
 
     db.init_app(app)
-
-    with app.app_context():
-        # for test purposes:
-        db.drop_all()
-        db.create_all()
-
-        bootstrap()
-
-    db.init_app(app)
     config_oauth(app)
     app.register_blueprint(auth_bp, url_prefix='/api')
 
