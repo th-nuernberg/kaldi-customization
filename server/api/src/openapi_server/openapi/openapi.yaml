@@ -1,0 +1,492 @@
+openapi: 3.0.1
+info:
+  description: Kaldi Customization Server.
+  title: Kaldi Customization Server
+  version: 1.0.0
+servers:
+- url: https://localhost/api/v1
+- url: http://localhost/api/v1
+tags:
+- description: Operations about projects
+  name: project
+- description: Operations about ASR training
+  name: training
+- description: Operations about user
+  name: user
+paths:
+  /file:
+    post:
+      operationId: create_file
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Resource'
+        description: File object that needs to be created
+        required: true
+      responses:
+        405:
+          content: {}
+          description: Invalid input
+      security:
+      - oauth:
+        - write:files
+        - read:files
+      summary: Create/Upload a new file
+      tags:
+      - file
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: openapi_server.controllers.file_controller
+  /file/{fileUuid}:
+    get:
+      description: Returns a single file
+      operationId: get_file_by_uuid
+      parameters:
+      - description: UUID of file to return
+        in: path
+        name: fileUuid
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+          description: successful operation
+        400:
+          content: {}
+          description: Invalid UUID supplied
+        404:
+          content: {}
+          description: Page not found
+      security:
+      - oauth:
+        - read:files
+      summary: Find file by UUID
+      tags:
+      - file
+      x-openapi-router-controller: openapi_server.controllers.file_controller
+  /project:
+    post:
+      operationId: create_project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+        description: Project object that needs to be created
+        required: true
+      responses:
+        405:
+          content: {}
+          description: Invalid input
+      security:
+      - oauth:
+        - write:projects
+        - read:projects
+      summary: Create a new project
+      tags:
+      - project
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: openapi_server.controllers.project_controller
+    put:
+      operationId: update_project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+        description: Project object that needs to be updated
+        required: true
+      responses:
+        400:
+          content: {}
+          description: Invalid UUID supplied
+        404:
+          content: {}
+          description: Project not found
+        405:
+          content: {}
+          description: Validation exception
+      security:
+      - oauth:
+        - write:projects
+        - read:projects
+      summary: Update an existing project
+      tags:
+      - project
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: openapi_server.controllers.project_controller
+  /project/{projectUuid}:
+    get:
+      description: Returns a single project
+      operationId: get_project_by_uuid
+      parameters:
+      - description: UUID of project to return
+        in: path
+        name: projectUuid
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+          description: successful operation
+        400:
+          content: {}
+          description: Invalid UUID supplied
+        404:
+          content: {}
+          description: Project not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Find project by UUID
+      tags:
+      - project
+      x-openapi-router-controller: openapi_server.controllers.project_controller
+  /project/{projectUuid}/training:
+    get:
+      description: Returns an archive
+      operationId: download_training_result
+      parameters:
+      - description: UUID of project training result to return
+        in: path
+        name: projectUuid
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                format: binary
+                type: string
+          description: ZIP archive of project training result
+        400:
+          content: {}
+          description: Invalid UUID supplied
+        401:
+          content: {}
+          description: Invalid input, cannot access project training result now
+        404:
+          content: {}
+          description: Project not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Find project training results by UUID
+      tags:
+      - project
+      - training
+      x-openapi-router-controller: openapi_server.controllers.project_controller
+    post:
+      operationId: train_project
+      parameters:
+      - description: Project object that needs to be trained
+        in: path
+        name: projectUuid
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingStatus'
+          description: successful operation
+        404:
+          content: {}
+          description: Project not found
+        405:
+          content: {}
+          description: Invalid input
+      security:
+      - oauth:
+        - write:projects
+        - read:projects
+        - train:projects
+      summary: Train current project
+      tags:
+      - project
+      - training
+      x-openapi-router-controller: openapi_server.controllers.project_controller
+  /user:
+    get:
+      description: Provides info about the logged in user.
+      operationId: get_user
+      responses:
+        200:
+          content: {}
+          description: successfull operation
+        403:
+          content: {}
+          description: No user is logged in.
+      security:
+      - oauth:
+        - read:user
+      summary: Get current user
+      tags:
+      - user
+      x-openapi-router-controller: openapi_server.controllers.user_controller
+    post:
+      description: This can only be done by the logged in user.
+      operationId: create_user
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/User'
+        description: Created user object
+        required: true
+      responses:
+        default:
+          content: {}
+          description: successful operation
+      summary: Create user
+      tags:
+      - user
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: openapi_server.controllers.user_controller
+  /user/login:
+    get:
+      operationId: login_user
+      parameters:
+      - description: The user name for login
+        in: query
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: The password for login in clear text
+        in: query
+        name: password
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: string
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                format: int32
+                type: integer
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                format: date-time
+                type: string
+        400:
+          content: {}
+          description: Invalid username/password supplied
+      summary: Logs user into the system
+      tags:
+      - user
+      x-openapi-router-controller: openapi_server.controllers.user_controller
+  /user/logout:
+    get:
+      operationId: logout_user
+      responses:
+        default:
+          content: {}
+          description: successful operation
+      summary: Logs out current logged in user session
+      tags:
+      - user
+      x-openapi-router-controller: openapi_server.controllers.user_controller
+components:
+  schemas:
+    Project:
+      example:
+        owner:
+          id: 0
+          username: username
+        name: name
+        resources:
+        - name: name
+        - name: name
+        acoustic_model:
+          name: name
+          language:
+            name: name
+            id: 1
+          id: 6
+        uuid: uuid
+      properties:
+        uuid:
+          type: string
+        name:
+          type: string
+        owner:
+          $ref: '#/components/schemas/User'
+        acoustic_model:
+          $ref: '#/components/schemas/AcousticModel'
+        parent:
+          $ref: '#/components/schemas/Project'
+        status:
+          $ref: '#/components/schemas/TrainingStatus'
+        resources:
+          items:
+            $ref: '#/components/schemas/Resource'
+          type: array
+      required:
+      - acoustic_model
+      - name
+      - owner
+      type: object
+    TrainingStatus:
+      enum:
+      - 100
+      - 200
+      - 210
+      - 220
+      - 300
+      - 320
+      type: integer
+      x-enum-varnames:
+      - Init
+      - Trainable
+      - Training_Pending
+      - Training_In_Progress
+      - Training_Success
+      - Training_Failure
+    User:
+      example:
+        id: 0
+        username: username
+      properties:
+        id:
+          format: int64
+          type: integer
+        username:
+          type: string
+      required:
+      - username
+      type: object
+    AcousticModel:
+      example:
+        name: name
+        language:
+          name: name
+          id: 1
+        id: 6
+      properties:
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        language:
+          $ref: '#/components/schemas/Language'
+        model_type:
+          $ref: '#/components/schemas/AcousticModelType'
+      required:
+      - language
+      - model_type
+      - name
+      type: object
+    AcousticModelType:
+      enum:
+      - 100
+      - 200
+      - 300
+      type: integer
+      x-enum-varnames:
+      - HMM_GMM
+      - HMM_DNN
+      - HMM_RNN
+    Language:
+      example:
+        name: name
+        id: 1
+      properties:
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+      required:
+      - name
+      type: object
+    Resource:
+      example:
+        name: name
+      properties:
+        name:
+          type: string
+        status:
+          $ref: '#/components/schemas/FileStatus'
+        file_type:
+          $ref: '#/components/schemas/FileType'
+      required:
+      - file_type
+      - name
+      type: object
+    FileStatus:
+      enum:
+      - 0
+      - 1
+      - 9
+      - 10
+      - 11
+      - 12
+      - 13
+      type: integer
+      x-enum-varnames:
+      - Upload_InProgress
+      - Upload_Failure
+      - TextPreparation_Ready
+      - TextPreparation_Pending
+      - TextPreparation_InProcess
+      - TextPreparation_Failure
+      - TextPreparation_Success
+    FileType:
+      enum:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      type: integer
+      x-enum-varnames:
+      - html
+      - docx
+      - txt
+      - pdf
+      - png
+      - jpg
+  securitySchemes:
+    oauth:
+      flows:
+        implicit:
+          authorizationUrl: http://localhost:8080/api/oauth/authorize
+          scopes:
+            write:user: modify the user account
+            read:user: read the user account
+            write:projects: modify projects in your account
+            read:projects: read your projects
+            train:projects: train projects in your account
+            write:files: modify files in your account
+            read:files: read your files
+      type: oauth2
+      x-tokenInfoFunc: openapi_server.controllers.security_controller_.info_from_oauth
+      x-scopeValidateFunc: openapi_server.controllers.security_controller_.validate_scope_oauth
+    api_key:
+      in: header
+      name: api_key
+      type: apiKey
+      x-apikeyInfoFunc: openapi_server.controllers.security_controller_.info_from_api_key

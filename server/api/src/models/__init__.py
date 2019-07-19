@@ -1,5 +1,4 @@
 from ._db import db
-from ._bootstrap import bootstrap
 
 from .acousticmodel import *
 from .auth import *

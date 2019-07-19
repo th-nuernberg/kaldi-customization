@@ -14,8 +14,7 @@ minio_buckets = dict(
     # acoustic models that are trained by users
     ACOUSTIC_MODELS_BUCKET  = 'acoustic-models',
     # predefined models and stuff for kaldi like vocabular
-    LANGUAGE_MODELS_BUCKET  = 'language-models'
-)
+    LANGUAGE_MODELS_BUCKET  = 'language-models')
 
 def more_args(parser):
     # webserver
