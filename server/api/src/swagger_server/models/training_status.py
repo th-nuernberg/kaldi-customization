@@ -24,6 +24,7 @@ class TrainingStatus(Model):
     _220 = "220"
     _300 = "300"
     _320 = "320"
+
     def __init__(self):  # noqa: E501
         """TrainingStatus - a model defined in Swagger
 

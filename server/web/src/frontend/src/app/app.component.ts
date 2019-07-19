@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { PetService, Pet } from 'swagger-client';
+import { UserService, ProjectService } from 'swagger-client';
 
 @Component({
   selector: 'app-root',
@@ -7,11 +7,7 @@ import { PetService, Pet } from 'swagger-client';
   styleUrls: ['./app.component.less']
 })
 export class AppComponent {
-  constructor(petService: PetService) {
-    petService
-      .addPet({
-        name: "Test",
-        photoUrls: ["about:blank"]})
-      .subscribe(console.log);
+  constructor(userService: UserService, projectService: ProjectService) {
+    
   }
 }

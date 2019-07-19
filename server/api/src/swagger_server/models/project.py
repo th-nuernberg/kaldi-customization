@@ -19,6 +19,7 @@ class Project(Model):
 
     Do not edit the class manually.
     """
+
     def __init__(self, uuid: str=None, name: str=None, owner: User=None, acoustic_model: AcousticModel=None, parent: Project=None, status: TrainingStatus=None, resources: List[File]=None):  # noqa: E501
         """Project - a model defined in Swagger
 
@@ -56,6 +57,7 @@ class Project(Model):
             'status': 'status',
             'resources': 'resources'
         }
+
         self._uuid = uuid
         self._name = name
         self._owner = owner
