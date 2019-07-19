@@ -25,6 +25,7 @@ class FileStatus(Model):
     _11 = "11"
     _12 = "12"
     _13 = "13"
+
     def __init__(self):  # noqa: E501
         """FileStatus - a model defined in Swagger
 

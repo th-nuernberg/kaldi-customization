@@ -14,6 +14,7 @@ class User(Model):
 
     Do not edit the class manually.
     """
+
     def __init__(self, id: int=None, username: str=None):  # noqa: E501
         """User - a model defined in Swagger
 
@@ -31,6 +32,7 @@ class User(Model):
             'id': 'id',
             'username': 'username'
         }
+
         self._id = id
         self._username = username
 

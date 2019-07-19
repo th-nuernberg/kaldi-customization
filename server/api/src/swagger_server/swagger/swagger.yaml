@@ -1,247 +1,494 @@
-openapi: 3.0.1
+---
+swagger: "2.0"
 info:
-  title: Kaldi Customization Server
-  description: Kaldi Customization Server.
-  version: 1.0.0
-servers:
-- url: https://localhost/api/v1
-- url: http://localhost/api/v1
+  description: "Kaldi Customization Server."
+  version: "1.0.0"
+  title: "Kaldi Customization Server"
+host: "localhost"
+basePath: "/api/v1"
 tags:
-- name: project
-  description: Operations about projects
-- name: user
-  description: Operations about user
+- name: "project"
+  description: "Operations about projects"
+- name: "training"
+  description: "Operations about ASR training"
+- name: "user"
+  description: "Operations about user"
+schemes:
+- "https"
+- "http"
 paths:
   /project:
-    put:
-      tags:
-      - project
-      summary: Update an existing project
-      operationId: update_project
-      requestBody:
-        description: Project object that needs to be updated
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Project'
-        required: true
-      responses:
-        400:
-          description: Invalid UUID supplied
-          content: {}
-        404:
-          description: Project not found
-          content: {}
-        405:
-          description: Validation exception
-          content: {}
-      security:
-      - project_auth:
-        - write:projects
-        - read:projects
-      x-openapi-router-controller: swagger_server.controllers.project_controller
     post:
       tags:
-      - project
-      summary: Create a new project
-      operationId: create_project
-      requestBody:
-        description: Project object that needs to be created
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Project'
+      - "project"
+      summary: "Create a new project"
+      description: ""
+      operationId: "create_project"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Project object that needs to be created"
         required: true
+        schema:
+          $ref: "#/definitions/Project"
       responses:
         405:
-          description: Invalid input
-          content: {}
+          description: "Invalid input"
       security:
-      - project_auth:
-        - write:projects
-        - read:projects
-      x-openapi-router-controller: swagger_server.controllers.project_controller
+      - oauth:
+        - "write:projects"
+        - "read:projects"
+      x-swagger-router-controller: "swagger_server.controllers.project_controller"
+    put:
+      tags:
+      - "project"
+      summary: "Update an existing project"
+      description: ""
+      operationId: "update_project"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Project object that needs to be updated"
+        required: true
+        schema:
+          $ref: "#/definitions/Project"
+      responses:
+        400:
+          description: "Invalid UUID supplied"
+        404:
+          description: "Project not found"
+        405:
+          description: "Validation exception"
+      security:
+      - oauth:
+        - "write:projects"
+        - "read:projects"
+      x-swagger-router-controller: "swagger_server.controllers.project_controller"
   /project/{projectUuid}:
     get:
       tags:
-      - project
-      summary: Find project by UUID
-      description: Returns a single project
-      operationId: get_project_by_uuid
+      - "project"
+      summary: "Find project by UUID"
+      description: "Returns a single project"
+      operationId: "get_project_by_uuid"
+      produces:
+      - "application/json"
       parameters:
-      - name: projectUuid
-        in: path
-        description: UUID of project to return
+      - name: "projectUuid"
+        in: "path"
+        description: "UUID of project to return"
         required: true
-        schema:
-          type: string
+        type: "string"
       responses:
         200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Project'
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Project"
         400:
-          description: Invalid UUID supplied
-          content: {}
+          description: "Invalid UUID supplied"
         404:
-          description: Project not found
-          content: {}
+          description: "Project not found"
       security:
-      - api_key: []
-      x-openapi-router-controller: swagger_server.controllers.project_controller
-    delete:
+      - oauth:
+        - "read:projects"
+      x-swagger-router-controller: "swagger_server.controllers.project_controller"
+  /project/{projectUuid}/training:
+    get:
       tags:
-      - project
-      summary: Deletes a project
-      operationId: delete_project
+      - "project"
+      - "training"
+      summary: "Find project training results by UUID"
+      description: "Returns an archive"
+      operationId: "download_training_result"
+      produces:
+      - "application/json"
       parameters:
-      - name: api_key
-        in: header
-        schema:
-          type: string
-      - name: projectUuid
-        in: path
-        description: Project UUID to delete
+      - name: "projectUuid"
+        in: "path"
+        description: "UUID of project training result to return"
         required: true
-        schema:
-          type: string
+        type: "string"
       responses:
+        200:
+          description: "ZIP archive of project training result"
+          schema:
+            type: "string"
+            format: "binary"
         400:
-          description: Invalid UUID supplied
-          content: {}
+          description: "Invalid UUID supplied"
+        401:
+          description: "Invalid input, cannot access project training result now"
         404:
-          description: Project not found
-          content: {}
+          description: "Project not found"
       security:
-      - project_auth:
-        - write:projects
-        - read:projects
-      x-openapi-router-controller: swagger_server.controllers.project_controller
-  /user:
+      - oauth:
+        - "read:projects"
+      x-swagger-router-controller: "swagger_server.controllers.project_controller"
     post:
       tags:
-      - user
-      summary: Create user
-      description: This can only be done by the logged in user.
-      operationId: create_user
-      requestBody:
-        description: Created user object
-        content:
-          '*/*':
-            schema:
-              $ref: '#/components/schemas/User'
+      - "project"
+      - "training"
+      summary: "Train current project"
+      description: ""
+      operationId: "train_project"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "projectUuid"
+        in: "path"
+        description: "Project object that needs to be trained"
         required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/TrainingStatus"
+        404:
+          description: "Project not found"
+        405:
+          description: "Invalid input"
+      security:
+      - oauth:
+        - "write:projects"
+        - "read:projects"
+        - "train:projects"
+      x-swagger-router-controller: "swagger_server.controllers.project_controller"
+  /file:
+    post:
+      tags:
+      - "file"
+      summary: "Create/Upload a new file"
+      description: ""
+      operationId: "create_file"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "File object that needs to be created"
+        required: true
+        schema:
+          $ref: "#/definitions/File"
+      responses:
+        405:
+          description: "Invalid input"
+      security:
+      - oauth:
+        - "write:files"
+        - "read:files"
+      x-swagger-router-controller: "swagger_server.controllers.file_controller"
+  /file/{fileUuid}:
+    get:
+      tags:
+      - "file"
+      summary: "Find file by UUID"
+      description: "Returns a single file"
+      operationId: "get_file_by_uuid"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "fileUuid"
+        in: "path"
+        description: "UUID of file to return"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/File"
+        400:
+          description: "Invalid UUID supplied"
+        404:
+          description: "Page not found"
+      security:
+      - oauth:
+        - "read:files"
+      x-swagger-router-controller: "swagger_server.controllers.file_controller"
+  /user:
+    get:
+      tags:
+      - "user"
+      summary: "Get current user"
+      description: "Provides info about the logged in user."
+      operationId: "get_user"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successfull operation"
+        403:
+          description: "No user is logged in."
+      security:
+      - oauth:
+        - "read:user"
+      x-swagger-router-controller: "swagger_server.controllers.user_controller"
+    post:
+      tags:
+      - "user"
+      summary: "Create user"
+      description: "This can only be done by the logged in user."
+      operationId: "create_user"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
       responses:
         default:
-          description: successful operation
-          content: {}
-      x-openapi-router-controller: swagger_server.controllers.user_controller
+          description: "successful operation"
+      x-swagger-router-controller: "swagger_server.controllers.user_controller"
   /user/login:
     get:
       tags:
-      - user
-      summary: Logs user into the system
-      operationId: login_user
+      - "user"
+      summary: "Logs user into the system"
+      description: ""
+      operationId: "login_user"
+      produces:
+      - "application/json"
       parameters:
-      - name: username
-        in: query
-        description: The user name for login
+      - name: "username"
+        in: "query"
+        description: "The user name for login"
         required: true
-        schema:
-          type: string
-      - name: password
-        in: query
-        description: The password for login in clear text
+        type: "string"
+      - name: "password"
+        in: "query"
+        description: "The password for login in clear text"
         required: true
-        schema:
-          type: string
+        type: "string"
       responses:
         200:
-          description: successful operation
+          description: "successful operation"
           headers:
             X-Rate-Limit:
-              description: calls per hour allowed by the user
-              schema:
-                type: integer
-                format: int32
+              type: "integer"
+              format: "int32"
+              description: "calls per hour allowed by the user"
             X-Expires-After:
-              description: date in UTC when token expires
-              schema:
-                type: string
-                format: date-time
-          content:
-            application/json:
-              schema:
-                type: string
-                x-content-type: application/json
+              type: "string"
+              format: "date-time"
+              description: "date in UTC when token expires"
+          schema:
+            type: "string"
         400:
-          description: Invalid username/password supplied
-          content: {}
-      x-openapi-router-controller: swagger_server.controllers.user_controller
+          description: "Invalid username/password supplied"
+      x-swagger-router-controller: "swagger_server.controllers.user_controller"
   /user/logout:
     get:
       tags:
-      - user
-      summary: Logs out current logged in user session
-      operationId: logout_user
+      - "user"
+      summary: "Logs out current logged in user session"
+      description: ""
+      operationId: "logout_user"
+      produces:
+      - "application/json"
+      parameters: []
       responses:
         default:
-          description: successful operation
-          content: {}
-      x-openapi-router-controller: swagger_server.controllers.user_controller
-components:
-  schemas:
-    Project:
-      required:
-      - name
-      - uuid
-      type: object
-      properties:
-        uuid:
-          type: string
-        name:
-          type: string
-      example:
-        name: name
-        uuid: uuid
-    User:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        username:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        email:
-          type: string
-        password:
-          type: string
-        phone:
-          type: string
-        userStatus:
-          type: integer
-          description: User Status
-          format: int32
-  securitySchemes:
-    project_auth:
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: https://petstore.swagger.io/oauth/authorize
-          scopes:
-            write:projects: modify projects in your account
-            read:projects: read your projects
-      x-tokenInfoFunc: swagger_server.controllers.authorization_controller.check_project_auth
-      x-scopeValidateFunc: swagger_server.controllers.authorization_controller.validate_scope_project_auth
-    api_key:
-      type: apiKey
-      name: api_key
-      in: header
-      x-apikeyInfoFunc: swagger_server.controllers.authorization_controller.check_api_key
-
+          description: "successful operation"
+      x-swagger-router-controller: "swagger_server.controllers.user_controller"
+securityDefinitions:
+  oauth:
+    type: "oauth2"
+    authorizationUrl: "http://localhost:8080/api/oauth/authorize"
+    flow: "implicit"
+    scopes:
+      write:user: "modify the user account"
+      read:user: "read the user account"
+      write:projects: "modify projects in your account"
+      read:projects: "read your projects"
+      train:projects: "train projects in your account"
+      write:files: "modify files in your account"
+      read:files: "read your files"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  Project:
+    type: "object"
+    required:
+    - "acoustic_model"
+    - "name"
+    - "owner"
+    properties:
+      uuid:
+        type: "string"
+      name:
+        type: "string"
+      owner:
+        $ref: "#/definitions/User"
+      acoustic_model:
+        $ref: "#/definitions/AcousticModel"
+      parent:
+        $ref: "#/definitions/Project"
+      status:
+        $ref: "#/definitions/TrainingStatus"
+      resources:
+        type: "array"
+        items:
+          $ref: "#/definitions/File"
+    example:
+      owner:
+        id: 0
+        username: "username"
+      name: "name"
+      resources:
+      - file_type: {}
+        name: "name"
+        status: {}
+      - file_type: {}
+        name: "name"
+        status: {}
+      acoustic_model:
+        name: "name"
+        model_type: {}
+        language:
+          name: "name"
+          id: 1
+        id: 6
+      uuid: "uuid"
+      status: {}
+  TrainingStatus:
+    type: "integer"
+    enum:
+    - "100"
+    - "200"
+    - "210"
+    - "220"
+    - "300"
+    - "320"
+    x-enum-varnames:
+    - "Init"
+    - "Trainable"
+    - "Training_Pending"
+    - "Training_In_Progress"
+    - "Training_Success"
+    - "Training_Failure"
+  User:
+    type: "object"
+    required:
+    - "username"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      username:
+        type: "string"
+    example:
+      id: 0
+      username: "username"
+  AcousticModel:
+    type: "object"
+    required:
+    - "language"
+    - "model_type"
+    - "name"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+      language:
+        $ref: "#/definitions/Language"
+      model_type:
+        $ref: "#/definitions/AcousticModelType"
+    example:
+      name: "name"
+      model_type: {}
+      language:
+        name: "name"
+        id: 1
+      id: 6
+  AcousticModelType:
+    type: "integer"
+    enum:
+    - "100"
+    - "200"
+    - "300"
+    x-enum-varnames:
+    - "HMM_GMM"
+    - "HMM_DNN"
+    - "HMM_RNN"
+  Language:
+    type: "object"
+    required:
+    - "name"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+    example:
+      name: "name"
+      id: 1
+  File:
+    type: "object"
+    required:
+    - "file_type"
+    - "name"
+    properties:
+      name:
+        type: "string"
+      status:
+        $ref: "#/definitions/FileStatus"
+      file_type:
+        $ref: "#/definitions/FileType"
+    example:
+      file_type: {}
+      name: "name"
+      status: {}
+  FileStatus:
+    type: "integer"
+    enum:
+    - "0"
+    - "1"
+    - "9"
+    - "10"
+    - "11"
+    - "12"
+    - "13"
+    x-enum-varnames:
+    - "Upload_InProgress"
+    - "Upload_Failure"
+    - "TextPreparation_Ready"
+    - "TextPreparation_Pending"
+    - "TextPreparation_InProcess"
+    - "TextPreparation_Failure"
+    - "TextPreparation_Success"
+  FileType:
+    type: "integer"
+    enum:
+    - "1"
+    - "2"
+    - "3"
+    - "4"
+    - "5"
+    - "6"
+    x-enum-varnames:
+    - "html"
+    - "docx"
+    - "txt"
+    - "pdf"
+    - "png"
+    - "jpg"

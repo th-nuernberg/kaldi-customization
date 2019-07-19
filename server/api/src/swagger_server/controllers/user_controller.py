@@ -20,6 +20,17 @@ def create_user(body):  # noqa: E501
     return 'do some magic!'
 
 
+def get_user():  # noqa: E501
+    """Get current user
+
+    Provides info about the logged in user. # noqa: E501
+
+
+    :rtype: None
+    """
+    return 'do some magic!'
+
+
 def login_user(username, password):  # noqa: E501
     """Logs user into the system
 

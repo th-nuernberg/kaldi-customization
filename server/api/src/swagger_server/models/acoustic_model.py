@@ -16,6 +16,7 @@ class AcousticModel(Model):
 
     Do not edit the class manually.
     """
+
     def __init__(self, id: int=None, name: str=None, language: Language=None, model_type: AcousticModelType=None):  # noqa: E501
         """AcousticModel - a model defined in Swagger
 
@@ -41,6 +42,7 @@ class AcousticModel(Model):
             'language': 'language',
             'model_type': 'model_type'
         }
+
         self._id = id
         self._name = name
         self._language = language

@@ -22,7 +22,18 @@ class TestUserController(BaseTestCase):
             '/api/v1/user',
             method='POST',
             data=json.dumps(body),
-            content_type='*/*')
+            content_type='application/json')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_get_user(self):
+        """Test case for get_user
+
+        Get current user
+        """
+        response = self.client.open(
+            '/api/v1/user',
+            method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 

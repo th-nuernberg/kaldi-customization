@@ -21,6 +21,7 @@ class AcousticModelType(Model):
     _100 = "100"
     _200 = "200"
     _300 = "300"
+
     def __init__(self):  # noqa: E501
         """AcousticModelType - a model defined in Swagger
 

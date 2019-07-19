@@ -24,6 +24,7 @@ class FileType(Model):
     _4 = "4"
     _5 = "5"
     _6 = "6"
+
     def __init__(self):  # noqa: E501
         """FileType - a model defined in Swagger
 

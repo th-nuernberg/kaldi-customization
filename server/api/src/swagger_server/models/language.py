@@ -14,6 +14,7 @@ class Language(Model):
 
     Do not edit the class manually.
     """
+
     def __init__(self, id: int=None, name: str=None):  # noqa: E501
         """Language - a model defined in Swagger
 
@@ -31,6 +32,7 @@ class Language(Model):
             'id': 'id',
             'name': 'name'
         }
+
         self._id = id
         self._name = name
 
