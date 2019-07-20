@@ -17,12 +17,25 @@ services:
                 --redis-host=redis --redis-password=${REDIS_PASSWORD} \
                 --minio-host=minio --minio-access-key=${MINIO_ACCESS_KEY} --minio-secret-key=${MINIO_SECRET_KEY}"
 
+  test-data-preparation-worker:
+    build:
+      context: ../../../
+      dockerfile: ./worker/data-preparation-worker/test/Dockerfile
+    networks: 
+      - backend
+    depends_on:
+      - redis
+      - minio
+    command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
+              /bin/sh /tools/wait-for.sh redis:6379 -- \
+              python -u /test_data_prep_worker/test_data_preparation.py \
+                redis ${REDIS_PASSWORD} \
+                minio ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY}"
+
   redis:
     env_file:
       - ../../../config/.env
     image: redis
-    ports:
-      - 6380:6379
     networks:
       - backend
     command: "redis-server --requirepass ${REDIS_PASSWORD}"
@@ -31,11 +44,6 @@ services:
     env_file:
       - ../../../config/.env
     image: "minio/minio"
-    volumes:
-      - ./dfs/data:/data
-      - ./config/.minio:/root/.minio
-    ports:
-      - 9001:9000
     command: server /data
     networks:
       - backend
