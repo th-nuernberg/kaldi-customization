@@ -1,5 +1,6 @@
 import secrets
-
+import redis
+from minio import Minio
 
 minio_buckets = dict(
     # MinIO Bucket definitions
@@ -14,8 +15,7 @@ minio_buckets = dict(
     # acoustic models that are trained by users
     ACOUSTIC_MODELS_BUCKET  = 'acoustic-models',
     # predefined models and stuff for kaldi like vocabular
-    LANGUAGE_MODELS_BUCKET  = 'language-models'
-)
+    LANGUAGE_MODELS_BUCKET  = 'language-models')
 
 def more_args(parser):
     # webserver
@@ -57,3 +57,13 @@ def more_args(parser):
         '--db-password',
         help='password for user of database'
     )
+
+redis_client = redis.Redis(host='redis', port=6379, password='kalditproject')
+
+# Import and configure MinIO
+minio_client = Minio(
+    'minio:9000',
+    access_key='AKIAIOSFODNN7EXAMPLE',
+    secret_key='wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+    secure=False
+)
