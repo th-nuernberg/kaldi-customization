@@ -20,6 +20,7 @@ const FILE_DATA: HistoryFile[] = [
   templateUrl: './upload.component.html',
   styleUrls: ['./upload.component.less'],
 })
+
 export class UploadComponent implements OnInit {
 
   private fileContent;
@@ -30,7 +31,6 @@ export class UploadComponent implements OnInit {
   public dataSource = new MatTableDataSource<HistoryFile>(FILE_DATA);
   public historySelection = new SelectionModel<HistoryFile>(true, []);
   public currentSelection = new SelectionModel<string>(true, [])
-
   public currentFiles: string[] = [];
   public uploadedFiles : { name: string, selected: boolean; }[] = [];
 
@@ -38,6 +38,13 @@ export class UploadComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  handleSelection(event, file) {
+    if (event.option.selected) {
+      event.source.deselectAll();
+      event.option._setSelected(true);
+    }
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -65,23 +72,20 @@ export class UploadComponent implements OnInit {
   // copies selected history elements to current panel
   copy() {
     this.historySelection.selected.forEach(file => {
-       //if(!this.currentFiles.includes(file.name)) this.currentFiles.push(file.name);
-       if(!this.uploadedFiles.includes( { name:file.name, selected:true }))
-       {
-         this.uploadedFiles.push({ name:file.name, selected:true });
+      if(!this.uploadedFiles.includes( { name:file.name, selected:true }))
+      {
+        this.uploadedFiles.push({ name:file.name, selected:false });
 
-         this.currentFiles = this.uploadedFiles
-          .filter(item => item.selected)
-          .map(item => item.name);
-       }
+        this.currentFiles = this.uploadedFiles
+        .filter(item => item.selected)
+        .map(item => item.name);
+      }
     });
   }
 
   // removes selected history elements
   remove(files:any) {
-    //files.selectedOptions.selected.forEach(file => this.currentFiles.splice(this.currentFiles.indexOf(file)))
-
-    files.selectedOptions.selected.forEach(file => this.uploadedFiles.splice(this.uploadedFiles.indexOf(file)))
+    files.selectedOptions.selected.forEach(file => this.uploadedFiles.splice(this.uploadedFiles.indexOf(file)));
   }
 
   // toggles remove button (disabled if nothing is selected)
@@ -94,10 +98,7 @@ export class UploadComponent implements OnInit {
     return true;
   }
 
-  /*  loads file from file dialog into current panel
-      loads file text into preview
-      pre-selects uploaded file in current panel
-  */
+  // uploads file and show preview
   loadFile(file:HTMLInputElement, list:any) {
 
     let fileName = file.files[0].name;
@@ -109,18 +110,22 @@ export class UploadComponent implements OnInit {
     this.currentFiles.push(fileName);
 
     // loads content of uploaded file into preview
-    var reader = new FileReader();
-    reader.readAsText(file.files[0]);
-    var me = this;
-    reader.onload = function () {
-      me.fileContent = reader.result;
-    }
-
+    this.showPreview(file)
     this.show = false;
   }
 
   // toggles start and verify button in current panel
   toggle() {
     this.show = !this.show;
+  }
+
+  showPreview(file:any) {
+    // loads content of uploaded file into preview
+    var reader = new FileReader();
+    reader.readAsText(file.files[0]);
+    var me = this;
+    reader.onload = function () {
+      me.fileContent = reader.result;
+    }
   }
 }
