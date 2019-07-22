@@ -108,6 +108,8 @@ def get_file_by_uuid(file_uuid):  # noqa: E501
     :rtype: Resource
     """
 
+    return Resource(name="Hello", status=FileStateEnum.TextPreparation_Success, file_type=FileType.jpg)
+
     db_file = File.query.get(file_uuid)
     if (db_file is None):
         return ("Page not found", 404)
