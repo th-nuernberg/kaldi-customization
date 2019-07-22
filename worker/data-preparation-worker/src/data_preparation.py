@@ -5,7 +5,7 @@ import os
 from connector import *
 from data_processing import (execute_phonetisaurus, merge_word_lists,
                              merge_corpus_list, remove_local_files)
-from minio_communication import download_from_bucket, upload_to_bucket
+from minio_communication import download_from_bucket, upload_to_bucket, minio_buckets
 
 
 
@@ -85,25 +85,27 @@ def infinite_loop():
             if not missing:
                 print("All needed parameters are available. Processing continues.")
                 
-                bucket_in = data["bucket-in"]
-                bucket_out = data["bucket-out"]
-                lexicon = data["lexicon"]
-                word_lists = data["uniquewordlists"]
-                print(word_lists)
-                #TODO: Acoustic bucket is still missing. This bucket is needed in order to retrieve the lexicon file
-                #TODO: Corpuslist is still missing
-                corpus_list = data["corpuslist"]
+                resources = data["resources"]
+                project = data["bucket-out"]
+                acoustic_model = data["acoustic-model"]
+
+                print(resources)
 
                 # Step 1: Download all files which were created by the Text-Preparation-Worker for this task:
                 # Download of the used lexicon
                 download_results = []
-                download_results.append(download_from_bucket(minio_client, bucket_in, lexicon, "/data_prep_worker/in/"))
+                download_results.append(download_from_bucket(minio_client, minio_buckets["ACOUSTIC_MODELS_BUCKET"], acoustic_model + "/lexicon.txt" ,"/data_prep_worker/in/lexicon.txt"))
                 # Download of all word lists which were created within the TPW
-                for word_list in word_lists:
-                    download_results.append(download_from_bucket(minio_client, bucket_in, word_list, "/data_prep_worker/in/"))
-                # Download of all corpuses which were created within the TPW
-                for corpus in corpus_list:
-                    download_results.append(download_from_bucket(minio_client, bucket_in, corpus, "/data_prep_worker/in/"))
+                word_lists = list()
+                corpus_list = list()
+                for resource in resources:
+                    loc_corp_path = "/data_prep_worker/in/" + resource + "_corpus.txt"
+                    download_results.append(download_from_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], resource + "/corpus.txt" , loc_corp_path))
+                    corpus_list.append(loc_corp_path)
+
+                    loc_wl_path = "/data_prep_worker/in/" + resource + "_wl.txt"
+                    download_results.append(download_from_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], resource + "/wl.txt" , loc_wl_path))
+                    word_lists.append(loc_wl_path)
 
                 for download in download_results:
                     if not download[0]:

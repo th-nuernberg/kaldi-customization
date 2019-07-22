@@ -2,19 +2,15 @@ import minio
 from minio import ResponseError
 
 minio_buckets = dict(
-    # MinIO Bucket definitions
-    # text-prep-worker
-    TEXTS_IN_BUCKET='texts-in',
-    TEXTS_OUT_BUCKET='texts-out',
-
-    # G2P-worker
-    G2P_IN_BUCKET  = 'g2p-in',
-    G2P_OUT_BUCKET = 'g2p-out',
+    #all resources/file uploads
+    RESOURCE_BUCKET = 'resources',
 
     # acoustic models thfilenameat are trained by users
     ACOUSTIC_MODELS_BUCKET  = 'acoustic-models',
-    # predefined models and stuff for kaldi like vocabular
-    LANGUAGE_MODELS_BUCKET  = 'language-models')
+
+    # projects
+    PROJECT_BUCKET  = 'projects')
+
 
 def does_bucket_exist(minio_client, bucket_name):
     try:
