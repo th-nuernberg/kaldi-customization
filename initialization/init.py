@@ -57,6 +57,8 @@ with app.app_context():
     db.session.commit()
 
     #commit generates ids, we need them later so safe them before closing the session
+    test_project_id = test_project.id
+
     voxfore_rnn_id = Voxforge_RNN.id
     db.session.close()
 
@@ -77,3 +79,7 @@ upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfo
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/lexicon.txt"  , "initialization/acoustic-models/voxforge-rnn/lexicon.txt")
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/tree"  , "initialization/acoustic-models/voxforge-rnn/tree")
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/g2p_model.fst"  , "initialization/acoustic-models/voxforge-rnn/g2p_model.fst")
+
+# Test Project
+upload_to_bucket(minio_client,minio_buckets["PROJECT_BUCKET"], str(voxfore_rnn_id) + "/corpus.txt"  , "initialization/example/corpus.txt")
+upload_to_bucket(minio_client,minio_buckets["PROJECT_BUCKET"], str(voxfore_rnn_id) + "/lexicon.txt"  , "initialization/example/lexicon.txt")
