@@ -56,6 +56,16 @@ def are_parameters_missing(json_data):
         return (True, "The following parameter is missing: " + missing_list[0])
     elif len(missing_list) == 2:
         return (True, "The following parameters are missing: " + missing_list[0] + " and " + missing_list[1])
+    elif len(missing_list) > 2:
+        message = "The following parameters are missing: " + missing_list[0] + ", "
+        for i in range(1, len(missing_list), 1):
+            if i == len(missing_list) - 1:
+                message += " and " + missing_list[i]
+            elif i == len(missing_list) -2 :
+                message += missing_list[i]
+            else:
+                message += missing_list[i] + ", "
+    return (True, message)
 
 
 def infinite_loop():

@@ -6,7 +6,7 @@ import os
 from connector import *
 from file_parser import (pdf_parser, html_parser, word_parser, 
                          text_parser, ocr_parser, generate_corpus)
-from minio_communication import download_from_bucket, upload_to_bucket, does_bucket_exist
+from minio_communication import download_from_bucket, upload_to_bucket, does_bucket_exist, minio_buckets
 
 def report_status_to_API(queue_status, status_queue, filename=None, message=None):
     '''
@@ -49,7 +49,7 @@ def remove_local_files(path):
     for file in text_prep_in_files:
         os.remove(path + file)
 
-def process_file(file_type, filename, minio_client):
+def process_file(file_type, filename, resource_id, minio_client):
     '''
     This function is called, in order to open the received filename of the API.
     All files which need to be processed are saved within:
@@ -65,17 +65,13 @@ def process_file(file_type, filename, minio_client):
     text_prep_input = "/text_prep_worker/in/"
     text_prep_output = "/text_prep_worker/out/"
 
-    # Step 1: Checks whether the requested buckets exist
-    existance_result_in = does_bucket_exist(minio_client, "texts-in")
+    # Step 1: Checks whether the requested bucket exist
+    existance_result_in = does_bucket_exist(minio_client, minio_buckets["RESOURCE_BUCKET"])
     if not existance_result_in[0]:
         return existance_result_in
 
-    existance_result_out = does_bucket_exist(minio_client, "texts-out")
-    if not existance_result_out[0]:
-        return existance_result_out
-
     # Step 2: Downloads the needed file which is located within the texts-in bucket
-    download_result = download_from_bucket(minio_client, "texts-in", filename, text_prep_input)
+    download_result = download_from_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], resource_id + "/" + filename, text_prep_input + filename)
     if not download_result[0]:
         return download_result
 
@@ -117,14 +113,14 @@ def process_file(file_type, filename, minio_client):
 
     # Step 5: Upload unique_word_list and corpus in bucket 
     # Uploads the created unique word list
-    unique_word_list_path = text_prep_output
-    file_upload_result = upload_to_bucket(minio_client, "texts-out", filename, unique_word_list_path)
+    unique_word_list_path = text_prep_output + filename
+    file_upload_result = upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], resource_id + "/wl.txt", unique_word_list_path)
     if not file_upload_result[0]:
         return file_upload_result
 
     # Uploads the created corpus
-    corpus_path = text_prep_output
-    corpus_upload_result = upload_to_bucket(minio_client, "texts-out", corpus_name, corpus_path)
+    corpus_path = text_prep_output + corpus_name
+    corpus_upload_result = upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], resource_id + "/corpus.txt", corpus_path)
     if not corpus_upload_result[0]:
         return corpus_upload_result
 
@@ -144,17 +140,21 @@ def infinite_loop():
         print(data)
         try:
             print("Starting to process received data")
-            if "text" in data and "type" in data:
-                report_status_to_API(queue_status=11, status_queue=status_queue, filename=data["text"])
+            if "resource_id" in data and "filename" in data and "type" in data:
+                report_status_to_API(queue_status=11, status_queue=status_queue, filename=data["resource_id"]+ "/" + data["filename"])
 
-                return_value = process_file(data["type"], data["text"], minio_client)
+                file_type = data["type"]
+                filename = data["filename"]
+                resource_id = data["resource_id"]
+
+                return_value = process_file(file_type, filename, resource_id, minio_client)
 
                 # If the task was successfully processed, the if-statement is executed
                 # Otherwise, the status queue is updated to: failure
                 if return_value[0]:
-                    report_status_to_API(queue_status=200, status_queue=status_queue, filename=data["text"])
+                    report_status_to_API(queue_status=200, status_queue=status_queue, filename=data["resource_id"]+ "/" + data["filename"])
                 else:
-                    report_status_to_API(queue_status=12, status_queue=status_queue, filename=data["text"], message=return_value[1])
+                    report_status_to_API(queue_status=12, status_queue=status_queue, filename=data["resource_id"]+ "/" + data["filename"], message=return_value[1])
 
                 if return_value[1]:
                     print("Processing finished successfully")
