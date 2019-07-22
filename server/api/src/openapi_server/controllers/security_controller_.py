@@ -1,4 +1,7 @@
 from typing import List
+from models import OAuth2Token
+
+import time
 
 
 def info_from_api_key(api_key, required_scopes):
@@ -14,7 +17,11 @@ def info_from_api_key(api_key, required_scopes):
     :return: Information attached to provided api_key or None if api_key is invalid or does not allow access to called API
     :rtype: dict | None
     """
-    return {'uid': 'user_id'}
+
+    # TODO: implement access by api_key
+
+    return None
+    # return {'uid': token.user_id}
 
 
 def info_from_oauth(token):
@@ -29,7 +36,13 @@ def info_from_oauth(token):
     :return: Decoded token information or None if token is invalid
     :rtype: dict | None
     """
-    return {'scopes': ['read:pets', 'write:pets'], 'uid': 'user_id'}
+
+    token = OAuth2Token.query.filter_by(access_token=token).first()
+
+    if not token or token.is_refresh_token_expired():
+        return None
+
+    return {'scopes': token.scope.split(), 'uid': token.user_id}
 
 
 def validate_scope_oauth(required_scopes, token_scopes):
@@ -44,5 +57,3 @@ def validate_scope_oauth(required_scopes, token_scopes):
     :rtype: bool
     """
     return set(required_scopes).issubset(set(token_scopes))
-
-

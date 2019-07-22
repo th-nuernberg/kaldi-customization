@@ -42,7 +42,7 @@ def are_parameters_missing(json_data):
     If no parameter is missing, the function will return: (False, "").
     '''
 
-    parameter_list = ["bucket-in", "bucket-out", "lexicon", "uniquewordlists", "corpuslist"]
+    parameter_list = ["resources", "acoustic-model", "id"]
     missing_list = []
 
     for parameter in parameter_list:
@@ -79,51 +79,57 @@ def infinite_loop():
             report_status_to_API(queue_status=21, status_queue=status_queue, filename="In-Progress")
 
             print("Starting to process received data")
-
             missing, message = are_parameters_missing(data)
 
             if not missing:
                 print("All needed parameters are available. Processing continues.")
-                
                 resources = data["resources"]
-                project = data["bucket-out"]
                 acoustic_model = data["acoustic-model"]
-
+                id = data["id"]
                 print(resources)
+                
+                download_results = []
 
                 # Step 1: Download all files which were created by the Text-Preparation-Worker for this task:
-                # Download of the used lexicon
-                download_results = []
-                download_results.append(download_from_bucket(minio_client, minio_buckets["ACOUSTIC_MODELS_BUCKET"], acoustic_model + "/lexicon.txt" ,"/data_prep_worker/in/lexicon.txt"))
-                # Download of all word lists which were created within the TPW
+                # Download of the models lexicon and graph
+                download_results.append(download_from_bucket(minio_client, minio_buckets["ACOUSTIC_MODELS_BUCKET"],
+                                        acoustic_model + "/g2p_model.fst" ,"/data_prep_worker/in/g2p_model.fst"))
+
                 word_lists = list()
                 corpus_list = list()
                 for resource in resources:
+                    # Download of all corpus files which were created within the TPW
                     loc_corp_path = "/data_prep_worker/in/" + resource + "_corpus.txt"
-                    download_results.append(download_from_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], resource + "/corpus.txt" , loc_corp_path))
+                    download_results.append(download_from_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"],
+                                            resource + "/corpus.txt" , loc_corp_path))
                     corpus_list.append(loc_corp_path)
 
+                    # Download of all word lists which were created within the TPW
                     loc_wl_path = "/data_prep_worker/in/" + resource + "_wl.txt"
-                    download_results.append(download_from_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], resource + "/wl.txt" , loc_wl_path))
+                    download_results.append(download_from_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"],
+                                            resource + "/wl.txt" , loc_wl_path))
                     word_lists.append(loc_wl_path)
 
+                # If any download did not finish --> Set task status to: Failure
                 for download in download_results:
                     if not download[0]:
                         print("At least one download did not finish successfully.")
+                        #TODO: Update status-queue to: Failure
+
                 # Step 2: Merge all word lists into one 
                 merge_word_lists(word_lists)
 
                 # Step 3: Merge all corpuses into one 
                 merge_corpus_list(corpus_list)
-                
+
                 # Step 4: Execute Phonetisaurus and create phones for the unique word list of all files
-                execute_phonetisaurus(lexicon)
+                execute_phonetisaurus()
+                print("Finished creating lexicon.txt")
 
                 # Step 5: Upload lexicon which was retrieved by phonetisaurus-apply and its graph
                 #TODO: Check whether the upload is successfull
-                upload_to_bucket(minio_client, bucket_out, "model.fst", "/data_prep_worker/out/")
-                upload_to_bucket(minio_client, bucket_out, "final_word_list_with_phones", "/data_prep_worker/out/")
-                upload_to_bucket(minio_client, bucket_out, "final_corpus", "/data_prep_worker/out/")
+                upload_to_bucket(minio_client, minio_buckets["PROJECT_BUCKET"], id + "/lexicon.txt", "/data_prep_worker/out/lexicon.txt")
+                upload_to_bucket(minio_client, minio_buckets["PROJECT_BUCKET"], id + "/corpus.txt", "/data_prep_worker/out/corpus.txt")
 
                 # Step 6: Delete all files which were downloaded or created for this task
                 remove_local_files("/data_prep_worker/in/")

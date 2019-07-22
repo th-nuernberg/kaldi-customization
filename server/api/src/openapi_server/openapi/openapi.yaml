@@ -19,10 +19,15 @@ paths:
       operationId: create_file
       requestBody:
         content:
-          '*/*':
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Resource'
-        description: File object that needs to be created
+              properties:
+                upfile:
+                  description: File object that needs to be created
+                  format: binary
+                  type: string
+              required:
+              - upfile
         required: true
       responses:
         405:
@@ -35,7 +40,6 @@ paths:
       summary: Create/Upload a new file
       tags:
       - file
-      x-codegen-request-body-name: body
       x-openapi-router-controller: openapi_server.controllers.file_controller
   /file/{fileUuid}:
     get:
@@ -472,8 +476,8 @@ components:
   securitySchemes:
     oauth:
       flows:
-        implicit:
-          authorizationUrl: http://localhost:8080/api/oauth/authorize
+        password:
+          tokenUrl: http://localhost:8080/api/oauth/token
           scopes:
             write:user: modify the user account
             read:user: read the user account
