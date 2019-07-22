@@ -41,11 +41,16 @@ export class UploadComponent implements OnInit {
   }
 
   // enables single selection for current panel list
-  handleSelection(event) {
+  handleSelection(event, file) {
     // TODO: show and clean preview content of selected file
+    console.log(event);
     if (event.option.selected) {
-      event.source.deselectAll();
-      event.option._setSelected(true);
+      event.source.deselectAll();      
+      event.option._setSelected(true);      
+      this.showPreview(file);
+    }
+    else {
+      this.fileContent = null;
     }
   }
 
@@ -138,8 +143,9 @@ export class UploadComponent implements OnInit {
   showPreview(file:any) {
     // loads content of uploaded file into preview
     var reader = new FileReader();
-    reader.readAsText(file.files[0]);
     var me = this;
+    
+    reader.readAsText(file.files[0]);
     reader.onload = function () {
       me.fileContent = reader.result;
     }

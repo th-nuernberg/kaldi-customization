@@ -57,11 +57,8 @@
     <!-- Current File panel -->
     <div class="upload-panel" fxFlex="33">
       <h2>Current</h2>
-      <mat-selection-list #files (selectionChange)="handleSelection($event)">
-        <mat-list-option
-          *ngFor='let file of uploadedFiles' 
-          [selected]='file.selected' 
-          [value]="file.name">
+      <mat-selection-list #files (selectionChange)="handleSelection($event, file)">
+        <mat-list-option *ngFor='let file of uploadedFiles' [selected]='file.selected' [value]="file.name">
           {{file.name}}
         </mat-list-option>
       </mat-selection-list><p>
