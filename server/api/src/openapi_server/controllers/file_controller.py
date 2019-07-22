@@ -7,7 +7,7 @@ from openapi_server.models.file_status import FileStatus
 from openapi_server.models.file_type import FileType
 
 from openapi_server import util
-from models import db, File, FileTypeEnum, FileStateEnum
+from models import db, File, FileTypeEnum, FileStateEnum, User
 from werkzeug.utils import secure_filename
 
 from minio_communication import download_from_bucket, upload_to_bucket
@@ -40,62 +40,72 @@ def create_file(upfile):  # noqa: E501
     if connexion.request.is_json:
         body = Resource.from_dict(connexion.request.get_json())  # noqa: E501
 
-    if 'file' not in connexion.request.files:
-        return ('No file', 405)
-    file = connexion.request.files['file']
+    print('------------------------------- new request -----')
+    print(type(upfile))
+    print(upfile)
+    print(connexion.request)
+
     # if user does not select file, browser also
     # submit an empty part without filename
-    if file.filename == '':
-        return ('No file selected', 405)
+    if upfile is None:
+        return ('Invalid input', 405)
     
-    filename = secure_filename(file.filename)
+    filename = secure_filename(upfile.filename)
     filetype = get_filetype(filename)
-    if file and filetype is not None:
-        # file is okay: create db entry, store to dfs and create textprep job
 
-        db_file = File(
-            name=filename,
-            status=FileTypeEnum.Upload_InProgress,
-            file_type=filetype,
-            owner=0 #TODO: wie kann der Benutzer ermittelt werden?
-        )
-        db.session.add(db_file)
-        db.session.commit()
-
-        # cache file in local file system, then upload to MinIO
-        file_path = os.path.join(TEMP_UPLOAD_FOLDER, db_file.id)
-        file.save(file_path)
-
-        upload_result = upload_to_bucket(
-            minio_client=minio_client,
-            #TODO: Wo ist der minio_client definiert?!
-            bucket=TEXTS_IN_BUCKET,
-            filename=db_file.id,
-            file_path=file_path
-        )
-
-        if upload_result[0]:
-            db_file.status = FileTypeEnum.Upload_Failure
-        else:
-            db_file.status = FileTypeEnum.TextPreparation_Ready
-
-        db.session.add(db_file)
-        db.session.commit()
-
-        create_textprep_job(db_file.id, db_file.file_type)
-
-        db_file.status = FileTypeEnum.TextPreparation_Pending
-        db.session.add(db_file)
-        db.session.commit()
-
-        return Resource(
-            name=db_file.filename,
-            status=FileStatus[db_file.status],
-            file_type=FileType[db_file.file_type]
-        )
+    if filetype is None:
+        return ('Invalid input', 405)
     
-    return 'do some magic!'
+    # file is okay: create db entry, store to dfs and create textprep job
 
+    my_user = User.query.get(1)
+
+    print("User gefunden")
+
+    db_file = File(
+        name=filename,
+        status=FileStateEnum.Upload_InProgress,
+        file_type=filetype,
+        owner=my_user #TODO: wie kann der Benutzer ermittelt werden?
+    )
+    print(db_file)
+    print(str(db_file))
+    db.session.add(db_file)
+    db.session.commit()
+
+    # cache file in local file system, then upload to MinIO
+    if not os.path.exists(TEMP_UPLOAD_FOLDER):
+        os.makedirs(TEMP_UPLOAD_FOLDER)
+
+    file_path = os.path.join(TEMP_UPLOAD_FOLDER, str(db_file.id))
+    upfile.save(file_path)
+
+    upload_result = upload_to_bucket(
+        minio_client=minio_client,
+        bucket=TEXTS_IN_BUCKET,
+        filename=str(db_file.id),
+        file_path=file_path
+    )
+
+    if upload_result[0]:
+        db_file.status = FileStateEnum.Upload_Failure
+    else:
+        db_file.status = FileStateEnum.TextPreparation_Ready
+
+    db.session.add(db_file)
+    db.session.commit()
+
+    create_textprep_job(str(db_file.id), db_file.file_type)
+
+    db_file.status = FileStateEnum.TextPreparation_Pending
+    db.session.add(db_file)
+    db.session.commit()
+
+    return Resource(
+        name=db_file.name,
+        status=FileStatus.FileStateEnum_to_FileStatus(db_file.status),
+        file_type=FileType.FileTypeEnum_to_FileType(db_file.file_type)
+    )
 
 def get_file_by_uuid(file_uuid):  # noqa: E501
     """Find file by UUID

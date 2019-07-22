@@ -50,4 +50,4 @@ class File(db.Model):
     owner = db.relationship('User')
 
     def __repr__(self):
-        return "File"
+        return "File: " + str(self.id) + "; Name: " + str(self.name) + "; Status: " + str(self.status) + "; File_type: " + str(self.file_type) + " owner: " + str(self.owner)

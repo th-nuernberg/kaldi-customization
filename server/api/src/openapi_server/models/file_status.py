@@ -46,3 +46,16 @@ class FileStatus(Model):
         :rtype: FileStatus
         """
         return util.deserialize_model(dikt, cls)
+
+    @staticmethod
+    def FileStateEnum_to_FileStatus(fileState):
+        return {
+            0: FileStatus.Upload_InProgress,
+            1: FileStatus.Upload_Failure,
+            9: FileStatus.TextPreparation_Ready,
+
+            10: FileStatus.TextPreparation_Pending,
+            11: FileStatus.TextPreparation_InProcess,
+            12: FileStatus.TextPreparation_Failure,
+            13: FileStatus.TextPreparation_Success
+            }[fileState]
