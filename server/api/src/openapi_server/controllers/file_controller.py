@@ -40,10 +40,7 @@ def create_file(upfile):  # noqa: E501
     if connexion.request.is_json:
         body = Resource.from_dict(connexion.request.get_json())  # noqa: E501
 
-    print('------------------------------- new request -----')
-    print(type(upfile))
-    print(upfile)
-    print(connexion.request)
+    print('Received new file: ' + str(upfile))
 
     # if user does not select file, browser also
     # submit an empty part without filename
@@ -59,8 +56,7 @@ def create_file(upfile):  # noqa: E501
     # file is okay: create db entry, store to dfs and create textprep job
 
     my_user = User.query.get(1)
-
-    print("User gefunden")
+    print('Set ownership to user 1')
 
     db_file = File(
         name=filename,
@@ -68,10 +64,10 @@ def create_file(upfile):  # noqa: E501
         file_type=filetype,
         owner=my_user #TODO: wie kann der Benutzer ermittelt werden?
     )
-    print(db_file)
-    print(str(db_file))
     db.session.add(db_file)
     db.session.commit()
+
+    print('Added database entry: ' + str(db_file))
 
     # cache file in local file system, then upload to MinIO
     if not os.path.exists(TEMP_UPLOAD_FOLDER):
@@ -88,18 +84,23 @@ def create_file(upfile):  # noqa: E501
     )
 
     if upload_result[0]:
-        db_file.status = FileStateEnum.Upload_Failure
-    else:
         db_file.status = FileStateEnum.TextPreparation_Ready
+    else:
+        db_file.status = FileStateEnum.Upload_Failure
 
     db.session.add(db_file)
     db.session.commit()
 
-    create_textprep_job(str(db_file.id), db_file.file_type)
+    print('Uploaded file to MinIO: ' + str(db_file))
 
-    db_file.status = FileStateEnum.TextPreparation_Pending
-    db.session.add(db_file)
-    db.session.commit()
+    if db_file.status == FileStateEnum.TextPreparation_Ready:
+        create_textprep_job(str(db_file.id), db_file.file_type)
+
+        db_file.status = FileStateEnum.TextPreparation_Pending
+        db.session.add(db_file)
+        db.session.commit()
+
+        print('Created TextPreparation job: ' + str(db_file))
 
     return Resource(
         name=db_file.name,
@@ -118,16 +119,19 @@ def get_file_by_uuid(file_uuid):  # noqa: E501
     :rtype: Resource
     """
 
-    return Resource(name="Hello", status=FileStateEnum.TextPreparation_Success, file_type=FileType.jpg)
+    #TODO: check the ownership of the file
+    # db_file.owner
+    # retrieve file from MinIO vs. File information only
 
     db_file = File.query.get(file_uuid)
+
     if (db_file is None):
-        return ("Page not found", 404)
+        return ("File not found", 404)
 
-    # check the ownership of the file
-    # db_file.owner
+    this_resource = Resource(
+        name=db_file.name, 
+        status=FileStateEnum(db_file.status),
+        file_type=FileTypeEnum(db_file.file_type)
+    )
 
-    # retrieve file from MinIO
-
-    # return file
-    return File.query.get(file_uuid)
+    return this_resource
