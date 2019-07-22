@@ -74,7 +74,7 @@ def word_parser(file_path):
     fullText = []
     for para in word_doc.paragraphs:
         fullText.append(para.text)
-        text = text + para + "\n"
+        text = text + para.text + "\n"
 
     # Create the word list and the unique list
     word_list = []

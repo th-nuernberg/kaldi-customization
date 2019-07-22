@@ -117,13 +117,13 @@ def process_file(file_type, filename, minio_client):
 
     # Step 5: Upload unique_word_list and corpus in bucket 
     # Uploads the created unique word list
-    unique_word_list_path = text_prep_output + filename
+    unique_word_list_path = text_prep_output
     file_upload_result = upload_to_bucket(minio_client, "texts-out", filename, unique_word_list_path)
     if not file_upload_result[0]:
         return file_upload_result
 
     # Uploads the created corpus
-    corpus_path = text_prep_output + corpus_name
+    corpus_path = text_prep_output
     corpus_upload_result = upload_to_bucket(minio_client, "texts-out", corpus_name, corpus_path)
     if not corpus_upload_result[0]:
         return corpus_upload_result
@@ -143,27 +143,26 @@ def infinite_loop():
         print("Received the following task from Text-Prep-Queue: ")
         print(data)
         try:
-            json_data = json.loads(data[1])
             print("Starting to process received data")
-            if "text" in json_data and "type" in json_data:
-                report_status_to_API(queue_status=11, status_queue=status_queue, filename=json_data["text"])
+            if "text" in data and "type" in data:
+                report_status_to_API(queue_status=11, status_queue=status_queue, filename=data["text"])
 
-                return_value = process_file(json_data["type"], json_data["text"], minio_client)
+                return_value = process_file(data["type"], data["text"], minio_client)
 
                 # If the task was successfully processed, the if-statement is executed
                 # Otherwise, the status queue is updated to: failure
                 if return_value[0]:
-                    report_status_to_API(queue_status=200, status_queue=status_queue, filename=json_data["text"])
+                    report_status_to_API(queue_status=200, status_queue=status_queue, filename=data["text"])
                 else:
-                    report_status_to_API(queue_status=12, status_queue=status_queue, filename=json_data["text"], message=return_value[1])
+                    report_status_to_API(queue_status=12, status_queue=status_queue, filename=data["text"], message=return_value[1])
 
                 if return_value[1]:
                     print("Processing finished successfully")
             else:
                 # Received parameters are wrong --> Update status queue and set task processing to: failure
-                if "text" not in json_data and "type" in json_data:
+                if "text" not in data and "type" in data:
                     report_status_to_API(queue_status=12, status_queue=status_queue, filename="failure", message="text key is missing or misspelled within the JSON.")
-                elif "type" not in json_data and "text" in json_data:
+                elif "type" not in data and "text" in data:
                     report_status_to_API(queue_status=12, status_queue=status_queue, filename="failure", message="type key is missing or misspelled within the JSON.")
                 else:
                     report_status_to_API(queue_status=12, status_queue=status_queue, filename="failure", message="Both keys are not correct")
