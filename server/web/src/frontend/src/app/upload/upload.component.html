@@ -57,8 +57,11 @@
     <!-- Current File panel -->
     <div class="upload-panel" fxFlex="33">
       <h2>Current</h2>
-      <mat-selection-list #files (selectionChange)="handleSelection($event, file)">
-        <mat-list-option *ngFor='let file of uploadedFiles' [selected]='file.selected' [value]="file.name">
+      <mat-selection-list #files (selectionChange)="handleSelection($event)">
+        <mat-list-option
+          *ngFor='let file of uploadedFiles' 
+          [selected]='file.selected' 
+          [value]="file.name">
           {{file.name}}
         </mat-list-option>
       </mat-selection-list><p>
@@ -77,7 +80,7 @@
       <h2>Preview</h2>
       <form class="text-content-form">
         <mat-form-field class="text-content-full">
-          <textarea matInput cdkTextareaAutosize cdkAutosizeMinRows="3" cdkAutosizeMaxRows="23">{{fileContent}}</textarea>
+          <textarea matInput cdkTextareaAutosize cdkAutosizeMinRows="18" cdkAutosizeMaxRows="18">{{fileContent}}</textarea>
         </mat-form-field>
         <button type="button" class="uploadSite-Button" mat-flat-button [disabled]="shouldSave()">Save</button>
       </form>
