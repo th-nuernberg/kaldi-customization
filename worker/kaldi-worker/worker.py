@@ -4,11 +4,12 @@ import os
 import shutil
 
 import subprocess
-from minio_communication import download_from_bucket, upload_to_bucket
+from minio_communication import download_from_bucket, upload_to_bucket, minio_buckets
 import redis_config
 import json
 
-print("starting")
+acoustic_model_bucket = minio_buckets['ACOUSTIC_MODELS_BUCKET']
+project_bucket = minio_buckets["PROJECT_BUCKET"]
 
 script_root_path = os.path.dirname(os.path.realpath(__file__))
 workspace_path = os.path.join(script_root_path, 'workspace')
@@ -32,11 +33,9 @@ if __name__ == "__main__":
         for task in tasks.listen():
             print("Read task from queue:")
             print(task)
-            task = json.loads(task[1])
-            acoustic_model_bucket = task["acoustic-model_bucket"]
-            acoustic_model_id = task["acoustic-model-id"]
-            project_bucket = task["project-bucket"]
-            project_uuid = task["project-uuid"]
+
+            acoustic_model_id = task["acoustic_model_id"]
+            project_id = task["project_id"]
 
             if not os.path.exists(acoustic_model_folder):
                         os.makedirs(workspace_path)
@@ -49,14 +48,18 @@ if __name__ == "__main__":
                 download_from_bucket(minio_client, acoustic_model_bucket, acoustic_model_id + "/tree", os.path.join(cur_acoustic_model_path,"tree"))
 
                 downloaded_acoustic_models.add(acoustic_model_id)
+            
+
             # TODO: load resources
-            download_from_bucket(minio_client, project_bucket, project_uuid + "/lexicon.txt", lexicon_path)
-            download_from_bucket(minio_client, project_bucket, project_uuid + "/corpus.txt", corpus_path)
+            download_from_bucket(minio_client, project_bucket, project_id + "/lexicon.txt", lexicon_path)
+            download_from_bucket(minio_client, project_bucket, project_id + "/corpus.txt", corpus_path)
             # TODO: train resources
-            subprocess.call("scripts/create_new_graph.sh"+ " {} {} {} {} {}".format(lexicon_path,corpus_path,cur_acoustic_model_path,new_graph_dir,workspace_path),shell=True)
+            os.chdir("/kaldi/scripts/")
+            subprocess.call("/kaldi/scripts/create_new_graph.sh"+ " {} {} {} {} {}".format(lexicon_path,corpus_path,cur_acoustic_model_path,new_graph_dir,workspace_path),shell=True)
+            os.chdir("/")
             # TODO Upload new model
             shutil.make_archive(new_graph_archive,archive_format,workspace_path,new_graph_dir)
-            upload_to_bucket(minio_client,project_bucket,project_uuid + "/graph.zip", new_graph_archive)
+            upload_to_bucket(minio_client,project_bucket,project_id + "/graph.zip", new_graph_archive)
             # TODO: unload resources
             shutil.rmtree(workspace_path)
 
