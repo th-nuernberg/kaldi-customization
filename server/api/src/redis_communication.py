@@ -11,7 +11,7 @@ def create_textprep_job(resourcename, filetype):
         "text" : resourcename,
         "type" : filetype.name
     }
-    redis_client.rpush(redis_client.TEXT_PREP_QUEUE, json.dumps(entry))
+    redis_client.rpush(redis_queues.TEXT_PREP_QUEUE, json.dumps(entry))
     return
 
 
@@ -25,5 +25,5 @@ def create_g2p_job(uniquewordlists, language_model='Voxforge'):
         "language_model" : language_model,
         "uniquewordlists" : [wl.name for wl in uniquewordlists]
     }
-    redis_client.rpush(redis_client.G2P_QUEUE, json.dumps(entry))
+    redis_client.rpush(redis_queues.G2P_QUEUE, json.dumps(entry))
     return
