@@ -38,8 +38,6 @@ with app.app_context():
     db.session.add(german)
 
 
-
-
     acoustic_model = AcousticModel(name='Voxforge-RNN', language=german.id, model_type=ModelType.HMM_RNN)
     db.session.add(acoustic_model)
     """

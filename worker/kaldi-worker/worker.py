@@ -23,7 +23,8 @@ new_graph_archive = os.path.join(script_root_path,"graph")
 archive_format ="zip"
 
 downloaded_acoustic_models = set()
-os.makedirs(acoustic_model_folder)
+if not os.path.exists(acoustic_model_folder):
+    os.makedirs(acoustic_model_folder)
 if __name__ == "__main__":
     try:
         conf, tasks, status, minio_client = parse_args('Kaldi Worker Connector', task_queue=redis_config.redis_queues["KALDI_QUEUE"])
@@ -37,7 +38,8 @@ if __name__ == "__main__":
             project_bucket = task["project-bucket"]
             project_uuid = task["project-uuid"]
 
-            os.makedirs(workspace_path)
+            if not os.path.exists(acoustic_model_folder):
+                        os.makedirs(workspace_path)
 
             # cache models when used once and reduce download
             cur_acoustic_model_path = os.path.join(acoustic_model_folder,acoustic_model_id)
