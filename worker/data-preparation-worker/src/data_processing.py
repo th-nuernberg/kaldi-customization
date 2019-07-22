@@ -3,32 +3,23 @@ import re
 import subprocess
 
 
-def execute_phonetisaurus(lexicon):
+def execute_phonetisaurus():
     '''
-    This function executes two Phonetisaurus commands:
-        1) phonetisaurus-train
-        2) phonetisaurus-apply
-    These calls are used to create a word list with all their phones. 
+    This function executes the phonetisaurus-apply command
+    This call is used to create a lexicon.txt file which is afterwards used by the kaldi-worker
 
-    This function saves two files:
-        1) model.fst --> This file is a graph which was created with the phonetisaurus-train command
-        2) word list with phones --> This file consists of all words and their phones
-    All these files are saved locally and are afterwards uploaded to their corresponding MinIO-Bucket
+    This function saves one file:
+        - lexicon.txt --> This file consists of all words and their phones
+    This file is saved locally and are afterwards uploaded to its corresponding MinIO-Bucket
 
-    Loading lexicon from: /data_prep_worker/in/
+    Loading g2p graph for command from: /data_prep_worker/in/
     Loading final_word_list from: /data/prep_worker/out/
-    Saving all files to: /data_prep_worker/out/
+    Saving lexicon.txt in: /data_prep_worker/out/
     '''
-    # Trains a new graph with the base lexicon
-    subprocess.call(["phonetisaurus-train", "-l", "/data_prep_worker/in/" + lexicon, "-s2d", "-g", "-o", "8"])
-    
-    with open("/data_prep_worker/out/final_word_list_with_phones", "w") as file_handler:            
+    with open("/data_prep_worker/out/lexicon.txt", "w") as file_handler:            
         # Applies the previously trained graph onto the word list and creates phones for all words
-        subprocess.call(["phonetisaurus-apply", "--model", "train/model.fst", "--word_list", "/data_prep_worker/out/final_word_list", 
-                         "-n", "2", "-l", "/data_prep_worker/in/" + lexicon, "--beam", "10000", "-g", "-t", "10000"], stdout=file_handler)
-
-    # Moves the created graph into /data_prep_worker/out/
-    subprocess.call(["mv", "train/model.fst", "/data_prep_worker/out/model.fst"])
+        subprocess.call(["phonetisaurus-apply", "--model", "/data_prep_worker/in/g2p_model.fst", "--word_list", "/data_prep_worker/out/final_word_list", 
+                         "--beam", "10000", "-g", "-t", "10000"], stdout=file_handler)
 
 
 def merge_word_lists(unique_words):
@@ -45,11 +36,11 @@ def merge_word_lists(unique_words):
     Loading all files from: /data_prep_worker/in/
     Saving final word list into: /data_prep_worker/out/
     '''
-    first_list = open("/data_prep_worker/in/" + unique_words[0], "r").read().lower()
+    first_list = open(unique_words[0], "r").read().lower()
     first_word_list = re.split("\n", first_list)
 
     for word_list in range(1, len(unique_words), 1):
-        second_list = open("/data_prep_worker/in/" + unique_words[word_list], "r").read().lower()
+        second_list = open(unique_words[word_list], "r").read().lower()
         second_word_list = re.split("\n", second_list)
         first_word_list = set(first_word_list).union(set(second_word_list))
 
@@ -74,18 +65,18 @@ def merge_corpus_list(corpus_list):
     Loading all files from: /data_prep_worker/in/
     Saving merged corpus into: /data_prep_worker/out/
     '''
-    first_corpus = open("/data_prep_worker/in/" + corpus_list[0], "r").read()
+    first_corpus = open(corpus_list[0], "r").read()
     first_corpus_list = re.split("\n", first_corpus)    
 
     for corpus in range(1, len(corpus_list), 1):
-        second_corpus = open("/data_prep_worker/in/" + corpus_list[corpus], "r").read()
+        second_corpus = open(corpus_list[corpus], "r").read()
         second_corpus_list = re.split("\n", second_corpus)
 
         # Appends all sentences of the second corpus to the first one
         for sentence in second_corpus_list:
             first_corpus_list.append(sentence)
 
-    with open("/data_prep_worker/out/final_corpus", "w") as file_writer:
+    with open("/data_prep_worker/out/corpus.txt", "w") as file_writer:
         for sentence in first_corpus_list:
             if sentence != "":
                 file_writer.write(sentence + "\n")
