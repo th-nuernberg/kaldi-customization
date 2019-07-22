@@ -476,8 +476,8 @@ components:
   securitySchemes:
     oauth:
       flows:
-        implicit:
-          authorizationUrl: http://localhost:8080/api/oauth/authorize
+        password:
+          tokenUrl: http://localhost:8080/api/oauth/token
           scopes:
             write:user: modify the user account
             read:user: read the user account
