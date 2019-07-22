@@ -78,21 +78,21 @@ def infinite_loop():
             #TODO: Update status queue and set task to: In Progress
             report_status_to_API(queue_status=21, status_queue=status_queue, filename="In-Progress")
 
-            json_data = json.loads(data[1])
             print("Starting to process received data")
 
-            missing, message = are_parameters_missing(json_data)
+            missing, message = are_parameters_missing(data)
 
             if not missing:
                 print("All needed parameters are available. Processing continues.")
                 
-                bucket_in = json_data["bucket-in"]
-                bucket_out = json_data["bucket-out"]
-                lexicon = json_data["lexicon"]
-                word_lists = json_data["uniquewordlists"]
+                bucket_in = data["bucket-in"]
+                bucket_out = data["bucket-out"]
+                lexicon = data["lexicon"]
+                word_lists = data["uniquewordlists"]
+                print(word_lists)
                 #TODO: Acoustic bucket is still missing. This bucket is needed in order to retrieve the lexicon file
                 #TODO: Corpuslist is still missing
-                corpus_list = json_data["corpuslist"]
+                corpus_list = data["corpuslist"]
 
                 # Step 1: Download all files which were created by the Text-Preparation-Worker for this task:
                 # Download of the used lexicon

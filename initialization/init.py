@@ -1,4 +1,5 @@
 import importlib
+import importlib.machinery
 importlib.machinery.SourceFileLoader('minio_communication','shared/minio_communication.py').load_module()
 importlib.machinery.SourceFileLoader('models','server/api/src/models/__init__.py').load_module()
 from models import *
