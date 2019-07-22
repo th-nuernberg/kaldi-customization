@@ -1,1 +1,27 @@
-<h1>Default Workspace</h1>
+<div style="height:calc(100vh - 56px);">
+   <div flex fxLayout="row"
+         fyLayoutAlign="space-around center"
+         fxLayout.xs="column"
+         fxLayoutAlign.xs="space-around center">
+
+      <!-- Existing workspaces-->
+      <div class="workspace-panel" fxFlex="33">
+         <h3>Existierende Arbeitsbereiche</h3>
+         <mat-list>
+            <ng-container *ngFor="let workspace of workspaces">
+               <a routerLink="{{workspace.link}}" mat-list-item>{{workspace.name}}</a>
+               <mat-list style="margin-left:30px;">
+               <div *ngFor="let project of workspace.projects">
+                  <a routerLink="{{project.link}}" mat-list-item>{{project.name}}</a>
+               </div>
+               </mat-list>
+            </ng-container>
+         </mat-list>
+      </div>
+      <!-- Create workspace -->
+      <div class="workspace-panel" fxFlex="33">
+         <button class="workspace-button" mat-flat-button (click)="create()">Create</button>
+      </div>
+   </div>
+
+</div>

@@ -8,6 +8,7 @@ export interface HistoryFile {
   uploaded: string;
 }
 
+// TODO: adapt to information from database
 const FILE_DATA: HistoryFile[] = [
   {position: 1, name: 'Kafka1', uploaded: "01.01.1970"},
   {position: 2, name: 'Kant1', uploaded: "01.01.1970"},
