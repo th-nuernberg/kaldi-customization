@@ -45,7 +45,9 @@ class File(db.Model):
 
     status = db.Column(db.Enum(FileStateEnum))
     file_type = db.Column(db.Enum(FileTypeEnum), nullable=True)
-    owner = db.Column(db.Integer,db.ForeignKey("users.id"))
+
+    owner_id = db.Column(db.Integer,db.ForeignKey("users.id"))
+    owner = db.relationship('User')
 
     def __repr__(self):
         return "File"

@@ -20,8 +20,8 @@ class AcousticModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
 
-    #language = db.relationship('Language')#, backref=db.backref('project', remote_side=[id], lazy=True, cascade='all,delete'))
-    language = db.Column(db.Integer,db.ForeignKey("languages.id"))
+    language = db.relationship('Language')#, backref=db.backref('project', remote_side=[id], lazy=True, cascade='all,delete'))
+    language_id = db.Column(db.Integer,db.ForeignKey("languages.id"))
     model_type = db.Column(db.Enum(ModelType), nullable=True)
 
     def __repr__(self):
