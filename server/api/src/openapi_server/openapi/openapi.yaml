@@ -4,8 +4,8 @@ info:
   title: Kaldi Customization Server
   version: 1.0.0
 servers:
-- url: https://localhost/api/v1
-- url: http://localhost/api/v1
+- url: https://localhost:8080/api/v1
+- url: http://localhost:8080/api/v1
 tags:
 - description: Operations about projects
   name: project
