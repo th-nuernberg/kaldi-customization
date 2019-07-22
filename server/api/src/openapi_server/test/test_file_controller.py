@@ -6,7 +6,7 @@ import unittest
 from flask import json
 from six import BytesIO
 
-java.io.File  # noqa: E501
+from openapi_server.models.resource import Resource  # noqa: E501
 from openapi_server.test import BaseTestCase
 
 
@@ -19,7 +19,7 @@ class TestFileController(BaseTestCase):
 
         Create/Upload a new file
         """
-        body = (BytesIO(b'some file data'), 'file.txt')
+        body = {}
         headers = { 
             'Content-Type': 'application/json',
             'Authorization': 'Bearer special-key',

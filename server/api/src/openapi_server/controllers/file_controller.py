@@ -27,13 +27,13 @@ def get_filetype(filename):
             return FileTypeEnum[filetype]
     return None
 
-def create_file(body):  # noqa: E501
+def create_file(upfile):  # noqa: E501
     """Create/Upload a new file
 
      # noqa: E501
 
-    :param body: File object that needs to be created
-    :type body: dict | bytes
+    :param upfile: File object that needs to be created
+    :type upfile: str
 
     :rtype: None
     """
