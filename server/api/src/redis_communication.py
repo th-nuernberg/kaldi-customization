@@ -1,5 +1,6 @@
 import json
-from config import redis_client, minio_buckets
+from config import redis_client
+from minio_communication import minio_buckets
 from redis_config import redis_queues
 
 def create_textprep_job(resourcename, filetype):

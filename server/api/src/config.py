@@ -2,21 +2,6 @@ import secrets
 import redis
 from minio import Minio
 
-minio_buckets = dict(
-    # MinIO Bucket definitions
-    # text-prep-worker
-    TEXTS_IN_BUCKET='texts-in',
-    TEXTS_OUT_BUCKET='texts-out',
-
-    # G2P-worker
-    G2P_IN_BUCKET  = 'g2p-in',
-    G2P_OUT_BUCKET = 'g2p-out',
-
-    # acoustic models that are trained by users
-    ACOUSTIC_MODELS_BUCKET  = 'acoustic-models',
-    # predefined models and stuff for kaldi like vocabular
-    LANGUAGE_MODELS_BUCKET  = 'language-models')
-
 def more_args(parser):
     # webserver
     parser.add_argument(
