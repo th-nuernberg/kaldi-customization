@@ -8,6 +8,9 @@ from openapi_server.models.project import Project  # noqa: E501
 from openapi_server.models.training_status import TrainingStatus  # noqa: E501
 from openapi_server import util
 
+from models import db, Project as DB_Project, ProjectStateEnum as DB_ProjectStateEnum
+
+import uuid
 
 def create_project(body):  # noqa: E501
     """Create a new project
@@ -21,6 +24,17 @@ def create_project(body):  # noqa: E501
     """
     if connexion.request.is_json:
         body = Project.from_dict(connexion.request.get_json())  # noqa: E501
+        db_proj = DB_Project(
+            api_token=str(uuid.uuid4().hex) + str(uuid.uuid4().hex),
+            name=body.name,
+            uuid=uuid.uuid4().hex,
+            status=DB_ProjectStateEnum.Training_Success
+        )
+        db.session.add(db_proj)
+        db.session.commit()
+        return db_proj.uuid
+    else:
+        return (405, 'Invalid input')
     return 'do some magic!'
 
 
