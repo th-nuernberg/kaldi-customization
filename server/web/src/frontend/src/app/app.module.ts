@@ -24,7 +24,6 @@ import {
   MatTableModule,
 } from '@angular/material';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { WorkspaceComponent } from './workspace/workspace.component';
 import { ProjectComponent } from './project/project.component';
 import { CoverComponent } from './cover/cover.component';
 import { UploadComponent } from './upload/upload.component';
@@ -34,7 +33,6 @@ import { AccountComponent } from './account/account.component';
   declarations: [
     AppComponent,
     DashboardComponent,
-    WorkspaceComponent,
     ProjectComponent,
     CoverComponent,
     UploadComponent,

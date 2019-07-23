@@ -7,12 +7,6 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DashboardComponent implements OnInit {
 
-  public workspaces = [
-    { name: "Workspace 1", link:"/workspace/_", projects: [{name: "Project 1", link:"/project/_"}, {name: "Project 2", link:"/project/_"}, {name: "Project 3", link:"/project/_"}]},
-    { name: "Workspace 2", link:"/workspace/_", projects: [{name: "Project 1", link:"/project/_"}, {name: "Project 2", link:"/project/_"}, {name: "Project 3", link:"/project/_"}]},
-    { name: "Workspace 3", link:"/workspace/_", projects: [{name: "Project 1", link:"/project/_"}, {name: "Project 2", link:"/project/_"}, {name: "Project 3", link:"/project/_"}]}
-  ]
-
   public projects = [
     { name: "Project 1", link:"/project/_", models: [{name: "Model 1", link:"/project/_"}, {name: "Model 2", link:"/project/_"}, {name: "Model 3", link:"/project/_"}]},
     { name: "Project 2", link:"/project/_", models: [{name: "Model 1", link:"/project/_"}, {name: "Model 2", link:"/project/_"}, {name: "Model 3", link:"/project/_"}]},

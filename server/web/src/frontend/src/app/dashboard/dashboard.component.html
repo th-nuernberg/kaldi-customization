@@ -8,24 +8,9 @@
     <div class="dashboard-panel" fxFlex="33">
       <h3>Letzte Ausführungen</h3>
       <mat-list>
-        <a routerLink="/workspace/_" mat-list-item>Letzte Ausführung 1</a>
         <a routerLink="/project/_" mat-list-item>Letzte Ausführung 2</a>
         <a routerLink="/upload/_" mat-list-item>Upload</a>
       </mat-list>
-    </div>
-      <!-- Center -->
-    <div class="dashboard-panel" fxFlex="33">
-        <h3>Arbeitsbereiche</h3>
-        <mat-list>
-        <ng-container *ngFor="let workspace of workspaces">
-            <a routerLink="{{workspace.link}}" mat-list-item>{{workspace.name}}</a>
-            <mat-list style="margin-left:30px;">
-              <div *ngFor="let project of workspace.projects">
-                <a routerLink="{{project.link}}" mat-list-item>{{project.name}}</a>
-              </div>
-            </mat-list>
-          </ng-container>
-        </mat-list>
     </div>
     <!-- Right -->
     <div class="dashboard-panel" fxFlex="33">
