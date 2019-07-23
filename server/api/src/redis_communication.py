@@ -8,7 +8,8 @@ def create_textprep_job(resourcename, filetype):
     Creates a new job in the queue for a text preperation worker.
     '''
     entry = {
-        "text" : resourcename,
+        "resource_id" : resourcename,
+        "filename" : resourcename,
         "type" : filetype.name
     }
     redis_client.rpush(redis_queues["TEXT_PREP_QUEUE"], json.dumps(entry))

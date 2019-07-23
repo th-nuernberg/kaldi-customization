@@ -10,12 +10,11 @@ from openapi_server import util
 from models import db, File, FileTypeEnum, FileStateEnum, User
 from werkzeug.utils import secure_filename
 
-from minio_communication import download_from_bucket, upload_to_bucket
+from minio_communication import download_from_bucket, upload_to_bucket, minio_buckets
 from redis_communication import create_textprep_job
 from config import minio_client
 
 TEMP_UPLOAD_FOLDER = '/tmp/fileupload'
-TEXTS_IN_BUCKET = 'texts-in'
 
 def get_filetype(filename):
     '''
@@ -73,15 +72,19 @@ def create_file(upfile):  # noqa: E501
     if not os.path.exists(TEMP_UPLOAD_FOLDER):
         os.makedirs(TEMP_UPLOAD_FOLDER)
 
-    file_path = os.path.join(TEMP_UPLOAD_FOLDER, str(db_file.id))
-    upfile.save(file_path)
+    local_file_path = os.path.join(TEMP_UPLOAD_FOLDER, str(db_file.id))
+    upfile.save(local_file_path)
+
+    minio_file_path = str(db_file.id) + '/' + str(db_file.id)
 
     upload_result = upload_to_bucket(
         minio_client=minio_client,
-        bucket=TEXTS_IN_BUCKET,
-        filename=str(db_file.id),
-        file_path=file_path
+        bucket=minio_buckets["RESOURCE_BUCKET"],
+        filename=minio_file_path,
+        file_path=local_file_path
     )
+
+    #TODO: delete local file local_file_path
 
     if upload_result[0]:
         db_file.status = FileStateEnum.TextPreparation_Ready

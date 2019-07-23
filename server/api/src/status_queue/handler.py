@@ -5,6 +5,7 @@ from .text_prep import handle_text_prep_status
 from config import redis_client
 from redis_config import redis_queues
 
+#from app import app
 
 def handle_statue_queue(status_queue, db):
     '''
@@ -33,7 +34,8 @@ def handle_statue_queue(status_queue, db):
                         print("[Status] unknown type \"{}\" in status queue!".format(msg_data['type']))
         except Exception as e:
             print("[Status] Exception at status queue: {}".format(type(e).__name__))
-            print("[Status] Further information: " + e.__str__())
+            print("[Status] Further information 1: " + e.__str__())
+            print("[Status] Further information 2: " + str(e))
 
 
 def start_status_queue_handler(db):
