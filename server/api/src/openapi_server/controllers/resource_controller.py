@@ -26,18 +26,16 @@ def get_filetype(filename):
             return FileTypeEnum[filetype]
     return None
 
-def create_file(upfile):  # noqa: E501
-    """Create/Upload a new file
+def create_resource(upfile):  # noqa: E501
+    """Create/Upload a new resource
 
      # noqa: E501
 
-    :param upfile: File object that needs to be created
+    :param upfile: File object that needs to be uploaded
     :type upfile: str
 
-    :rtype: None
+    :rtype: Resource
     """
-    if connexion.request.is_json:
-        body = Resource.from_dict(connexion.request.get_json())  # noqa: E501
 
     print('Received new file: ' + str(upfile))
 
@@ -111,13 +109,25 @@ def create_file(upfile):  # noqa: E501
         file_type=FileType.FileTypeEnum_to_FileType(db_file.file_type)
     )
 
-def get_file_by_uuid(file_uuid):  # noqa: E501
-    """Find file by UUID
 
-    Returns a single file # noqa: E501
+def get_resource():  # noqa: E501
+    """Returns a list of available resources
 
-    :param file_uuid: UUID of file to return
-    :type file_uuid: str
+     # noqa: E501
+
+
+    :rtype: List[Resource]
+    """
+    return 'do some magic!'
+
+
+def get_resource_by_uuid(resource_uuid):  # noqa: E501
+    """Find resource by UUID
+
+    Returns a single resource # noqa: E501
+
+    :param resource_uuid: UUID of resource to return
+    :type resource_uuid: str
 
     :rtype: Resource
     """
@@ -138,3 +148,16 @@ def get_file_by_uuid(file_uuid):  # noqa: E501
     )
 
     return this_resource
+
+
+def get_resource_data(resource_uuid):  # noqa: E501
+    """Returns the resource content
+
+    Returns the resource content # noqa: E501
+
+    :param resource_uuid: UUID of resource to return
+    :type resource_uuid: str
+
+    :rtype: file
+    """
+    return 'do some magic!'

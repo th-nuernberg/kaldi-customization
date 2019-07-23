@@ -10,40 +10,73 @@ from openapi_server.models.resource import Resource  # noqa: E501
 from openapi_server.test import BaseTestCase
 
 
-class TestFileController(BaseTestCase):
-    """FileController integration test stubs"""
+class TestResourceController(BaseTestCase):
+    """ResourceController integration test stubs"""
 
-    @unittest.skip("*/* not supported by Connexion. Use application/json instead. See https://github.com/zalando/connexion/pull/760")
-    def test_create_file(self):
-        """Test case for create_file
+    @unittest.skip("multipart/form-data not supported by Connexion")
+    def test_create_resource(self):
+        """Test case for create_resource
 
-        Create/Upload a new file
+        Create/Upload a new resource
         """
-        body = {}
         headers = { 
-            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Content-Type': 'multipart/form-data',
             'Authorization': 'Bearer special-key',
         }
+        data = dict(upfile=(BytesIO(b'some file data'), 'file.txt'))
         response = self.client.open(
-            '/api/v1/file',
+            '/api/v1/resource',
             method='POST',
             headers=headers,
-            data=json.dumps(body),
-            content_type='application/json')
+            data=data,
+            content_type='multipart/form-data')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_get_file_by_uuid(self):
-        """Test case for get_file_by_uuid
+    def test_get_resource(self):
+        """Test case for get_resource
 
-        Find file by UUID
+        Returns a list of available resources
         """
         headers = { 
             'Accept': 'application/json',
             'Authorization': 'Bearer special-key',
         }
         response = self.client.open(
-            '/api/v1/file/{file_uuid}'.format(file_uuid='file_uuid_example'),
+            '/api/v1/resource',
+            method='GET',
+            headers=headers)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_get_resource_by_uuid(self):
+        """Test case for get_resource_by_uuid
+
+        Find resource by UUID
+        """
+        headers = { 
+            'Accept': 'application/json',
+            'Authorization': 'Bearer special-key',
+        }
+        response = self.client.open(
+            '/api/v1/resource/{resource_uuid}'.format(resource_uuid='resource_uuid_example'),
+            method='GET',
+            headers=headers)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_get_resource_data(self):
+        """Test case for get_resource_data
+
+        Returns the resource content
+        """
+        headers = { 
+            'Accept': 'image/jpeg',
+            'Authorization': 'Bearer special-key',
+        }
+        response = self.client.open(
+            '/api/v1/resource/{resource_uuid}/data'.format(resource_uuid='resource_uuid_example'),
             method='GET',
             headers=headers)
         self.assert200(response,
