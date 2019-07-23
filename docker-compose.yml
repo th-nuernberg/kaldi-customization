@@ -2,53 +2,69 @@ version: '3.2'
 
 services:
   kaldi-worker:
-    build: ./worker/kaldi-worker
+    env_file:
+      - ./config/.env
+    build:
+      context: .
+      dockerfile: ./worker/kaldi-worker/Dockerfile
     networks:
       - backend
     restart: always
     depends_on:
       - redis
-    
+      - minio
+    command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
+              /bin/sh /tools/wait-for.sh redis:6379 -- \
+              python3 -u /kaldi/worker.py \
+                --redis-host=redis --redis-password=${REDIS_PASSWORD} \
+                --minio-host=minio --minio-access-key=${MINIO_ACCESS_KEY} --minio-secret-key=${MINIO_SECRET_KEY}"
+
   text-prep-worker:
-    build: ./worker/text-preparation-worker
+    build:
+      context: .
+      dockerfile: ./worker/text-preparation-worker/Dockerfile
     networks:
       - backend
-    volumes:
-      - type: bind
-        source: ./dfs/texts/in
-        target: /text_prep_worker/in
-      - type: bind
-        source: ./dfs/texts/out
-        target: /text_prep_worker/out
     restart: always
     depends_on:
       - redis
-  
-  g2p-worker:
-    build: ./worker/g2p-worker
+      - minio
+    command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
+              /bin/sh /tools/wait-for.sh redis:6379 -- \
+              python -u /text_prep_worker/text_preparation.py \
+                --redis-host=redis --redis-password=${REDIS_PASSWORD} \
+                --minio-host=minio --minio-access-key=${MINIO_ACCESS_KEY} --minio-secret-key=${MINIO_SECRET_KEY}"
+
+  data-preparation-worker:
+    build:
+      context: .
+      dockerfile: ./worker/data-preparation-worker/Dockerfile
     networks:
       - backend
-    volumes:
-      - type: bind
-        source: ./dfs/texts/in
-        target: /g2p_worker/in
-      - type: bind
-        source: ./dfs/texts/out
-        target: /g2p_worker/out
     restart: always
     depends_on:
       - redis
+      - minio
+    command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
+              /bin/sh /tools/wait-for.sh redis:6379 -- \
+              python -u /data_prep_worker/data_preparation.py \
+                --redis-host=redis --redis-password=${REDIS_PASSWORD} \
+                --minio-host=minio --minio-access-key=${MINIO_ACCESS_KEY} --minio-secret-key=${MINIO_SECRET_KEY}"
 
   redis:
-    image: "redis:alpine"
+    env_file:
+      - ./config/.env
+    image: redis
     ports:
       - 6380:6379
-    command: redis-server --requirepass kalditproject
     networks:
       - backend
     restart: always
+    command: "redis-server --requirepass ${REDIS_PASSWORD}"
 
   minio:
+    env_file:
+      - config/.env
     image: "minio/minio"
     volumes:
       - ./dfs/data:/data
@@ -56,24 +72,18 @@ services:
     ports:
       - 9001:9000
     command: server /data
-    environment:
-      MINIO_ACCESS_KEY: AKIAIOSFODNN7EXAMPLE
-      MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
     networks:
       - backend
     restart: always
 
   db:
+    env_file:
+      - ./config/.env
     image: "mariadb"
     ports:
       - 3307:3306
     command:
       - --interactive_timeout=28800
-    environment:
-      MYSQL_ROOT_PASSWORD: kalditproject
-      MYSQL_USER: api
-      MYSQL_PASSWORD: api-server-password
-      MYSQL_DATABASE: api
     networks:
       - frontend
     restart: always
@@ -92,21 +102,24 @@ services:
       - web
 
   api:
-    build: ./server/api
+    build:
+      context: .
+      dockerfile: ./server/api/Dockerfile
     networks:
       - frontend
       - backend
-    volumes:
-      - type: bind
-        source: ./dfs/asr
-        target: /www/asr
-      - type: bind
-        source: ./dfs/texts
-        target: /www/texts
     restart: always
     depends_on:
       - db
       - redis
+      - minio
+    command: "/bin/sh /tools/wait-for.sh db:3306 -- \
+              /bin/sh /tools/wait-for.sh minio:9000 -- \
+              /bin/sh /tools/wait-for.sh redis:6379 -- \
+              python -u /www/app.py \
+                --redis-host=redis --redis-password=${REDIS_PASSWORD} \
+                --minio-host=minio --minio-access-key=${MINIO_ACCESS_KEY} --minio-secret-key=${MINIO_SECRET_KEY} \
+                --db-host=db --db-type=mysql --db-user=${MYSQL_USER} --db-password=${MYSQL_PASSWORD} --db=${MYSQL_DATABASE}"
 
   web:
     build: ./server/web
