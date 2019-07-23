@@ -26,22 +26,22 @@ def get_user():  # noqa: E501
     Provides info about the logged in user. # noqa: E501
 
 
-    :rtype: None
+    :rtype: User
     """
     return 'do some magic!'
 
 
-def login_user(username, password):  # noqa: E501
+def login_user(email, password):  # noqa: E501
     """Logs user into the system
 
      # noqa: E501
 
-    :param username: The user name for login
-    :type username: str
+    :param email: The user name for login
+    :type email: str
     :param password: The password for login in clear text
     :type password: str
 
-    :rtype: str
+    :rtype: None
     """
     return 'do some magic!'
 

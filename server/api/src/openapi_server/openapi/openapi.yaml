@@ -14,9 +14,30 @@ tags:
 - description: Operations about user
   name: user
 paths:
-  /file:
+  /resource:
+    get:
+      operationId: get_resource
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Resource'
+                type: array
+          description: List of resources
+        403:
+          content: {}
+          description: Forbidden
+      security:
+      - oauth:
+        - read:resources
+      summary: Returns a list of available resources
+      tags:
+      - resource
+      x-openapi-router-controller: openapi_server.controllers.resource_controller
     post:
-      operationId: create_file
+      operationId: create_resource
       requestBody:
         content:
           multipart/form-data:
@@ -24,32 +45,41 @@ paths:
               type: object
               properties:
                 upfile:
-                  description: File object that needs to be created
+                  description: File object that needs to be uploaded
                   format: binary
                   type: string
               required:
               - upfile
         required: true
       responses:
+        202:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+          description: Upload successful
+        403:
+          content: {}
+          description: Forbidden
         405:
           content: {}
           description: Invalid input
       security:
       - oauth:
-        - write:files
-        - read:files
-      summary: Create/Upload a new file
+        - write:resources
+        - read:resources
+      summary: Create/Upload a new resource
       tags:
-      - file
-      x-openapi-router-controller: openapi_server.controllers.file_controller
-  /file/{fileUuid}:
+      - resource
+      x-openapi-router-controller: openapi_server.controllers.resource_controller
+  /resource/{resource_uuid}:
     get:
-      description: Returns a single file
-      operationId: get_file_by_uuid
+      description: Returns a single resource
+      operationId: get_resource_by_uuid
       parameters:
-      - description: UUID of file to return
+      - description: UUID of resource to return
         in: path
-        name: fileUuid
+        name: resource_uuid
         required: true
         schema:
           type: string
@@ -59,20 +89,72 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Resource'
-          description: successful operation
-        400:
+          description: Resource object
+        403:
           content: {}
-          description: Invalid UUID supplied
+          description: Forbidden
         404:
           content: {}
           description: Page not found
       security:
       - oauth:
-        - read:files
-      summary: Find file by UUID
+        - read:resources
+      summary: Find resource by UUID
       tags:
-      - file
-      x-openapi-router-controller: openapi_server.controllers.file_controller
+      - resource
+      x-openapi-router-controller: openapi_server.controllers.resource_controller
+  /resource/{resource_uuid}/data:
+    get:
+      description: Returns the resource content
+      operationId: get_resource_data
+      parameters:
+      - description: UUID of resource to return
+        in: path
+        name: resource_uuid
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/pdf:
+              schema:
+                format: binary
+                type: string
+            image/png:
+              schema:
+                format: binary
+                type: string
+            text/html:
+              schema:
+                format: binary
+                type: string
+            text/plain:
+              schema:
+                format: binary
+                type: string
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+              schema:
+                format: binary
+                type: string
+            image/jpeg:
+              schema:
+                format: binary
+                type: string
+          description: Uploaded resource content
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Page not found
+      security:
+      - oauth:
+        - read:resources
+      summary: Returns the resource content
+      tags:
+      - resource
+      x-openapi-router-controller: openapi_server.controllers.resource_controller
   /project:
     post:
       operationId: create_project
@@ -124,14 +206,14 @@ paths:
       - project
       x-codegen-request-body-name: body
       x-openapi-router-controller: openapi_server.controllers.project_controller
-  /project/{projectUuid}:
+  /project/{project_uuid}:
     get:
       description: Returns a single project
       operationId: get_project_by_uuid
       parameters:
       - description: UUID of project to return
         in: path
-        name: projectUuid
+        name: project_uuid
         required: true
         schema:
           type: string
@@ -155,14 +237,14 @@ paths:
       tags:
       - project
       x-openapi-router-controller: openapi_server.controllers.project_controller
-  /project/{projectUuid}/training:
+  /project/{project_uuid}/training:
     get:
       description: Returns an archive
       operationId: download_training_result
       parameters:
       - description: UUID of project training result to return
         in: path
-        name: projectUuid
+        name: project_uuid
         required: true
         schema:
           type: string
@@ -196,7 +278,7 @@ paths:
       parameters:
       - description: Project object that needs to be trained
         in: path
-        name: projectUuid
+        name: project_uuid
         required: true
         schema:
           type: string
@@ -229,8 +311,11 @@ paths:
       operationId: get_user
       responses:
         200:
-          content: {}
-          description: successfull operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: OK
         403:
           content: {}
           description: No user is logged in.
@@ -252,21 +337,24 @@ paths:
         description: Created user object
         required: true
       responses:
-        default:
+        200:
           content: {}
-          description: successful operation
+          description: Successful operation
+        400:
+          content: {}
+          description: Error at operation
       summary: Create user
       tags:
       - user
       x-codegen-request-body-name: body
       x-openapi-router-controller: openapi_server.controllers.user_controller
   /user/login:
-    get:
+    post:
       operationId: login_user
       parameters:
       - description: The user name for login
         in: query
-        name: username
+        name: email
         required: true
         schema:
           type: string
@@ -278,10 +366,7 @@ paths:
           type: string
       responses:
         200:
-          content:
-            application/json:
-              schema:
-                type: string
+          content: {}
           description: successful operation
           headers:
             X-Rate-Limit:
@@ -302,10 +387,10 @@ paths:
       - user
       x-openapi-router-controller: openapi_server.controllers.user_controller
   /user/logout:
-    get:
+    post:
       operationId: logout_user
       responses:
-        default:
+        200:
           content: {}
           description: successful operation
       summary: Logs out current logged in user session
@@ -321,8 +406,10 @@ components:
           username: username
         name: name
         resources:
-        - name: name
-        - name: name
+        - name: myFile.pdf
+          uuid: "1234567890"
+        - name: myFile.pdf
+          uuid: "1234567890"
         acoustic_model:
           name: name
           language:
@@ -428,19 +515,25 @@ components:
       type: object
     Resource:
       example:
-        name: name
+        name: myFile.pdf
+        uuid: "1234567890"
       properties:
+        uuid:
+          example: "1234567890"
+          type: string
         name:
+          example: myFile.pdf
           type: string
         status:
-          $ref: '#/components/schemas/FileStatus'
-        file_type:
-          $ref: '#/components/schemas/FileType'
+          $ref: '#/components/schemas/ResourceStatus'
+        resource_type:
+          $ref: '#/components/schemas/ResourceType'
       required:
-      - file_type
       - name
+      - resource_type
+      - uuid
       type: object
-    FileStatus:
+    ResourceStatus:
       enum:
       - 0
       - 1
@@ -458,7 +551,7 @@ components:
       - TextPreparation_InProcess
       - TextPreparation_Failure
       - TextPreparation_Success
-    FileType:
+    ResourceType:
       enum:
       - 1
       - 2
@@ -478,15 +571,15 @@ components:
     oauth:
       flows:
         password:
-          tokenUrl: http://localhost:8080/api/oauth/token
           scopes:
             write:user: modify the user account
             read:user: read the user account
             write:projects: modify projects in your account
             read:projects: read your projects
             train:projects: train projects in your account
-            write:files: modify files in your account
-            read:files: read your files
+            write:resources: modify resources in your account
+            read:resources: read your resources
+          tokenUrl: http://localhost:8080/api/oauth/token
       type: oauth2
       x-tokenInfoFunc: openapi_server.controllers.security_controller_.info_from_oauth
       x-scopeValidateFunc: openapi_server.controllers.security_controller_.validate_scope_oauth
