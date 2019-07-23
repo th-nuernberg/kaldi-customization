@@ -21,6 +21,7 @@ paths:
         content:
           multipart/form-data:
             schema:
+              type: object
               properties:
                 upfile:
                   description: File object that needs to be created

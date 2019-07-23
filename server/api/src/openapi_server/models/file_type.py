@@ -45,3 +45,15 @@ class FileType(Model):
         :rtype: FileType
         """
         return util.deserialize_model(dikt, cls)
+
+    @staticmethod
+    def FileTypeEnum_to_FileType(fileType):
+        return {
+            1: FileType.html,
+            2: FileType.docx,
+            3: FileType.txt,
+            4: FileType.pdf,
+            5: FileType.png,
+            6: FileType.jpg
+            }[fileType]
+            
