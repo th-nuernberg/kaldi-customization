@@ -4,7 +4,7 @@ from minio import ResponseError
 minio_buckets = dict(
     #all resources/file uploads
     RESOURCE_BUCKET = 'resources',
-    TRAINING_RESOURCE_BUCKET = 'training_resources',
+    TRAINING_RESOURCE_BUCKET = 'training-resources',
 
     DECODING_BUCKET = 'decodings',
 

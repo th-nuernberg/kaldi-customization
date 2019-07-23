@@ -7,7 +7,7 @@ from openapi_server.models.file_status import FileStatus
 from openapi_server.models.file_type import FileType
 
 from openapi_server import util
-from models import db, File, FileTypeEnum, FileStateEnum, User
+from models import db, Resource, ResourceTypeEnum, ResourceStateEnum, User
 from werkzeug.utils import secure_filename
 
 from minio_communication import download_from_bucket, upload_to_bucket, minio_buckets
@@ -87,19 +87,19 @@ def create_file(upfile):  # noqa: E501
     #TODO: delete local file local_file_path
 
     if upload_result[0]:
-        db_file.status = FileStateEnum.TextPreparation_Ready
+        db_file.status = ResourceStateEnum.TextPreparation_Ready
     else:
-        db_file.status = FileStateEnum.Upload_Failure
+        db_file.status = ResourceStateEnum.Upload_Failure
 
     db.session.add(db_file)
     db.session.commit()
 
     print('Uploaded file to MinIO: ' + str(db_file))
 
-    if db_file.status == FileStateEnum.TextPreparation_Ready:
+    if db_file.status == ResourceStateEnum.TextPreparation_Ready:
         create_textprep_job(str(db_file.id), db_file.file_type)
 
-        db_file.status = FileStateEnum.TextPreparation_Pending
+        db_file.status = ResourceStateEnum.TextPreparation_Pending
         db.session.add(db_file)
         db.session.commit()
 
@@ -126,15 +126,15 @@ def get_file_by_uuid(file_uuid):  # noqa: E501
     # db_file.owner
     # retrieve file from MinIO vs. File information only
 
-    db_file = File.query.get(file_uuid)
+    db_file = Resource.query.get(file_uuid)
 
     if (db_file is None):
         return ("File not found", 404)
 
     this_resource = Resource(
         name=db_file.name, 
-        status=FileStateEnum(db_file.status),
-        file_type=FileTypeEnum(db_file.file_type)
+        status=ResourceStateEnum(db_file.status),
+        file_type=ResourceTypeEnum(db_file.file_type)
     )
 
     return this_resource

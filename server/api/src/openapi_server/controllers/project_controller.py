@@ -8,7 +8,7 @@ from openapi_server.models.project import Project  # noqa: E501
 from openapi_server.models.training_status import TrainingStatus  # noqa: E501
 from openapi_server import util
 
-from models import db, Project as DB_Project, ProjectStateEnum as DB_ProjectStateEnum
+from models import db, Project as DB_Project, TrainingStateEnum as DB_TrainingStateEnum
 
 import uuid
 
@@ -28,7 +28,7 @@ def create_project(body):  # noqa: E501
             api_token=str(uuid.uuid4().hex) + str(uuid.uuid4().hex),
             name=body.name,
             uuid=uuid.uuid4().hex,
-            status=DB_ProjectStateEnum.Training_Success
+            status=DB_TrainingStateEnum.Training_Success
         )
         db.session.add(db_proj)
         db.session.commit()

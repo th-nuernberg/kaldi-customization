@@ -35,7 +35,7 @@ with app.app_context():
     db.init_app(app)
     db.drop_all()
     db.create_all()
-
+    """
     logging.basicConfig()
     logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
@@ -61,7 +61,8 @@ with app.app_context():
 
     voxfore_rnn_id = Voxforge_RNN.id
     db.session.close()
-
+    """
+    db.session.commit()
 
 '''Create buckets if they do not exist'''
 for bucket_name in minio_buckets.values():
@@ -73,6 +74,7 @@ for bucket_name in minio_buckets.values():
         raise e
 
 
+voxfore_rnn_id = 1
 #UPLOAD MODELS
 # Voxforge-RNN
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/final.mdl"  , "initialization/acoustic-models/voxforge-rnn/final.mdl")
@@ -81,5 +83,5 @@ upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfo
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/g2p_model.fst"  , "initialization/acoustic-models/voxforge-rnn/g2p_model.fst")
 
 # Test Project
-upload_to_bucket(minio_client,minio_buckets["PROJECT_BUCKET"], str(voxfore_rnn_id) + "/corpus.txt"  , "initialization/example/corpus.txt")
-upload_to_bucket(minio_client,minio_buckets["PROJECT_BUCKET"], str(voxfore_rnn_id) + "/lexicon.txt"  , "initialization/example/lexicon.txt")
+upload_to_bucket(minio_client,minio_buckets["TRAINING_BUCKET"], str(voxfore_rnn_id) + "/corpus.txt"  , "initialization/example/corpus.txt")
+upload_to_bucket(minio_client,minio_buckets["TRAINING_BUCKET"], str(voxfore_rnn_id) + "/lexicon.txt"  , "initialization/example/lexicon.txt")
