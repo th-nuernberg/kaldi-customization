@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+import { TileData } from './tile/tile-data';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -7,26 +9,24 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DashboardComponent implements OnInit {
 
-  public projects = [
-    { name: "Project 1", link:"/project/_", models: [{name: "Model 1", link:"/project/_"}, {name: "Model 2", link:"/project/_"}, {name: "Model 3", link:"/project/_"}]},
-    { name: "Project 2", link:"/project/_", models: [{name: "Model 1", link:"/project/_"}, {name: "Model 2", link:"/project/_"}, {name: "Model 3", link:"/project/_"}]},
-    { name: "Project 3", link:"/project/_", models: [{name: "Model 1", link:"/project/_"}, {name: "Model 2", link:"/project/_"}, {name: "Model 3", link:"/project/_"}]} 
-  ]
-  constructor() { }
+  gridTiles: TileData[];
+  maxCols: 4;
+
+  constructor(){}
 
   ngOnInit() {
+    this.gridTiles = [];
   }
   
-  //TODO load all recent executions of training (workspace, project), latest 10
-  loadRecentExecutions() {
-    // Name - Last Execution
-  }
-  //TODO load all workspaces
-  loadUserWorkspaces() {
-    // Name - List of Projects
-  }
-  //TODO load all project
-  loadUserProject() {
-    // Name - List of Models
+  newProject() {
+    this.gridTiles.push( 
+        {
+          projectName: "Foobar",
+          projectNumber: this.gridTiles.length + 1,
+          comments: "Bla bla bla",
+          status: "What happened?",
+          cols: 1,
+          rows: 1,
+        });
   }
 }

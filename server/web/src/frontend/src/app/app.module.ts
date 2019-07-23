@@ -12,13 +12,13 @@ import { NgtUniversalModule } from '@ng-toolkit/universal';
 import {
   MatButtonModule,
   MatCheckboxModule,
-
+  MatCardModule,
   MatIconModule,
   MatToolbarModule,
   MatSidenavModule,
   MatListModule,
   MatTabsModule,
-
+  
   MatDividerModule,
   MatInputModule,
   MatTableModule,
@@ -29,6 +29,8 @@ import { CoverComponent } from './cover/cover.component';
 import { UploadComponent } from './upload/upload.component';
 import { AccountComponent } from './account/account.component';
 
+import { TileComponent } from './dashboard/tile/tile.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -37,6 +39,7 @@ import { AccountComponent } from './account/account.component';
     CoverComponent,
     UploadComponent,
     AccountComponent,
+    TileComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
@@ -50,6 +53,7 @@ import { AccountComponent } from './account/account.component';
     MatToolbarModule,
     MatSidenavModule,
     MatButtonModule,
+    MatCardModule,
     MatCheckboxModule,
     MatListModule,
     MatTabsModule,

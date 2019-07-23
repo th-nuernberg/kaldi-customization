@@ -1,31 +1,17 @@
 <div style="height:calc(100vh - 56px);">
-
-  <div flex fxLayout="row"
-      fyLayoutAlign="space-around center"
-      fxLayout.xs="column"
-      fxLayoutAlign.xs="space-around center">
-    <!-- Left -->
-    <div class="dashboard-panel" fxFlex="33">
-      <h3>Letzte Ausführungen</h3>
-      <mat-list>
-        <a routerLink="/project/_" mat-list-item>Letzte Ausführung 2</a>
-        <a routerLink="/upload/_" mat-list-item>Upload</a>
-      </mat-list>
-    </div>
-    <!-- Right -->
-    <div class="dashboard-panel" fxFlex="33">
-        <h3>Projekte</h3>
-        <mat-list>
-          <ng-container *ngFor="let project of projects">
-              <a routerLink="{{project.link}}" mat-list-item>{{project.name}}</a>
-              <mat-list style="margin-left:30px;">
-                <div *ngFor="let model of project.models">
-                  <a routerLink="{{model.link}}" mat-list-item>{{model.name}}</a>
-                </div>
-              </mat-list>
-            </ng-container>
-        </mat-list>
-    </div>
+  
+  <button 
+    mat-raised-button 
+    color="primary" 
+    class="newProjectButton" 
+    (click)="newProject()">
+    Neues Projekt</button>
+  <div 
+    class="tilesWrapper"
+    fxLayout="center center">
+    <app-tile 
+      *ngFor="let tile of gridTiles" 
+      [tileData]="tile"></app-tile>   
   </div>
 
 </div>
