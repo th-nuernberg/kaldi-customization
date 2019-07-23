@@ -19,6 +19,7 @@ mkdir $new_local_dir/dict
 echo "Copying lexicon file,appending <SPN> spn as oov"
 cp $lex_file $new_local_dir/dict/lexicon.txt
 #echo "<SPN> spn" >> $new_local_dir/dict/lexicon.txt
+echo "<SIL> sil" >> $new_local_dir/dict/lexicon.txt
 
 echo "Creating phone files from lex. Silence = sil"
 python3 extract_phones.py $lex_file "$new_local_dir/dict/nonsilence_phones.txt"
@@ -28,7 +29,7 @@ echo "sil" >> $new_local_dir/dict/optional_silence.txt
 
 echo "Preparing Language data"
 #utils/prepare_lang.sh $new_local_dir/dict "<SPN>" $new_local_dir/lang $new_lang_dir
-utils/prepare_lang.sh $new_local_dir/dict "sil" $new_local_dir/lang $new_lang_dir
+utils/prepare_lang.sh $new_local_dir/dict "<SIL>" $new_local_dir/lang $new_lang_dir
 
 echo "Creating Language Model"
 echo "making lm.arpa"

@@ -59,7 +59,7 @@ if __name__ == "__main__":
             os.chdir("/")
             # TODO Upload new model
             shutil.make_archive(new_graph_archive,archive_format,workspace_path,new_graph_dir)
-            upload_to_bucket(minio_client,project_bucket,project_id + "/graph.zip", new_graph_archive)
+            upload_to_bucket(minio_client,project_bucket,project_id + "/graph.zip", new_graph_archive + "." + archive_format)
             # TODO: unload resources
             shutil.rmtree(workspace_path)
 

@@ -1,4 +1,4 @@
-FROM kaldi-base
+FROM th-nuernberg/kaldi-base:latest
 LABEL maintainer="Tobias Kruse <***REMOVED***>"
 
 ADD shared/connector/requirements.txt /kaldi/connector/requirements.txt

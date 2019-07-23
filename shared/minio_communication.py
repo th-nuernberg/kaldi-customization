@@ -4,12 +4,16 @@ from minio import ResponseError
 minio_buckets = dict(
     #all resources/file uploads
     RESOURCE_BUCKET = 'resources',
+    TRAINING_RESOURCE_BUCKET = 'training_resources',
+
+    DECODING_BUCKET = 'decodings',
 
     # acoustic models thfilenameat are trained by users
     ACOUSTIC_MODELS_BUCKET  = 'acoustic-models',
 
     # projects
-    PROJECT_BUCKET  = 'projects')
+    TRAINING_BUCKET  = 'trainings'
+    )
 
 
 def does_bucket_exist(minio_client, bucket_name):
