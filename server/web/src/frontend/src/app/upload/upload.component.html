@@ -6,7 +6,7 @@
       fxLayoutAlign.xs="center stretch">
     <!-- File History panel -->
     <div class="upload-panel" fxFlex="33">
-      <h2>History</h2>
+      <h2>Dateien</h2>
       <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
         <!-- Checkbox Column -->
         <ng-container matColumnDef="select">
@@ -50,37 +50,84 @@
         </tr>
       </table>
       <div>
-        <button class="uploadSite-Button" mat-flat-button (click)="copy()">Copy</button>
+        <button
+          mat-flat-button 
+          color="accent"
+          class="uploadFile_Button"
+          (click)="copy()">Add</button>
+        
+        <input #file id="fileInput" type="file" style="display:none" (change)="loadFile(file, files)" />
+        <button 
+          mat-flat-button 
+          color="primary" 
+          class="uploadFile_Button" 
+          onclick="document.getElementById('fileInput').click()">Upload</button>
       </div>
     </div>
+    
+    <div class="panel-divider"></div>
 
     <!-- Current File panel -->
     <div class="upload-panel" fxFlex="33">
-      <h2>Current</h2>
+      <h2>Modell</h2>
       <mat-selection-list #files (selectionChange)="handleSelection($event, file)">
         <mat-list-option *ngFor='let file of uploadedFiles' [selected]='file.selected' [value]="file.name">
           {{file.name}}
         </mat-list-option>
-      </mat-selection-list><p>
-      <div>
-        <button type="button" class="uploadSite-Button" mat-flat-button *ngIf="!show" (click)="toggle()">Verify</button>
-        <button type="button" class="uploadSite-Button" mat-flat-button *ngIf="show">Start</button>
-        <button type="button" class="uploadSite-Button" mat-flat-button (click)="remove(files)" [disabled]="isRemoveDisabled(files)">Remove</button>
+      </mat-selection-list>
 
-        <input #file id="fileInput" type="file" style="display:none" (change)="loadFile(file, files)" />
-        <button type="button" class="uploadSite-Button" mat-flat-button onclick="document.getElementById('fileInput').click()">Upload</button>
+      <div>
+        <form class="text-content-form" *ngIf="showContentPreview">
+          <mat-form-field class="text-content-full">
+            <textarea
+              matInput
+              cdkTextareaAutosize
+              cdkAutosizeMinRows="12" 
+              cdkAutosizeMaxRows="12"
+              readonly=true>
+              {{fileContent}}</textarea>
+          </mat-form-field>
+        </form>      
+      </div>
+      
+      <div>
+        <button type="button" class="uploadSite-Button" mat-flat-button (click)="remove(files)" disabled="isRemoveDisabled(files)">Remove</button>
       </div>
     </div>
+    
+    <div class="panel-divider"></div>
 
     <!-- Preview Text Editor -->
     <div class="upload-panel" fxFlex="33">
-      <h2>Preview</h2>
-      <form class="text-content-form">
-        <mat-form-field class="text-content-full">
-          <textarea matInput cdkTextareaAutosize cdkAutosizeMinRows="18" cdkAutosizeMaxRows="18">{{fileContent}}</textarea>
-        </mat-form-field>
-        <button type="button" class="uploadSite-Button" mat-flat-button [disabled]="shouldSave()">Save</button>
-      </form>
+      <h2>Details</h2>
+      <div>
+        <mat-list>
+          <mat-list-item>
+            Anzahl Dateien:
+          </mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item>
+            Anzahl Sätze:
+          </mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item>
+            Anzahl Wörter:
+          </mat-list-item>
+          <mat-divider></mat-divider>
+        </mat-list>
+        <button
+          class="uploadFile_Button"
+          mat-flat-button 
+          *ngIf="!show" 
+          (click)="toggle()"
+          color="warn">
+          Verify</button>
+        <button
+          class="uploadFile_Button" 
+          mat-flat-button 
+          *ngIf="show"
+          color="warn">Start</button>
+      </div>
     </div>
   </div>
 </div>

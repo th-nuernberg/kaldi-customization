@@ -27,6 +27,8 @@ export class UploadComponent implements OnInit {
   private fileContent;
 
   public show:boolean = false;
+  public showContentPreview:boolean = false;
+
   public displayedColumns: string[] = ['select', 'position', 'name', 'uploaded'];
 
   public dataSource = new MatTableDataSource<HistoryFile>(FILE_DATA);
@@ -39,6 +41,8 @@ export class UploadComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.fileContent = "";
+    this.showContentPreview = false;
   }
 
   // enables single selection for current panel list
@@ -47,8 +51,12 @@ export class UploadComponent implements OnInit {
     console.log(event);
     if (event.option.selected) {
       event.source.deselectAll();      
-      event.option._setSelected(true);      
-      this.showPreview(file);
+      event.option._setSelected(true);
+      if(file !== null) {
+        this.showPreview(file);
+      }
+      
+      this.showContentPreview = true;
     }
     else {
       this.fileContent = null;
@@ -104,12 +112,6 @@ export class UploadComponent implements OnInit {
     return files.selectedOptions.selected.length === 0;
   }
 
-  // toggles save button (dummy disabled, should be enabled if text changed)
-  shouldSave() {
-    // TODO toggles, when user changed the content of the selected file
-    return true;
-  }
-
   // uploads file and show preview
   loadFile(file:HTMLInputElement, list:any) {
 
@@ -119,7 +121,10 @@ export class UploadComponent implements OnInit {
     this.dummyShowUploadedFile(file, list)
 
     // loads content of uploaded file into preview
-    this.showPreview(file)
+    console.log(file);
+    if(file !== null) {
+      this.showPreview(file)
+    }
     this.show = false;
   }
 
