@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
 import { TransferHttpCacheModule } from '@nguniversal/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgtUniversalModule } from '@ng-toolkit/universal';
-
+import { FormsModule } from '@angular/forms';
 import {
   MatButtonModule,
   MatCheckboxModule,
@@ -18,7 +18,7 @@ import {
   MatSidenavModule,
   MatListModule,
   MatTabsModule,
-  
+  MatSelectModule,
   MatDividerModule,
   MatInputModule,
   MatTableModule,
@@ -60,6 +60,8 @@ import { TileComponent } from './dashboard/tile/tile.component';
     MatInputModule,
     MatDividerModule,
     MatTableModule,
+    MatSelectModule,
+    FormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

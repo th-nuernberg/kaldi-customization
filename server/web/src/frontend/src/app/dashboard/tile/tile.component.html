@@ -1,6 +1,12 @@
 <mat-card class="tile">
     <mat-card-title>Projekt #{{tileData.projectNumber}}</mat-card-title>
     <p>{{tileData.projectName}}</p>
-    <p>{{tileData.status}}</p>
+    <p>{{tileData.previousTrainedModel}}</p>
     <p>{{tileData.comments}}</p>
+    <span [ngClass]="{
+        'color-orange': tileData.status === 'Running',
+        'color-green': tileData.status === 'Done'}">
+        {{tileData.status}}
+    </span>
+    <a mat-stroked-button routerLink="/project/_" class="tileButton">More Info</a> 
 </mat-card>

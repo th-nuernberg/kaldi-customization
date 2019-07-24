@@ -2,4 +2,19 @@
     margin: 10px;
     height: 350px;
     width: 325px;
+    font-size: 12px;
 }
+
+.tileButton {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+}
+
+.color-orange {
+    color: orange;
+  }
+  
+  .color-green {
+    color: green;
+  }
