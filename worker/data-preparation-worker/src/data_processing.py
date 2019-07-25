@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 import os
 import re
 import subprocess
@@ -22,34 +23,31 @@ def execute_phonetisaurus():
                          "--beam", "10000", "-g", "-t", "10000"], stdout=file_handler)
 
 
-def merge_word_lists(unique_words):
+def save_txt_file(file_path, content_list):
     '''
-    This function merges multiple word lists into one.
-
-    Note: Due to the fact that multiple files are merged, it is possible that multiple files
-    use the same words. The final word list is an unique list. Therefore, all words occur only
-    once. In order to achieve this behavior, the lists are converted into sets and these sets 
-    are combined.
-
-    The final word list is locally saved and afterwards uploaded into the corresponding MinIO-Bucket
-
-    Loading all files from: /data_prep_worker/in/
-    Saving final word list into: /data_prep_worker/out/
+    This function saves a given txt-file into the /data_prep_worker/out/ directory.
     '''
-    first_list = open(unique_words[0], "r").read().lower()
-    first_word_list = re.split("\n", first_list)
+    with open(file_path, "w") as file_writer:
+        for item in content_list:
+            if item != "":
+                file_writer.write(item + "\n")
 
-    for word_list in range(1, len(unique_words), 1):
-        second_list = open(unique_words[word_list], "r").read().lower()
-        second_word_list = re.split("\n", second_list)
-        first_word_list = set(first_word_list).union(set(second_word_list))
 
-    first_word_list = sorted(first_word_list)
-    first_word_list.remove("")
+def retrieve_all_words(text):
+    remove_newline_after_minus = re.sub("[--–—−]\n[a-z]+", "", text)
+    regex = r"[^a-zA-ZäöüÄÖÜß]+"
+    all_words = re.split(regex, remove_newline_after_minus)
+    return all_words
 
-    with open("/data_prep_worker/out/final_word_list", "w") as file_writer:
-        for word in first_word_list:
-            file_writer.write(word + "\n")
+
+def create_unique_word_list(file_path):
+    with open(file_path, "r") as file_handler:
+        text = file_handler.read()
+
+        all_words = retrieve_all_words(text)
+        unique_word_list = sorted(list(set(all_words)))
+
+    return unique_word_list
 
 
 def merge_corpus_list(corpus_list):
@@ -66,7 +64,7 @@ def merge_corpus_list(corpus_list):
     Saving merged corpus into: /data_prep_worker/out/
     '''
     first_corpus = open(corpus_list[0], "r").read()
-    first_corpus_list = re.split("\n", first_corpus)    
+    return_corpus_list = re.split("\n", first_corpus)    
 
     for corpus in range(1, len(corpus_list), 1):
         second_corpus = open(corpus_list[corpus], "r").read()
@@ -74,12 +72,10 @@ def merge_corpus_list(corpus_list):
 
         # Appends all sentences of the second corpus to the first one
         for sentence in second_corpus_list:
-            first_corpus_list.append(sentence)
+            return_corpus_list.append(sentence)
 
-    with open("/data_prep_worker/out/corpus.txt", "w") as file_writer:
-        for sentence in first_corpus_list:
-            if sentence != "":
-                file_writer.write(sentence + "\n")
+    return return_corpus_list
+
 
 
 def remove_local_files(path):

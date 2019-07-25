@@ -8,6 +8,7 @@ from file_parser import (pdf_parser, html_parser, word_parser,
                          text_parser, ocr_parser, generate_corpus)
 from minio_communication import download_from_bucket, upload_to_bucket, does_bucket_exist, minio_buckets
 
+
 def report_status_to_API(queue_status, status_queue, filename=None, message=None):
     '''
     By calling this function the status queue is updated.
@@ -33,8 +34,8 @@ def report_status_to_API(queue_status, status_queue, filename=None, message=None
 
 def save_textfile(text_list, filename):
     '''
-    This function saves the unique word list into the file system as a txt-file
-    The following directory will be used to save the unique world list:
+    This function saves the created corpus into the file system as a txt-file
+    The following directory will be used to save the corpus:
         /text-preparation/out/<filename>.txt
     '''
 
@@ -61,7 +62,6 @@ def process_file(file_type, filename, resource_id, minio_client):
         - txt
         - PNG or JPG
     '''
-    unique_word_list = []
     text_prep_input = "/text_prep_worker/in/"
     text_prep_output = "/text_prep_worker/out/"
 
@@ -76,22 +76,20 @@ def process_file(file_type, filename, resource_id, minio_client):
         return download_result
 
     # Step 3: Process the downloaded file
-    #         Results of the processing are: 
-    #           1) unique_word_list
-    #           2) corpus
+    #         After processing the corpus is ready
     file_path = text_prep_input + filename
     full_text = ""
     try:
         if file_type == "pdf":
-            unique_word_list, full_text = pdf_parser(file_path)
+            full_text = pdf_parser(file_path)
         elif file_type == "docx":
-            unique_word_list, full_text = word_parser(file_path)
+            full_text = word_parser(file_path)
         elif file_type == "html":
-            unique_word_list, full_text = html_parser(file_path)
+            full_text = html_parser(file_path)
         elif file_type == "txt":
-            unique_word_list, full_text = text_parser(file_path)
+            full_text = text_parser(file_path)
         elif file_type == "png" or file_type == "jpg":
-            unique_word_list, full_text = ocr_parser(file_path)            
+            full_text = ocr_parser(file_path)            
         else:
             return (False, "Given file type is not supported. Finishing processing")
 
@@ -102,23 +100,14 @@ def process_file(file_type, filename, resource_id, minio_client):
         print(e)
         return (False, "Failed to parse given file")
 
-    # Step 4: Save unique_word_list and corpus locally 
+    # Step 4: Save corpus locally 
     try:
         corpus_name = filename + "_corpus"
-
-        save_textfile(unique_word_list, filename)
         save_textfile(corpus, corpus_name)
     except:
-        return (False, "Failed to save word list")
+        return (False, "Failed to save corpus")
 
-    # Step 5: Upload unique_word_list and corpus in bucket 
-    # Uploads the created unique word list
-    unique_word_list_path = text_prep_output + filename
-    file_upload_result = upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], resource_id + "/wl.txt", unique_word_list_path)
-    if not file_upload_result[0]:
-        return file_upload_result
-
-    # Uploads the created corpus
+    # Step 5: Upload corpus in bucket 
     corpus_path = text_prep_output + corpus_name
     corpus_upload_result = upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], resource_id + "/corpus.txt", corpus_path)
     if not corpus_upload_result[0]:
@@ -159,6 +148,7 @@ def infinite_loop():
                 if return_value[1]:
                     print("Processing finished successfully")
             else:
+                #TODO: Rewrite error message section. Currently deprecated.
                 # Received parameters are wrong --> Update status queue and set task processing to: failure
                 if "text" not in data and "type" in data:
                     report_status_to_API(queue_status=12, status_queue=status_queue, filename="failure", message="text key is missing or misspelled within the JSON.")

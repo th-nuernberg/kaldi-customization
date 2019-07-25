@@ -9,19 +9,19 @@ from minio_communication import *
 def test_data_prep_worker(redis_client, minio_client):
     # Step 1: Create all needed buckets
     try:
-        minio_client.make_bucket("resources")
+        minio_client.make_bucket(minio_buckets["RESOURCE_BUCKET"])
     except (minio.error.BucketAlreadyOwnedByYou, minio.error.BucketAlreadyExists):
         pass
     except minio.ResponseError as e:
         raise e
     try:
-        minio_client.make_bucket("acoustic-models")
+        minio_client.make_bucket(minio_buckets["ACOUSTIC_MODELS_BUCKET"])
     except (minio.error.BucketAlreadyOwnedByYou, minio.error.BucketAlreadyExists):
         pass
     except minio.ResponseError as e:
         raise e
     try:
-        minio_client.make_bucket("projects")
+        minio_client.make_bucket(minio_buckets["TRAINING_RESOURCE_BUCKET"])
     except (minio.error.BucketAlreadyOwnedByYou, minio.error.BucketAlreadyExists):
         pass
     except minio.ResponseError as e:
@@ -30,11 +30,11 @@ def test_data_prep_worker(redis_client, minio_client):
 
     # Step 2: Upload all needed files for the data-prep-worker
     # upload_to_bucket(minio_client, bucket, filename, file_path):
-    upload_to_bucket(minio_client, "resources", "kafka/wl.txt", "test-files/kafka_word_list.txt")
-    upload_to_bucket(minio_client, "resources", "kafka/corpus.txt", "test-files/kafka_corpus.txt")
-    upload_to_bucket(minio_client, "resources", "text_generator/wl.txt", "test-files/text_generator_word_list.txt")
-    upload_to_bucket(minio_client, "resources", "text_generator/corpus.txt", "test-files/text_generator_corpus.txt")
-    upload_to_bucket(minio_client, "acoustic-models", "Voxforge-RNN/g2p_model.fst", "test-files/g2p_model.fst")
+    upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "kafka/wl.txt", "test-files/kafka_word_list.txt")
+    upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "kafka/corpus.txt", "test-files/kafka_corpus.txt")
+    upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "text_generator/wl.txt", "test-files/text_generator_word_list.txt")
+    upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "text_generator/corpus.txt", "test-files/text_generator_corpus.txt")
+    upload_to_bucket(minio_client, minio_buckets["ACOUSTIC_MODELS_BUCKET"], "Voxforge-RNN/g2p_model.fst", "test-files/g2p_model.fst")
 
     # Step 3: Subscribe to the status-queue
     pubsub = redis_client.pubsub()

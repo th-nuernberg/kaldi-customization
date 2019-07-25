@@ -1,10 +1,11 @@
+# -*- encoding: utf-8 -*-
 #!/usr/bin/python
 import json
 import os
 
 from connector import *
-from data_processing import (execute_phonetisaurus, merge_word_lists,
-                             merge_corpus_list, remove_local_files)
+from data_processing import (execute_phonetisaurus, merge_corpus_list, 
+                             remove_local_files, save_txt_file, create_unique_word_list)
 from minio_communication import download_from_bucket, upload_to_bucket, minio_buckets
 
 
@@ -90,12 +91,12 @@ def infinite_loop():
                 
                 download_results = []
 
-                # Step 1: Download all files which were created by the Text-Preparation-Worker for this task:
-                # Download of the models lexicon and graph
+                # Step 1: Download all files which were created by the Text-Preparation-Worker for this task. 
+                #         In addition to that, download the G2P-graph from the acoustic-bucket:
+                # Download of the graph
                 download_results.append(download_from_bucket(minio_client, minio_buckets["ACOUSTIC_MODELS_BUCKET"],
                                         acoustic_model + "/g2p_model.fst" ,"/data_prep_worker/in/g2p_model.fst"))
 
-                word_lists = list()
                 corpus_list = list()
                 for resource in resources:
                     # Download of all corpus files which were created within the TPW
@@ -104,32 +105,28 @@ def infinite_loop():
                                             resource + "/corpus.txt" , loc_corp_path))
                     corpus_list.append(loc_corp_path)
 
-                    # Download of all word lists which were created within the TPW
-                    loc_wl_path = "/data_prep_worker/in/" + resource + "_wl.txt"
-                    download_results.append(download_from_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"],
-                                            resource + "/wl.txt" , loc_wl_path))
-                    word_lists.append(loc_wl_path)
-
                 # If any download did not finish --> Set task status to: Failure
                 for download in download_results:
                     if not download[0]:
                         print("At least one download did not finish successfully.")
                         #TODO: Update status-queue to: Failure
 
-                # Step 2: Merge all word lists into one 
-                merge_word_lists(word_lists)
+                # Step 2: Merge all corpus-files into one final corpus and save the file locally
+                corpus = merge_corpus_list(corpus_list)
+                save_txt_file("/data_prep_worker/out/corpus.txt", corpus)
 
-                # Step 3: Merge all corpuses into one 
-                merge_corpus_list(corpus_list)
+                # Step 3: Create the lexicon file by using the combined corpus
+                lexicon = create_unique_word_list("/data_prep_worker/out/corpus.txt")
+                save_txt_file("/data_prep_worker/out/final_word_list", lexicon)
 
-                # Step 4: Execute Phonetisaurus and create phones for the unique word list of all files
+                # Step 4: Execute Phonetisaurus and create phones for the unique word
                 execute_phonetisaurus()
                 print("Finished creating lexicon.txt")
 
                 # Step 5: Upload lexicon which was retrieved by phonetisaurus-apply and its graph
                 #TODO: Check whether the upload is successfull
-                upload_to_bucket(minio_client, minio_buckets["PROJECT_BUCKET"], id + "/lexicon.txt", "/data_prep_worker/out/lexicon.txt")
-                upload_to_bucket(minio_client, minio_buckets["PROJECT_BUCKET"], id + "/corpus.txt", "/data_prep_worker/out/corpus.txt")
+                upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], id + "/lexicon.txt", "/data_prep_worker/out/lexicon.txt")
+                upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], id + "/corpus.txt", "/data_prep_worker/out/corpus.txt")
 
                 # Step 6: Delete all files which were downloaded or created for this task
                 remove_local_files("/data_prep_worker/in/")
