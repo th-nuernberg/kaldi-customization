@@ -1,13 +1,15 @@
 import connexion
 import os
 import six
+import uuid
+import datetime
 
 from openapi_server.models.resource import Resource  # noqa: E501
-from openapi_server.models.file_status import FileStatus
-from openapi_server.models.file_type import FileType
+from openapi_server.models.resource_status import ResourceStatus
+from openapi_server.models.resource_type import ResourceType
 
 from openapi_server import util
-from models import db, Resource, ResourceTypeEnum, ResourceStateEnum, User
+from models import db, Resource as DB_Resource, ResourceTypeEnum as DB_ResourceType, ResourceStateEnum as DB_ResourceState, User as DB_User
 from werkzeug.utils import secure_filename
 
 from minio_communication import download_from_bucket, upload_to_bucket, minio_buckets
@@ -22,8 +24,8 @@ def get_filetype(filename):
     '''
     if '.' in filename:
         filetype = filename.rsplit('.', 1)[1].lower()
-        if filetype in FileTypeEnum.__members__:
-            return FileTypeEnum[filetype]
+        if filetype in DB_ResourceType.__members__:
+            return DB_ResourceType[filetype]
     return None
 
 def create_resource(upfile):  # noqa: E501
@@ -52,13 +54,13 @@ def create_resource(upfile):  # noqa: E501
     
     # file is okay: create db entry, store to dfs and create textprep job
 
-    my_user = User.query.get(1)
+    my_user = DB_User.query.get(1)
     print('Set ownership to user 1')
 
-    db_file = File(
+    db_file = DB_Resource(
         name=filename,
-        status=FileStateEnum.Upload_InProgress,
-        file_type=filetype,
+        status=DB_ResourceState.Upload_InProgress,
+        resource_type=filetype,
         owner=my_user #TODO: wie kann der Benutzer ermittelt werden?
     )
     db.session.add(db_file)
@@ -85,19 +87,19 @@ def create_resource(upfile):  # noqa: E501
     #TODO: delete local file local_file_path
 
     if upload_result[0]:
-        db_file.status = ResourceStateEnum.TextPreparation_Ready
+        db_file.status = DB_ResourceState.TextPreparation_Ready
     else:
-        db_file.status = ResourceStateEnum.Upload_Failure
+        db_file.status = DB_ResourceState.Upload_Failure
 
     db.session.add(db_file)
     db.session.commit()
 
     print('Uploaded file to MinIO: ' + str(db_file))
 
-    if db_file.status == ResourceStateEnum.TextPreparation_Ready:
-        create_textprep_job(str(db_file.id), db_file.file_type)
+    if db_file.status == DB_ResourceState.TextPreparation_Ready:
+        create_textprep_job(str(db_file.id), db_file.resource_type)
 
-        db_file.status = ResourceStateEnum.TextPreparation_Pending
+        db_file.status = DB_ResourceState.TextPreparation_Pending
         db.session.add(db_file)
         db.session.commit()
 
@@ -105,8 +107,9 @@ def create_resource(upfile):  # noqa: E501
 
     return Resource(
         name=db_file.name,
-        status=FileStatus.FileStateEnum_to_FileStatus(db_file.status),
-        file_type=FileType.FileTypeEnum_to_FileType(db_file.file_type)
+        status=ResourceStatus.ResourceStateEnum_to_ResourceStatus(db_file.status),
+        resource_type=ResourceType.ResourceTypeEnum_to_ResourceType(db_file.resource_type),
+        uuid=db_file.uuid
     )
 
 
@@ -118,7 +121,16 @@ def get_resource():  # noqa: E501
 
     :rtype: List[Resource]
     """
-    return 'do some magic!'
+
+    #TODO filter by user
+    db_resources = DB_Resource.query.all()
+
+    return [ Resource(
+        name=r.name,
+        status=ResourceStatus.ResourceStateEnum_to_ResourceStatus(r.status),
+        resource_type=ResourceType.ResourceTypeEnum_to_ResourceType(r.resource_type),
+        uuid=r.uuid
+    ) for r in db_resources ]
 
 
 def get_resource_by_uuid(resource_uuid):  # noqa: E501
@@ -136,15 +148,16 @@ def get_resource_by_uuid(resource_uuid):  # noqa: E501
     # db_file.owner
     # retrieve file from MinIO vs. File information only
 
-    db_file = Resource.query.get(file_uuid)
+    db_file = DB_Resource.query.get(resource_uuid)
 
     if (db_file is None):
         return ("File not found", 404)
 
     this_resource = Resource(
         name=db_file.name, 
-        status=ResourceStateEnum(db_file.status),
-        file_type=ResourceTypeEnum(db_file.file_type)
+        status=ResourceStatus.ResourceStateEnum_to_ResourceStatus(db_file.status),
+        resource_type=ResourceType.ResourceTypeEnum_to_ResourceType(db_file.resource_type),
+        uuid=db_file.uuid
     )
 
     return this_resource
