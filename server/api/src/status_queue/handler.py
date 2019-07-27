@@ -5,9 +5,7 @@ from .text_prep import handle_text_prep_status
 from config import redis_client
 from redis_config import redis_queues
 
-#from app import app
-
-def handle_statue_queue(status_queue, db):
+def handle_statue_queue(status_queue, app, db):
     '''
     Listens to STATUS_QUEUE and handle the messages.
     '''
@@ -28,7 +26,7 @@ def handle_statue_queue(status_queue, db):
                 if msg_data and "type" in msg_data and "text" in msg_data and "status" in msg_data:
                     if msg_data['type'] == 'text-prep':
                         print("[Status] handle text prep status...")
-                        handle_text_prep_status(msg_data, db)
+                        handle_text_prep_status(msg_data, app, db)
                         print("[Status] ...handled text prep status")
                     else:
                         print("[Status] unknown type \"{}\" in status queue!".format(msg_data['type']))
@@ -38,8 +36,8 @@ def handle_statue_queue(status_queue, db):
             print("[Status] Further information 2: " + str(e))
 
 
-def start_status_queue_handler(db):
-    thread = threading.Thread(target=handle_statue_queue, name="Redis-Handler", args=(redis_queues["STATUS_QUEUE"], db))
+def start_status_queue_handler(app, db):
+    thread = threading.Thread(target=handle_statue_queue, name="Redis-Handler", args=(redis_queues["STATUS_QUEUE"], app, db))
     thread.start()
 
     return thread
