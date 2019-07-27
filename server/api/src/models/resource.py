@@ -42,10 +42,10 @@ class ResourceTypeEnum(enum.IntEnum):
 class Resource(db.Model):
     __tablename__ = 'resources'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(255))
 
-    uuid = db.Column(db.String, name="uuid", primary_key=True, default=generate_uuid)
+    uuid = db.Column(db.String(36), name="uuid", primary_key=True, default=generate_uuid)
     upload_date = db.Column(db.DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     status = db.Column(db.Enum(ResourceStateEnum))

@@ -72,10 +72,10 @@ def create_resource(upfile):  # noqa: E501
     if not os.path.exists(TEMP_UPLOAD_FOLDER):
         os.makedirs(TEMP_UPLOAD_FOLDER)
 
-    local_file_path = os.path.join(TEMP_UPLOAD_FOLDER, str(db_file.id))
+    local_file_path = os.path.join(TEMP_UPLOAD_FOLDER, str(db_file.uuid))
     upfile.save(local_file_path)
 
-    minio_file_path = str(db_file.id) + '/' + str(db_file.id)
+    minio_file_path = str(db_file.uuid) + '/' + str(db_file.uuid)
 
     upload_result = upload_to_bucket(
         minio_client=minio_client,
@@ -97,7 +97,7 @@ def create_resource(upfile):  # noqa: E501
     print('Uploaded file to MinIO: ' + str(db_file))
 
     if db_file.status == DB_ResourceState.TextPreparation_Ready:
-        create_textprep_job(str(db_file.id), db_file.resource_type)
+        create_textprep_job(str(db_file.uuid), db_file.resource_type)
 
         db_file.status = DB_ResourceState.TextPreparation_Pending
         db.session.add(db_file)
@@ -148,7 +148,7 @@ def get_resource_by_uuid(resource_uuid):  # noqa: E501
     # db_file.owner
     # retrieve file from MinIO vs. File information only
 
-    db_file = DB_Resource.query.get(resource_uuid)
+    db_file = DB_Resource.query.filter_by(uuid=resource_uuid).first()
 
     if (db_file is None):
         return ("File not found", 404)
