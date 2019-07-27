@@ -64,7 +64,6 @@ if __name__ == "__main__":
     config_oauth(app)
     app.register_blueprint(auth_bp, url_prefix='/api')
 
-    #start_status_queue_handler(status_queue, db)
-    start_status_queue_handler(app, db=db.create_scoped_session())
+    start_status_queue_handler(app, db)
 
     connex_app.run(host=conf.host, port=conf.port, debug=conf.verbose)
