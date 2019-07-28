@@ -26,9 +26,11 @@ class TestProjectController(BaseTestCase):
   },
   "name" : "name",
   "resources" : [ {
-    "name" : "name"
+    "name" : "myFile.pdf",
+    "uuid" : "1234567890"
   }, {
-    "name" : "name"
+    "name" : "myFile.pdf",
+    "uuid" : "1234567890"
   } ],
   "acoustic_model" : {
     "name" : "name",
@@ -113,9 +115,11 @@ class TestProjectController(BaseTestCase):
   },
   "name" : "name",
   "resources" : [ {
-    "name" : "name"
+    "name" : "myFile.pdf",
+    "uuid" : "1234567890"
   }, {
-    "name" : "name"
+    "name" : "myFile.pdf",
+    "uuid" : "1234567890"
   } ],
   "acoustic_model" : {
     "name" : "name",

@@ -1,5 +1,7 @@
-from ._db import db
+from ._db import db, AlchemyEncoder, generate_uuid
 import enum
+import json
+import datetime
 
 class ResourceStateEnum(enum.IntEnum):
     Upload_InProgress = 0
@@ -33,24 +35,24 @@ class ResourceTypeEnum(enum.IntEnum):
     jpg = 6
 
     @staticmethod
-    def file_type_to_string(t):
+    def resource_type_to_string(t):
         return (None, 'html', 'docx', 'txt', 'pdf', 'png', 'jpg')[t]
 
 
 class Resource(db.Model):
     __tablename__ = 'resources'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(255))
 
-    uuid = db.Column(db.String(255))
-    upload_date = db.Column(db.DateTime(timezone=False))
+    uuid = db.Column(db.String(36), name="uuid", primary_key=True, default=generate_uuid)
+    upload_date = db.Column(db.DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     status = db.Column(db.Enum(ResourceStateEnum))
-    file_type = db.Column(db.Enum(ResourceTypeEnum), nullable=True)
+    resource_type = db.Column(db.Enum(ResourceTypeEnum), nullable=True)
 
     owner_id = db.Column(db.Integer,db.ForeignKey("users.id"))
     owner = db.relationship('User')
 
     def __repr__(self):
-        return self.__dict__
+        return json.dumps(self, cls=AlchemyEncoder)

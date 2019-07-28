@@ -38,6 +38,7 @@ class TestUserController(BaseTestCase):
         Get current user
         """
         headers = { 
+            'Accept': 'application/json',
             'Authorization': 'Bearer special-key',
         }
         response = self.client.open(
@@ -52,14 +53,14 @@ class TestUserController(BaseTestCase):
 
         Logs user into the system
         """
-        query_string = [('username', 'username_example'),
+        query_string = [('email', 'email_example'),
                         ('password', 'password_example')]
         headers = { 
             'Accept': 'application/json',
         }
         response = self.client.open(
             '/api/v1/user/login',
-            method='GET',
+            method='POST',
             headers=headers,
             query_string=query_string)
         self.assert200(response,
@@ -74,7 +75,7 @@ class TestUserController(BaseTestCase):
         }
         response = self.client.open(
             '/api/v1/user/logout',
-            method='GET',
+            method='POST',
             headers=headers)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
