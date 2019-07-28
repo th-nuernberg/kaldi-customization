@@ -19,7 +19,7 @@ class TestUserController(BaseTestCase):
 
         Create user
         """
-        body = {}
+        user = {}
         headers = { 
             'Content-Type': 'application/json',
         }
@@ -27,7 +27,7 @@ class TestUserController(BaseTestCase):
             '/api/v1/user',
             method='POST',
             headers=headers,
-            data=json.dumps(body),
+            data=json.dumps(user),
             content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -56,7 +56,6 @@ class TestUserController(BaseTestCase):
         query_string = [('email', 'email_example'),
                         ('password', 'password_example')]
         headers = { 
-            'Accept': 'application/json',
         }
         response = self.client.open(
             '/api/v1/user/login',

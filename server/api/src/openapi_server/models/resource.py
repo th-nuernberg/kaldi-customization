@@ -19,7 +19,7 @@ class Resource(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, uuid=None, name=None, status=None, resource_type=None):  # noqa: E501
+    def __init__(self, uuid=None, name=None, status=None, resource_type=None, creation_timestamp=None):  # noqa: E501
         """Resource - a model defined in OpenAPI
 
         :param uuid: The uuid of this Resource.  # noqa: E501
@@ -30,25 +30,30 @@ class Resource(Model):
         :type status: ResourceStatus
         :param resource_type: The resource_type of this Resource.  # noqa: E501
         :type resource_type: ResourceType
+        :param creation_timestamp: The creation_timestamp of this Resource.  # noqa: E501
+        :type creation_timestamp: datetime
         """
         self.openapi_types = {
             'uuid': str,
             'name': str,
             'status': ResourceStatus,
-            'resource_type': ResourceType
+            'resource_type': ResourceType,
+            'creation_timestamp': datetime
         }
 
         self.attribute_map = {
             'uuid': 'uuid',
             'name': 'name',
             'status': 'status',
-            'resource_type': 'resource_type'
+            'resource_type': 'resource_type',
+            'creation_timestamp': 'creation_timestamp'
         }
 
         self._uuid = uuid
         self._name = name
         self._status = status
         self._resource_type = resource_type
+        self._creation_timestamp = creation_timestamp
 
     @classmethod
     def from_dict(cls, dikt) -> 'Resource':
@@ -150,3 +155,24 @@ class Resource(Model):
             raise ValueError("Invalid value for `resource_type`, must not be `None`")  # noqa: E501
 
         self._resource_type = resource_type
+
+    @property
+    def creation_timestamp(self):
+        """Gets the creation_timestamp of this Resource.
+
+
+        :return: The creation_timestamp of this Resource.
+        :rtype: datetime
+        """
+        return self._creation_timestamp
+
+    @creation_timestamp.setter
+    def creation_timestamp(self, creation_timestamp):
+        """Sets the creation_timestamp of this Resource.
+
+
+        :param creation_timestamp: The creation_timestamp of this Resource.
+        :type creation_timestamp: datetime
+        """
+
+        self._creation_timestamp = creation_timestamp

@@ -19,7 +19,7 @@ class AcousticModel(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, name=None, language=None, model_type=None):  # noqa: E501
+    def __init__(self, id=None, name=None, language=None, model_type=None, uuid=None):  # noqa: E501
         """AcousticModel - a model defined in OpenAPI
 
         :param id: The id of this AcousticModel.  # noqa: E501
@@ -30,25 +30,30 @@ class AcousticModel(Model):
         :type language: Language
         :param model_type: The model_type of this AcousticModel.  # noqa: E501
         :type model_type: AcousticModelType
+        :param uuid: The uuid of this AcousticModel.  # noqa: E501
+        :type uuid: str
         """
         self.openapi_types = {
             'id': int,
             'name': str,
             'language': Language,
-            'model_type': AcousticModelType
+            'model_type': AcousticModelType,
+            'uuid': str
         }
 
         self.attribute_map = {
             'id': 'id',
             'name': 'name',
             'language': 'language',
-            'model_type': 'model_type'
+            'model_type': 'model_type',
+            'uuid': 'uuid'
         }
 
         self._id = id
         self._name = name
         self._language = language
         self._model_type = model_type
+        self._uuid = uuid
 
     @classmethod
     def from_dict(cls, dikt) -> 'AcousticModel':
@@ -150,3 +155,26 @@ class AcousticModel(Model):
             raise ValueError("Invalid value for `model_type`, must not be `None`")  # noqa: E501
 
         self._model_type = model_type
+
+    @property
+    def uuid(self):
+        """Gets the uuid of this AcousticModel.
+
+
+        :return: The uuid of this AcousticModel.
+        :rtype: str
+        """
+        return self._uuid
+
+    @uuid.setter
+    def uuid(self, uuid):
+        """Sets the uuid of this AcousticModel.
+
+
+        :param uuid: The uuid of this AcousticModel.
+        :type uuid: str
+        """
+        if uuid is None:
+            raise ValueError("Invalid value for `uuid`, must not be `None`")  # noqa: E501
+
+        self._uuid = uuid

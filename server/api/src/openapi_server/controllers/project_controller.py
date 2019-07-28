@@ -4,6 +4,7 @@ import redis
 import json
 import config
 
+from openapi_server.models.inline_object import InlineObject  # noqa: E501
 from openapi_server.models.project import Project  # noqa: E501
 from openapi_server.models.training_status import TrainingStatus  # noqa: E501
 from openapi_server import util
@@ -12,18 +13,18 @@ from models import db, Project as DB_Project, TrainingStateEnum as DB_TrainingSt
 
 import uuid
 
-def create_project(body):  # noqa: E501
+def create_project(inline_object):  # noqa: E501
     """Create a new project
 
      # noqa: E501
 
-    :param body: Project object that needs to be created
-    :type body: dict | bytes
+    :param inline_object: 
+    :type inline_object: dict | bytes
 
-    :rtype: None
+    :rtype: Project
     """
     if connexion.request.is_json:
-        body = Project.from_dict(connexion.request.get_json())  # noqa: E501
+        inline_object = InlineObject.from_dict(connexion.request.get_json())  # noqa: E501
         db_proj = DB_Project(
             api_token=str(uuid.uuid4().hex) + str(uuid.uuid4().hex),
             name=body.name,
@@ -57,13 +58,13 @@ def get_project_by_uuid(project_uuid):  # noqa: E501
     Returns a single project # noqa: E501
 
     :param project_uuid: UUID of project to return
-    :type project_uuid: str
+    :type project_uuid: 
 
     :rtype: Project
     """
     return 'do some magic!'
 
-
+"""
 def train_project(project_uuid):  # noqa: E501
     """Train current project
 
@@ -83,17 +84,4 @@ def train_project(project_uuid):  # noqa: E501
     redis_conn.rpush("QUEUE", json.dumps(entry))
     return TrainingStatus.Training_Pending
 
-
-def update_project(body):  # noqa: E501
-    """Update an existing project
-
-     # noqa: E501
-
-    :param body: Project object that needs to be updated
-    :type body: dict | bytes
-
-    :rtype: None
-    """
-    if connexion.request.is_json:
-        body = Project.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+"""

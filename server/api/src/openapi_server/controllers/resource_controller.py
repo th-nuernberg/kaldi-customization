@@ -5,6 +5,7 @@ import uuid
 import datetime
 
 from openapi_server.models.resource import Resource  # noqa: E501
+from openapi_server.models.training import Training  # noqa: E501
 from openapi_server.models.resource_status import ResourceStatus
 from openapi_server.models.resource_type import ResourceType
 
@@ -18,6 +19,22 @@ from redis_communication import create_textprep_job
 from config import minio_client
 
 TEMP_UPLOAD_FOLDER = '/tmp/fileupload'
+
+def assign_resource_to_training(project_uuid, training_version, resource_uuid):  # noqa: E501
+    """Assign a resource to the training
+
+    Assign the specified resource to the training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+    :param resource_uuid: UUID of the resource
+    :type resource_uuid: 
+
+    :rtype: Resource
+    """
+    return 'do some magic!'
 
 def get_filetype(filename):
     '''
@@ -113,6 +130,39 @@ def create_resource(upfile):  # noqa: E501
         uuid=db_file.uuid
     )
 
+def delete_assigned_resource_from_training(project_uuid, training_version, resource_uuid):  # noqa: E501
+    """Remove a resource from the training
+
+    Removes the assigned resource from the training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+    :param resource_uuid: UUID of the resource
+    :type resource_uuid: 
+
+    :rtype: None
+    """
+    return 'do some magic!'
+
+
+def get_corpus_of_training_resource(project_uuid, training_version, resource_uuid):  # noqa: E501
+    """Get the corpus of the resource
+
+    Returns the corpus of the specified resource for this training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+    :param resource_uuid: UUID of the resource
+    :type resource_uuid: 
+
+    :rtype: str
+    """
+    return 'do some magic!'
+
 
 def get_resource():  # noqa: E501
     """Returns a list of available resources
@@ -202,3 +252,36 @@ def get_resource_data(resource_uuid):  # noqa: E501
             return ("File not found", 404)
 
     return send_file(local_file_path, as_attachment=True, attachment_filename=db_file.name)
+
+def get_training_resources(project_uuid, training_version):  # noqa: E501
+    """Get a list of assigned resources
+
+    Returns a list of all resources assigned to this training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+
+    :rtype: List[Training]
+    """
+    return 'do some magic!'
+
+
+def set_corpus_of_training_resource(project_uuid, training_version, resource_uuid, body):  # noqa: E501
+    """Set the corpus of the resource
+
+    Updates the corpus of the specified resource for this training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+    :param resource_uuid: UUID of the resource
+    :type resource_uuid: 
+    :param body: New or updated corpus as plain text
+    :type body: str
+
+    :rtype: None
+    """
+    return 'do some magic!'
