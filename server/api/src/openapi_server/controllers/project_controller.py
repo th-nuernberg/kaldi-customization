@@ -64,7 +64,7 @@ def get_project_by_uuid(project_uuid):  # noqa: E501
     """
     return 'do some magic!'
 
-"""
+'''
 def train_project(project_uuid):  # noqa: E501
     """Train current project
 
@@ -84,4 +84,4 @@ def train_project(project_uuid):  # noqa: E501
     redis_conn.rpush("QUEUE", json.dumps(entry))
     return TrainingStatus.Training_Pending
 
-"""
+'''

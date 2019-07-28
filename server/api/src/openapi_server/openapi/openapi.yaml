@@ -245,7 +245,7 @@ paths:
           multipart/form-data:
             schema:
               properties:
-                upfile:
+                audio_file:
                   description: Audio file for decoding
                   format: binary
                   type: string
@@ -1168,7 +1168,7 @@ components:
       type: object
     inline_object_1:
       properties:
-        upfile:
+        audio_file:
           description: Audio file for decoding
           format: binary
           type: string

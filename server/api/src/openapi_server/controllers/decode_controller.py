@@ -23,7 +23,7 @@ def get_decode_result(project_uuid, training_version, decode_uuid):  # noqa: E50
     return 'do some magic!'
 
 
-def start_decode(project_uuid, training_version, upfile=None):  # noqa: E501
+def start_decode(project_uuid, training_version, audio_file):  # noqa: E501
     """Decode audio to text
 
     Decode audio data to text using the trained project # noqa: E501
@@ -32,8 +32,8 @@ def start_decode(project_uuid, training_version, upfile=None):  # noqa: E501
     :type project_uuid: 
     :param training_version: Training version of the project
     :type training_version: int
-    :param upfile: Audio file for decoding
-    :type upfile: str
+    :param audio_file: Audio file for decoding
+    :type audio_file: str
 
     :rtype: InlineResponse202
     """
