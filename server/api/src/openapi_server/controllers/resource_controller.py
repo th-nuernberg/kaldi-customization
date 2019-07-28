@@ -11,6 +11,7 @@ from openapi_server.models.resource_type import ResourceType
 from openapi_server import util
 from models import db, Resource as DB_Resource, ResourceTypeEnum as DB_ResourceType, ResourceStateEnum as DB_ResourceState, User as DB_User
 from werkzeug.utils import secure_filename
+from flask import send_file
 
 from minio_communication import download_from_bucket, upload_to_bucket, minio_buckets
 from redis_communication import create_textprep_job
@@ -146,7 +147,6 @@ def get_resource_by_uuid(resource_uuid):  # noqa: E501
 
     #TODO: check the ownership of the file
     # db_file.owner
-    # retrieve file from MinIO vs. File information only
 
     db_file = DB_Resource.query.filter_by(uuid=resource_uuid).first()
 
@@ -173,4 +173,32 @@ def get_resource_data(resource_uuid):  # noqa: E501
 
     :rtype: file
     """
-    return 'do some magic!'
+
+    #TODO: check the ownership of the file
+    db_file = DB_Resource.query.filter_by(uuid=resource_uuid).first()
+
+    if (db_file is None):
+        print('Resource {} in DB not found'.format(resource_uuid))
+        return ("File not found", 404)
+    
+    minio_file_path = str(db_file.uuid) + '/' + str(db_file.uuid)
+    
+    if not os.path.exists(TEMP_UPLOAD_FOLDER):
+        os.makedirs(TEMP_UPLOAD_FOLDER)
+
+    # use local file system as file cache?
+    local_file_path = os.path.join(TEMP_UPLOAD_FOLDER, str(db_file.uuid))
+    
+    if not os.path.exists(local_file_path):
+        download_result = download_from_bucket(
+            minio_client=minio_client,
+            bucket=minio_buckets["RESOURCE_BUCKET"],
+            filename=minio_file_path,
+            target_path=local_file_path
+        )
+
+        if not download_result[0]: # means no success
+            print('Resource {} in MinIO not found'.format(resource_uuid))
+            return ("File not found", 404)
+
+    return send_file(local_file_path, as_attachment=True, attachment_filename=db_file.name)

@@ -31,7 +31,9 @@ def handle_statue_queue(status_queue, app, db):
                             handle_text_prep_status(msg_data, db_session)
                             print("[Status] ...handled text prep status")
                         else:
-                            print("[Status] unknown type \"{}\" in status queue!".format(msg_data['type']))
+                            print("[Status] WARN: unknown type \"{}\" in status queue!".format(msg_data['type']))
+                    else:
+                        print("[Status] WARN: missing entry in message data")
             except Exception as e:
                 print("[Status] Exception at status queue: {}".format(type(e).__name__))
                 print("[Status] Further information 1: " + e.__str__())
