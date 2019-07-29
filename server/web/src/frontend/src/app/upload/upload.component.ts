@@ -69,7 +69,7 @@ export class UploadComponent implements OnInit {
 
       //if(file !== null) {
         //this.showPreview(file);
-        //this.showContentPreview = true;
+        this.showContentPreview = true;
       //}
       
     }
@@ -156,26 +156,26 @@ export class UploadComponent implements OnInit {
   }
 
   // uploads file and show preview
-  loadFile(file:HTMLInputElement, list:any) {
+  loadFile(file:HTMLInputElement) {
 
     // TODO: API - TPW Results as uploaded files in current file list
-    this.dummyShowUploadedFile(file, list)
+    this.dummyShowUploadedFile(file);
 
     // loads content of uploaded file into preview
     if(file !== null) {
-      this.showPreview(file)
+      this.showPreview(file);
     }
     this.show = false;
   }
 
-  dummyShowUploadedFile(file, list) {
+  dummyShowUploadedFile(file) {
     let fileName = file.files[0].name;
     // add uploaded file to current file list
     this.uploadedFiles.push({ name:fileName, selected:true });
-
+    
     // selects element in current panel
-    this.currentFiles = list.selectedOptions.selected.map(item => item.value);
     this.currentFiles.push(fileName);
+    this.currentFiles = this.uploadedFiles.map(item => item.name);
   }
 
   // toggles start and verify button in current panel

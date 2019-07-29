@@ -54,14 +54,18 @@
           mat-flat-button 
           color="accent"
           class="uploadFile_Button"
-          (click)="copy()">Add</button>
+          (click)="copy()">
+          <mat-icon aria-hidden="false" aria-label="Example add icon">library_add</mat-icon>
+        </button>
         
-        <input #file id="fileInput" type="file" style="display:none" (change)="loadFile(file, files)" />
+        <input #file id="fileInput" type="file" style="display:none" (change)="loadFile(file)" />
         <button 
           mat-flat-button 
           color="primary" 
           class="uploadFile_Button" 
-          onclick="document.getElementById('fileInput').click()">Upload</button>
+          onclick="document.getElementById('fileInput').click()">
+          <mat-icon aria-hidden="false" aria-label="Example upload icon">cloud_upload</mat-icon>
+        </button>
       </div>
     </div>
     
@@ -105,7 +109,7 @@
     
     <div class="panel-divider"></div>
 
-    <!-- Preview Text Editor -->
+    <!-- Details -->
     <div class="upload-panel" fxFlex="33">
       <h2>Details</h2>
       <div>
@@ -129,12 +133,15 @@
           *ngIf="!show" 
           (click)="toggleSave()"
           color="warn">
-          Verify</button>
+          <mat-icon aria-hidden="false" aria-label="Example delete icon">spellcheck</mat-icon>
+        </button>
         <button
           class="uploadFile_Button" 
           mat-flat-button 
           *ngIf="show"
-          color="warn">Start</button>
+          color="warn">
+          <mat-icon aria-hidden="false" aria-label="Example delete icon">play_circle_filled_white</mat-icon>
+        </button>
       </div>
     </div>
   </div>
