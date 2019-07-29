@@ -33,7 +33,7 @@ export class UploadComponent implements OnInit {
 
   public dataSource = new MatTableDataSource<HistoryFile>(FILE_DATA);
   public historySelection = new SelectionModel<HistoryFile>(true, []);
-  public currentSelection = new SelectionModel<string>(true, [])
+  
   public currentFiles: string[] = [];
   public uploadedFiles : { name: string, selected: boolean; }[] = [];
 
@@ -46,20 +46,50 @@ export class UploadComponent implements OnInit {
   }
 
   // enables single selection for current panel list
-  handleSelection(event, file) {
+  handleSelection(event) {
     // TODO: show and clean preview content of selected file
     console.log(event);
     if (event.option.selected) {
       event.source.deselectAll();      
       event.option._setSelected(true);
-      if(file !== null) {
-        this.showPreview(file);
-      }
+
+      // update select in uploaded file list
+      let selectedItemName: string;
+      event.source.selectedOptions.selected.forEach(s => {
+        if (s.selected === true) {
+          selectedItemName = s.value;
+        }
+      });
+
+      this.uploadedFiles.forEach(f => {
+        if(f.name === selectedItemName) {
+          f.selected = true;
+        }
+      });
+
+      //if(file !== null) {
+        //this.showPreview(file);
+        //this.showContentPreview = true;
+      //}
       
-      this.showContentPreview = true;
     }
     else {
       this.fileContent = null;
+      this.showContentPreview = false;
+
+      // update deselect in uploaded file list
+      let selectedItemName: string;
+      event.source.selectedOptions.selected.forEach(s => {
+        if (s.selected === false) {
+          selectedItemName = s.value;
+        }
+      });
+
+      this.uploadedFiles.forEach(f => {
+        if(f.name === selectedItemName) {
+          f.selected = false;
+        }
+      });
     }
   }
 
@@ -101,35 +131,42 @@ export class UploadComponent implements OnInit {
   }
 
   // removes selected history elements
-  remove(files:any) {
-    // TODO: find more generic solution
-    files.selectedOptions.selected.forEach(file => this.uploadedFiles.splice(this.uploadedFiles.indexOf(file)));
+  remove() {
+    let delecteCount = 1;
+    this.uploadedFiles.forEach(file => {      
+      if(file.selected === true) {
+        let index = this.uploadedFiles.indexOf(file);
+        console.log("Name: " + file.name + " selected: " + file.selected + " Index: " + index);
+        this.uploadedFiles.splice(index, delecteCount);
+      }
+    });
   }
 
   // toggles remove button (disabled if nothing is selected)
-  isRemoveDisabled(files:any) {
-    // TODO find more generic solution
-    return files.selectedOptions.selected.length === 0;
+  isRemoveDisabled() {
+    // return true => disables button | return false => enables button
+    let isDisabled: Boolean = true;
+    this.uploadedFiles.forEach(file => {
+       if(file.selected === true) {
+        isDisabled = false; 
+      } 
+    });
+
+    return isDisabled;
   }
 
   // uploads file and show preview
   loadFile(file:HTMLInputElement, list:any) {
 
     // TODO: API - TPW Results as uploaded files in current file list
-    this.sendFileToAPI();
-    let api_result = this.getResultFromAPI();
     this.dummyShowUploadedFile(file, list)
 
     // loads content of uploaded file into preview
-    console.log(file);
     if(file !== null) {
       this.showPreview(file)
     }
     this.show = false;
   }
-
-  sendFileToAPI() {}
-  getResultFromAPI() {}
 
   dummyShowUploadedFile(file, list) {
     let fileName = file.files[0].name;
@@ -142,7 +179,7 @@ export class UploadComponent implements OnInit {
   }
 
   // toggles start and verify button in current panel
-  toggle() {
+  toggleSave() {
     this.show = !this.show;
   }
 

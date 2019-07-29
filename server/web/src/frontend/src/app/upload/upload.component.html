@@ -70,11 +70,23 @@
     <!-- Current File panel -->
     <div class="upload-panel" fxFlex="33">
       <h2>Modell</h2>
-      <mat-selection-list #files (selectionChange)="handleSelection($event, file)">
-        <mat-list-option *ngFor='let file of uploadedFiles' [selected]='file.selected' [value]="file.name">
-          {{file.name}}
+      <mat-selection-list
+        (selectionChange)="handleSelection($event, file)">
+        <mat-list-option
+          *ngFor='let file of uploadedFiles'
+          [selected]='file.selected'
+          [value]="file.name">
+          <p mat-line>{{file.name}}</p>
         </mat-list-option>
       </mat-selection-list>
+      <button
+        mat-flat-button
+        class="uploadSite-Button" 
+        color="primary"
+        [disabled]="isRemoveDisabled()"              
+        (click)="remove()">
+        <mat-icon aria-hidden="false" aria-label="Example delete icon">delete</mat-icon>
+      </button>
 
       <div>
         <form class="text-content-form" *ngIf="showContentPreview">
@@ -88,10 +100,6 @@
               {{fileContent}}</textarea>
           </mat-form-field>
         </form>      
-      </div>
-      
-      <div>
-        <button type="button" class="uploadSite-Button" mat-flat-button (click)="remove(files)" disabled="isRemoveDisabled(files)">Remove</button>
       </div>
     </div>
     
@@ -119,7 +127,7 @@
           class="uploadFile_Button"
           mat-flat-button 
           *ngIf="!show" 
-          (click)="toggle()"
+          (click)="toggleSave()"
           color="warn">
           Verify</button>
         <button

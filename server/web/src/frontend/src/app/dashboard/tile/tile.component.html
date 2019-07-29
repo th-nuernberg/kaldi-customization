@@ -8,5 +8,7 @@
         'color-green': tileData.status === 'Done'}">
         {{tileData.status}}
     </span>
-    <a mat-stroked-button routerLink="/project/_" class="tileButton">More Info</a> 
+    <button mat-stroked-button routerLink="/project/_" class="tileButton">        
+      <mat-icon aria-hidden="false" aria-label="Example more info">more_horiz</mat-icon>
+    </button> 
 </mat-card>
