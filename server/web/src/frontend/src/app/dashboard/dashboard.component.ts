@@ -16,7 +16,7 @@ export class DashboardComponent implements OnInit {
   // TODO: add function to load existing projects/models on component init!
   // TODO: implement API calls: get Project, Post Project
 
-  gridTiles: TileData[] = [];
+  gridTiles: TileData[];
   maxCols: 4;
   newProjectName: string;
 
@@ -30,7 +30,7 @@ export class DashboardComponent implements OnInit {
   constructor(){}
 
   ngOnInit() {
-    //this.gridTiles = [];
+    this.gridTiles = [];
     this.selectedPrevTrain = "";
     this.newProjectName = "";
   }
@@ -40,6 +40,9 @@ export class DashboardComponent implements OnInit {
   }
 
   newProject() {
+    // TODO: New Project should create a new model automatically
+    // TODO: Opens automatically the model overview
+
     let index = Math.floor(Math.random() * 3) + 1
     let rndStatus = "What happened?";
     console.log(this.newProjectName);
@@ -51,7 +54,7 @@ export class DashboardComponent implements OnInit {
     }
 
     if(this.newProjectName === "") {
-      this.newProjectName = "Project name placeholder";
+      this.newProjectName = "Project name placeholder ";
     }
 
     if(this.selectedPrevTrain === "") {
