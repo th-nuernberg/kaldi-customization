@@ -50,17 +50,17 @@ if __name__ == "__main__":
                 downloaded_acoustic_models.add(acoustic_model_id)
             
 
-            # TODO: load resources
+            # load resources
             download_from_bucket(minio_client, training_bucket, project_id + "/lexicon.txt", lexicon_path)
             download_from_bucket(minio_client, training_bucket, project_id + "/corpus.txt", corpus_path)
-            # TODO: train resources
+            # train resources
             os.chdir("/kaldi/scripts/")
             subprocess.call("/kaldi/scripts/create_new_graph.sh"+ " {} {} {} {} {}".format(lexicon_path,corpus_path,cur_acoustic_model_path,new_graph_dir,workspace_path),shell=True)
             os.chdir("/")
-            # TODO Upload new model
+            # Upload new model
             shutil.make_archive(new_graph_archive,archive_format,workspace_path,new_graph_dir)
             upload_to_bucket(minio_client,training_bucket,project_id + "/graph.zip", new_graph_archive + "." + archive_format)
-            # TODO: unload resources
+            # unload resources
             shutil.rmtree(workspace_path)
 
             # write in status queue
