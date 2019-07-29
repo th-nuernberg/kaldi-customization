@@ -3,11 +3,12 @@
     <p>{{tileData.projectName}}</p>
     <p>{{tileData.previousTrainedModel}}</p>
     <p>{{tileData.comments}}</p>
-    <span [ngClass]="{
-        'color-orange': tileData.status === 'Running',
-        'color-green': tileData.status === 'Done'}">
-        {{tileData.status}}
-    </span>
+    <div *ngFor="let modelData of tileData.model">
+      <span>{{modelData.name}}:</span>
+      <span [ngClass]="{'color-orange': modelData.status === 'Running', 'color-green': modelData.status === 'Done'}">
+        {{modelData.status}}
+      </span>
+    </div>
     <button mat-stroked-button routerLink="/project/_" class="tileButton">        
       <mat-icon aria-hidden="false" aria-label="Example more info">more_horiz</mat-icon>
     </button> 

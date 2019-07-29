@@ -8,6 +8,17 @@ export interface HistoryFile {
   uploaded: string;
 }
 
+export interface FileDetails {
+  project: number,
+  model: number,
+  numberFilesName: string;
+  numberFiles: number;
+  numberSentencesName: string;
+  numberSentences: number;
+  numberWordsName: string;
+  numberWords: number;
+}
+
 // TODO: adapt to information from database
 const FILE_DATA: HistoryFile[] = [
   {position: 1, name: 'Kafka1', uploaded: "01.01.1970"},
@@ -44,6 +55,10 @@ export class UploadComponent implements OnInit {
     this.fileContent = "";
     this.showContentPreview = false;
   }
+
+  fileDetails: FileDetails[] = [
+    { project: 815, model: 1337, numberFilesName: "Anzahl Dateien: ", numberFiles: 5, numberSentencesName: "Anzahl Sätze: ", numberSentences: 100, numberWordsName: "Anzahl Wörter: ", numberWords: 5000 }
+  ]
 
   // enables single selection for current panel list
   handleSelection(event) {

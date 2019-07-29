@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
-import { TileData } from './tile/tile-data';
+import { TileData, ModelData } from './tile/tile-data';
 
 export interface TrainingModel {
   name:string;
@@ -67,9 +66,13 @@ export class DashboardComponent implements OnInit {
           projectNumber: this.gridTiles.length + 1,
           previousTrainedModel: this.selectedPrevTrain,
           comments: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-          status: rndStatus,
           cols: 1,
           rows: 1,
+          model: [
+            { name: "Model 1", status: rndStatus },
+            { name: "Model 2", status: rndStatus },            
+            { name: "Model 3", status: rndStatus }
+          ]
         });
   }
 }

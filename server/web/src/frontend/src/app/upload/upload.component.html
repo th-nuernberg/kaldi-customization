@@ -85,7 +85,7 @@
       </mat-selection-list>
       <button
         mat-flat-button
-        class="uploadSite-Button" 
+        class="uploadFile_Button" 
         color="primary"
         [disabled]="isRemoveDisabled()"              
         (click)="remove()">
@@ -110,20 +110,28 @@
     <div class="panel-divider"></div>
 
     <!-- Details -->
-    <div class="upload-panel" fxFlex="33">
+    <div
+      class="upload-panel"
+      fxFlex="33"
+      *ngFor='let detail of fileDetails'>
       <h2>Details</h2>
       <div>
-        <mat-list>
+          <p>Projekt: {{detail.project}}</p>
+          <p>Modell: {{detail.model}}</p>
+      </div>
+      <div>
+        <mat-list
+          class="details">
           <mat-list-item>
-            Anzahl Dateien:
+              <p>{{detail.numberFilesName}} {{detail.numberFiles}}</p>
           </mat-list-item>
           <mat-divider></mat-divider>
           <mat-list-item>
-            Anzahl Sätze:
+            <p>{{detail.numberSentencesName}} {{detail.numberSentences}}</p>
           </mat-list-item>
           <mat-divider></mat-divider>
           <mat-list-item>
-            Anzahl Wörter:
+            <p>{{detail.numberWordsName}} {{detail.numberWords}}</p>
           </mat-list-item>
           <mat-divider></mat-divider>
         </mat-list>

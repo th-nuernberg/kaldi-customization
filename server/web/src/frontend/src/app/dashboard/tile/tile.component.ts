@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { TileData } from './tile-data';
+import { TileData, ModelData } from './tile-data';
 
 @Component({
   selector: 'app-tile',

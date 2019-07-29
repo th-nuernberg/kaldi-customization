@@ -32,7 +32,9 @@
               mat-flat-button
               color="accent"
               class="tabButton"
-              routerLink="{{model.link}}">Open</button>
+              routerLink="{{model.link}}">
+                <mat-icon aria-hidden="false" aria-label="Example open icon">open_in_browser</mat-icon>
+              </button>
             <mat-divider></mat-divider>
           </mat-list-item>
         </mat-list>
@@ -49,7 +51,7 @@
               mat-flat-button
               color="warn"
               class="tabButton">
-              More
+              <mat-icon aria-hidden="false" aria-label="Example view icon">pageview</mat-icon>
             </button>
             <mat-divider></mat-divider>
           </mat-list-item>
