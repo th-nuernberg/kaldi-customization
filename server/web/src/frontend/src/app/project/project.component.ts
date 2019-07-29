@@ -17,6 +17,15 @@ export interface TrainingsModel {
 export class ProjectComponent implements OnInit {
   uuid: string;
 
+  /* TODO
+    - create new model +  open model view
+    - get user data
+    - get project/model information -> using an existing model
+    - get status of project / model training
+    - provide direct file download: model & decoded text
+    - provide detailed model info
+  */
+
   constructor(private route: ActivatedRoute) { }
 
   ngOnInit() {

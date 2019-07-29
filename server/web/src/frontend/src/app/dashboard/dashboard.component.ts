@@ -14,6 +14,7 @@ export interface TrainingModel {
 export class DashboardComponent implements OnInit {
   // TODO: add function to load existing projects/models on component init!
   // TODO: implement API calls: get Project, Post Project
+  // TODO: create new project / new model
 
   gridTiles: TileData[];
   maxCols: 4;

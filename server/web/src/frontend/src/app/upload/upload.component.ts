@@ -50,7 +50,7 @@ export class UploadComponent implements OnInit {
 
   constructor() {
   }
-
+  // TODO post model information to the API: text files, project name, model name, prev model etc..
   ngOnInit() {
     this.fileContent = "";
     this.showContentPreview = false;

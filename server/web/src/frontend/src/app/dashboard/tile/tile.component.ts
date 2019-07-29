@@ -7,7 +7,7 @@ import { TileData, ModelData } from './tile-data';
   styleUrls: ['./tile.component.css']
 })
 export class TileComponent implements OnInit {
-
+  // TODO check for future details/data that is necessary for the dashboard tiles
   @Input() tileData: TileData;
 
   constructor() { }

@@ -55,6 +55,7 @@
           color="accent"
           class="uploadFile_Button"
           (click)="copy()">
+          <!-- TODO: update to new file format / resource format -->
           <mat-icon aria-hidden="false" aria-label="Example add icon">library_add</mat-icon>
         </button>
         
@@ -64,6 +65,7 @@
           color="primary" 
           class="uploadFile_Button" 
           onclick="document.getElementById('fileInput').click()">
+          <!-- TODO update to new file format / resource format -->
           <mat-icon aria-hidden="false" aria-label="Example upload icon">cloud_upload</mat-icon>
         </button>
       </div>
@@ -89,6 +91,7 @@
         color="primary"
         [disabled]="isRemoveDisabled()"              
         (click)="remove()">
+        <!-- TODO update to new file format / resource format-->
         <mat-icon aria-hidden="false" aria-label="Example delete icon">delete</mat-icon>
       </button>
 
@@ -141,6 +144,7 @@
           *ngIf="!show" 
           (click)="toggleSave()"
           color="warn">
+          <!-- TODO update to new file format / resource format-->
           <mat-icon aria-hidden="false" aria-label="Example delete icon">spellcheck</mat-icon>
         </button>
         <button
@@ -148,6 +152,7 @@
           mat-flat-button 
           *ngIf="show"
           color="warn">
+          <!-- TODO update to new file format / resource format-->
           <mat-icon aria-hidden="false" aria-label="Example delete icon">play_circle_filled_white</mat-icon>
         </button>
       </div>
