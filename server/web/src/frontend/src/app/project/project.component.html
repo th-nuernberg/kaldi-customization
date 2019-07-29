@@ -13,7 +13,9 @@
             <button
               mat-flat-button
               color="primary"
-              class="tabButton">Download</button>
+              class="tabButton">
+              <mat-icon aria-hidden="false" aria-label="Example download icon">cloud_download</mat-icon>
+            </button>
             <mat-divider></mat-divider>
           </mat-list-item>
         </mat-list>
@@ -23,24 +25,40 @@
           Modell
         </ng-template>
         <mat-list>
-            <mat-list-item *ngFor='let model of models'>
-              <h4 mat-line>{{model.name}}</h4>
-              <p mat-line>{{model.date}}</p>
-              <button
-                mat-flat-button
-                color="accent"
-                class="tabButton"
-                routerLink="{{model.link}}">Open</button>
-              <mat-divider></mat-divider>
-            </mat-list-item>
-          </mat-list>
+          <mat-list-item *ngFor='let model of models'>
+            <h4 mat-line>{{model.name}}</h4>
+            <p mat-line>{{model.date}}</p>
+            <button
+              mat-flat-button
+              color="accent"
+              class="tabButton"
+              routerLink="{{model.link}}">Open</button>
+            <mat-divider></mat-divider>
+          </mat-list-item>
+        </mat-list>
       </mat-tab>
       <mat-tab>
         <ng-template mat-tab-label>
           Texte
         </ng-template>
+        <mat-list>
+          <mat-list-item *ngFor='let model of models'>
+            <h4 mat-line>{{model.name}}</h4>
+            <p mat-line>{{model.texte}}</p>
+            <button
+              mat-flat-button
+              color="warn"
+              class="tabButton">
+              More
+            </button>
+            <mat-divider></mat-divider>
+          </mat-list-item>
+        </mat-list>
       </mat-tab>
     </mat-tab-group>
+    <button mat-flat-button class="tabGroupHeaderButton" color="primary">
+      <mat-icon aria-hidden="false" aria-label="Example add icon">add</mat-icon>
+    </button>
 </div>
 
 <mat-sidenav-container fxFlexFill>

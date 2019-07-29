@@ -6,9 +6,8 @@ export interface TrainingsModel {
   fileResultName: string;
   date: string;
   link: string;
+  texte: string;
 }
-
-
 
 @Component({
   selector: 'app-project',
@@ -30,18 +29,21 @@ export class ProjectComponent implements OnInit {
       fileResultName: "model1.pdf",
       date: "01.01.1970",
       link: "/upload/_",
+      texte: "Reißverschlussverfahren"
     },
     {
       name: "Model 2",
       fileResultName: "model2.pdf",
       date: "01.01.1970",
       link: "/upload/_",
+      texte: "Bla bla bla Mr. Freeman"
     },
     {
       name: "Model 3",
       fileResultName: "model3.pdf",
       date: "01.01.1970",
       link: "/upload/_",
+      texte: "Moin moin und Hallo!"
     }
   ];
 
