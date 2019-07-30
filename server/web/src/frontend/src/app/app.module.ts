@@ -23,8 +23,10 @@ import {
   MatInputModule,
   MatTableModule,
 } from '@angular/material';
+
+import { MatDialogModule } from '@angular/material/dialog';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ProjectComponent } from './project/project.component';
+import { ProjectComponent, ModelOverviewDialog } from './project/project.component';
 import { CoverComponent } from './cover/cover.component';
 import { UploadComponent } from './upload/upload.component';
 import { AccountComponent } from './account/account.component';
@@ -40,6 +42,7 @@ import { TileComponent } from './dashboard/tile/tile.component';
     UploadComponent,
     AccountComponent,
     TileComponent,
+    ModelOverviewDialog
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
@@ -62,8 +65,12 @@ import { TileComponent } from './dashboard/tile/tile.component';
     MatTableModule,
     MatSelectModule,
     FormsModule,
+    MatDialogModule,
   ],
   providers: [],
+  entryComponents: [
+    ModelOverviewDialog
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,5 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+
+export interface ModelOverviewDialogData {
+  id: number,
+  project: string,
+  prevModel: string,
+  status: string,
+}
 
 export interface TrainingsModel {
   name: string;
@@ -26,11 +34,11 @@ export class ProjectComponent implements OnInit {
     - provide detailed model info
   */
 
-  constructor(private route: ActivatedRoute) { }
-
+  constructor(private route: ActivatedRoute, public dialog: MatDialog) { }
+  
   ngOnInit() {
     this.uuid = this.route.snapshot.paramMap.get('uuid');
-  }
+  }  
 
   models: TrainingsModel[] =  [
     {
@@ -56,4 +64,29 @@ export class ProjectComponent implements OnInit {
     }
   ];
 
+  openModelOverviewDialog(): void {
+    const dialogRef = this.dialog.open(ModelOverviewDialog, {
+      width: '250px',
+      data: {id: 1337, project: "Project 0815", prevModel: "default", status: "Running" }
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
+  }
+}
+
+@Component({
+  selector: 'model.overview.dialog',
+  templateUrl: 'model.overview.dialog.html',
+})
+export class ModelOverviewDialog {
+
+  constructor(
+    public dialogRef: MatDialogRef<ModelOverviewDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: ModelOverviewDialogData) {}
+
+  onOkClick(): void {
+    this.dialogRef.close();
+  }
 }

@@ -1,0 +1,19 @@
+<h1 mat-dialog-title>Model {{data.id}}</h1>
+<div mat-dialog-content>
+  <p>Projekt: {{data.project}}</p>
+  <p>Model parent: {{data.prevModel}}</p>
+  <p>Status: {{data.status}}</p>
+</div>
+<div mat-dialog-actions>
+  <button
+    mat-button
+    cdkFocusInitial
+    color="primary"
+    (click)="onOkClick()">Ok</button>
+  <button
+    mat-button
+    cdkFocusInitial
+    color="primary"
+    routerLink="/upload/_"
+    (click)="onOkClick()">Decode Audio</button>
+</div>
