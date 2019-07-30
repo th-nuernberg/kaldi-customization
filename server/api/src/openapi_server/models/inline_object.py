@@ -15,26 +15,21 @@ class InlineObject(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, name=None, acoustic_model=None):  # noqa: E501
+    def __init__(self, audio_file=None):  # noqa: E501
         """InlineObject - a model defined in OpenAPI
 
-        :param name: The name of this InlineObject.  # noqa: E501
-        :type name: str
-        :param acoustic_model: The acoustic_model of this InlineObject.  # noqa: E501
-        :type acoustic_model: str
+        :param audio_file: The audio_file of this InlineObject.  # noqa: E501
+        :type audio_file: file
         """
         self.openapi_types = {
-            'name': str,
-            'acoustic_model': str
+            'audio_file': file
         }
 
         self.attribute_map = {
-            'name': 'name',
-            'acoustic_model': 'acoustic_model'
+            'audio_file': 'audio_file'
         }
 
-        self._name = name
-        self._acoustic_model = acoustic_model
+        self._audio_file = audio_file
 
     @classmethod
     def from_dict(cls, dikt) -> 'InlineObject':
@@ -48,47 +43,26 @@ class InlineObject(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def name(self):
-        """Gets the name of this InlineObject.
+    def audio_file(self):
+        """Gets the audio_file of this InlineObject.
 
-        Name of the new project  # noqa: E501
+        Audio file for decoding  # noqa: E501
 
-        :return: The name of this InlineObject.
-        :rtype: str
+        :return: The audio_file of this InlineObject.
+        :rtype: file
         """
-        return self._name
+        return self._audio_file
 
-    @name.setter
-    def name(self, name):
-        """Sets the name of this InlineObject.
+    @audio_file.setter
+    def audio_file(self, audio_file):
+        """Sets the audio_file of this InlineObject.
 
-        Name of the new project  # noqa: E501
+        Audio file for decoding  # noqa: E501
 
-        :param name: The name of this InlineObject.
-        :type name: str
+        :param audio_file: The audio_file of this InlineObject.
+        :type audio_file: file
         """
+        if audio_file is None:
+            raise ValueError("Invalid value for `audio_file`, must not be `None`")  # noqa: E501
 
-        self._name = name
-
-    @property
-    def acoustic_model(self):
-        """Gets the acoustic_model of this InlineObject.
-
-        UUID of the acoustic model  # noqa: E501
-
-        :return: The acoustic_model of this InlineObject.
-        :rtype: str
-        """
-        return self._acoustic_model
-
-    @acoustic_model.setter
-    def acoustic_model(self, acoustic_model):
-        """Sets the acoustic_model of this InlineObject.
-
-        UUID of the acoustic model  # noqa: E501
-
-        :param acoustic_model: The acoustic_model of this InlineObject.
-        :type acoustic_model: str
-        """
-
-        self._acoustic_model = acoustic_model
+        self._audio_file = audio_file

@@ -6,7 +6,7 @@ import unittest
 from flask import json
 from six import BytesIO
 
-from openapi_server.models.inline_object import InlineObject  # noqa: E501
+from openapi_server.models.create_project_object import CreateProjectObject  # noqa: E501
 from openapi_server.models.project import Project  # noqa: E501
 from openapi_server.test import BaseTestCase
 
@@ -19,7 +19,10 @@ class TestProjectController(BaseTestCase):
 
         Create a new project
         """
-        inline_object = {}
+        create_project_object = {
+  "name" : "MyProject",
+  "acoustic_model" : "550e8400-e29b-11d4-a716-446655440000"
+}
         headers = { 
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -29,7 +32,7 @@ class TestProjectController(BaseTestCase):
             '/api/v1/project',
             method='POST',
             headers=headers,
-            data=json.dumps(inline_object),
+            data=json.dumps(create_project_object),
             content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))

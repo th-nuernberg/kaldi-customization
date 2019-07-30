@@ -4,39 +4,57 @@ import redis
 import json
 import config
 
-from openapi_server.models.inline_object import InlineObject  # noqa: E501
+from openapi_server.models.acoustic_model import AcousticModel
+from openapi_server.models.acoustic_model_type import AcousticModelType
+from openapi_server.models.create_project_object import CreateProjectObject  # noqa: E501
 from openapi_server.models.project import Project  # noqa: E501
 from openapi_server.models.training_status import TrainingStatus  # noqa: E501
 from openapi_server import util
 
-from models import db, Project as DB_Project, TrainingStateEnum as DB_TrainingStateEnum
+from models import db, Project as DB_Project, TrainingStateEnum as DB_TrainingStateEnum, User as DB_User, AcousticModel as DB_AcousticModel
 
-import uuid
-
-def create_project(inline_object):  # noqa: E501
+def create_project(create_project_object=None):  # noqa: E501
     """Create a new project
 
      # noqa: E501
 
-    :param inline_object: 
-    :type inline_object: dict | bytes
+    :param create_project_object: Project object that needs to be created
+    :type create_project_object: dict | bytes
 
     :rtype: Project
     """
     if connexion.request.is_json:
-        inline_object = InlineObject.from_dict(connexion.request.get_json())  # noqa: E501
-        db_proj = DB_Project(
-            api_token=str(uuid.uuid4().hex) + str(uuid.uuid4().hex),
-            name=body.name,
-            uuid=uuid.uuid4().hex,
-            status=DB_TrainingStateEnum.Training_Success
-        )
-        db.session.add(db_proj)
-        db.session.commit()
-        return db_proj.uuid
+        create_project_object = CreateProjectObject.from_dict(connexion.request.get_json())  # noqa: E501
     else:
         return (405, 'Invalid input')
-    return 'do some magic!'
+
+    # Resolve acoustic model
+    db_acousticModel = DB_AcousticModel.query.filter_by(uuid=create_project_object.acoustic_model).first()
+
+    if not db_acousticModel:
+        return ("Acoustic Model not found", 404)
+
+    my_user = DB_User.query.get(1)
+
+    db_proj = DB_Project(
+        #api_token=str(uuid.uuid4().hex) + str(uuid.uuid4().hex),
+        name=create_project_object.name,
+        owner=my_user,
+        acoustic_model=db_acousticModel
+        #TODO: how to set parent model?
+    )
+    db.session.add(db_proj)
+    db.session.commit()
+
+    return Project(
+        name=db_proj.name,
+        uuid=db_proj.uuid,
+        acoustic_model=AcousticModel(
+            uuid=db_acousticModel.uuid,
+            name=db_acousticModel.name,
+            model_type=AcousticModelType.AcousticModelTypeEnum_to_AcousticModelType(db_acousticModel.model_type)
+        )
+    )
 
 
 def download_training_result(project_uuid):  # noqa: E501

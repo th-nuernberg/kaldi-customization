@@ -1,5 +1,6 @@
-from ._db import db
+from ._db import db, AlchemyEncoder, generate_uuid
 import enum
+import json
 
 class ModelType(enum.IntEnum):
     HMM_GMM = 100
@@ -17,12 +18,14 @@ class ModelType(enum.IntEnum):
 class AcousticModel(db.Model):
     __tablename__ = 'acousticmodels'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(255))
+    uuid = db.Column(db.String(36), name="uuid", primary_key=True, default=generate_uuid)
 
     language = db.relationship('Language')#, backref=db.backref('project', remote_side=[id], lazy=True, cascade='all,delete'))
     language_id = db.Column(db.Integer,db.ForeignKey("languages.id"))
     model_type = db.Column(db.Enum(ModelType), nullable=True)
 
     def __repr__(self):
-        return '{{"id":{},"name":{},"language":{},"model_type":{}}}'.format(self.id, self.name,self.language.name,ModelType.type_to_string(self.model_type))
+        return json.dumps(self, cls=AlchemyEncoder)
+        

@@ -20,21 +20,10 @@ paths:
     post:
       operationId: create_project
       requestBody:
-        $ref: '#/components/requestBodies/inline_object'
         content:
           application/json:
             schema:
-              properties:
-                name:
-                  description: Name of the new project
-                  example: MyProject
-                  type: string
-                acoustic_model:
-                  description: UUID of the acoustic model
-                  example: 550e8400-e29b-11d4-a716-446655440000
-                  format: uuid
-                  type: string
-              type: object
+              $ref: '#/components/schemas/CreateProjectObject'
         description: Project object that needs to be created
         required: true
       responses:
@@ -240,7 +229,7 @@ paths:
           type: integer
         style: simple
       requestBody:
-        $ref: '#/components/requestBodies/inline_object_1'
+        $ref: '#/components/requestBodies/inline_object'
         content:
           multipart/form-data:
             schema:
@@ -665,7 +654,7 @@ paths:
     post:
       operationId: create_resource
       requestBody:
-        $ref: '#/components/requestBodies/inline_object_2'
+        $ref: '#/components/requestBodies/inline_object_1'
         content:
           multipart/form-data:
             schema:
@@ -895,15 +884,9 @@ components:
       required: true
     inline_object:
       content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/inline_object'
-      required: true
-    inline_object_2:
-      content:
         multipart/form-data:
           schema:
-            $ref: '#/components/schemas/inline_object_2'
+            $ref: '#/components/schemas/inline_object'
       required: true
   schemas:
     AcousticModel:
@@ -1154,7 +1137,10 @@ components:
       required:
       - username
       type: object
-    inline_object:
+    CreateProjectObject:
+      example:
+        name: MyProject
+        acoustic_model: 550e8400-e29b-11d4-a716-446655440000
       properties:
         name:
           description: Name of the new project
@@ -1165,8 +1151,11 @@ components:
           example: 550e8400-e29b-11d4-a716-446655440000
           format: uuid
           type: string
+      required:
+      - acoustic_model
+      - name
       type: object
-    inline_object_1:
+    inline_object:
       properties:
         audio_file:
           description: Audio file for decoding
@@ -1183,7 +1172,7 @@ components:
           example: 550e8400-e29b-11d4-a716-446655440000
           format: uuid
           type: string
-    inline_object_2:
+    inline_object_1:
       properties:
         upfile:
           description: File object that needs to be uploaded
