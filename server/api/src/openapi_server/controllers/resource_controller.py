@@ -127,7 +127,8 @@ def create_resource(upfile):  # noqa: E501
         name=db_file.name,
         status=ResourceStatus.ResourceStateEnum_to_ResourceStatus(db_file.status),
         resource_type=ResourceType.ResourceTypeEnum_to_ResourceType(db_file.resource_type),
-        uuid=db_file.uuid
+        uuid=db_file.uuid,
+        creation_timestamp=db_file.upload_date
     )
 
 def delete_assigned_resource_from_training(project_uuid, training_version, resource_uuid):  # noqa: E501
@@ -180,7 +181,8 @@ def get_resource():  # noqa: E501
         name=r.name,
         status=ResourceStatus.ResourceStateEnum_to_ResourceStatus(r.status),
         resource_type=ResourceType.ResourceTypeEnum_to_ResourceType(r.resource_type),
-        uuid=r.uuid
+        uuid=r.uuid,
+        creation_timestamp=r.upload_date
     ) for r in db_resources ]
 
 
@@ -207,7 +209,8 @@ def get_resource_by_uuid(resource_uuid):  # noqa: E501
         name=db_file.name, 
         status=ResourceStatus.ResourceStateEnum_to_ResourceStatus(db_file.status),
         resource_type=ResourceType.ResourceTypeEnum_to_ResourceType(db_file.resource_type),
-        uuid=db_file.uuid
+        uuid=db_file.uuid,
+        creation_timestamp=db_file.upload_date
     )
 
     return this_resource
