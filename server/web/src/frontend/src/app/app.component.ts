@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { UserService, ProjectService } from 'swagger-client';
+import { UserService, ProjectService } from '../../projects/swagger-client/src';
 
 @Component({
   selector: 'app-root',

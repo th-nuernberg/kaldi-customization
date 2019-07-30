@@ -30,7 +30,7 @@ import { ProjectComponent, ModelOverviewDialog } from './project/project.compone
 import { CoverComponent } from './cover/cover.component';
 import { UploadComponent } from './upload/upload.component';
 import { AccountComponent } from './account/account.component';
-import { ApiModule } from 'swagger-client';
+import { ApiModule } from '../../projects/swagger-client/src';
 import { IdentityService } from '../identity.service';
 
 import { TileComponent } from './dashboard/tile/tile.component';

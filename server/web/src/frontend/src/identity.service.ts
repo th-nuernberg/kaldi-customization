@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Configuration } from 'swagger-client';
+import { Configuration } from '../projects/swagger-client/src';
 
 @Injectable({
   providedIn: 'root'
