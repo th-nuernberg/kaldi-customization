@@ -29,11 +29,11 @@ const FILE_DATA: HistoryFile[] = [
 
 @Component({
   selector: 'app-dashboard',
-  templateUrl: './upload.component.html',
-  styleUrls: ['./upload.component.less'],
+  templateUrl: './training.upload.component.html',
+  styleUrls: ['./training.upload.component.less'],
 })
 
-export class UploadComponent implements OnInit {
+export class TrainingUploadComponent implements OnInit {
 
   private fileContent;
 

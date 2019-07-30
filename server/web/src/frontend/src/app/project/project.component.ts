@@ -45,21 +45,21 @@ export class ProjectComponent implements OnInit {
       name: "Model 1",
       fileResultName: "model1.pdf",
       date: "01.01.1970",
-      link: "/upload/_",
+      link: "/upload/_/decoding",
       texte: "Reißverschlussverfahren"
     },
     {
       name: "Model 2",
       fileResultName: "model2.pdf",
       date: "01.01.1970",
-      link: "/upload/_",
+      link: "/upload/_/training",
       texte: "Bla bla bla Mr. Freeman"
     },
     {
       name: "Model 3",
       fileResultName: "model3.pdf",
       date: "01.01.1970",
-      link: "/upload/_",
+      link: "/upload/_/decoding",
       texte: "Moin moin und Hallo!"
     }
   ];

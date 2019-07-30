@@ -28,7 +28,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ProjectComponent, ModelOverviewDialog } from './project/project.component';
 import { CoverComponent } from './cover/cover.component';
-import { UploadComponent } from './upload/upload.component';
+import { DecodingUploadComponent } from './upload/decoding/decoding.upload.component';
+import { TrainingUploadComponent } from './upload/training/training.upload.component';
 import { AccountComponent } from './account/account.component';
 import { ApiModule } from '../../projects/swagger-client/src';
 import { IdentityService } from '../identity.service';
@@ -41,7 +42,8 @@ import { TileComponent } from './dashboard/tile/tile.component';
     DashboardComponent,
     ProjectComponent,
     CoverComponent,
-    UploadComponent,
+    DecodingUploadComponent,
+    TrainingUploadComponent,
     AccountComponent,
     TileComponent,
     ModelOverviewDialog
