@@ -106,3 +106,19 @@ def train_project(project_uuid):  # noqa: E501
     return TrainingStatus.Training_Pending
 
 '''
+
+
+def get_projects():  # noqa: E501
+    """Returns a list of available projects
+
+     # noqa: E501
+
+
+    :rtype: List[Project]
+    """
+    #TODO filter by user
+
+    db_projects = DB_Project.query.all()
+
+    return [ mapper.db_project_to_front(db_proj) for db_proj in db_projects ]
+    

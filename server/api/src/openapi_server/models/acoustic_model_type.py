@@ -42,4 +42,3 @@ class AcousticModelType(Model):
         :rtype: AcousticModelType
         """
         return util.deserialize_model(dikt, cls)
-        

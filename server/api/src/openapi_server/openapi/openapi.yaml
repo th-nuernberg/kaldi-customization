@@ -17,6 +17,27 @@ tags:
   name: decode
 paths:
   /project:
+    get:
+      operationId: get_projects
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Project'
+                type: array
+          description: List of projects
+        403:
+          content: {}
+          description: Forbidden
+      security:
+      - oauth:
+        - read:projects
+      summary: Returns a list of available projects
+      tags:
+      - project
+      x-openapi-router-controller: openapi_server.controllers.project_controller
     post:
       operationId: create_project
       requestBody:

@@ -46,4 +46,3 @@ class ResourceStatus(Model):
         :rtype: ResourceStatus
         """
         return util.deserialize_model(dikt, cls)
-        
