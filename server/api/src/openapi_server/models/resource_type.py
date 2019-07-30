@@ -45,15 +45,3 @@ class ResourceType(Model):
         :rtype: ResourceType
         """
         return util.deserialize_model(dikt, cls)
-
-    @staticmethod
-    def ResourceTypeEnum_to_ResourceType(resourceType):
-        return {
-            1: ResourceType.html,
-            2: ResourceType.docx,
-            3: ResourceType.txt,
-            4: ResourceType.pdf,
-            5: ResourceType.png,
-            6: ResourceType.jpg
-            }[resourceType]
-            

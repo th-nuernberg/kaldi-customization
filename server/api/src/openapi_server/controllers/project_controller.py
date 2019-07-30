@@ -13,6 +13,8 @@ from openapi_server import util
 
 from models import db, Project as DB_Project, TrainingStateEnum as DB_TrainingStateEnum, User as DB_User, AcousticModel as DB_AcousticModel
 
+from mapper import mapper
+
 def create_project(create_project_object=None):  # noqa: E501
     """Create a new project
 
@@ -46,15 +48,7 @@ def create_project(create_project_object=None):  # noqa: E501
     db.session.add(db_proj)
     db.session.commit()
 
-    return Project(
-        name=db_proj.name,
-        uuid=db_proj.uuid,
-        acoustic_model=AcousticModel(
-            uuid=db_acousticModel.uuid,
-            name=db_acousticModel.name,
-            model_type=AcousticModelType.AcousticModelTypeEnum_to_AcousticModelType(db_acousticModel.model_type)
-        )
-    )
+    return mapper.db_project_to_front(db_proj)
 
 
 def download_training_result(project_uuid):  # noqa: E501
@@ -80,7 +74,16 @@ def get_project_by_uuid(project_uuid):  # noqa: E501
 
     :rtype: Project
     """
-    return 'do some magic!'
+
+    #TODO: check the ownership of the file
+    # db_file.owner
+
+    db_proj = DB_Project.query.filter_by(uuid=project_uuid).first()
+
+    if (db_proj is None):
+        return ("Project not found", 404)
+
+    return mapper.db_project_to_front(db_proj)
 
 '''
 def train_project(project_uuid):  # noqa: E501

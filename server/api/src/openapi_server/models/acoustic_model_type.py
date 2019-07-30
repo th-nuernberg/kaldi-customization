@@ -42,11 +42,4 @@ class AcousticModelType(Model):
         :rtype: AcousticModelType
         """
         return util.deserialize_model(dikt, cls)
-
-    @staticmethod
-    def AcousticModelTypeEnum_to_AcousticModelType(modelType):
-        return {
-            100: AcousticModelType.HMM_GMM,
-            200: AcousticModelType.HMM_DNN,
-            300: AcousticModelType.HMM_RNN
-            }[modelType]
+        

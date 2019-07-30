@@ -46,16 +46,4 @@ class ResourceStatus(Model):
         :rtype: ResourceStatus
         """
         return util.deserialize_model(dikt, cls)
-
-    @staticmethod
-    def ResourceStateEnum_to_ResourceStatus(resourceState):
-        return {
-            0: ResourceStatus.Upload_InProgress,
-            1: ResourceStatus.Upload_Failure,
-            9: ResourceStatus.TextPreparation_Ready,
-
-            10: ResourceStatus.TextPreparation_Pending,
-            11: ResourceStatus.TextPreparation_InProcess,
-            12: ResourceStatus.TextPreparation_Failure,
-            13: ResourceStatus.TextPreparation_Success
-            }[resourceState]
+        
