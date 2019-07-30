@@ -27,7 +27,6 @@ def db_project_to_front(db_project):
     )
 
 def db_acousticModel_to_front(db_acousticModel):
-
     return AcousticModel(
         uuid=db_acousticModel.uuid,
         name=db_acousticModel.name,

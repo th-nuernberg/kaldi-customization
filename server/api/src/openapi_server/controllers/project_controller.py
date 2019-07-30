@@ -121,4 +121,3 @@ def get_projects():  # noqa: E501
     db_projects = DB_Project.query.all()
 
     return [ mapper.db_project_to_front(db_proj) for db_proj in db_projects ]
-    

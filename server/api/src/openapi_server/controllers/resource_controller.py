@@ -17,6 +17,7 @@ from flask import send_file
 from minio_communication import download_from_bucket, upload_to_bucket, minio_buckets
 from redis_communication import create_textprep_job
 from config import minio_client
+from mapper import mapper
 
 TEMP_UPLOAD_FOLDER = '/tmp/fileupload'
 
@@ -123,13 +124,7 @@ def create_resource(upfile):  # noqa: E501
 
         print('Created TextPreparation job: ' + str(db_file))
 
-    return Resource(
-        name=db_file.name,
-        status=ResourceStatus.ResourceStateEnum_to_ResourceStatus(db_file.status),
-        resource_type=ResourceType.ResourceTypeEnum_to_ResourceType(db_file.resource_type),
-        uuid=db_file.uuid,
-        creation_timestamp=db_file.upload_date
-    )
+    return mapper.db_resource_to_front(db_file)
 
 def delete_assigned_resource_from_training(project_uuid, training_version, resource_uuid):  # noqa: E501
     """Remove a resource from the training
@@ -177,13 +172,7 @@ def get_resource():  # noqa: E501
     #TODO filter by user
     db_resources = DB_Resource.query.all()
 
-    return [ Resource(
-        name=r.name,
-        status=ResourceStatus.ResourceStateEnum_to_ResourceStatus(r.status),
-        resource_type=ResourceType.ResourceTypeEnum_to_ResourceType(r.resource_type),
-        uuid=r.uuid,
-        creation_timestamp=r.upload_date
-    ) for r in db_resources ]
+    return [ mapper.db_resource_to_front(r) for r in db_resources ]
 
 
 def get_resource_by_uuid(resource_uuid):  # noqa: E501
@@ -205,15 +194,7 @@ def get_resource_by_uuid(resource_uuid):  # noqa: E501
     if (db_file is None):
         return ("File not found", 404)
 
-    this_resource = Resource(
-        name=db_file.name, 
-        status=ResourceStatus.ResourceStateEnum_to_ResourceStatus(db_file.status),
-        resource_type=ResourceType.ResourceTypeEnum_to_ResourceType(db_file.resource_type),
-        uuid=db_file.uuid,
-        creation_timestamp=db_file.upload_date
-    )
-
-    return this_resource
+    return mapper.db_resource_to_front(db_file)
 
 
 def get_resource_data(resource_uuid):  # noqa: E501
