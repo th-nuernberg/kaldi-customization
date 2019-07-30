@@ -10,13 +10,13 @@ import json
 
 redis_client = redis.Redis(host='localhost', port=6380, password='kalditproject')
 
-def create_kaldi_job(project_id,acoustic_model_id):
+def create_kaldi_job(training_id,acoustic_model_id):
     '''
     Creates a new job in the queue for a kaldi worker.
     '''
 
     entry = {
-        "project_id" : project_id,
+        "training_id" : training_id,
         "acoustic_model_id" : acoustic_model_id
     }
     redis_client.rpush(redis_queues["KALDI_QUEUE"], json.dumps(entry))

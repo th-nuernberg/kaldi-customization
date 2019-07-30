@@ -1,7 +1,7 @@
 #!/bin/bash
 . ./path.sh || exit 1
 
-[[ $# -ge 6 ]] && { echo "Usage: create_new_graph.sh <lexicon file> <corpus file> <acoustic model folder> <new graph dir> <temporary dir>"; exit 1; }
+[[ $# -ge 7 ]] && { echo "Usage: create_new_graph.sh <lexicon file> <corpus file> <acoustic model folder> <new graph dir> <temporary dir> <phone-symbol-table>"; exit 1; }
 
 lex_file=$1
 corp_file=$2
@@ -9,6 +9,7 @@ acoustic_model=$3
 lm_order=3
 new_graph_dir=$4
 tmp_dir=$5
+phone_symbol_table=$6
 
 new_lang_dir=$tmp_dir/lang
 new_local_dir=$tmp_dir/local
@@ -29,7 +30,7 @@ echo "sil" >> $new_local_dir/dict/optional_silence.txt
 
 echo "Preparing Language data"
 #utils/prepare_lang.sh $new_local_dir/dict "<SPN>" $new_local_dir/lang $new_lang_dir
-utils/prepare_lang.sh $new_local_dir/dict "<SIL>" $new_local_dir/lang $new_lang_dir
+utils/prepare_lang.sh --phone-symbol-table $phone_symbol_table $new_local_dir/dict "<SIL>" $new_local_dir/lang $new_lang_dir
 
 echo "Creating Language Model"
 echo "making lm.arpa"

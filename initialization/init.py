@@ -11,6 +11,8 @@ import logging
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 
+import datetime
+
 REDIS_PASSWORD="kalditproject"
 
 MINIO_ACCESS_KEY="AKIAIOSFODNN7EXAMPLE"
@@ -35,7 +37,6 @@ with app.app_context():
     db.init_app(app)
     db.drop_all()
     db.create_all()
-    """
     logging.basicConfig()
     logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
@@ -51,17 +52,19 @@ with app.app_context():
     user = User(username = "kaldi" , pw_hash="213123123", salt = "Dino")
     db.session.add(user)
 
-    test_project = Project(name = "TestProject", uuid = "12345678901234567890123456789012", api_token = "Hallo", owner = user,acoustic_model = Voxforge_RNN, status = ProjectStateEnum.Init)
+    test_project = Project(name = "TestProject", uuid = "12345678901234567890123456789012", owner = user,acoustic_model = Voxforge_RNN)
+    db.session.add(test_project)
+
+    test_training = Training(project = test_project, version = 1, create_date = datetime.datetime.now(), status = TrainingStateEnum.Init)
     db.session.add(test_project)
     
     db.session.commit()
 
     #commit generates ids, we need them later so safe them before closing the session
     test_project_id = test_project.id
-
-    voxfore_rnn_id = Voxforge_RNN.id
+    test_train_id = test_training.id
     db.session.close()
-    """
+
     db.session.commit()
 
 '''Create buckets if they do not exist'''
@@ -80,8 +83,20 @@ voxfore_rnn_id = 1
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/final.mdl"  , "initialization/acoustic-models/voxforge-rnn/final.mdl")
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/lexicon.txt"  , "initialization/acoustic-models/voxforge-rnn/lexicon.txt")
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/tree"  , "initialization/acoustic-models/voxforge-rnn/tree")
+upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/phones.txt"  , "initialization/acoustic-models/voxforge-rnn/phones.txt")
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/g2p_model.fst"  , "initialization/acoustic-models/voxforge-rnn/g2p_model.fst")
+upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/cmvn_opts"  , "initialization/acoustic-models/voxforge-rnn/cmvn_opts")
+upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/final.dubm"  , "initialization/acoustic-models/voxforge-rnn/extractor/final.dubm")
+upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/final.ie"  , "initialization/acoustic-models/voxforge-rnn/extractor/final.ie")
+upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/final.ie.id"  , "initialization/acoustic-models/voxforge-rnn/extractor/final.ie.id")
+upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/final.mat"  , "initialization/acoustic-models/voxforge-rnn/extractor/final.mat")
+upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/global_cmvn.stats"  , "initialization/acoustic-models/voxforge-rnn/extractor/global_cmvn.stats")
+upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/online_cmvn.conf"  , "initialization/acoustic-models/voxforge-rnn/extractor/online_cmvn.conf")
+upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/splice_opts"  , "initialization/acoustic-models/voxforge-rnn/extractor/splice_opts")
 
 # Test Project
-upload_to_bucket(minio_client,minio_buckets["TRAINING_BUCKET"], str(voxfore_rnn_id) + "/corpus.txt"  , "initialization/example/corpus.txt")
-upload_to_bucket(minio_client,minio_buckets["TRAINING_BUCKET"], str(voxfore_rnn_id) + "/lexicon.txt"  , "initialization/example/lexicon.txt")
+upload_to_bucket(minio_client,minio_buckets["TRAINING_BUCKET"], str(test_train_id) + "/corpus.txt"  , "initialization/example/corpus.txt")
+upload_to_bucket(minio_client,minio_buckets["TRAINING_BUCKET"], str(test_train_id) + "/lexicon.txt"  , "initialization/example/lexicon.txt")
+
+# Test Decode
+upload_to_bucket(minio_client,minio_buckets["DECODING_BUCKET"], "test.wav", "initialization/example/test.wav")
