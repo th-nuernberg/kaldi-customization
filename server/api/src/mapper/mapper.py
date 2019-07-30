@@ -1,6 +1,7 @@
 from openapi_server.models.acoustic_model import AcousticModel
 from openapi_server.models.acoustic_model_type import AcousticModelType
 from openapi_server.models.project import Project
+from openapi_server.models.training import Training
 from openapi_server.models.training_status import TrainingStatus
 from openapi_server.models.user import User
 from openapi_server.models.language import Language
@@ -9,6 +10,8 @@ from openapi_server.models.resource_type import ResourceType
 from openapi_server.models.resource_status import ResourceStatus
 
 from models import db, Project as DB_Project, TrainingStateEnum as DB_TrainingStateEnum, User as DB_User, AcousticModel as DB_AcousticModel
+from models.training_resource import TrainingResource as DB_TrainingResource
+from models.training import Training as DB_Training
 
 def db_project_to_front(db_project):
     if db_project.parent:
@@ -16,12 +19,20 @@ def db_project_to_front(db_project):
     else:
         parent_uuid = None
 
+    #TODO filter by user?
+    trainings = DB_Training.query.filter_by(project=db_project).all()
+
+    if trainings:
+        training_list = [ db_training_to_front(t) for t in trainings ]
+    else:
+        training_list = None
+
     return Project(
         name=db_project.name,
         uuid=db_project.uuid,
         acoustic_model=db_acousticModel_to_front(db_project.acoustic_model),
         parent=parent_uuid,
-        #trainings=.,
+        trainings=training_list,
         creation_timestamp=db_project.create_date,
         owner=db_user_to_front(db_project.owner)
     )
@@ -55,6 +66,22 @@ def db_resource_to_front(db_resource):
         creation_timestamp=db_resource.upload_date
     )
 
+def db_training_to_front(db_training):
+    #TODO filter by user?
+    resources = DB_TrainingResource.query.filter_by(training=db_training).all()
+
+    if resources:
+        resource_list = [ db_resource_to_front(r) for r in resources ]
+    else:
+        resource_list = None
+
+    return Training(
+        version=db_training.version,
+        creation_timestamp=db_training.create_date,
+        status=TrainingStateEnum_to_TrainingStatus(db_training.status),
+        resources=resource_list
+    )
+
 def ResourceTypeEnum_to_ResourceType(resourceType):
     return {
         1: ResourceType.html,
@@ -78,8 +105,18 @@ def ResourceStateEnum_to_ResourceStatus(resourceState):
         }[resourceState]
 
 def AcousticModelTypeEnum_to_AcousticModelType(modelType):
-        return {
-            100: AcousticModelType.HMM_GMM,
-            200: AcousticModelType.HMM_DNN,
-            300: AcousticModelType.HMM_RNN
-            }[modelType]
+    return {
+        100: AcousticModelType.HMM_GMM,
+        200: AcousticModelType.HMM_DNN,
+        300: AcousticModelType.HMM_RNN
+        }[modelType]
+
+def TrainingStateEnum_to_TrainingStatus(trainingState):
+    return {
+        100: TrainingStatus.Init,
+        200: TrainingStatus.Trainable,
+        210: TrainingStatus.Training_Pending,
+        220: TrainingStatus.Training_In_Progress,
+        300: TrainingStatus.Training_Success,
+        320: TrainingStatus.Training_Failure
+        }[trainingState]

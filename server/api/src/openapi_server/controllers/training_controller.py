@@ -5,6 +5,13 @@ from openapi_server.models.resource import Resource  # noqa: E501
 from openapi_server.models.training import Training  # noqa: E501
 from openapi_server import util
 
+from models import db
+from models.project import Project as DB_Project
+from models.user import User as DB_User
+from models.acousticmodel import AcousticModel as DB_AcousticModel
+from models.training import Training as DB_Training, TrainingStateEnum as DB_TrainingStateEnum
+
+from mapper import mapper
 
 def assign_resource_to_training(project_uuid, training_version, resource_uuid):  # noqa: E501
     """Assign a resource to the training
@@ -33,7 +40,20 @@ def create_training(project_uuid):  # noqa: E501
 
     :rtype: Training
     """
-    return 'do some magic!'
+    #TODO: check the ownership of the file
+
+    db_proj = DB_Project.query.filter_by(uuid=project_uuid).first()
+
+    if (db_proj is None):
+        return ("Project not found", 404)
+
+    db_training = DB_Training(
+        project=db_proj
+    )
+    db.session.add(db_training)
+    db.session.commit()
+
+    return mapper.db_training_to_front(db_training)
 
 
 def delete_assigned_resource_from_training(project_uuid, training_version, resource_uuid):  # noqa: E501
