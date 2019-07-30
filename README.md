@@ -1,5 +1,7 @@
 # Kaldi Customization
 
+***Use the env.cmd or env.sh script in your shell to setup the environment variables for docker-compose!***
+
 * Web Interface: [localhost:8080](http://localhost:8080)
 * Web API: [localhost:8080/api](http://localhost:8080/api)
 

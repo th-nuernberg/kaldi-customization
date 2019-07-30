@@ -30,6 +30,8 @@ import { ProjectComponent, ModelOverviewDialog } from './project/project.compone
 import { CoverComponent } from './cover/cover.component';
 import { UploadComponent } from './upload/upload.component';
 import { AccountComponent } from './account/account.component';
+import { ApiModule } from 'swagger-client';
+import { IdentityService } from '../identity.service';
 
 import { TileComponent } from './dashboard/tile/tile.component';
 
@@ -45,6 +47,7 @@ import { TileComponent } from './dashboard/tile/tile.component';
     ModelOverviewDialog
   ],
   imports: [
+    ApiModule.forRoot(IdentityService.getApiConfiguration),
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
     AppRoutingModule,
     CommonModule,

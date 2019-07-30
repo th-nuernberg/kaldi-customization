@@ -1,19 +1,23 @@
 FROM python:3.7-alpine3.9
-MAINTAINER Tobias Kruse <***REMOVED***>
+LABEL maintainer="Tobias Kruse <***REMOVED***>"
 
 EXPOSE 5000
-VOLUME ["/www/asr", "/www/texts"]
 
-ADD requirements.txt /www/requirements.txt
+ADD server/api/requirements.txt /www/requirements.txt
+ADD shared/connector/requirements.txt /www/connector/requirements.txt
 WORKDIR /www
 
 RUN apk add build-base libffi-dev openssl-dev mariadb-connector-c-dev --no-cache && \
-    pip install -r requirements.txt && \
+    pip install --no-cache-dir  -r requirements.txt && \
+    pip install --no-cache-dir -r /www/connector/requirements.txt && \
     apk del build-base
 
-ADD src /www
-ADD wait-for.sh /tools/wait-for.sh
+ADD server/api/src /www
+ADD shared/connector /www/connector
+ADD shared/wait-for.sh /tools/wait-for.sh
+ADD shared/minio_communication.py /www/minio_communication.py
+ADD shared/redis_config.py /www/redis_config.py
 
-ENV FLASK_APP=/www/app.py
+ENV AUTHLIB_INSECURE_TRANSPORT=true
 
-CMD ["/bin/sh", "/tools/wait-for.sh", "db:3306", "--", "python", "-m", "flask", "run", "--host=0.0.0.0"]
+CMD ["python", "-u", "/www/app.py"]

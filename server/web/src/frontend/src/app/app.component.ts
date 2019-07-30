@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { UserService, ProjectService } from 'swagger-client';
 
 @Component({
   selector: 'app-root',
@@ -6,4 +7,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.less']
 })
 export class AppComponent {
+  constructor(userService: UserService, projectService: ProjectService) {
+    
+  }
 }
