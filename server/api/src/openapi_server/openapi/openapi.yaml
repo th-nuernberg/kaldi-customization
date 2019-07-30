@@ -15,7 +15,43 @@ tags:
   name: user
 - description: Operations about decoding
   name: decode
+- description: Global operations
+  name: global
+- description: Operations about resources
+  name: resource
 paths:
+  /global/acousticmodels:
+    get:
+      operationId: get_acoustic_models
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AcousticModel'
+                type: array
+          description: List of acoustic models
+      summary: Returns a list of available acoustic models
+      tags:
+      - global
+      x-openapi-router-controller: openapi_server.controllers.global_controller
+  /global/languages:
+    get:
+      operationId: get_languages
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Language'
+                type: array
+          description: List of acoustic models
+      summary: Returns a list of available languages
+      tags:
+      - global
+      x-openapi-router-controller: openapi_server.controllers.global_controller
   /project:
     get:
       operationId: get_projects
@@ -984,7 +1020,7 @@ components:
     Project:
       example:
         owner:
-          id: 1
+          id: 0
           username: username
         parent: 550e8400-e29b-11d4-a716-446655440000
         creation_timestamp: 2000-01-23T04:56:07.000+00:00
@@ -1147,7 +1183,7 @@ components:
       type: object
     User:
       example:
-        id: 1
+        id: 0
         username: username
       properties:
         id:
