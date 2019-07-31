@@ -1,161 +1,67 @@
-<!-- Upload overview-->
-<div style="height: calc(100vh - 56px);">
-  <div flex fxLayout="row"
-      fxLayoutAlgin="center center"
-      fxLayout.xs="column"
-      fxLayoutAlign.xs="center stretch">
-    <!-- File History panel -->
-    <div class="upload-panel" fxFlex="33">
-      <h2>Dateien</h2>
-      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-        <!-- Checkbox Column -->
-        <ng-container matColumnDef="select">
-          <th mat-header-cell *matHeaderCellDef>
-            <mat-checkbox (change)="$event ? masterToggle() : null"
-                          [checked]="historySelection.hasValue() && isAllSelected()"
-                          [indeterminate]="historySelection.hasValue() && !isAllSelected()"
-                          [aria-label]="checkboxLabel()">
-            </mat-checkbox>
-          </th>
-          <td mat-cell *matCellDef="let row">
-            <mat-checkbox (click)="$event.stopPropagation()"
-                          (change)="$event ? historySelection.toggle(row) : null"
-                          [checked]="historySelection.isSelected(row)"
-                          [aria-label]="checkboxLabel(row)">
-            </mat-checkbox>
-          </td>
-        </ng-container>
+<mat-horizontal-stepper labelPosition="bottom" #stepper>
+    <mat-step [stepControl]="firstFormGroup">
+        <form [formGroup]="firstFormGroup">
+            <ng-template matStepLabel>Umfeld</ng-template>
+            <div>
+              <h2>Environment</h2>
+              <mat-list *ngFor='let info of environment'>
+                <mat-list-item>
+                  <p>Projekt: {{info.project}}</p>
+                  <p>Modell: {{info.model}}</p>
+                  <p>Vorheriges Modell: {{info.prevModel}}</p>
+                  <p>Status: {{info.modelStatus}}</p>
+                  <p>Datum: {{info.date}}</p>
+                </mat-list-item>
+              </mat-list>
+            </div>
+            <div>
+                <button mat-button matStepperNext>Next</button>
+            </div>
+        </form>
+    </mat-step>
 
-        <!-- Position Column -->
-        <ng-container matColumnDef="position">
-          <th mat-header-cell *matHeaderCellDef> No. </th>
-          <td mat-cell *matCellDef="let element"> {{element.position}} </td>
-        </ng-container>
 
-        <!-- Name Column -->
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef> Name </th>
-          <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-        </ng-container>
+    <mat-step [stepControl]="secondFormGroup">
+        <form [formGroup]="secondFormGroup">
+            <ng-template matStepLabel>Füge deine Audio Dateien hinzu</ng-template>
+            <div>
+              <h2>Audio Dateien</h2>
+              <!-- Current File panel -->
+              <div>
+                <mat-selection-list
+                  (selectionChange)="handleSelection($event, file)">
+                  <mat-list-option
+                    *ngFor='let file of uploadedFiles'
+                    [selected]='file.selected'
+                    [value]="file.name">
+                    <p mat-line>{{file.name}}</p>
+                  </mat-list-option>
+                </mat-selection-list>
+                <button
+                  mat-flat-button
+                  class="uploadFile_Button" 
+                  color="primary"
+                  [disabled]="isRemoveDisabled()"              
+                  (click)="remove()">
+                  <!-- TODO update to new file format / resource format-->
+                  <mat-icon aria-hidden="false" aria-label="Example delete icon">delete</mat-icon>
+                </button>
+              </div>
+            </div>
+            <div>
+                <button mat-button matStepperPrevious>Back</button>
+                <button mat-button matStepperNext>Next</button>
+            </div>
+        </form>
+    </mat-step>
 
-        <!-- Upload Column -->
-        <ng-container matColumnDef="uploaded">
-          <th mat-header-cell *matHeaderCellDef> Uploaded </th>
-          <td mat-cell *matCellDef="let element"> {{element.uploaded}} </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-            (click)="historySelection.toggle(row)">
-        </tr>
-      </table>
-      <div>
-        <button
-          mat-flat-button 
-          color="accent"
-          class="uploadFile_Button"
-          (click)="copy()">
-          <!-- TODO: update to new file format / resource format -->
-          <mat-icon aria-hidden="false" aria-label="Example add icon">library_add</mat-icon>
-        </button>
-        
-        <input #file id="fileInput" type="file" style="display:none" (change)="loadFile(file)" />
-        <button 
-          mat-flat-button 
-          color="primary" 
-          class="uploadFile_Button" 
-          onclick="document.getElementById('fileInput').click()">
-          <!-- TODO update to new file format / resource format -->
-          <mat-icon aria-hidden="false" aria-label="Example upload icon">cloud_upload</mat-icon>
-        </button>
-      </div>
-    </div>
     
-    <div class="panel-divider"></div>
-
-    <!-- Current File panel -->
-    <div class="upload-panel" fxFlex="33">
-      <h2>Modell</h2>
-      <mat-selection-list
-        (selectionChange)="handleSelection($event, file)">
-        <mat-list-option
-          *ngFor='let file of uploadedFiles'
-          [selected]='file.selected'
-          [value]="file.name">
-          <p mat-line>{{file.name}}</p>
-        </mat-list-option>
-      </mat-selection-list>
-      <button
-        mat-flat-button
-        class="uploadFile_Button" 
-        color="primary"
-        [disabled]="isRemoveDisabled()"              
-        (click)="remove()">
-        <!-- TODO update to new file format / resource format-->
-        <mat-icon aria-hidden="false" aria-label="Example delete icon">delete</mat-icon>
-      </button>
-
-      <div>
-        <form class="text-content-form" *ngIf="showContentPreview">
-          <mat-form-field class="text-content-full">
-            <textarea
-              matInput
-              cdkTextareaAutosize
-              cdkAutosizeMinRows="12" 
-              cdkAutosizeMaxRows="12"
-              readonly=true>
-              {{fileContent}}</textarea>
-          </mat-form-field>
-        </form>      
-      </div>
-    </div>
-    
-    <div class="panel-divider"></div>
-
-    <!-- Details -->
-    <div
-      class="upload-panel"
-      fxFlex="33"
-      *ngFor='let detail of fileDetails'>
-      <h2>Details</h2>
-      <div>
-          <p>Projekt: {{detail.project}}</p>
-          <p>Modell: {{detail.model}}</p>
-      </div>
-      <div>
-        <mat-list
-          class="details">
-          <mat-list-item>
-              <p>{{detail.numberFilesName}} {{detail.numberFiles}}</p>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item>
-            <p>{{detail.numberSentencesName}} {{detail.numberSentences}}</p>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item>
-            <p>{{detail.numberWordsName}} {{detail.numberWords}}</p>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-        </mat-list>
-        <button
-          class="uploadFile_Button"
-          mat-flat-button 
-          *ngIf="!show" 
-          (click)="toggleSave()"
-          color="warn">
-          <!-- TODO update to new file format / resource format-->
-          <mat-icon aria-hidden="false" aria-label="Example delete icon">spellcheck</mat-icon>
-        </button>
-        <button
-          class="uploadFile_Button" 
-          mat-flat-button 
-          *ngIf="show"
-          color="warn">
-          <!-- TODO update to new file format / resource format-->
-          <mat-icon aria-hidden="false" aria-label="Example delete icon">play_circle_filled_white</mat-icon>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+    <mat-step>
+        <ng-template matStepLabel>Start das Decode</ng-template>
+        You are now done.
+        <div>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button (click)="stepper.reset()">Reset</button>
+        </div>
+    </mat-step>
+</mat-horizontal-stepper>

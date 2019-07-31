@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
 import { TransferHttpCacheModule } from '@nguniversal/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgtUniversalModule } from '@ng-toolkit/universal';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   MatButtonModule,
   MatCheckboxModule,
@@ -22,6 +22,8 @@ import {
   MatDividerModule,
   MatInputModule,
   MatTableModule,
+  MatStepperModule,
+  MatAutocompleteModule,
 } from '@angular/material';
 
 import { MatDialogModule } from '@angular/material/dialog';
@@ -70,7 +72,10 @@ import { TileComponent } from './dashboard/tile/tile.component';
     MatTableModule,
     MatSelectModule,
     FormsModule,
+    ReactiveFormsModule,
     MatDialogModule,
+    MatStepperModule,
+    MatAutocompleteModule,
   ],
   providers: [],
   entryComponents: [

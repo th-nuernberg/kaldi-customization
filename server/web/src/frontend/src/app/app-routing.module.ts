@@ -12,7 +12,7 @@ const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'project/:uuid', component: ProjectComponent },
   { path: 'upload/decoding/:uuid', component: DecodingUploadComponent },
-  { path: 'upload/training/:uuid', component: DecodingUploadComponent },
+  { path: 'upload/training/:uuid', component: TrainingUploadComponent },
   { path: 'account',   component: AccountComponent },
 ];
 
