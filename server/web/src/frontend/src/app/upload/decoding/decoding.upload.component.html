@@ -1,106 +1,106 @@
 <div>
   <mat-horizontal-stepper labelPosition="bottom" #stepper>
-      <mat-step [stepControl]="firstFormGroup" class="decodingPage">
-          <form [formGroup]="firstFormGroup">
-              <ng-template matStepLabel>Umfeld</ng-template>
-              <div fxLayout="center center">
-                <mat-card class="example-card">
-                    <mat-card-content>
-                      <h2>Modell</h2>
-                      <mat-list *ngFor="let env of environment">
-                        <mat-list-item>
-                          <p>Projekt: {{env.project}}</p>
-                        </mat-list-item>
-                        <mat-divider></mat-divider>
-                        <mat-list-item>
-                          <p>Modell: {{env.model}}</p>
-                        </mat-list-item>
-                        <mat-divider></mat-divider>
-                        <mat-list-item>
-                          <p>Vorheriges Modell: {{env.prevModel}}</p>
-                        </mat-list-item>
-                        <mat-divider></mat-divider>
-                        <mat-list-item>
-                          <p>Status: {{env.modelStatus}}</p>
-                        </mat-list-item>
-                        <mat-divider></mat-divider>
-                        <mat-list-item>
-                          <p>Datum: {{env.date}}</p>
-                        </mat-list-item>
-                      </mat-list>
-                    </mat-card-content>
-                  </mat-card>
-              </div>
-              <div>
-                <button
-                  mat-flat-button
-                  matStepperNext
-                  class="uploadFile_Button"
-                  color="primary">Next</button>
-              </div>
-          </form>
+      <mat-step class="decodingPage">
+        <form>
+          <ng-template matStepLabel>Das Umfeld</ng-template>
+          <div fxLayout="center center">
+            <mat-card class="example-card">
+              <mat-card-content>
+                <h2>Modell</h2>
+                <mat-list *ngFor="let env of environment">
+                  <mat-list-item>
+                    <p>Projekt: {{env.project}}</p>
+                  </mat-list-item>
+                  <mat-divider></mat-divider>
+                  <mat-list-item>
+                    <p>Modell: {{env.model}}</p>
+                  </mat-list-item>
+                  <mat-divider></mat-divider>
+                  <mat-list-item>
+                    <p>Vorheriges Modell: {{env.prevModel}}</p>
+                  </mat-list-item>
+                  <mat-divider></mat-divider>
+                  <mat-list-item>
+                    <p>Status: {{env.modelStatus}}</p>
+                  </mat-list-item>
+                  <mat-divider></mat-divider>
+                  <mat-list-item>
+                    <p>Datum: {{env.date}}</p>
+                  </mat-list-item>
+                </mat-list>
+              </mat-card-content>
+            </mat-card>
+          </div>
+          <div>
+            <button
+              mat-flat-button
+              matStepperNext
+              class="uploadFile_Button"
+              color="primary">Next</button>
+          </div>
+        </form>
       </mat-step>
 
 
-      <mat-step [stepControl]="secondFormGroup">
-          <form [formGroup]="secondFormGroup">
-              <ng-template matStepLabel>Füge Dateien hinzu</ng-template>
-              <div fxLayout="center center">
-                <mat-card class="example-card">
-                  <mat-card-content>
-                    <h2>Audio Dateien</h2>
-                    <!-- Current File panel -->
-                    <div>
-                      <mat-selection-list
-                        (selectionChange)="handleSelection($event, file)">
-                        <mat-list-option
-                          *ngFor='let file of uploadedFiles'
-                          [selected]='file.selected'
-                          [value]="file.name">
-                          <p mat-line>{{file.name}}</p>
-                        </mat-list-option>
-                      </mat-selection-list>
-                      <input #file id="fileInput" type="file" style="display:none" (change)="loadFile(file)" />
-                      <button 
-                        mat-flat-button 
-                        color="warn" 
-                        class="uploadFile_Button" 
-                        onclick="document.getElementById('fileInput').click()">
-                        <!-- TODO update to new file format / resource format -->
-                        <mat-icon aria-hidden="false" aria-label="Example upload icon">cloud_upload</mat-icon>
-                      </button>
+      <mat-step class="decodingPage">
+        <form>
+          <ng-template matStepLabel>Füge Dateien hinzu</ng-template>
+          <div fxLayout="center center">
+            <mat-card class="example-card">
+              <mat-card-content>
+                <h2>Audio Dateien</h2>
+                <!-- Current File panel -->
+                <div>
+                  <mat-selection-list
+                    (selectionChange)="handleSelection($event, file)">
+                    <mat-list-option
+                      *ngFor='let file of uploadedFiles'
+                      [selected]='file.selected'
+                      [value]="file.name">
+                      <p mat-line>{{file.name}}</p>
+                    </mat-list-option>
+                  </mat-selection-list>
+                  <input #file id="fileInput" type="file" style="display:none" (change)="loadFile(file)" />
+                  <button 
+                    mat-flat-button 
+                    color="warn" 
+                    class="uploadFile_Button" 
+                    onclick="document.getElementById('fileInput').click()">
+                    <!-- TODO update to new file format / resource format -->
+                    <mat-icon aria-hidden="false" aria-label="Example upload icon">cloud_upload</mat-icon>
+                  </button>
 
-                      <button
-                        mat-flat-button
-                        class="uploadFile_Button" 
-                        color="warn"
-                        [disabled]="isRemoveDisabled()"              
-                        (click)="remove()">
-                        <!-- TODO update to new file format / resource format-->
-                        <mat-icon aria-hidden="false" aria-label="Example delete icon">delete</mat-icon>
-                      </button>
-                    </div>
-                  </mat-card-content>
-                </mat-card>
-              </div>
-              <div>
                   <button
                     mat-flat-button
-                    matStepperPrevious
-                    class="uploadFile_Button"
-                    color="primary">Back</button>
-                  <button
-                    mat-flat-button
-                    matStepperNext
-                    class="uploadFile_Button"
-                    color="primary">Next</button>
-              </div>
-          </form>
+                    class="uploadFile_Button" 
+                    color="warn"
+                    [disabled]="isRemoveDisabled()"              
+                    (click)="remove()">
+                    <!-- TODO update to new file format / resource format-->
+                    <mat-icon aria-hidden="false" aria-label="Example delete icon">delete</mat-icon>
+                  </button>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+          <div>
+            <button
+              mat-flat-button
+              matStepperPrevious
+              class="uploadFile_Button"
+              color="primary">Back</button>
+            <button
+              mat-flat-button
+              matStepperNext
+              class="uploadFile_Button"
+              color="primary">Next</button>
+          </div>
+        </form>
       </mat-step>
 
       
       <mat-step>
-          <ng-template matStepLabel>Check</ng-template>
+          <ng-template matStepLabel>Starte das Decoding</ng-template>
           <div fxLayout="center center">
             <mat-card class="example-card">
                 <mat-card-content>

@@ -34,7 +34,6 @@ const FILE_DATA: HistoryFile[] = [
 })
 
 export class TrainingUploadComponent implements OnInit {
-
   private fileContent;
 
   public show:boolean = false;
