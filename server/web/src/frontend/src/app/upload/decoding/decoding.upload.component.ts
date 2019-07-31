@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Input} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 export interface Environment {
@@ -7,6 +7,8 @@ export interface Environment {
   prevModel: string;
   modelStatus: string,
   date: string,
+  numberAudio: number;
+  listAudio: string[]
 }
 
 @Component({
@@ -17,13 +19,22 @@ export interface Environment {
 export class DecodingUploadComponent implements OnInit {
   firstFormGroup: FormGroup;
   secondFormGroup: FormGroup;
+  
+  environment: Environment[] = [
+    { 
+      project: 1,
+      model: 4,
+      prevModel: "default",
+      modelStatus: "Done",
+      date: "01.07.1970",
+      numberAudio: 1,
+      listAudio: [ "foo.wav" ],
+    },
+  ];
 
   public currentFiles: string[] = [];
   public uploadedFiles : { name: string, selected: boolean; }[] = [];
 
-  environment: Environment[] = [
-    { project: 1, model: 4, prevModel: "default", modelStatus: "Done", date: "01.07.1970" }
-  ]
   constructor(private _formBuilder: FormBuilder) {}
 
   ngOnInit() {
@@ -98,4 +109,22 @@ export class DecodingUploadComponent implements OnInit {
 
     return isDisabled;
   }
+
+  // uploads file and show preview
+  loadFile(file:HTMLInputElement) {
+
+    // TODO: API - TPW Results as uploaded files in current file list
+    this.dummyShowUploadedFile(file);
+  }
+
+  dummyShowUploadedFile(file) {
+    let fileName = file.files[0].name;
+    // add uploaded file to current file list
+    this.uploadedFiles.push({ name:fileName, selected:true });
+    
+    // selects element in current panel
+    this.currentFiles.push(fileName);
+    this.currentFiles = this.uploadedFiles.map(item => item.name);
+  }
+
 }

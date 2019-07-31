@@ -1,67 +1,153 @@
-<mat-horizontal-stepper labelPosition="bottom" #stepper>
-    <mat-step [stepControl]="firstFormGroup">
-        <form [formGroup]="firstFormGroup">
-            <ng-template matStepLabel>Umfeld</ng-template>
-            <div>
-              <h2>Environment</h2>
-              <mat-list *ngFor='let info of environment'>
-                <mat-list-item>
-                  <p>Projekt: {{info.project}}</p>
-                  <p>Modell: {{info.model}}</p>
-                  <p>Vorheriges Modell: {{info.prevModel}}</p>
-                  <p>Status: {{info.modelStatus}}</p>
-                  <p>Datum: {{info.date}}</p>
-                </mat-list-item>
-              </mat-list>
-            </div>
-            <div>
-                <button mat-button matStepperNext>Next</button>
-            </div>
-        </form>
-    </mat-step>
-
-
-    <mat-step [stepControl]="secondFormGroup">
-        <form [formGroup]="secondFormGroup">
-            <ng-template matStepLabel>Füge deine Audio Dateien hinzu</ng-template>
-            <div>
-              <h2>Audio Dateien</h2>
-              <!-- Current File panel -->
+<div>
+  <mat-horizontal-stepper labelPosition="bottom" #stepper>
+      <mat-step [stepControl]="firstFormGroup" class="decodingPage">
+          <form [formGroup]="firstFormGroup">
+              <ng-template matStepLabel>Umfeld</ng-template>
+              <div fxLayout="center center">
+                <mat-card class="example-card">
+                    <mat-card-content>
+                      <h2>Modell</h2>
+                      <mat-list *ngFor="let env of environment">
+                        <mat-list-item>
+                          <p>Projekt: {{env.project}}</p>
+                        </mat-list-item>
+                        <mat-divider></mat-divider>
+                        <mat-list-item>
+                          <p>Modell: {{env.model}}</p>
+                        </mat-list-item>
+                        <mat-divider></mat-divider>
+                        <mat-list-item>
+                          <p>Vorheriges Modell: {{env.prevModel}}</p>
+                        </mat-list-item>
+                        <mat-divider></mat-divider>
+                        <mat-list-item>
+                          <p>Status: {{env.modelStatus}}</p>
+                        </mat-list-item>
+                        <mat-divider></mat-divider>
+                        <mat-list-item>
+                          <p>Datum: {{env.date}}</p>
+                        </mat-list-item>
+                      </mat-list>
+                    </mat-card-content>
+                  </mat-card>
+              </div>
               <div>
-                <mat-selection-list
-                  (selectionChange)="handleSelection($event, file)">
-                  <mat-list-option
-                    *ngFor='let file of uploadedFiles'
-                    [selected]='file.selected'
-                    [value]="file.name">
-                    <p mat-line>{{file.name}}</p>
-                  </mat-list-option>
-                </mat-selection-list>
                 <button
                   mat-flat-button
-                  class="uploadFile_Button" 
-                  color="primary"
-                  [disabled]="isRemoveDisabled()"              
-                  (click)="remove()">
-                  <!-- TODO update to new file format / resource format-->
-                  <mat-icon aria-hidden="false" aria-label="Example delete icon">delete</mat-icon>
-                </button>
+                  matStepperNext
+                  class="uploadFile_Button"
+                  color="primary">Next</button>
               </div>
-            </div>
-            <div>
-                <button mat-button matStepperPrevious>Back</button>
-                <button mat-button matStepperNext>Next</button>
-            </div>
-        </form>
-    </mat-step>
+          </form>
+      </mat-step>
 
-    
-    <mat-step>
-        <ng-template matStepLabel>Start das Decode</ng-template>
-        You are now done.
-        <div>
-            <button mat-button matStepperPrevious>Back</button>
-            <button mat-button (click)="stepper.reset()">Reset</button>
-        </div>
-    </mat-step>
-</mat-horizontal-stepper>
+
+      <mat-step [stepControl]="secondFormGroup">
+          <form [formGroup]="secondFormGroup">
+              <ng-template matStepLabel>Füge Dateien hinzu</ng-template>
+              <div fxLayout="center center">
+                <mat-card class="example-card">
+                  <mat-card-content>
+                    <h2>Audio Dateien</h2>
+                    <!-- Current File panel -->
+                    <div>
+                      <mat-selection-list
+                        (selectionChange)="handleSelection($event, file)">
+                        <mat-list-option
+                          *ngFor='let file of uploadedFiles'
+                          [selected]='file.selected'
+                          [value]="file.name">
+                          <p mat-line>{{file.name}}</p>
+                        </mat-list-option>
+                      </mat-selection-list>
+                      <input #file id="fileInput" type="file" style="display:none" (change)="loadFile(file)" />
+                      <button 
+                        mat-flat-button 
+                        color="warn" 
+                        class="uploadFile_Button" 
+                        onclick="document.getElementById('fileInput').click()">
+                        <!-- TODO update to new file format / resource format -->
+                        <mat-icon aria-hidden="false" aria-label="Example upload icon">cloud_upload</mat-icon>
+                      </button>
+
+                      <button
+                        mat-flat-button
+                        class="uploadFile_Button" 
+                        color="warn"
+                        [disabled]="isRemoveDisabled()"              
+                        (click)="remove()">
+                        <!-- TODO update to new file format / resource format-->
+                        <mat-icon aria-hidden="false" aria-label="Example delete icon">delete</mat-icon>
+                      </button>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+              <div>
+                  <button
+                    mat-flat-button
+                    matStepperPrevious
+                    class="uploadFile_Button"
+                    color="primary">Back</button>
+                  <button
+                    mat-flat-button
+                    matStepperNext
+                    class="uploadFile_Button"
+                    color="primary">Next</button>
+              </div>
+          </form>
+      </mat-step>
+
+      
+      <mat-step>
+          <ng-template matStepLabel>Check</ng-template>
+          <div fxLayout="center center">
+            <mat-card class="example-card">
+                <mat-card-content>
+                  <h2>Decode</h2>
+                  <mat-list *ngFor="let env of environment">
+                    <mat-list-item>
+                      <p>Projekt: {{env.project}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Modell: {{env.model}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Vorheriges Modell: {{env.prevModel}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Status: {{env.modelStatus}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Datum: {{env.date}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Anzahl Audio Dateien: {{env.numberAUdio}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item *ngFor="let file of env.listAudio">
+                      <p>Audio Dateien: {{file}}</p>
+                    </mat-list-item>
+                  </mat-list>
+                </mat-card-content>
+              </mat-card>
+          </div>
+          <div>
+              <button
+                mat-flat-button
+                matStepperPrevious
+                class="uploadFile_Button"
+                color="primary">Back</button>
+                <button
+                mat-flat-button
+                class="uploadFile_Button"
+                color="primary">Start Decode</button>
+          </div>
+      </mat-step>
+  </mat-horizontal-stepper>
+</div>
