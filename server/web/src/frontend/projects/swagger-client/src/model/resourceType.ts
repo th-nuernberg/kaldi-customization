@@ -11,10 +11,13 @@
  */
 
 
-export type AcousticModelType = 100 | 200 | 300;
+export type ResourceType = 1 | 2 | 3 | 4 | 5 | 6;
 
-export const AcousticModelType = {
-    HMM_GMM: 100 as AcousticModelType,
-    HMM_DNN: 200 as AcousticModelType,
-    HMM_RNN: 300 as AcousticModelType
+export const ResourceType = {
+    html: 1 as ResourceType,
+    docx: 2 as ResourceType,
+    txt: 3 as ResourceType,
+    pdf: 4 as ResourceType,
+    png: 5 as ResourceType,
+    jpg: 6 as ResourceType
 };

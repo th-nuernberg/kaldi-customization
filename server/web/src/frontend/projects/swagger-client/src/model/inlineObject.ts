@@ -11,10 +11,10 @@
  */
 
 
-export type AcousticModelType = 100 | 200 | 300;
+export interface InlineObject { 
+    /**
+     * Audio file for decoding
+     */
+    audioFile: Blob;
+}
 
-export const AcousticModelType = {
-    HMM_GMM: 100 as AcousticModelType,
-    HMM_DNN: 200 as AcousticModelType,
-    HMM_RNN: 300 as AcousticModelType
-};

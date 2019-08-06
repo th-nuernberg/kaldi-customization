@@ -52,7 +52,7 @@
                 <!-- Current File panel -->
                 <div>
                   <mat-selection-list
-                    (selectionChange)="handleSelection($event, file)">
+                    (selectionChange)="handleSelection($event)">
                     <mat-list-option
                       *ngFor='let file of uploadedFiles'
                       [selected]='file.selected'

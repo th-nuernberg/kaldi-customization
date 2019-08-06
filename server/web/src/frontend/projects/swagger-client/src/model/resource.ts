@@ -9,12 +9,15 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { ResourceStatus } from './resourceStatus';
+import { ResourceType } from './resourceType';
 
 
-export type AcousticModelType = 100 | 200 | 300;
+export interface Resource { 
+    uuid: string;
+    name: string;
+    status?: ResourceStatus;
+    resourceType: ResourceType;
+    creationTimestamp?: Date;
+}
 
-export const AcousticModelType = {
-    HMM_GMM: 100 as AcousticModelType,
-    HMM_DNN: 200 as AcousticModelType,
-    HMM_RNN: 300 as AcousticModelType
-};

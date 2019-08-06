@@ -18,8 +18,8 @@ import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 
 import { Observable }                                        from 'rxjs';
 
-import { CreateProjectObject } from '../model/createProjectObject';
-import { Project } from '../model/project';
+import { DecodeMessage } from '../model/decodeMessage';
+import { InlineResponse202 } from '../model/inlineResponse202';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
@@ -28,7 +28,7 @@ import { Configuration }                                     from '../configurat
 @Injectable({
   providedIn: 'root'
 })
-export class ProjectService {
+export class DecodeService {
 
     protected basePath = 'http://localhost:8080/api/v1';
     public defaultHeaders = new HttpHeaders();
@@ -61,72 +61,26 @@ export class ProjectService {
 
 
     /**
-     * Create a new project
-     * 
-     * @param createProjectObject Project object that needs to be created
+     * Get the result of a decoding task
+     * Returns the result of a decoding task
+     * @param projectUuid UUID of the project
+     * @param trainingVersion Training version of the project
+     * @param decodeUuid UUID of the decoding task
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createProject(createProjectObject: CreateProjectObject, observe?: 'body', reportProgress?: boolean): Observable<Project>;
-    public createProject(createProjectObject: CreateProjectObject, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Project>>;
-    public createProject(createProjectObject: CreateProjectObject, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Project>>;
-    public createProject(createProjectObject: CreateProjectObject, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (createProjectObject === null || createProjectObject === undefined) {
-            throw new Error('Required parameter createProjectObject was null or undefined when calling createProject.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        const httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected !== undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected !== undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<Project>(`${this.configuration.basePath}/project`,
-            createProjectObject,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * Find project by UUID
-     * Returns a single project
-     * @param projectUuid UUID of project to return
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public getProjectByUuid(projectUuid: string, observe?: 'body', reportProgress?: boolean): Observable<Project>;
-    public getProjectByUuid(projectUuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Project>>;
-    public getProjectByUuid(projectUuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Project>>;
-    public getProjectByUuid(projectUuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getDecodeResult(projectUuid: string, trainingVersion: number, decodeUuid: string, observe?: 'body', reportProgress?: boolean): Observable<DecodeMessage>;
+    public getDecodeResult(projectUuid: string, trainingVersion: number, decodeUuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DecodeMessage>>;
+    public getDecodeResult(projectUuid: string, trainingVersion: number, decodeUuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DecodeMessage>>;
+    public getDecodeResult(projectUuid: string, trainingVersion: number, decodeUuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (projectUuid === null || projectUuid === undefined) {
-            throw new Error('Required parameter projectUuid was null or undefined when calling getProjectByUuid.');
+            throw new Error('Required parameter projectUuid was null or undefined when calling getDecodeResult.');
+        }
+        if (trainingVersion === null || trainingVersion === undefined) {
+            throw new Error('Required parameter trainingVersion was null or undefined when calling getDecodeResult.');
+        }
+        if (decodeUuid === null || decodeUuid === undefined) {
+            throw new Error('Required parameter decodeUuid was null or undefined when calling getDecodeResult.');
         }
 
         let headers = this.defaultHeaders;
@@ -152,7 +106,7 @@ export class ProjectService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<Project>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}`,
+        return this.httpClient.get<DecodeMessage>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}/training/${encodeURIComponent(String(trainingVersion))}/decode/${encodeURIComponent(String(decodeUuid))}`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -163,15 +117,27 @@ export class ProjectService {
     }
 
     /**
-     * Returns a list of available projects
-     * 
+     * Decode audio to text
+     * Decode audio data to text using the trained project
+     * @param projectUuid UUID of the project
+     * @param trainingVersion Training version of the project
+     * @param audioFile Audio file for decoding
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getProjects(observe?: 'body', reportProgress?: boolean): Observable<Array<Project>>;
-    public getProjects(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Project>>>;
-    public getProjects(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Project>>>;
-    public getProjects(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public startDecode(projectUuid: string, trainingVersion: number, audioFile: Blob, observe?: 'body', reportProgress?: boolean): Observable<InlineResponse202>;
+    public startDecode(projectUuid: string, trainingVersion: number, audioFile: Blob, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<InlineResponse202>>;
+    public startDecode(projectUuid: string, trainingVersion: number, audioFile: Blob, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<InlineResponse202>>;
+    public startDecode(projectUuid: string, trainingVersion: number, audioFile: Blob, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (projectUuid === null || projectUuid === undefined) {
+            throw new Error('Required parameter projectUuid was null or undefined when calling startDecode.');
+        }
+        if (trainingVersion === null || trainingVersion === undefined) {
+            throw new Error('Required parameter trainingVersion was null or undefined when calling startDecode.');
+        }
+        if (audioFile === null || audioFile === undefined) {
+            throw new Error('Required parameter audioFile was null or undefined when calling startDecode.');
+        }
 
         let headers = this.defaultHeaders;
 
@@ -194,9 +160,29 @@ export class ProjectService {
 
         // to determine the Content-Type header
         const consumes: string[] = [
+            'multipart/form-data'
         ];
 
-        return this.httpClient.get<Array<Project>>(`${this.configuration.basePath}/project`,
+        const canConsumeForm = this.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any; };
+        let useForm = false;
+        let convertFormParamsToString = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        // see https://stackoverflow.com/questions/4007969/application-x-www-form-urlencoded-or-multipart-form-data
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        }
+
+        if (audioFile !== undefined) {
+            formParams = formParams.append('audio_file', <any>audioFile) as any || formParams;
+        }
+
+        return this.httpClient.post<InlineResponse202>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}/training/${encodeURIComponent(String(trainingVersion))}/decode`,
+            convertFormParamsToString ? formParams.toString() : formParams,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
