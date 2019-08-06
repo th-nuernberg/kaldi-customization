@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
-import { UserService, ProjectService } from '../../projects/swagger-client/src';
+import { UserService, ProjectService, User } from 'swagger-client';
+import { AuthenticationService } from './_services';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -7,7 +9,18 @@ import { UserService, ProjectService } from '../../projects/swagger-client/src';
   styleUrls: ['./app.component.less']
 })
 export class AppComponent {
-  constructor(userService: UserService, projectService: ProjectService) {
-    
+  currentUser: User;
+  
+  constructor(
+    private router: Router,
+    private userService: UserService,
+    private projectService: ProjectService,
+    private authenticationService: AuthenticationService) {
+      this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+  }
+
+  logout() {
+      this.authenticationService.logout();
+      this.router.navigate(['/login']);
   }
 }

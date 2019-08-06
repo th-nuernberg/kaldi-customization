@@ -29,7 +29,7 @@ import { Configuration }                                     from '../configurat
 })
 export class UserService {
 
-    protected basePath = 'http://localhost:8080/api/v1';
+    protected basePath = '/api/v1';
     public defaultHeaders = new HttpHeaders();
     public configuration = new Configuration();
 

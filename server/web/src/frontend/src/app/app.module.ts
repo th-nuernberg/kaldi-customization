@@ -37,6 +37,7 @@ import { ApiModule } from '../../projects/swagger-client/src';
 import { IdentityService } from '../identity.service';
 
 import { TileComponent } from './dashboard/tile/tile.component';
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [
@@ -48,7 +49,8 @@ import { TileComponent } from './dashboard/tile/tile.component';
     TrainingUploadComponent,
     AccountComponent,
     TileComponent,
-    ModelOverviewDialog
+    ModelOverviewDialog,
+    LoginComponent
   ],
   imports: [
     ApiModule.forRoot(IdentityService.getApiConfiguration),
