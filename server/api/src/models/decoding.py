@@ -1,9 +1,11 @@
-from ._db import db
+from ._db import db, generate_uuid
 import enum
 
 class DecodingStateEnum(enum.IntEnum):
     Init = 100
     
+    Queued = 200
+
     Decoding_Success = 300
     Decoding_Failure = 320
 
@@ -19,7 +21,7 @@ class Decoding(db.Model):
     __tablename__ = 'decodings'
 
     id = db.Column(db.Integer, primary_key=True)
-    uuid = db.Column(db.String(32))
+    uuid = db.Column(db.String(36), name="uuid", primary_key=True, default=generate_uuid)
     
     training = db.relationship('Training')
     training_id = db.Column(db.Integer,db.ForeignKey("trainings.id"))

@@ -49,7 +49,7 @@ with app.app_context():
     Voxforge_RNN = AcousticModel(name='Voxforge-RNN', language=german, model_type=ModelType.HMM_RNN)
     db.session.add(Voxforge_RNN)
 
-    user = User(username = "kaldi" , pw_hash="213123123", salt = "Dino")
+    user = User(username = "kaldi" , pw_hash="213123123", salt = "Ein Muffin")
     db.session.add(user)
 
     test_project = Project(name = "TestProject", uuid = "12345678901234567890123456789012", owner = user,acoustic_model = Voxforge_RNN)

@@ -5,6 +5,10 @@ from openapi_server.models.resource import Resource  # noqa: E501
 from openapi_server.models.training import Training  # noqa: E501
 from openapi_server import util
 
+from redis_communication import create_kaldi_job
+
+from models import db, AcousticModel as DB_AcousticModel, Project as DB_Project, Training as DB_Training, TrainingStateEnum as DB_TrainingStateEnum
+
 
 def assign_resource_to_training(project_uuid, training_version, resource_uuid):  # noqa: E501
     """Assign a resource to the training
@@ -116,7 +120,31 @@ def set_corpus_of_training_resource(project_uuid, training_version, resource_uui
 
     :rtype: None
     """
-    return 'do some magic!'
+    return 'do somid = db.Column(db.Integer, primary_key=True)
+    
+    project = db.relationship('Project')
+    project_id = db.Column(db.Integer,db.ForeignKey("projects.id"))
+
+    version = db.Column(db.Integer)
+    
+    create_date = db.Column(db.DateTime(timezone=False))
+    status = db.Column(db.Enum(TrainingStateEnum))id = db.Column(db.Integer, primary_key=True)
+    
+    project = db.relationship('Project')
+    project_id = db.Column(db.Integer,db.ForeignKey("projects.id"))
+
+    version = db.Column(db.Integer)
+    
+    create_date = db.Column(db.DateTime(timezone=False))
+    status = db.Column(db.Enum(TrainingStateEnum))id = db.Column(db.Integer, primary_key=True)
+    
+    project = db.relationship('Project')
+    project_id = db.Column(db.Integer,db.ForeignKey("projects.id"))
+
+    version = db.Column(db.Integer)
+    
+    create_date = db.Column(db.DateTime(timezone=False))
+    status = db.Column(db.Enum(TrainingStateEnum))e magic!'
 
 
 def start_training_by_version(project_uuid, training_version):  # noqa: E501
@@ -131,4 +159,18 @@ def start_training_by_version(project_uuid, training_version):  # noqa: E501
 
     :rtype: Training
     """
+    db_project = DB_Project.query.filter_by(uuid=project_uuid).first()
+    db_training = DB_Training.query.filter_by(version=training_version,project=db_project).first()
+
+    if db_training.status != DB_TrainingStateEnum.Trainable:
+        return ("training already done or pending",400)
+
+    db_training.status = DB_TrainingStateEnum.Training_Pending
+
+    db.session.add(db_training)
+    db.session.commit()
+
+    create_kaldi_job(training_id=db_training.id, acoustic_model_id=db_project.acoustic_model_id)
+
+    #TODO return Training -> missing mapper
     return 'do some magic!'
