@@ -1,5 +1,7 @@
-from ._db import db
+from ._db import db, AlchemyEncoder
 import enum
+import datetime
+import json
 
 class TrainingStateEnum(enum.IntEnum):
     Init = 100
@@ -27,15 +29,15 @@ class TrainingStateEnum(enum.IntEnum):
 class Training(db.Model):
     __tablename__ = 'trainings'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     
     project = db.relationship('Project')
     project_id = db.Column(db.Integer,db.ForeignKey("projects.id"))
 
-    version = db.Column(db.Integer)
+    version = db.Column(db.Integer, autoincrement=True)
     
-    create_date = db.Column(db.DateTime(timezone=False))
-    status = db.Column(db.Enum(TrainingStateEnum))
+    create_date = db.Column(db.DateTime(timezone=False), default=datetime.datetime.utcnow)
+    status = db.Column(db.Enum(TrainingStateEnum), default=TrainingStateEnum.Init)
 
     def __repr__(self):
-        return self.__dict__
+        return json.dumps(self, cls=AlchemyEncoder)

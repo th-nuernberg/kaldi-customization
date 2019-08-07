@@ -20,6 +20,7 @@ class TestProjectController(BaseTestCase):
         Create a new project
         """
         create_project_object = {
+  "parent" : "550e8400-e29b-11d4-a716-446655440000",
   "name" : "MyProject",
   "acoustic_model" : "550e8400-e29b-11d4-a716-446655440000"
 }

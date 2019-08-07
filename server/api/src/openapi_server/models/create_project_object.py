@@ -15,26 +15,31 @@ class CreateProjectObject(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, name=None, acoustic_model=None):  # noqa: E501
+    def __init__(self, name=None, acoustic_model=None, parent=None):  # noqa: E501
         """CreateProjectObject - a model defined in OpenAPI
 
         :param name: The name of this CreateProjectObject.  # noqa: E501
         :type name: str
         :param acoustic_model: The acoustic_model of this CreateProjectObject.  # noqa: E501
         :type acoustic_model: str
+        :param parent: The parent of this CreateProjectObject.  # noqa: E501
+        :type parent: str
         """
         self.openapi_types = {
             'name': str,
-            'acoustic_model': str
+            'acoustic_model': str,
+            'parent': str
         }
 
         self.attribute_map = {
             'name': 'name',
-            'acoustic_model': 'acoustic_model'
+            'acoustic_model': 'acoustic_model',
+            'parent': 'parent'
         }
 
         self._name = name
         self._acoustic_model = acoustic_model
+        self._parent = parent
 
     @classmethod
     def from_dict(cls, dikt) -> 'CreateProjectObject':
@@ -96,3 +101,26 @@ class CreateProjectObject(Model):
             raise ValueError("Invalid value for `acoustic_model`, must not be `None`")  # noqa: E501
 
         self._acoustic_model = acoustic_model
+
+    @property
+    def parent(self):
+        """Gets the parent of this CreateProjectObject.
+
+        UUID of the optional parent project  # noqa: E501
+
+        :return: The parent of this CreateProjectObject.
+        :rtype: str
+        """
+        return self._parent
+
+    @parent.setter
+    def parent(self, parent):
+        """Sets the parent of this CreateProjectObject.
+
+        UUID of the optional parent project  # noqa: E501
+
+        :param parent: The parent of this CreateProjectObject.
+        :type parent: str
+        """
+
+        self._parent = parent

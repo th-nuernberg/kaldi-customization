@@ -1,4 +1,5 @@
-from ._db import db
+from ._db import db, AlchemyEncoder
+import json
 
 class TrainingResource(db.Model):
     __tablename__ = 'training_resources'
@@ -12,4 +13,4 @@ class TrainingResource(db.Model):
     origin_id = db.Column(db.Integer,db.ForeignKey("resources.id"))
 
     def __repr__(self):
-        return self.__dict__
+        return json.dumps(self, cls=AlchemyEncoder)

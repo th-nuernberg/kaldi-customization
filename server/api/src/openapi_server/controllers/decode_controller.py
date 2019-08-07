@@ -5,8 +5,9 @@ import json
 import os
 import datetime
 
+from openapi_server.models.binary_decode_object import BinaryDecodeObject  # noqa: E501
 from openapi_server.models.decode_message import DecodeMessage  # noqa: E501
-from openapi_server.models.inline_response202 import InlineResponse202  # noqa: E501
+from openapi_server.models.decode_task_reference import DecodeTaskReference  # noqa: E501
 from openapi_server import util
 
 from models import db, Project as DB_Project, Training as DB_Training, Decoding as DB_Decoding, DecodingStateEnum as DB_DecodingStateEnum
@@ -45,7 +46,22 @@ def get_decode_result(project_uuid, training_version, decode_uuid):  # noqa: E50
     return 'do some magic!'
 
 
-def start_decode(project_uuid, training_version, audio_file):  # noqa: E501
+def get_decodings(project_uuid, training_version):  # noqa: E501
+    """List of all decodings
+
+    Returns a list of all decodings for this training version # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+
+    :rtype: List[DecodeMessage]
+    """
+    return 'do some magic!'
+
+
+def start_decode(project_uuid, training_version, binary_decode_object):  # noqa: E501
     """Decode audio to text
 
     Decode audio data to text using the trained project # noqa: E501
@@ -54,11 +70,15 @@ def start_decode(project_uuid, training_version, audio_file):  # noqa: E501
     :type project_uuid: 
     :param training_version: Training version of the project
     :type training_version: int
-    :param audio_file: Audio file for decoding
-    :type audio_file: str
+    :param binary_decode_object: 
+    :type binary_decode_object: dict | bytes
 
-    :rtype: InlineResponse202
+    :rtype: DecodeTaskReference
     """
+    if connexion.request.is_json:
+        binary_decode_object = BinaryDecodeObject.from_dict(connexion.request.get_json())  # noqa: E501
+
+    audio_file = binary_decode_object.audio_file
     print('Received new file for decode: ' + str(audio_file))
 
 
