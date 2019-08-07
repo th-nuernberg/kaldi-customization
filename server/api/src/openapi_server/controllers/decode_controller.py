@@ -137,7 +137,7 @@ def start_decode(project_uuid, training_version, binary_decode_object):  # noqa:
     print('Uploaded file to MinIO for decoding: ' + str(db_file))
 
     if db_file.status == DB_DecodingStateEnum.Init:
-        create_decode_job(decode_file=minio_file_path,acoustic_model_id=db_project.acoustic_model_id,db_training.id)
+        create_decode_job(decode_file=minio_file_path,acoustic_model_id=db_project.acoustic_model_id,training_id=db_training.id)
 
         db_file.status = DB_DecodingStateEnum.Queued
         db.session.add(db_file)
