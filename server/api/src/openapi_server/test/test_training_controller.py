@@ -6,8 +6,8 @@ import unittest
 from flask import json
 from six import BytesIO
 
-from openapi_server.models.inline_object import InlineObject  # noqa: E501
 from openapi_server.models.resource import Resource  # noqa: E501
+from openapi_server.models.resource_reference_object import ResourceReferenceObject  # noqa: E501
 from openapi_server.models.training import Training  # noqa: E501
 from openapi_server.test import BaseTestCase
 
@@ -20,7 +20,9 @@ class TestTrainingController(BaseTestCase):
 
         Assign a resource to the training
         """
-        inline_object = {}
+        resource_reference_object = {
+  "resource_uuid" : "550e8400-e29b-11d4-a716-446655440000"
+}
         headers = { 
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -30,7 +32,7 @@ class TestTrainingController(BaseTestCase):
             '/api/v1/project/{project_uuid}/training/{training_version}/resource'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
             method='POST',
             headers=headers,
-            data=json.dumps(inline_object),
+            data=json.dumps(resource_reference_object),
             content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))

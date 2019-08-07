@@ -1,8 +1,9 @@
 import connexion
 import six
 
+from openapi_server.models.binary_decode_object import BinaryDecodeObject  # noqa: E501
 from openapi_server.models.decode_message import DecodeMessage  # noqa: E501
-from openapi_server.models.inline_response202 import InlineResponse202  # noqa: E501
+from openapi_server.models.decode_task_reference import DecodeTaskReference  # noqa: E501
 from openapi_server import util
 
 
@@ -38,7 +39,7 @@ def get_decodings(project_uuid, training_version):  # noqa: E501
     return 'do some magic!'
 
 
-def start_decode(project_uuid, training_version, audio_file):  # noqa: E501
+def start_decode(project_uuid, training_version, binary_decode_object):  # noqa: E501
     """Decode audio to text
 
     Decode audio data to text using the trained project # noqa: E501
@@ -47,9 +48,11 @@ def start_decode(project_uuid, training_version, audio_file):  # noqa: E501
     :type project_uuid: 
     :param training_version: Training version of the project
     :type training_version: int
-    :param audio_file: Audio file for decoding
-    :type audio_file: str
+    :param binary_decode_object: 
+    :type binary_decode_object: dict | bytes
 
-    :rtype: InlineResponse202
+    :rtype: DecodeTaskReference
     """
+    if connexion.request.is_json:
+        binary_decode_object = BinaryDecodeObject.from_dict(connexion.request.get_json())  # noqa: E501
     return 'do some magic!'

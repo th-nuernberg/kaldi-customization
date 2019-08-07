@@ -4,11 +4,12 @@ import six
 import uuid
 import datetime
 
-from openapi_server.models.inline_object import InlineObject  # noqa: E501
+from openapi_server.models.binary_resource_object import BinaryResourceObject  # noqa: E501
 from openapi_server.models.resource import Resource  # noqa: E501
 from openapi_server.models.training import Training  # noqa: E501
 from openapi_server.models.resource_status import ResourceStatus
 from openapi_server.models.resource_type import ResourceType
+from openapi_server.models.resource_reference_object import ResourceReferenceObject  # noqa: E501
 
 from openapi_server import util
 from models import db, Resource as DB_Resource, ResourceTypeEnum as DB_ResourceType, ResourceStateEnum as DB_ResourceState, User as DB_User
@@ -22,7 +23,7 @@ from mapper import mapper
 
 TEMP_UPLOAD_FOLDER = '/tmp/fileupload'
 
-def assign_resource_to_training(project_uuid, training_version, inline_object=None):  # noqa: E501
+def assign_resource_to_training(project_uuid, training_version, resource_reference_object=None):  # noqa: E501
     """Assign a resource to the training
 
     Assign the specified resource to the training # noqa: E501
@@ -31,13 +32,13 @@ def assign_resource_to_training(project_uuid, training_version, inline_object=No
     :type project_uuid: 
     :param training_version: Training version of the project
     :type training_version: int
-    :param inline_object: 
-    :type inline_object: dict | bytes
+    :param resource_reference_object: Resource that needs to be added
+    :type resource_reference_object: dict | bytes
 
     :rtype: Resource
     """
     if connexion.request.is_json:
-        inline_object = InlineObject.from_dict(connexion.request.get_json())  # noqa: E501
+        resource_reference_object = ResourceReferenceObject.from_dict(connexion.request.get_json())  # noqa: E501
     return 'do some magic!'
 
 def get_filetype(filename):
@@ -50,17 +51,18 @@ def get_filetype(filename):
             return DB_ResourceType[filetype]
     return None
 
-def create_resource(upfile):  # noqa: E501
+def create_resource(binary_resource_object):  # noqa: E501
     """Create/Upload a new resource
 
      # noqa: E501
 
-    :param upfile: File object that needs to be uploaded
-    :type upfile: str
+    :param binary_resource_object: 
+    :type binary_resource_object: dict | bytes
 
     :rtype: Resource
     """
 
+    upfile = binary_resource_object.upfile
     print('Received new file: ' + str(upfile))
 
     # if user does not select file, browser also
@@ -239,20 +241,6 @@ def get_resource_data(resource_uuid):  # noqa: E501
             return ("File not found", 404)
 
     return send_file(local_file_path, as_attachment=True, attachment_filename=db_file.name)
-
-def get_training_resources(project_uuid, training_version):  # noqa: E501
-    """Get a list of assigned resources
-
-    Returns a list of all resources assigned to this training # noqa: E501
-
-    :param project_uuid: UUID of the project
-    :type project_uuid: 
-    :param training_version: Training version of the project
-    :type training_version: int
-
-    :rtype: List[Training]
-    """
-    return 'do some magic!'
 
 
 def set_corpus_of_training_resource(project_uuid, training_version, resource_uuid, body):  # noqa: E501

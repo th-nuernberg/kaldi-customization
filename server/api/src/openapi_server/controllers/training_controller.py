@@ -1,8 +1,8 @@
 import connexion
 import six
 
-from openapi_server.models.inline_object import InlineObject  # noqa: E501
 from openapi_server.models.resource import Resource  # noqa: E501
+from openapi_server.models.resource_reference_object import ResourceReferenceObject  # noqa: E501
 from openapi_server.models.training import Training  # noqa: E501
 from openapi_server import util
 
@@ -14,7 +14,7 @@ from models.training import Training as DB_Training, TrainingStateEnum as DB_Tra
 
 from mapper import mapper
 
-def assign_resource_to_training(project_uuid, training_version, inline_object=None):  # noqa: E501
+def assign_resource_to_training(project_uuid, training_version, resource_reference_object=None):  # noqa: E501
     """Assign a resource to the training
 
     Assign the specified resource to the training # noqa: E501
@@ -23,13 +23,13 @@ def assign_resource_to_training(project_uuid, training_version, inline_object=No
     :type project_uuid: 
     :param training_version: Training version of the project
     :type training_version: int
-    :param inline_object: 
-    :type inline_object: dict | bytes
+    :param resource_reference_object: Resource that needs to be added
+    :type resource_reference_object: dict | bytes
 
     :rtype: Resource
     """
     if connexion.request.is_json:
-        inline_object = InlineObject.from_dict(connexion.request.get_json())  # noqa: E501
+        resource_reference_object = ResourceReferenceObject.from_dict(connexion.request.get_json())  # noqa: E501
     return 'do some magic!'
 
 
@@ -104,21 +104,6 @@ def get_training_by_version(project_uuid, training_version):  # noqa: E501
     :type training_version: int
 
     :rtype: Training
-    """
-    return 'do some magic!'
-
-
-def get_training_resources(project_uuid, training_version):  # noqa: E501
-    """Get a list of assigned resources
-
-    Returns a list of all resources assigned to this training # noqa: E501
-
-    :param project_uuid: UUID of the project
-    :type project_uuid: 
-    :param training_version: Training version of the project
-    :type training_version: int
-
-    :rtype: List[Training]
     """
     return 'do some magic!'
 

@@ -337,8 +337,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BinaryDecodeObject'
-              description: The Audio File to decode
-              required: true
         required: true
       responses:
         202:
@@ -450,8 +448,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ResourceReferenceObject'
-              description: A Refrence to the uploaded resource
-              required: true
         description: Resource that needs to be added
       responses:
         200:
@@ -708,9 +704,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BinaryResourceObject'
-              required: true
-              description: File to Uplaod
-              type: object
         required: true
       responses:
         202:
@@ -1194,6 +1187,8 @@ components:
       - name
       type: object
     ResourceReferenceObject:
+      example:
+        resource_uuid: 550e8400-e29b-11d4-a716-446655440000
       properties:
         resource_uuid:
           description: UUID of the resource
@@ -1204,6 +1199,8 @@ components:
       - resource_uuid
       type: object
     BinaryDecodeObject:
+      example:
+        audio_file: ""
       properties:
         audio_file:
           description: Audio file for decoding
@@ -1221,6 +1218,8 @@ components:
           format: uuid
           type: string
     BinaryResourceObject:
+      example:
+        upfile: ""
       properties:
         upfile:
           description: File object that needs to be uploaded
