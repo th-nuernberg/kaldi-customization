@@ -6,6 +6,7 @@ import unittest
 from flask import json
 from six import BytesIO
 
+from openapi_server.models.inline_object import InlineObject  # noqa: E501
 from openapi_server.models.resource import Resource  # noqa: E501
 from openapi_server.models.training import Training  # noqa: E501
 from openapi_server.test import BaseTestCase
@@ -19,14 +20,18 @@ class TestTrainingController(BaseTestCase):
 
         Assign a resource to the training
         """
+        inline_object = {}
         headers = { 
             'Accept': 'application/json',
+            'Content-Type': 'application/json',
             'Authorization': 'Bearer special-key',
         }
         response = self.client.open(
-            '/api/v1/project/{project_uuid}/training/{training_version}/resource/{resource_uuid}'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56, resource_uuid=550e8400-e29b-11d4-a716-446655440000),
+            '/api/v1/project/{project_uuid}/training/{training_version}/resource'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
             method='POST',
-            headers=headers)
+            headers=headers,
+            data=json.dumps(inline_object),
+            content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -67,7 +72,7 @@ class TestTrainingController(BaseTestCase):
         Get the corpus of the resource
         """
         headers = { 
-            'Accept': 'application/json',
+            'Accept': 'text/plain',
             'Authorization': 'Bearer special-key',
         }
         response = self.client.open(
@@ -88,22 +93,6 @@ class TestTrainingController(BaseTestCase):
         }
         response = self.client.open(
             '/api/v1/project/{project_uuid}/training/{training_version}'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
-            method='GET',
-            headers=headers)
-        self.assert200(response,
-                       'Response body is : ' + response.data.decode('utf-8'))
-
-    def test_get_training_resources(self):
-        """Test case for get_training_resources
-
-        Get a list of assigned resources
-        """
-        headers = { 
-            'Accept': 'application/json',
-            'Authorization': 'Bearer special-key',
-        }
-        response = self.client.open(
-            '/api/v1/project/{project_uuid}/training/{training_version}/resource'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
             method='GET',
             headers=headers)
         self.assert200(response,

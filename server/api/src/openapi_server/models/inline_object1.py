@@ -15,21 +15,21 @@ class InlineObject1(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, upfile=None):  # noqa: E501
+    def __init__(self, audio_file=None):  # noqa: E501
         """InlineObject1 - a model defined in OpenAPI
 
-        :param upfile: The upfile of this InlineObject1.  # noqa: E501
-        :type upfile: file
+        :param audio_file: The audio_file of this InlineObject1.  # noqa: E501
+        :type audio_file: file
         """
         self.openapi_types = {
-            'upfile': file
+            'audio_file': file
         }
 
         self.attribute_map = {
-            'upfile': 'upfile'
+            'audio_file': 'audio_file'
         }
 
-        self._upfile = upfile
+        self._audio_file = audio_file
 
     @classmethod
     def from_dict(cls, dikt) -> 'InlineObject1':
@@ -43,26 +43,26 @@ class InlineObject1(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def upfile(self):
-        """Gets the upfile of this InlineObject1.
+    def audio_file(self):
+        """Gets the audio_file of this InlineObject1.
 
-        File object that needs to be uploaded  # noqa: E501
+        Audio file for decoding  # noqa: E501
 
-        :return: The upfile of this InlineObject1.
+        :return: The audio_file of this InlineObject1.
         :rtype: file
         """
-        return self._upfile
+        return self._audio_file
 
-    @upfile.setter
-    def upfile(self, upfile):
-        """Sets the upfile of this InlineObject1.
+    @audio_file.setter
+    def audio_file(self, audio_file):
+        """Sets the audio_file of this InlineObject1.
 
-        File object that needs to be uploaded  # noqa: E501
+        Audio file for decoding  # noqa: E501
 
-        :param upfile: The upfile of this InlineObject1.
-        :type upfile: file
+        :param audio_file: The audio_file of this InlineObject1.
+        :type audio_file: file
         """
-        if upfile is None:
-            raise ValueError("Invalid value for `upfile`, must not be `None`")  # noqa: E501
+        if audio_file is None:
+            raise ValueError("Invalid value for `audio_file`, must not be `None`")  # noqa: E501
 
-        self._upfile = upfile
+        self._audio_file = audio_file

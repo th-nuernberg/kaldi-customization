@@ -9,6 +9,7 @@ from openapi_server.models.create_project_object import CreateProjectObject
 from openapi_server.models.decode_message import DecodeMessage
 from openapi_server.models.inline_object import InlineObject
 from openapi_server.models.inline_object1 import InlineObject1
+from openapi_server.models.inline_object2 import InlineObject2
 from openapi_server.models.inline_response202 import InlineResponse202
 from openapi_server.models.language import Language
 from openapi_server.models.project import Project

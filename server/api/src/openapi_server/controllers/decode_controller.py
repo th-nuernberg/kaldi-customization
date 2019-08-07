@@ -23,6 +23,21 @@ def get_decode_result(project_uuid, training_version, decode_uuid):  # noqa: E50
     return 'do some magic!'
 
 
+def get_decodings(project_uuid, training_version):  # noqa: E501
+    """List of all decodings
+
+    Returns a list of all decodings for this training version # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+
+    :rtype: List[DecodeMessage]
+    """
+    return 'do some magic!'
+
+
 def start_decode(project_uuid, training_version, audio_file):  # noqa: E501
     """Decode audio to text
 

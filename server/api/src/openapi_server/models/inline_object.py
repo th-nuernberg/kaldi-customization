@@ -15,21 +15,21 @@ class InlineObject(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, audio_file=None):  # noqa: E501
+    def __init__(self, resource_uuid=None):  # noqa: E501
         """InlineObject - a model defined in OpenAPI
 
-        :param audio_file: The audio_file of this InlineObject.  # noqa: E501
-        :type audio_file: file
+        :param resource_uuid: The resource_uuid of this InlineObject.  # noqa: E501
+        :type resource_uuid: str
         """
         self.openapi_types = {
-            'audio_file': file
+            'resource_uuid': str
         }
 
         self.attribute_map = {
-            'audio_file': 'audio_file'
+            'resource_uuid': 'resource_uuid'
         }
 
-        self._audio_file = audio_file
+        self._resource_uuid = resource_uuid
 
     @classmethod
     def from_dict(cls, dikt) -> 'InlineObject':
@@ -43,26 +43,26 @@ class InlineObject(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def audio_file(self):
-        """Gets the audio_file of this InlineObject.
+    def resource_uuid(self):
+        """Gets the resource_uuid of this InlineObject.
 
-        Audio file for decoding  # noqa: E501
+        UUID of the resource  # noqa: E501
 
-        :return: The audio_file of this InlineObject.
-        :rtype: file
+        :return: The resource_uuid of this InlineObject.
+        :rtype: str
         """
-        return self._audio_file
+        return self._resource_uuid
 
-    @audio_file.setter
-    def audio_file(self, audio_file):
-        """Sets the audio_file of this InlineObject.
+    @resource_uuid.setter
+    def resource_uuid(self, resource_uuid):
+        """Sets the resource_uuid of this InlineObject.
 
-        Audio file for decoding  # noqa: E501
+        UUID of the resource  # noqa: E501
 
-        :param audio_file: The audio_file of this InlineObject.
-        :type audio_file: file
+        :param resource_uuid: The resource_uuid of this InlineObject.
+        :type resource_uuid: str
         """
-        if audio_file is None:
-            raise ValueError("Invalid value for `audio_file`, must not be `None`")  # noqa: E501
+        if resource_uuid is None:
+            raise ValueError("Invalid value for `resource_uuid`, must not be `None`")  # noqa: E501
 
-        self._audio_file = audio_file
+        self._resource_uuid = resource_uuid

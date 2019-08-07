@@ -1,6 +1,7 @@
 import connexion
 import six
 
+from openapi_server.models.inline_object import InlineObject  # noqa: E501
 from openapi_server.models.resource import Resource  # noqa: E501
 from openapi_server.models.training import Training  # noqa: E501
 from openapi_server import util
@@ -13,7 +14,7 @@ from models.training import Training as DB_Training, TrainingStateEnum as DB_Tra
 
 from mapper import mapper
 
-def assign_resource_to_training(project_uuid, training_version, resource_uuid):  # noqa: E501
+def assign_resource_to_training(project_uuid, training_version, inline_object=None):  # noqa: E501
     """Assign a resource to the training
 
     Assign the specified resource to the training # noqa: E501
@@ -22,11 +23,13 @@ def assign_resource_to_training(project_uuid, training_version, resource_uuid): 
     :type project_uuid: 
     :param training_version: Training version of the project
     :type training_version: int
-    :param resource_uuid: UUID of the resource
-    :type resource_uuid: 
+    :param inline_object: 
+    :type inline_object: dict | bytes
 
     :rtype: Resource
     """
+    if connexion.request.is_json:
+        inline_object = InlineObject.from_dict(connexion.request.get_json())  # noqa: E501
     return 'do some magic!'
 
 

@@ -19,11 +19,9 @@ class AcousticModel(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, name=None, language=None, model_type=None, uuid=None):  # noqa: E501
+    def __init__(self, name=None, language=None, model_type=None, uuid=None):  # noqa: E501
         """AcousticModel - a model defined in OpenAPI
 
-        :param id: The id of this AcousticModel.  # noqa: E501
-        :type id: int
         :param name: The name of this AcousticModel.  # noqa: E501
         :type name: str
         :param language: The language of this AcousticModel.  # noqa: E501
@@ -34,7 +32,6 @@ class AcousticModel(Model):
         :type uuid: str
         """
         self.openapi_types = {
-            'id': int,
             'name': str,
             'language': Language,
             'model_type': AcousticModelType,
@@ -42,14 +39,12 @@ class AcousticModel(Model):
         }
 
         self.attribute_map = {
-            'id': 'id',
             'name': 'name',
             'language': 'language',
             'model_type': 'model_type',
             'uuid': 'uuid'
         }
 
-        self._id = id
         self._name = name
         self._language = language
         self._model_type = model_type
@@ -65,27 +60,6 @@ class AcousticModel(Model):
         :rtype: AcousticModel
         """
         return util.deserialize_model(dikt, cls)
-
-    @property
-    def id(self):
-        """Gets the id of this AcousticModel.
-
-
-        :return: The id of this AcousticModel.
-        :rtype: int
-        """
-        return self._id
-
-    @id.setter
-    def id(self, id):
-        """Sets the id of this AcousticModel.
-
-
-        :param id: The id of this AcousticModel.
-        :type id: int
-        """
-
-        self._id = id
 
     @property
     def name(self):
