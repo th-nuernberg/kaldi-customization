@@ -333,25 +333,19 @@ paths:
           type: integer
         style: simple
       requestBody:
-        $ref: '#/components/requestBodies/inline_object_1'
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              properties:
-                audio_file:
-                  description: Audio file for decoding
-                  format: binary
-                  type: string
-              required:
-              - audio_file
-              type: object
+              $ref: '#/components/schemas/BinaryDecodeObject'
+              description: The Audio File to decode
+              required: true
         required: true
       responses:
         202:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_202'
+                $ref: '#/components/schemas/DecodeTaskReference'
           description: Decoding successfully queued
         400:
           content: {}
@@ -452,19 +446,12 @@ paths:
           type: integer
         style: simple
       requestBody:
-        $ref: '#/components/requestBodies/inline_object'
         content:
           application/json:
             schema:
-              properties:
-                resource_uuid:
-                  description: UUID of the resource
-                  example: 550e8400-e29b-11d4-a716-446655440000
-                  format: uuid
-                  type: string
-              required:
-              - resource_uuid
-              type: object
+              $ref: '#/components/schemas/ResourceReferenceObject'
+              description: A Refrence to the uploaded resource
+              required: true
         description: Resource that needs to be added
       responses:
         200:
@@ -717,17 +704,12 @@ paths:
     post:
       operationId: create_resource
       requestBody:
-        $ref: '#/components/requestBodies/inline_object_2'
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              properties:
-                upfile:
-                  description: File object that needs to be uploaded
-                  format: binary
-                  type: string
-              required:
-              - upfile
+              $ref: '#/components/schemas/BinaryResourceObject'
+              required: true
+              description: File to Uplaod
               type: object
         required: true
       responses:
@@ -938,24 +920,6 @@ paths:
       - user
       x-openapi-router-controller: openapi_server.controllers.user_controller
 components:
-  requestBodies:
-    inline_object_1:
-      content:
-        multipart/form-data:
-          schema:
-            $ref: '#/components/schemas/inline_object_1'
-      required: true
-    inline_object:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/inline_object'
-    inline_object_2:
-      content:
-        multipart/form-data:
-          schema:
-            $ref: '#/components/schemas/inline_object_2'
-      required: true
   schemas:
     AcousticModel:
       example:
@@ -1229,7 +1193,7 @@ components:
       - acoustic_model
       - name
       type: object
-    inline_object:
+    ResourceReferenceObject:
       properties:
         resource_uuid:
           description: UUID of the resource
@@ -1239,7 +1203,7 @@ components:
       required:
       - resource_uuid
       type: object
-    inline_object_1:
+    BinaryDecodeObject:
       properties:
         audio_file:
           description: Audio file for decoding
@@ -1248,7 +1212,7 @@ components:
       required:
       - audio_file
       type: object
-    inline_response_202:
+    DecodeTaskReference:
       example:
         decode_uuid: 550e8400-e29b-11d4-a716-446655440000
       properties:
@@ -1256,7 +1220,7 @@ components:
           example: 550e8400-e29b-11d4-a716-446655440000
           format: uuid
           type: string
-    inline_object_2:
+    BinaryResourceObject:
       properties:
         upfile:
           description: File object that needs to be uploaded
