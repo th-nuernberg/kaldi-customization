@@ -19,13 +19,11 @@ lexicon_path = os.path.join(workspace_path, 'lexicon.txt')
 corpus_path = os.path.join(workspace_path, 'corpus.txt')
 acoustic_model_folder = os.path.join(script_root_path,"acc_models")
 
-new_graph_dir = os.path.join(script_root_path,"new_graph")
-new_graph_archive = os.path.join(script_root_path,"graph")
-archive_format ="zip"
-
 downloaded_acoustic_models = set()
-if not os.path.exists(acoustic_model_folder):
-    os.makedirs(acoustic_model_folder)
+if os.path.exists(acoustic_model_folder):
+    shutil.rmtree(acoustic_model_folder)
+os.makedirs(acoustic_model_folder)
+
 if __name__ == "__main__":
     try:
         conf, tasks, status, minio_client = parse_args('Kaldi Worker Connector', task_queue=redis_config.redis_queues["KALDI_QUEUE"])
@@ -35,32 +33,40 @@ if __name__ == "__main__":
             print(task)
 
             acoustic_model_id = task["acoustic_model_id"]
-            project_id = task["project_id"]
+            training_id = task["training_id"]
 
             if not os.path.exists(acoustic_model_folder):
                         os.makedirs(workspace_path)
 
             # cache models when used once and reduce download
             cur_acoustic_model_path = os.path.join(acoustic_model_folder,acoustic_model_id)
+            phone_symbol_table = os.path.join(cur_acoustic_model_path,"phones.txt")
             if(acoustic_model_id not in downloaded_acoustic_models):
                 os.makedirs(cur_acoustic_model_path)
                 download_from_bucket(minio_client, acoustic_model_bucket, acoustic_model_id + "/final.mdl", os.path.join(cur_acoustic_model_path,"final.mdl"))
                 download_from_bucket(minio_client, acoustic_model_bucket, acoustic_model_id + "/tree", os.path.join(cur_acoustic_model_path,"tree"))
+                download_from_bucket(minio_client, acoustic_model_bucket, acoustic_model_id + "/phones.txt", phone_symbol_table)
 
                 downloaded_acoustic_models.add(acoustic_model_id)
             
 
-            # TODO: load resources
-            download_from_bucket(minio_client, training_bucket, project_id + "/lexicon.txt", lexicon_path)
-            download_from_bucket(minio_client, training_bucket, project_id + "/corpus.txt", corpus_path)
-            # TODO: train resources
+            # load resources
+            download_from_bucket(minio_client, training_bucket, training_id + "/lexicon.txt", lexicon_path)
+            download_from_bucket(minio_client, training_bucket, training_id + "/corpus.txt", corpus_path)
+
+            # train resources
+            new_graph_dir = os.path.join(script_root_path,"new_graph")
             os.chdir("/kaldi/scripts/")
-            subprocess.call("/kaldi/scripts/create_new_graph.sh"+ " {} {} {} {} {}".format(lexicon_path,corpus_path,cur_acoustic_model_path,new_graph_dir,workspace_path),shell=True)
+            subprocess.call("/kaldi/scripts/create_new_graph.sh"+ " {} {} {} {} {} {}".format(lexicon_path,corpus_path,cur_acoustic_model_path,new_graph_dir,workspace_path,phone_symbol_table),shell=True)
             os.chdir("/")
-            # TODO Upload new model
-            shutil.make_archive(new_graph_archive,archive_format,workspace_path,new_graph_dir)
-            upload_to_bucket(minio_client,training_bucket,project_id + "/graph.zip", new_graph_archive + "." + archive_format)
-            # TODO: unload resources
+
+            # Upload new model
+            new_graph_archive = os.path.join(script_root_path,"graph")
+            archive_format ="zip"
+            shutil.make_archive(base_name=new_graph_archive, format=archive_format, root_dir=new_graph_dir, base_dir="./")
+            upload_to_bucket(minio_client,training_bucket,training_id + "/graph.zip", new_graph_archive + "." + archive_format)
+
+            # unload resources
             shutil.rmtree(workspace_path)
 
             # write in status queue
