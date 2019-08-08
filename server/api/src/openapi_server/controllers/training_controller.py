@@ -126,32 +126,7 @@ def set_corpus_of_training_resource(project_uuid, training_version, resource_uui
 
     :rtype: None
     """
-    return 'do somid = db.Column(db.Integer, primary_key=True)
-    
-    project = db.relationship('Project')
-    project_id = db.Column(db.Integer,db.ForeignKey("projects.id"))
-
-    version = db.Column(db.Integer)
-    
-    create_date = db.Column(db.DateTime(timezone=False))
-    status = db.Column(db.Enum(TrainingStateEnum))id = db.Column(db.Integer, primary_key=True)
-    
-    project = db.relationship('Project')
-    project_id = db.Column(db.Integer,db.ForeignKey("projects.id"))
-
-    version = db.Column(db.Integer)
-    
-    create_date = db.Column(db.DateTime(timezone=False))
-    status = db.Column(db.Enum(TrainingStateEnum))id = db.Column(db.Integer, primary_key=True)
-    
-    project = db.relationship('Project')
-    project_id = db.Column(db.Integer,db.ForeignKey("projects.id"))
-
-    version = db.Column(db.Integer)
-    
-    create_date = db.Column(db.DateTime(timezone=False))
-    status = db.Column(db.Enum(TrainingStateEnum))e magic!'
-
+    return "do some magic!"
 
 def start_training_by_version(project_uuid, training_version):  # noqa: E501
     """Start the specified training
