@@ -47,8 +47,8 @@ def db_acousticModel_to_front(db_acousticModel):
 
 def db_user_to_front(db_user):
     return User(
-        id=db_user.id,
-        username=db_user.username
+        username=db_user.username,
+        user_email=db_user.user_email
     )
 
 def db_language_to_front(db_language):
@@ -60,7 +60,8 @@ def db_language_to_front(db_language):
 def db_resource_to_front(db_resource):
     return Resource(
         name=db_resource.name, 
-        status=ResourceStatus.ResourceStateEnum_to_ResourceStatus(db_resource.status),
+        
+        status=ResourceStateEnum_to_ResourceStatus(db_resource.status),
         resource_type=ResourceTypeEnum_to_ResourceType(db_resource.resource_type),
         uuid=db_resource.uuid,
         creation_timestamp=db_resource.upload_date

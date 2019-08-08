@@ -5,6 +5,7 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True)
+    user_email = db.Column(db.String(255))
     pw_hash = db.Column(db.String(256))
     salt = db.Column(db.String(64))
 
