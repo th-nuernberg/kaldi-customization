@@ -6,7 +6,6 @@ import unittest
 from flask import json
 from six import BytesIO
 
-from openapi_server.models.binary_resource_object import BinaryResourceObject  # noqa: E501
 from openapi_server.models.resource import Resource  # noqa: E501
 from openapi_server.models.resource_reference_object import ResourceReferenceObject  # noqa: E501
 from openapi_server.test import BaseTestCase
@@ -37,25 +36,24 @@ class TestResourceController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    @unittest.skip("multipart/form-data not supported by Connexion")
     def test_create_resource(self):
         """Test case for create_resource
 
         Create/Upload a new resource
         """
-        binary_resource_object = {
-  "upfile" : ""
-}
         headers = { 
             'Accept': 'application/json',
-            'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
             'Authorization': 'Bearer special-key',
         }
+        data = dict(upfile=(BytesIO(b'some file data'), 'file.txt'))
         response = self.client.open(
             '/api/v1/resource',
             method='POST',
             headers=headers,
-            data=json.dumps(binary_resource_object),
-            content_type='application/json')
+            data=data,
+            content_type='multipart/form-data')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 

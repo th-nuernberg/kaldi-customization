@@ -61,7 +61,7 @@ def get_decodings(project_uuid, training_version):  # noqa: E501
     return 'do some magic!'
 
 
-def start_decode(project_uuid, training_version, binary_decode_object):  # noqa: E501
+def start_decode(project_uuid, training_version, audio_file):  # noqa: E501
     """Decode audio to text
 
     Decode audio data to text using the trained project # noqa: E501
@@ -70,15 +70,12 @@ def start_decode(project_uuid, training_version, binary_decode_object):  # noqa:
     :type project_uuid: 
     :param training_version: Training version of the project
     :type training_version: int
-    :param binary_decode_object: 
-    :type binary_decode_object: dict | bytes
+    :param audio_file: Audio file for decoding
+    :type audio_file: str
 
     :rtype: DecodeTaskReference
     """
-    if connexion.request.is_json:
-        binary_decode_object = BinaryDecodeObject.from_dict(connexion.request.get_json())  # noqa: E501
 
-    audio_file = binary_decode_object.audio_file
     print('Received new file for decode: ' + str(audio_file))
 
 

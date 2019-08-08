@@ -51,18 +51,17 @@ def get_filetype(filename):
             return DB_ResourceType[filetype]
     return None
 
-def create_resource(binary_resource_object):  # noqa: E501
+def create_resource(upfile):  # noqa: E501
     """Create/Upload a new resource
 
      # noqa: E501
 
-    :param binary_resource_object: 
-    :type binary_resource_object: dict | bytes
+    :param upfile: File object that needs to be uploaded
+    :type upfile: str
 
     :rtype: Resource
     """
 
-    upfile = binary_resource_object.upfile
     print('Received new file: ' + str(upfile))
 
     # if user does not select file, browser also
