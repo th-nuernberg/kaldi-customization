@@ -46,7 +46,6 @@ def create_project(create_project_object=None):  # noqa: E501
     my_user = DB_User.query.get(1)
 
     db_proj = DB_Project(
-        #api_token=str(uuid.uuid4().hex) + str(uuid.uuid4().hex),
         name=create_project_object.name,
         owner=my_user,
         acoustic_model=db_acousticModel
@@ -59,19 +58,6 @@ def create_project(create_project_object=None):  # noqa: E501
     db.session.commit()
 
     return mapper.db_project_to_front(db_proj)
-
-
-def download_training_result(project_uuid):  # noqa: E501
-    """Find project training results by UUID
-
-    Returns an archive # noqa: E501
-
-    :param project_uuid: UUID of project training result to return
-    :type project_uuid: str
-
-    :rtype: file
-    """
-    return 'do some magic!'
 
 
 def get_project_by_uuid(project_uuid):  # noqa: E501
@@ -94,28 +80,6 @@ def get_project_by_uuid(project_uuid):  # noqa: E501
         return ("Project not found", 404)
 
     return mapper.db_project_to_front(db_proj)
-
-'''
-def train_project(project_uuid):  # noqa: E501
-    """Train current project
-
-     # noqa: E501
-
-    :param project_uuid: Project object that needs to be trained
-    :type project_uuid: str
-
-    :rtype: TrainingStatus
-    """
-    entry = {
-        "acoustic-model-bucket" : config.minio_buckets.ACOUSTIC_MODELS_BUCKET,
-        "acoustic-model-id" : 1,
-        "project-bucket" : config.minio_buckets.LANGUAGE_MODELS_BUCKET,
-        "project-uuid" : project_uuid
-    }
-    redis_conn.rpush("QUEUE", json.dumps(entry))
-    return TrainingStatus.Training_Pending
-
-'''
 
 
 def get_projects():  # noqa: E501

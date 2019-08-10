@@ -300,22 +300,3 @@ def get_resource_data(resource_uuid):  # noqa: E501
             return ("File not found", 404)
 
     return send_file(local_file_path, as_attachment=True, attachment_filename=db_file.name)
-
-
-def set_corpus_of_training_resource(project_uuid, training_version, resource_uuid, body):  # noqa: E501
-    """Set the corpus of the resource
-
-    Updates the corpus of the specified resource for this training # noqa: E501
-
-    :param project_uuid: UUID of the project
-    :type project_uuid: 
-    :param training_version: Training version of the project
-    :type training_version: int
-    :param resource_uuid: UUID of the resource
-    :type resource_uuid: 
-    :param body: New or updated corpus as plain text
-    :type body: str
-
-    :rtype: None
-    """
-    return 'do some magic!'
