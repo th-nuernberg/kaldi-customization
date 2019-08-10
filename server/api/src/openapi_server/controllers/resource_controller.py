@@ -12,7 +12,19 @@ from openapi_server.models.resource_type import ResourceType
 from openapi_server.models.resource_reference_object import ResourceReferenceObject  # noqa: E501
 
 from openapi_server import util
-from models import db, Resource as DB_Resource, ResourceTypeEnum as DB_ResourceType, ResourceStateEnum as DB_ResourceState, User as DB_User
+
+from models import db
+from models import Resource as DB_Resource
+from models import ResourceTypeEnum as DB_ResourceType
+from models import ResourceStateEnum as DB_ResourceState
+from models import User as DB_User
+from models import Project as DB_Project
+from models import Training as DB_Training
+from models import TrainingResource as DB_TrainingResource
+from models import TrainingStateEnum as DB_TrainingStateEnum
+
+from sqlalchemy import and_
+
 from werkzeug.utils import secure_filename
 from flask import send_file
 
@@ -22,6 +34,23 @@ from config import minio_client
 from mapper import mapper
 
 TEMP_UPLOAD_FOLDER = '/tmp/fileupload'
+
+
+def get_db_project_training(project_uuid, training_version):
+    """
+    Queries the database and returns the specified project / training.
+    Returns None if not found
+    """
+    #TODO: check the ownership / permission
+
+    db_proj = DB_Project.query.filter_by(uuid=project_uuid).first()
+    if db_proj is None:
+        return None, None
+
+    db_train = DB_Training.query.filter_by(and_(project=db_proj, version=training_version))
+
+    return db_proj, db_train
+
 
 def assign_resource_to_training(project_uuid, training_version, resource_reference_object=None):  # noqa: E501
     """Assign a resource to the training
@@ -39,7 +68,31 @@ def assign_resource_to_training(project_uuid, training_version, resource_referen
     """
     if connexion.request.is_json:
         resource_reference_object = ResourceReferenceObject.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+
+    db_res = DB_Resource.query.filter_by(uuid=resource_reference_object.resource_uuid)
+    if db_res is None:
+        return ("Resource not found", 404)
+
+    db_proj, db_train = get_db_project_training(project_uuid, training_version)
+    if db_proj is None:
+        return ("Project not found", 404)
+    if db_train is None:
+        return ("Training not found", 404)
+
+    # check if already assigned
+    db_train_res = DB_TrainingResource.query.filter_by(and_(training=db_train, origin=db_res))
+    
+    if db_train_res is not None:
+        return ("Resource already in training", 400)
+
+    db_train_res = DB_TrainingResource(
+        training=db_train,
+        origin=db_res
+    )
+    db.session.add(db_train_res)
+    db.session.commit()
+
+    return mapper.db_resource_to_front(db_res)
 
 def get_filetype(filename):
     '''
@@ -144,24 +197,31 @@ def delete_assigned_resource_from_training(project_uuid, training_version, resou
 
     :rtype: None
     """
-    return 'do some magic!'
 
+    db_res = DB_Resource.query.filter_by(uuid=resource_uuid)
+    if db_res is None:
+        return ("Resource not found", 404)
 
-def get_corpus_of_training_resource(project_uuid, training_version, resource_uuid):  # noqa: E501
-    """Get the corpus of the resource
+    db_proj, db_train = get_db_project_training(project_uuid, training_version)
+    if db_proj is None:
+        return ("Project not found", 404)
+    if db_train is None:
+        return ("Training not found", 404)
 
-    Returns the corpus of the specified resource for this training # noqa: E501
+    # check if training already started
+    if not (db_train.status == DB_TrainingStateEnum.Init or db_train.status == DB_TrainingStateEnum.Trainable):
+        return ("Conflict: already in training", 409)
 
-    :param project_uuid: UUID of the project
-    :type project_uuid: 
-    :param training_version: Training version of the project
-    :type training_version: int
-    :param resource_uuid: UUID of the resource
-    :type resource_uuid: 
+    # check if already assigned
+    db_train_res = DB_TrainingResource.query.filter_by(and_(training=db_train, origin=db_res))
+    
+    if db_train_res is None:
+        return ("Resource was not in training", 400)
 
-    :rtype: str
-    """
-    return 'do some magic!'
+    db.session.delete(db_train_res)
+    db.session.commit()
+
+    return ("Resource assignment successfully removed", 200)
 
 
 def get_resource():  # noqa: E501
