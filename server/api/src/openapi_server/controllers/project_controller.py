@@ -28,13 +28,20 @@ def create_project(create_project_object=None):  # noqa: E501
     if connexion.request.is_json:
         create_project_object = CreateProjectObject.from_dict(connexion.request.get_json())  # noqa: E501
     else:
-        return (405, 'Invalid input')
+        return ('Invalid input', 405)
 
     # Resolve acoustic model
     db_acousticModel = DB_AcousticModel.query.filter_by(uuid=create_project_object.acoustic_model).first()
 
     if not db_acousticModel:
         return ("Acoustic Model not found", 404)
+
+    # Resolve optional parent project
+    db_parent_proj = None
+    if create_project_object.parent is not None:
+        db_parent_proj = DB_Project.query.filter_by(uuid=create_project_object.parent).first()
+        if db_parent_proj is None:
+            return ("Parent project not found", 404)
 
     my_user = DB_User.query.get(1)
 
@@ -43,8 +50,11 @@ def create_project(create_project_object=None):  # noqa: E501
         name=create_project_object.name,
         owner=my_user,
         acoustic_model=db_acousticModel
-        #TODO: how to set parent model?
     )
+
+    if db_parent_proj is not None:
+        db_proj.parent = db_parent_proj
+
     db.session.add(db_proj)
     db.session.commit()
 
