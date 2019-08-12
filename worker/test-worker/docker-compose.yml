@@ -1,0 +1,96 @@
+version: '3.2'
+
+services:
+  redis:
+    env_file:
+      - ../../config/.env
+    image: redis
+    networks:
+      - backend
+    command: "redis-server --requirepass ${REDIS_PASSWORD}"
+
+  minio:
+    env_file:
+      - ../../config/.env
+    image: "minio/minio"
+    command: server /data
+    networks:
+      - backend
+
+  text-prep-worker:
+    build:
+      context: ../../
+      dockerfile: ./worker/text-preparation-worker/Dockerfile
+    networks:
+      - backend    
+    depends_on:
+      - redis
+      - minio
+    command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
+              /bin/sh /tools/wait-for.sh redis:6379 -- \
+              python -u /text_prep_worker/text_preparation.py \
+                --redis-host=redis --redis-password=${REDIS_PASSWORD} \
+                --minio-host=minio --minio-access-key=${MINIO_ACCESS_KEY} --minio-secret-key=${MINIO_SECRET_KEY}"
+
+  data-prep-worker:
+    build:
+      context: ../../
+      dockerfile: ./worker/data-preparation-worker/Dockerfile
+    networks:
+      - backend
+    depends_on:
+      - redis
+      - minio
+    command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
+              /bin/sh /tools/wait-for.sh redis:6379 -- \
+              python -u /data_prep_worker/data_preparation.py \
+                --redis-host=redis --redis-password=${REDIS_PASSWORD} \
+                --minio-host=minio --minio-access-key=${MINIO_ACCESS_KEY} --minio-secret-key=${MINIO_SECRET_KEY}"
+
+  kaldi-worker:
+    build:
+      context: ../../
+      dockerfile: ./worker/kaldi-worker/Dockerfile
+    networks:
+      - backend
+    depends_on:
+      - redis
+      - minio
+    command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
+              /bin/sh /tools/wait-for.sh redis:6379 -- \
+              python -u /kaldi/worker.py \
+                --redis-host=redis --redis-password=${REDIS_PASSWORD} \
+                --minio-host=minio --minio-access-key=${MINIO_ACCESS_KEY} --minio-secret-key=${MINIO_SECRET_KEY}"
+
+  decode-worker:
+    build:
+      context: ../../
+      dockerfile: ./worker/decode-worker/Dockerfile
+    networks:
+      - backend
+    depends_on:
+      - redis
+      - minio
+    command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
+              /bin/sh /tools/wait-for.sh redis:6379 -- \
+              python -u /kaldi/worker.py \
+                --redis-host=redis --redis-password=${REDIS_PASSWORD} \
+                --minio-host=minio --minio-access-key=${MINIO_ACCESS_KEY} --minio-secret-key=${MINIO_SECRET_KEY}"
+
+  test-worker:
+    build:
+      context: ../../
+      dockerfile: ./worker/test-worker/Dockerfile
+    networks:
+      - backend
+    depends_on:
+      - redis
+      - minio
+    command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
+              /bin/sh /tools/wait-for.sh redis:6379 -- \
+              /bin/sh /test_worker/test-worker.sh \
+                redis ${REDIS_PASSWORD} \
+                minio ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY}"
+
+networks:
+  backend:
