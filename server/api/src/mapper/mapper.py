@@ -59,8 +59,7 @@ def db_language_to_front(db_language):
 
 def db_resource_to_front(db_resource):
     return Resource(
-        name=db_resource.name, 
-        
+        name=db_resource.name,
         status=ResourceStateEnum_to_ResourceStatus(db_resource.status),
         resource_type=ResourceTypeEnum_to_ResourceType(db_resource.resource_type),
         uuid=db_resource.uuid,
@@ -68,13 +67,13 @@ def db_resource_to_front(db_resource):
     )
 
 def db_training_to_front(db_training):
-    #TODO filter by user?
+    # TODO filter by user?
     resources = DB_TrainingResource.query.filter_by(training=db_training).all()
 
     if resources:
-        resource_list = [ db_resource_to_front(r) for r in resources ]
+        resource_list = [db_training_resource_to_front(r) for r in resources]
     else:
-        resource_list = None
+        resource_list = []
 
     return Training(
         version=db_training.version,
@@ -82,6 +81,9 @@ def db_training_to_front(db_training):
         status=TrainingStateEnum_to_TrainingStatus(db_training.status),
         resources=resource_list
     )
+
+def db_training_resource_to_front(db_training_resource):
+    return db_resource_to_front(db_training_resource.origin)
 
 def ResourceTypeEnum_to_ResourceType(resourceType):
     return {

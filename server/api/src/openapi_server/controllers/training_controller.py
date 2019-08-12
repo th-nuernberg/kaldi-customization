@@ -10,7 +10,9 @@ from models import db
 from models.project import Project as DB_Project
 from models.user import User as DB_User
 from models.acousticmodel import AcousticModel as DB_AcousticModel
+from models.resource import Resource as DB_Resource
 from models.training import Training as DB_Training, TrainingStateEnum as DB_TrainingStateEnum
+from models.training_resource import TrainingResource as DB_TrainingResource
 
 from redis_communication import create_kaldi_job
 
@@ -32,7 +34,34 @@ def assign_resource_to_training(project_uuid, training_version, resource_referen
     """
     if connexion.request.is_json:
         resource_reference_object = ResourceReferenceObject.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+
+    db_proj = DB_Project.query.filter_by(uuid=project_uuid).first()
+
+    if not db_proj:
+        return ("Project not found", 404)
+
+    db_training = DB_Training.query.filter_by(project_id=db_proj.id, version=training_version).first()
+
+    if not db_training:
+        return ("Training not found", 404)
+
+    db_resource = DB_Resource.query.filter_by(uuid=resource_reference_object.resource_uuid).first()
+
+    if not db_resource:
+        return ("Resource not found", 404)
+
+    db_training_resource = DB_TrainingResource.query.filter_by(training_id=db_training.id, origin_id=db_resource.id).first()
+
+    if db_training_resource:
+        return mapper.db_training_resource_to_front(db_training_resource)
+
+    db_training_resource = DB_TrainingResource(
+        training=db_training, origin=db_resource)
+
+    db.session.add(db_training_resource)
+    db.session.commit()
+
+    return mapper.db_training_resource_to_front(db_training_resource)
 
 
 def create_training(project_uuid):  # noqa: E501
@@ -45,15 +74,20 @@ def create_training(project_uuid):  # noqa: E501
 
     :rtype: Training
     """
-    #TODO: check the ownership of the file
+    # TODO: check the ownership of the file
 
     db_proj = DB_Project.query.filter_by(uuid=project_uuid).first()
 
     if (db_proj is None):
         return ("Project not found", 404)
 
+    db_last_training = DB_Training.query.filter_by(project_id=db_proj.id).order_by(DB_Training.version.desc()).first()
+
+    version = db_last_training.id + 1 if db_last_training else 1
+
     db_training = DB_Training(
-        project=db_proj
+        project=db_proj,
+        version=version
     )
     db.session.add(db_training)
     db.session.commit()
@@ -144,7 +178,7 @@ def start_training_by_version(project_uuid, training_version):  # noqa: E501
     db_training = DB_Training.query.filter_by(version=training_version,project=db_project).first()
 
     if db_training.status != DB_TrainingStateEnum.Trainable:
-        return ("training already done or pending",400)
+        return ("training already done or pending", 400)
 
     db_training.status = DB_TrainingStateEnum.Training_Pending
 
@@ -153,5 +187,4 @@ def start_training_by_version(project_uuid, training_version):  # noqa: E501
 
     create_kaldi_job(training_id=db_training.id, acoustic_model_id=db_project.acoustic_model_id)
 
-    #TODO return Training -> missing mapper
-    return 'do some magic!'
+    return mapper.db_training_to_front(db_training)
