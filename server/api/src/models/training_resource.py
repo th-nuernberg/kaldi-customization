@@ -4,7 +4,7 @@ import json
 class TrainingResource(db.Model):
     __tablename__ = 'training_resources'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     
     training = db.relationship('Training')
     training_id = db.Column(db.Integer,db.ForeignKey("trainings.id"))

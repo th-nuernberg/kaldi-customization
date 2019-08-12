@@ -28,7 +28,7 @@ def create_project(create_project_object=None):  # noqa: E501
     if connexion.request.is_json:
         create_project_object = CreateProjectObject.from_dict(connexion.request.get_json())  # noqa: E501
     else:
-        return (405, 'Invalid input')
+        return ('Invalid input', 405)
 
     # Resolve acoustic model
     db_acousticModel = DB_AcousticModel.query.filter_by(uuid=create_project_object.acoustic_model).first()
@@ -36,32 +36,28 @@ def create_project(create_project_object=None):  # noqa: E501
     if not db_acousticModel:
         return ("Acoustic Model not found", 404)
 
+    # Resolve optional parent project
+    db_parent_proj = None
+    if create_project_object.parent is not None:
+        db_parent_proj = DB_Project.query.filter_by(uuid=create_project_object.parent).first()
+        if db_parent_proj is None:
+            return ("Parent project not found", 404)
+
     my_user = DB_User.query.get(1)
 
     db_proj = DB_Project(
-        #api_token=str(uuid.uuid4().hex) + str(uuid.uuid4().hex),
         name=create_project_object.name,
         owner=my_user,
         acoustic_model=db_acousticModel
-        #TODO: how to set parent model?
     )
+
+    if db_parent_proj is not None:
+        db_proj.parent = db_parent_proj
+
     db.session.add(db_proj)
     db.session.commit()
 
     return mapper.db_project_to_front(db_proj)
-
-
-def download_training_result(project_uuid):  # noqa: E501
-    """Find project training results by UUID
-
-    Returns an archive # noqa: E501
-
-    :param project_uuid: UUID of project training result to return
-    :type project_uuid: str
-
-    :rtype: file
-    """
-    return 'do some magic!'
 
 
 def get_project_by_uuid(project_uuid):  # noqa: E501
@@ -84,28 +80,6 @@ def get_project_by_uuid(project_uuid):  # noqa: E501
         return ("Project not found", 404)
 
     return mapper.db_project_to_front(db_proj)
-
-'''
-def train_project(project_uuid):  # noqa: E501
-    """Train current project
-
-     # noqa: E501
-
-    :param project_uuid: Project object that needs to be trained
-    :type project_uuid: str
-
-    :rtype: TrainingStatus
-    """
-    entry = {
-        "acoustic-model-bucket" : config.minio_buckets.ACOUSTIC_MODELS_BUCKET,
-        "acoustic-model-id" : 1,
-        "project-bucket" : config.minio_buckets.LANGUAGE_MODELS_BUCKET,
-        "project-uuid" : project_uuid
-    }
-    redis_conn.rpush("QUEUE", json.dumps(entry))
-    return TrainingStatus.Training_Pending
-
-'''
 
 
 def get_projects():  # noqa: E501

@@ -17,7 +17,7 @@ class Project(db.Model):
     acoustic_model = db.relationship('AcousticModel')
 
     parent_id = db.Column(db.Integer, db.ForeignKey("projects.id"), nullable=True)
-    parent = db.relationship('Project')
+    parent = db.relationship('Project', uselist=False)
 
     create_date = db.Column(db.DateTime(timezone=False), default=datetime.datetime.utcnow)
 
