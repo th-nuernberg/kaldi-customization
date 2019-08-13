@@ -34,8 +34,11 @@ class KaldiStatusCode(IntEnum):
 class KaldiStatus(dict):
     """KaldiStatus is used for redis communication from KaldiWorker to API"""
 
-    def __init__(self, id):
-        dict.__init__(self, id=id)
+    def __init__(self, id, __queue__='kaldi'):
+        assert __queue__ == 'kaldi'
+
+        dict.__init__(self, __queue__=__queue__,
+                      id=id)
 
     @property
     def id(self):
