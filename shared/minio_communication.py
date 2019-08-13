@@ -2,17 +2,17 @@ import minio
 from minio import ResponseError
 
 minio_buckets = dict(
-    #all resources/file uploads
-    RESOURCE_BUCKET = 'resources',
-    TRAINING_RESOURCE_BUCKET = 'training-resources',
+    # all resources/file uploads
+    RESOURCE_BUCKET='resources',
+    TRAINING_RESOURCE_BUCKET='training-resources',
 
-    DECODING_BUCKET = 'decodings',
+    DECODING_BUCKET='decodings',
 
     # acoustic models thfilenameat are trained by users
-    ACOUSTIC_MODELS_BUCKET  = 'acoustic-models',
+    ACOUSTIC_MODELS_BUCKET='acoustic-models',
 
     # projects
-    TRAINING_BUCKET  = 'trainings'
+    TRAINING_BUCKET='trainings'
     )
 
 
@@ -29,7 +29,7 @@ def does_bucket_exist(minio_client, bucket_name):
 def download_from_bucket(minio_client, bucket, filename, target_path):
     try:
         minio_client.fget_object(bucket, filename, target_path)
-            
+
     except ResponseError as err:
         print(err)
         return (False, err)
