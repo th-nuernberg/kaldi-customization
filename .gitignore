@@ -1,5 +1,7 @@
 dfs/
 
+*.pyc
+
 ### Idea ###
 .idea/
 .idea_modules/

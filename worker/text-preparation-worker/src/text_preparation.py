@@ -105,6 +105,8 @@ def infinite_loop():
         print("Received the following task from Text-Prep-Queue: ")
         print(data)
 
+        task = None
+
         try:
             print("Starting to process received data")
             task = TextPrepTask(**data)
@@ -135,7 +137,7 @@ def infinite_loop():
         except Exception as e:
             status_queue.submit(TextPrepStatus(
                 id=TextPrepStatusCode.FAILURE,
-                resource_uuid=task.resource_uuid,
+                resource_uuid=task.resource_uuid if task else None,
                 message=str(e)
             ))
             raise e

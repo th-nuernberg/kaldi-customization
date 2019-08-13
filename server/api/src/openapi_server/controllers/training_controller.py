@@ -10,7 +10,7 @@ from models import db
 from models.project import Project as DB_Project
 from models.user import User as DB_User
 from models.acousticmodel import AcousticModel as DB_AcousticModel
-from models.resource import Resource as DB_Resource
+from models.resource import Resource as DB_Resource, ResourceStateEnum as DB_ResourceStateEnum
 from models.training import Training as DB_Training, TrainingStateEnum as DB_TrainingStateEnum
 from models.training_resource import TrainingResource as DB_TrainingResource
 
@@ -45,10 +45,16 @@ def assign_resource_to_training(project_uuid, training_version, resource_referen
     if not db_training:
         return ("Training not found", 404)
 
+    if not db_training.can_assign_resource():
+        return ("Training already in progress", 400)
+
     db_resource = DB_Resource.query.filter_by(uuid=resource_reference_object.resource_uuid).first()
 
     if not db_resource:
         return ("Resource not found", 404)
+
+    if db_resource.has_error():
+        return ("Resource has errors", 400)
 
     db_training_resource = DB_TrainingResource.query.filter_by(training_id=db_training.id, origin_id=db_resource.id).first()
 
@@ -59,6 +65,13 @@ def assign_resource_to_training(project_uuid, training_version, resource_referen
         training=db_training, origin=db_resource)
 
     db.session.add(db_training_resource)
+
+    if db_resource.status != DB_ResourceStateEnum.TextPreparation_Success:
+        db_training.status = DB_TrainingStateEnum.TextPrep_Pending
+    elif db_training.status == DB_TrainingStateEnum.Init:
+        db_training.status = DB_TrainingStateEnum.Trainable
+
+    db.session.add(db_training)
     db.session.commit()
 
     return mapper.db_training_resource_to_front(db_training_resource)
@@ -141,7 +154,17 @@ def get_training_by_version(project_uuid, training_version):  # noqa: E501
 
     :rtype: Training
     """
-    return 'do some magic!'
+    db_proj = DB_Project.query.filter_by(uuid=project_uuid).first()
+
+    if not db_proj:
+        return ("Project not found", 404)
+
+    db_training = DB_Training.query.filter_by(project_id=db_proj.id, version=training_version).first()
+
+    if not db_training:
+        return ("Training not found", 404)
+
+    return mapper.db_training_to_front(db_training)
 
 
 def set_corpus_of_training_resource(project_uuid, training_version, resource_uuid, body):  # noqa: E501

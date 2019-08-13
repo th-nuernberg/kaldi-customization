@@ -31,7 +31,9 @@ class TextPrepStatusCode(IntEnum):
 class TextPrepStatus(dict):
     """TextPrepStatus is used for redis communication from TextPrepWorker to API"""
 
-    def __init__(self, id, resource_uuid, message, __queue__='text-prep'):
+    def __init__(self, id, resource_uuid, message, __queue__='text_prep'):
+        assert __queue__ == 'text_prep'
+
         dict.__init__(self, __queue__=__queue__,
                       id=id, message=message, resource_uuid=resource_uuid)
 

@@ -1,7 +1,8 @@
 from ._db import db, AlchemyEncoder, generate_uuid
+import datetime
 import enum
 import json
-import datetime
+
 
 class ResourceStateEnum(enum.IntEnum):
     Upload_InProgress = 0
@@ -25,6 +26,7 @@ class ResourceStateEnum(enum.IntEnum):
             12: 'TextPreparation_Failure',
             13: 'TextPreparation_Success'
             }[status]
+
 
 class ResourceTypeEnum(enum.IntEnum):
     html = 1
@@ -56,3 +58,7 @@ class Resource(db.Model):
 
     def __repr__(self):
         return json.dumps(self, cls=AlchemyEncoder)
+
+    def has_error(self):
+        return self.status == ResourceStateEnum.Upload_Failure \
+            or self.status == ResourceStateEnum.TextPreparation_Failure
