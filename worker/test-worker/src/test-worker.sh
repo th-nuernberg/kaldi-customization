@@ -12,25 +12,24 @@ echo "----------------------------------------------------------------------"
 
 # Step 2: Setup all test cases for the text-preparation-worker and execute these test cases
 echo ""
-echo "Python call not implemented yet"
-echo ""
+python3 test_text_preparation.py $1 $2 $3 $4 $5
 echo "----------------------------------------------------------------------"
 
 # Step 3: Evaluate the test results
 echo ""
-echo "Python call not implemented yet"
+echo "Test evaluation not implemented yet"
 echo ""
 echo "----------------------------------------------------------------------"
 
 # Step 4: Setup all test cases for the data-preparation-worker and execute these test cases
 echo ""
-echo "Python call not implemented yet"
+python3 test_data_preparation.py $1 $2 $3 $4 $5
 echo ""
 echo "----------------------------------------------------------------------"
 
 # Step 5: Evaluate the test results
 echo ""
-echo "Python call not implemented yet"
+echo "Test evaluation not implemented yet"
 echo ""
 echo "----------------------------------------------------------------------"
 
@@ -42,7 +41,7 @@ echo "----------------------------------------------------------------------"
 
 # Step 7: Evaluate the test results
 echo ""
-echo "Python call not implemented yet"
+echo "Test evaluation not implemented yet"
 echo ""
 echo "----------------------------------------------------------------------"
 
@@ -54,7 +53,7 @@ echo "----------------------------------------------------------------------"
 
 # Step 9: Evaluate the test results
 echo ""
-echo "Python call not implemented yet"
+echo "Test evaluation not implemented yet"
 echo ""
 echo "----------------------------------------------------------------------"
 
@@ -62,6 +61,6 @@ echo "----------------------------------------------------------------------"
 #          If all tests were successfully executed --> exit 0
 #          Else --> print which test cases failed
 echo ""
-echo "Python call not implemented yet"
+echo "General evaluation not implemented yet"
 echo ""
 echo "----------------------------------------------------------------------"

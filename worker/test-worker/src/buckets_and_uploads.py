@@ -12,43 +12,32 @@ def create_all_buckets(minio_client):
 
 
 def upload_all_text_prep_files(minio_client):
-    '''
-    The following files are needed for the Text-Preparation-Worker:
-        - txt-file
-        - docx-file
-        - pdf-file
-        - png-file
-        - jpg-file
-        - html-file
-
-    All these files need to be saved within the resources bucket
-    '''
-    pass
+    upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "1/source", "test-files/text_prep_files/txt/kafkatxt")
+    upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "2/source", "test-files/text_prep_files/pdf/kafkapdf")
+    upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "3/source", "test-files/text_prep_files/word/kafkadocx")
+    upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "4/source", "test-files/text_prep_files/html/gamestarhtml")
+    upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "5/source", "test-files/text_prep_files/jpg/dokumentjpg")
+    upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "6/source", "test-files/text_prep_files/png/dokumentpng")
 
 
-def upload_all_data_prep_files(minio_client):
-    '''
-    The following files are needed for the Data-Preparation-Worker:
-        - acoustic model == g2p_model.fst
+def upload_all_remaining_files(minio_client):
+    voxfore_rnn_id = 1
 
-    The acoustic model needs to be uploaded to the acoustic-models bucket
-    '''
-    pass
+    upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/final.mdl"  , "test-files/remaining_files/voxforge-rnn/final.mdl")
+    upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/lexicon.txt"  , "test-files/remaining_files/voxforge-rnn/lexicon.txt")
+    upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/tree"  , "test-files/remaining_files/voxforge-rnn/tree")
+    upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/phones.txt"  , "test-files/remaining_files/voxforge-rnn/phones.txt")
+    upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/g2p_model.fst"  , "test-files/remaining_files/voxforge-rnn/g2p_model.fst")
+    upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/cmvn_opts"  , "test-files/remaining_files/voxforge-rnn/cmvn_opts")
+    upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/final.dubm"  , "test-files/remaining_files/voxforge-rnn/extractor/final.dubm")
+    upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/final.ie"  , "test-files/remaining_files/voxforge-rnn/extractor/final.ie")
+    upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/final.ie.id"  , "test-files/remaining_files/voxforge-rnn/extractor/final.ie.id")
+    upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/final.mat"  , "test-files/remaining_files/voxforge-rnn/extractor/final.mat")
+    upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/global_cmvn.stats"  , "test-files/remaining_files/voxforge-rnn/extractor/global_cmvn.stats")
+    upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/online_cmvn.conf"  , "test-files/remaining_files/voxforge-rnn/extractor/online_cmvn.conf")
+    upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/splice_opts"  , "test-files/remaining_files/voxforge-rnn/extractor/splice_opts")
 
-
-def upload_all_files_for_kaldi(minio_client):
-    '''
-    The following files are needed for the Kaldi-Worker:
-        -
-
-    The acoustic model needs to be uploaded to the acoustic-models bucket
-
-    The following files are needed for the Decode-Worker:
-        - 
-    
-    The acoustic model needs to be uploaded to the acoustic-models bucket
-    '''
-    pass
+    upload_to_bucket(minio_client,minio_buckets["DECODING_BUCKET"], "test.wav", "test-files/remaining_files/test.wav")
 
 
 if __name__ == "__main__":
@@ -76,14 +65,8 @@ if __name__ == "__main__":
     print("All necessary files were successfully uploaded")
     print("")
 
-    # Step 4: Uploading all necessary files for data-preparation-worker
-    print("Starting to upload all necessary files for the Data-Preparation-Worker")
-    upload_all_data_prep_files(minio_client)
-    print("All necessary files were successfully uploaded")
-    print("")
-
-    # Step 5: Uploading all necessary files for kaldi-worker and decode-worker
-    print("Starting to upload all necessary files for the Kaldi-worker and Decode-worker")
-    upload_all_files_for_kaldi(minio_client)
+    # Step 4: Uploading all necessary files for kaldi-worker, decode-worker and data-prep-worker
+    print("Starting to upload all necessary files for the Kaldi-worker, Decode-worker and Data-Prep-Worker")
+    upload_all_remaining_files(minio_client)
     print("All necessary files were successfully uploaded")
     print("")
