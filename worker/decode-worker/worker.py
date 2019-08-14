@@ -10,6 +10,7 @@ import json
 
 acoustic_model_bucket = minio_buckets['ACOUSTIC_MODELS_BUCKET']
 decode_bucket = minio_buckets["DECODING_BUCKET"]
+training_bucket = minio_buckets["TRAINING_RESOURCE_BUCKET"]
 
 script_root_path = os.path.dirname(os.path.realpath(__file__))
 workspace_path = os.path.join(script_root_path, 'workspace')
@@ -19,8 +20,13 @@ wav_file_path = os.path.join(workspace_path, 'tmp.wav')
 acoustic_model_folder = os.path.join(script_root_path,"acc_models")
 
 downloaded_acoustic_models = set()
-if not os.path.exists(acoustic_model_folder):
-    os.makedirs(acoustic_model_folder)
+if os.path.exists(acoustic_model_folder):
+    shutil.rmtree(acoustic_model_folder)
+os.makedirs(acoustic_model_folder)
+
+
+if os.path.exists(workspace_path):
+    shutil.rmtree(workspace_path)
 
 if __name__ == "__main__":
     try:
@@ -30,15 +36,15 @@ if __name__ == "__main__":
             print("Read task from queue:")
             print(task)
 
-            acoustic_model_id = task["acoustic_model_id"]
+            acoustic_model_id = str(task["acoustic_model_id"])
             decode_file = task["decode_file"]
-            training = task["training"]
+            training_id = str(task["training_id"])
 
             if not os.path.exists(acoustic_model_folder):
                         os.makedirs(workspace_path)
 
             # cache acoustic models when used once and reduce download
-            cur_acoustic_model_path = os.path.join(acoustic_model_folder,acoustic_model_id)
+            cur_acoustic_model_path = os.path.join(acoustic_model_folder,str(acoustic_model_id))
             ivector_extractor_path = os.path.join(cur_acoustic_model_path,"extractor")
             if(acoustic_model_id not in downloaded_acoustic_models):
                 os.makedirs(cur_acoustic_model_path)
@@ -57,8 +63,12 @@ if __name__ == "__main__":
 
                 downloaded_acoustic_models.add(acoustic_model_id)
             
-            # TODO Download Graph files from training
+            # Download Graph files from training
             cur_graph_path = os.path.join(workspace_path,"graph")
+            download_graph_path = os.path.join(workspace_path, "graph.zip")
+            download_from_bucket(minio_client, training_bucket, training_id + "/graph.zip", download_graph_path)
+            shutil.unpack_archive(download_graph_path, cur_graph_path)
+
 
             # Download wav file to decode
             download_from_bucket(minio_client, decode_bucket, decode_file , wav_file_path)
@@ -66,10 +76,10 @@ if __name__ == "__main__":
             # create data dir
             data_path = os.path.join(workspace_path,"data")
             os.makedirs(data_path)
-            with open(os.path.join(data_path,"utt2spk")) as f:
+            with open(os.path.join(data_path,"utt2spk"),"w") as f:
                 f.write("generic generic_speaker")
             
-            with open(os.path.join(data_path,"wav.scp")) as f:
+            with open(os.path.join(data_path,"wav.scp"),"w") as f:
                 f.write("generic " + wav_file_path)
 
             # decode
@@ -80,7 +90,7 @@ if __name__ == "__main__":
 
             result = "ERROR"
             # extract from acoustic_model/decode
-            with open(os.path.join(decode_path, "log", "decode.1.log") as f:
+            with open(os.path.join(decode_path, "log", "decode.1.log")) as f:
                 for line in f:
                     line = line.split()
                     if line[0] == 'generic':
@@ -91,6 +101,8 @@ if __name__ == "__main__":
             # unload resources
             shutil.rmtree(workspace_path)
             shutil.rmtree(decode_path)
+
+            status.submit(DecodeStatus(id=DecodeStatusCode.SUCCESS, decode_uuid=decode_file, transcripts=[result]))
 
     except KeyboardInterrupt:
         #cleanup

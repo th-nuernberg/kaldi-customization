@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   description: Kaldi Customization Server.
   title: Kaldi Customization Server
-  version: 1.0.1
+  version: 1.0.2
 servers:
 - url: http://localhost:8080/api/v1
 - url: https://localhost:8080/api/v1
@@ -15,7 +15,43 @@ tags:
   name: user
 - description: Operations about decoding
   name: decode
+- description: Global operations
+  name: global
+- description: Operations about resources
+  name: resource
 paths:
+  /global/acousticmodels:
+    get:
+      operationId: get_acoustic_models
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AcousticModel'
+                type: array
+          description: List of acoustic models
+      summary: Returns a list of available acoustic models
+      tags:
+      - global
+      x-openapi-router-controller: openapi_server.controllers.global_controller
+  /global/languages:
+    get:
+      operationId: get_languages
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Language'
+                type: array
+          description: List of acoustic models
+      summary: Returns a list of available languages
+      tags:
+      - global
+      x-openapi-router-controller: openapi_server.controllers.global_controller
   /project:
     get:
       operationId: get_projects
@@ -227,6 +263,53 @@ paths:
       - training
       x-openapi-router-controller: openapi_server.controllers.training_controller
   /project/{project_uuid}/training/{training_version}/decode:
+    get:
+      description: Returns a list of all decodings for this training version
+      operationId: get_decodings
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/DecodeMessage'
+                type: array
+          description: List of decoding messages
+        400:
+          content: {}
+          description: Training not finished
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - decode:projects
+      summary: List of all decodings
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
     post:
       description: Decode audio data to text using the trained project
       operationId: start_decode
@@ -250,25 +333,17 @@ paths:
           type: integer
         style: simple
       requestBody:
-        $ref: '#/components/requestBodies/inline_object'
         content:
           multipart/form-data:
             schema:
-              properties:
-                audio_file:
-                  description: Audio file for decoding
-                  format: binary
-                  type: string
-              required:
-              - audio_file
-              type: object
+              $ref: '#/components/schemas/BinaryDecodeObject'
         required: true
       responses:
         202:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_202'
+                $ref: '#/components/schemas/DecodeTaskReference'
           description: Decoding successfully queued
         400:
           content: {}
@@ -346,9 +421,9 @@ paths:
       - decode
       x-openapi-router-controller: openapi_server.controllers.decode_controller
   /project/{project_uuid}/training/{training_version}/resource:
-    get:
-      description: Returns a list of all resources assigned to this training
-      operationId: get_training_resources
+    post:
+      description: Assign the specified resource to the training
+      operationId: assign_resource_to_training
       parameters:
       - description: UUID of the project
         explode: false
@@ -368,26 +443,35 @@ paths:
         schema:
           type: integer
         style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceReferenceObject'
+        description: Resource that needs to be added
       responses:
         200:
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/Training'
-                type: array
-          description: List of assigend resources
+                $ref: '#/components/schemas/Resource'
+          description: Resource successfully assigned
+        400:
+          content: {}
+          description: Resource already in training
         403:
           content: {}
           description: Forbidden
         404:
           content: {}
-          description: Project or training not found
+          description: Project, training or resource not found
       security:
       - oauth:
         - read:projects
+        - write:projects
         - read:resources
-      summary: Get a list of assigned resources
+        - write:resources
+      summary: Assign a resource to the training
       tags:
       - training
       - resource
@@ -448,65 +532,6 @@ paths:
       - training
       - resource
       x-openapi-router-controller: openapi_server.controllers.training_controller
-    post:
-      description: Assign the specified resource to the training
-      operationId: assign_resource_to_training
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      - description: UUID of the resource
-        explode: false
-        in: path
-        name: resource_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Resource'
-          description: Resource successfully assigned
-        400:
-          content: {}
-          description: Resource already in training
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project, training or resource not found
-      security:
-      - oauth:
-        - read:projects
-        - write:projects
-        - read:resources
-        - write:resources
-      summary: Assign a resource to the training
-      tags:
-      - training
-      - resource
-      x-openapi-router-controller: openapi_server.controllers.training_controller
   /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/corpus:
     get:
       description: Returns the corpus of the specified resource for this training
@@ -543,7 +568,7 @@ paths:
       responses:
         200:
           content:
-            application/json:
+            text/plain:
               schema:
                 description: Corpus of the resource
                 example: er horte leise schritte hinter sich das bedeutete nichts
@@ -675,18 +700,10 @@ paths:
     post:
       operationId: create_resource
       requestBody:
-        $ref: '#/components/requestBodies/inline_object_1'
         content:
           multipart/form-data:
             schema:
-              properties:
-                upfile:
-                  description: File object that needs to be uploaded
-                  format: binary
-                  type: string
-              required:
-              - upfile
-              type: object
+              $ref: '#/components/schemas/BinaryResourceObject'
         required: true
       responses:
         202:
@@ -896,32 +913,15 @@ paths:
       - user
       x-openapi-router-controller: openapi_server.controllers.user_controller
 components:
-  requestBodies:
-    inline_object_1:
-      content:
-        multipart/form-data:
-          schema:
-            $ref: '#/components/schemas/inline_object_1'
-      required: true
-    inline_object:
-      content:
-        multipart/form-data:
-          schema:
-            $ref: '#/components/schemas/inline_object'
-      required: true
   schemas:
     AcousticModel:
       example:
         name: name
         language:
           name: name
-          id: 6
-        id: 0
+          id: 0
         uuid: 550e8400-e29b-11d4-a716-446655440000
       properties:
-        id:
-          format: int64
-          type: integer
         name:
           type: string
         language:
@@ -971,7 +971,7 @@ components:
     Language:
       example:
         name: name
-        id: 6
+        id: 0
       properties:
         id:
           format: int64
@@ -984,7 +984,8 @@ components:
     Project:
       example:
         owner:
-          id: 1
+          user-email: user-email
+          password: password
           username: username
         parent: 550e8400-e29b-11d4-a716-446655440000
         creation_timestamp: 2000-01-23T04:56:07.000+00:00
@@ -1012,8 +1013,7 @@ components:
           name: name
           language:
             name: name
-            id: 6
-          id: 0
+            id: 0
           uuid: 550e8400-e29b-11d4-a716-446655440000
         uuid: 550e8400-e29b-11d4-a716-446655440000
       properties:
@@ -1147,19 +1147,24 @@ components:
       type: object
     User:
       example:
-        id: 1
+        user-email: user-email
+        password: password
         username: username
       properties:
-        id:
-          format: int64
-          type: integer
         username:
           type: string
+        user-email:
+          format: email
+          type: string
+        password:
+          type: string
+          writeOnly: true
       required:
       - username
       type: object
     CreateProjectObject:
       example:
+        parent: 550e8400-e29b-11d4-a716-446655440000
         name: MyProject
         acoustic_model: 550e8400-e29b-11d4-a716-446655440000
       properties:
@@ -1172,11 +1177,16 @@ components:
           example: 550e8400-e29b-11d4-a716-446655440000
           format: uuid
           type: string
+        parent:
+          description: UUID of the optional parent project
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
       required:
       - acoustic_model
       - name
       type: object
-    inline_object:
+    BinaryDecodeObject:
       properties:
         audio_file:
           description: Audio file for decoding
@@ -1185,7 +1195,7 @@ components:
       required:
       - audio_file
       type: object
-    inline_response_202:
+    DecodeTaskReference:
       example:
         decode_uuid: 550e8400-e29b-11d4-a716-446655440000
       properties:
@@ -1193,7 +1203,20 @@ components:
           example: 550e8400-e29b-11d4-a716-446655440000
           format: uuid
           type: string
-    inline_object_1:
+      type: object
+    ResourceReferenceObject:
+      example:
+        resource_uuid: 550e8400-e29b-11d4-a716-446655440000
+      properties:
+        resource_uuid:
+          description: UUID of the resource
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+      required:
+      - resource_uuid
+      type: object
+    BinaryResourceObject:
       properties:
         upfile:
           description: File object that needs to be uploaded

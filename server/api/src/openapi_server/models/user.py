@@ -15,26 +15,31 @@ class User(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, username=None):  # noqa: E501
+    def __init__(self, username=None, user_email=None, password=None):  # noqa: E501
         """User - a model defined in OpenAPI
 
-        :param id: The id of this User.  # noqa: E501
-        :type id: int
         :param username: The username of this User.  # noqa: E501
         :type username: str
+        :param user_email: The user_email of this User.  # noqa: E501
+        :type user_email: str
+        :param password: The password of this User.  # noqa: E501
+        :type password: str
         """
         self.openapi_types = {
-            'id': int,
-            'username': str
+            'username': str,
+            'user_email': str,
+            'password': str
         }
 
         self.attribute_map = {
-            'id': 'id',
-            'username': 'username'
+            'username': 'username',
+            'user_email': 'user-email',
+            'password': 'password'
         }
 
-        self._id = id
         self._username = username
+        self._user_email = user_email
+        self._password = password
 
     @classmethod
     def from_dict(cls, dikt) -> 'User':
@@ -46,27 +51,6 @@ class User(Model):
         :rtype: User
         """
         return util.deserialize_model(dikt, cls)
-
-    @property
-    def id(self):
-        """Gets the id of this User.
-
-
-        :return: The id of this User.
-        :rtype: int
-        """
-        return self._id
-
-    @id.setter
-    def id(self, id):
-        """Sets the id of this User.
-
-
-        :param id: The id of this User.
-        :type id: int
-        """
-
-        self._id = id
 
     @property
     def username(self):
@@ -90,3 +74,45 @@ class User(Model):
             raise ValueError("Invalid value for `username`, must not be `None`")  # noqa: E501
 
         self._username = username
+
+    @property
+    def user_email(self):
+        """Gets the user_email of this User.
+
+
+        :return: The user_email of this User.
+        :rtype: str
+        """
+        return self._user_email
+
+    @user_email.setter
+    def user_email(self, user_email):
+        """Sets the user_email of this User.
+
+
+        :param user_email: The user_email of this User.
+        :type user_email: str
+        """
+
+        self._user_email = user_email
+
+    @property
+    def password(self):
+        """Gets the password of this User.
+
+
+        :return: The password of this User.
+        :rtype: str
+        """
+        return self._password
+
+    @password.setter
+    def password(self, password):
+        """Sets the password of this User.
+
+
+        :param password: The password of this User.
+        :type password: str
+        """
+
+        self._password = password
