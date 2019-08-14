@@ -22,6 +22,6 @@ class Project(db.Model):
     create_date = db.Column(db.DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     #TODO Trainings?
-    
+
     def __repr__(self):
         return json.dumps(self, cls=AlchemyEncoder)

@@ -16,7 +16,7 @@ def handle_text_prep_status(msg_data, db_session):
     '''
     status = TextPrepStatus(**msg_data)
 
-    db_resource = db_session.query(Resource).filter_by(uuid=uuid.UUID(status.resource_uuid)).first()
+    db_resource = db_session.query(Resource).filter(Resource.uuid == status.resource_uuid).first()
 
     if not db_resource:
         print('[Error] Received invalid Uuid from text-prep')

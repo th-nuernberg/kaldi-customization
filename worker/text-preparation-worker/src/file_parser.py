@@ -37,7 +37,6 @@ def pdf_parser(file_path):
         full_text += text + "\n"
         print("Finished finished processing of " + str(image))
         print("--------------------------------------")
-
     return full_text
 
 
@@ -92,9 +91,10 @@ def generate_corpus(text):
     
     clean_sentences = []
     for sentence in sentences:
+        sentence = re.sub(r"[--–—−]\n([a-z])", r"\g<1>", sentence)
         sentence = sentence.lower()
 
-        sentence = re.sub("\n", "", sentence)
+        sentence = re.sub("\n", " ", sentence)
         sentence = re.sub("ä", "\"a", sentence)
         sentence = re.sub("ö", "\"o", sentence)
         sentence = re.sub("ü", "\"u", sentence)
@@ -108,7 +108,7 @@ def generate_corpus(text):
         sentence = re.sub("7", "sieben ", sentence)
         sentence = re.sub("8", "acht ", sentence)
         sentence = re.sub("9", "neun ", sentence)
-        sentence = re.sub(r"[^a-z\s]+", "", sentence)
+        sentence = re.sub(r"[^a-z\s\"]+", " ", sentence)
 
         clean_sentences.append(sentence)
 
