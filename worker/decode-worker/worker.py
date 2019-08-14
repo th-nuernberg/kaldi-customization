@@ -102,6 +102,8 @@ if __name__ == "__main__":
             shutil.rmtree(workspace_path)
             shutil.rmtree(decode_path)
 
+            status.submit(DecodeStatus(id=DecodeStatusCode.SUCCESS, decode_uuid=decode_file, transcripts=[result]))
+
     except KeyboardInterrupt:
         #cleanup
         shutil.rmtree(acoustic_model_folder)

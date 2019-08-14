@@ -19,6 +19,7 @@ from config import minio_client
 
 TEMP_UPLOAD_FOLDER = '/tmp/fileupload'
 
+
 def get_filetype(filename):
     '''
     Returns the filetype or None, if it cannot be processed by the text preperation worker.
@@ -26,6 +27,7 @@ def get_filetype(filename):
     if '.' in filename:
         return filename.rsplit('.', 1)[1].lower()
     return None
+
 
 def get_decode_result(project_uuid, training_version, decode_uuid):  # noqa: E501
     """Get the result of a decoding task
@@ -41,7 +43,13 @@ def get_decode_result(project_uuid, training_version, decode_uuid):  # noqa: E50
 
     :rtype: DecodeMessage
     """
-    return 'do some magic!'
+
+    db_decoding = DB_Decoding.query.filter_by(uuid=decode_uuid).first()
+
+    if not db_decoding:
+        return ('Decoding not found', 404)
+
+    return DecodeMessage(uuid=db_decoding.uuid, transcripts=json.loads(db_decoding.transcripts))
 
 
 def get_decodings(project_uuid, training_version):  # noqa: E501
@@ -76,26 +84,26 @@ def start_decode(project_uuid, training_version, audio_file):  # noqa: E501
 
     print('Received new file for decode: ' + str(audio_file))
 
-
     db_project = DB_Project.query.filter_by(uuid=project_uuid).first()
-    db_training = DB_Training.query.filter_by(version=training_version,project=db_project).first()
+    db_training = DB_Training.query.filter_by(
+        version=training_version, project=db_project).first()
 
     # if user does not select file, browser also
     # submit an empty part without filename
     if audio_file is None:
         return ('Invalid input', 405)
-    
+
     filename = secure_filename(audio_file.filename)
     filetype = get_filetype(filename)
 
     if filetype is None:
         return ('Invalid input', 405)
-    
+
     # file is okay: create db entry, store to dfs and create decode job
 
     db_file = DB_Decoding(
-        training = db_training,
-        status = DB_DecodingStateEnum.Init
+        training=db_training,
+        status=DB_DecodingStateEnum.Init
     )
     db.session.add(db_file)
     db.session.commit()
@@ -118,7 +126,7 @@ def start_decode(project_uuid, training_version, audio_file):  # noqa: E501
         file_path=local_file_path
     )
 
-    #TODO: delete local file local_file_path
+    # TODO: delete local file local_file_path
 
     if upload_result[0]:
         db_file.status = DB_DecodingStateEnum.Init
@@ -131,12 +139,13 @@ def start_decode(project_uuid, training_version, audio_file):  # noqa: E501
     print('Uploaded file to MinIO for decoding: ' + str(db_file))
 
     if db_file.status == DB_DecodingStateEnum.Init:
-        create_decode_job(decode_file=minio_file_path,acoustic_model_id=db_project.acoustic_model_id,training_id=db_training.id)
+        create_decode_job(decode_file=minio_file_path,
+                          acoustic_model_id=db_project.acoustic_model_id, training_id=db_training.id)
 
-        db_file.status = DB_DecodingStateEnum.Queued
+        db_file.status = DB_DecodingStateEnum.Decoding_Pending
         db.session.add(db_file)
         db.session.commit()
 
         print('Created Decoding job: ' + str(db_file))
 
-    return DecodeMessage(uuid=db_file.uuid, transcripts=[])
+    return DecodeTaskReference(decode_uuid=db_file.uuid)

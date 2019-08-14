@@ -3,6 +3,7 @@ import threading
 import traceback
 
 from .data_prep import handle_data_prep_status
+from .decode import handle_decode_status
 from .kaldi import handle_kaldi_status
 from .text_prep import handle_text_prep_status
 from config import redis_client
@@ -11,6 +12,7 @@ from redis_config import redis_queues
 
 queue_handler = dict(
     data_prep=handle_data_prep_status,
+    decode=handle_decode_status,
     kaldi=handle_kaldi_status,
     text_prep=handle_text_prep_status,
 )
