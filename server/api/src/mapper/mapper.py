@@ -117,7 +117,15 @@ def AcousticModelTypeEnum_to_AcousticModelType(modelType):
 def TrainingStateEnum_to_TrainingStatus(trainingState):
     return {
         100: TrainingStatus.Init,
+        # text prep status missing
+        150: TrainingStatus.Init,
+        151: TrainingStatus.Init,
         200: TrainingStatus.Trainable,
+        # data prep status missing
+        205: TrainingStatus.Init,
+        206: TrainingStatus.Init,
+        207: TrainingStatus.Init,
+        208: TrainingStatus.Init,
         210: TrainingStatus.Training_Pending,
         220: TrainingStatus.Training_In_Progress,
         300: TrainingStatus.Training_Success,

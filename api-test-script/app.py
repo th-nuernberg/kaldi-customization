@@ -83,6 +83,11 @@ if __name__ == "__main__":
         resource_reference_object=ResourceReferenceObject(resource_uuid=resource.uuid))
     print(training_resource)
 
+    print('Wait for training status become trainable')
+
+    while training_instance.get_training_by_version(project.uuid, training.version).status != TrainingStatus.Trainable:
+        time.sleep(5)
+
     print('Start training:')
     started_training = training_instance.start_training_by_version(
         project.uuid, training.version)
@@ -105,7 +110,7 @@ if __name__ == "__main__":
         exit(1)
 
     print('Start decoding:')
-    decode_session = decode_api_instance.start_decode(project.uuid, training.version, '')
+    decode_session = decode_api_instance.start_decode(project.uuid, training.version, '../initialization/example/test.wav')
     print(decode_session)
 
     while not decode_session.transcripts:

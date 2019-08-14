@@ -4,142 +4,88 @@ import json
 import os
 
 from connector import *
-from data_processing import (execute_phonetisaurus, merge_corpus_list, 
+from data_processing import (execute_phonetisaurus, merge_corpus_list,
                              remove_local_files, save_txt_file, create_unique_word_list)
 from minio_communication import download_from_bucket, upload_to_bucket, minio_buckets
 
 
-
-def report_status_to_API(queue_status, status_queue, filename=None, message=None):
-    '''
-    By calling this function the status queue is updated.
-    Possible updates for the status queue are:
-        - InProgress --> queue_status = 21
-        - Success    --> queue_status = 200
-        - Failure    --> queue_status = 22
-    As soon as the Data-Preparation-Worker receives a new task, its entry
-    within the Status-Queue is updated to: In-Progress.
-    Depending on the processing result, the status of the task can change into:
-        - Success
-        - Failure
-    '''
-    if queue_status == 21 and not message:
-        message = "Task in progress"
-    elif queue_status == 22 and not message:
-        message == "Task has failed"
-    elif queue_status == 200 and not message:
-        message = "Task finished successfully"
-
-    status_queue.submit({"type": "text-prep", "text": filename, "status": queue_status, "msg": message})
-
-
-def are_parameters_missing(json_data):
-    '''
-    This function checks whether a needed parameter is missing. 
-
-    If one or more parameters are missing, the function will return: (True, message), where message
-    contains the missing parameters.
-
-    If no parameter is missing, the function will return: (False, "").
-    '''
-
-    parameter_list = ["resources", "acoustic-model", "id"]
-    missing_list = []
-
-    for parameter in parameter_list:
-        if parameter not in json_data:
-            missing_list.append(parameter)
-
-    if len(missing_list) == 0:
-        return (False, "")
-
-    if len(missing_list) == 1:
-        return (True, "The following parameter is missing: " + missing_list[0])
-    elif len(missing_list) == 2:
-        return (True, "The following parameters are missing: " + missing_list[0] + " and " + missing_list[1])
-    elif len(missing_list) > 2:
-        message = "The following parameters are missing: " + missing_list[0] + ", "
-        for i in range(1, len(missing_list), 1):
-            if i == len(missing_list) - 1:
-                message += " and " + missing_list[i]
-            elif i == len(missing_list) -2 :
-                message += missing_list[i]
-            else:
-                message += missing_list[i] + ", "
-    return (True, message)
-
-
 def infinite_loop():
-    _ , task_queue, status_queue, minio_client = parse_args('Data-Preparation-Worker Connector', task_queue='Data-Prep-Queue')
+    _, task_queue, status_queue, minio_client = parse_args(
+        'Data-Preparation-Worker Connector', task_queue='Data-Prep-Queue')
 
     for data in task_queue.listen():
         print("Received the following task from Data-Prep-Queue: ")
         print(data)
+
+        task = None
+
         try:
-            #TODO: Update status queue and set task to: In Progress
-            report_status_to_API(queue_status=21, status_queue=status_queue, filename="In-Progress")
-
             print("Starting to process received data")
-            missing, message = are_parameters_missing(data)
+            task = DataPrepTask(**data)
 
-            if not missing:
-                print("All needed parameters are available. Processing continues.")
-                resources = data["resources"]
-                acoustic_model = data["acoustic-model"]
-                id = data["id"]
-                print(resources)
-                
-                download_results = []
+            status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.IN_PROGRESS,
+                                            training_id=task.training_id, message="Task in progress"))
 
-                # Step 1: Download all files which were created by the Text-Preparation-Worker for this task. 
-                #         In addition to that, download the G2P-graph from the acoustic-bucket:
-                # Download of the graph
-                download_results.append(download_from_bucket(minio_client, minio_buckets["ACOUSTIC_MODELS_BUCKET"],
-                                        acoustic_model + "/g2p_model.fst" ,"/data_prep_worker/in/g2p_model.fst"))
+            print("All needed parameters are available. Processing continues.")
+            print(task.resources)
 
-                corpus_list = list()
-                for resource in resources:
-                    # Download of all corpus files which were created within the TPW
-                    loc_corp_path = "/data_prep_worker/in/" + resource + "_corpus.txt"
-                    download_results.append(download_from_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"],
-                                            resource + "/corpus.txt" , loc_corp_path))
-                    corpus_list.append(loc_corp_path)
+            download_results = []
 
-                # If any download did not finish --> Set task status to: Failure
-                for download in download_results:
-                    if not download[0]:
-                        print("At least one download did not finish successfully.")
-                        #TODO: Update status-queue to: Failure
+            # Step 1: Download all files which were created by the Text-Preparation-Worker for this task.
+            #         In addition to that, download the G2P-graph from the acoustic-bucket:
+            # Download of the graph
+            download_results.append(download_from_bucket(minio_client, minio_buckets["ACOUSTIC_MODELS_BUCKET"],
+                                                        "{}/g2p_model.fst".format(task.acoustic_model), "/data_prep_worker/in/g2p_model.fst"))
 
-                # Step 2: Merge all corpus-files into one final corpus and save the file locally
-                corpus = merge_corpus_list(corpus_list)
-                save_txt_file("/data_prep_worker/out/corpus.txt", corpus)
+            corpus_list = list()
+            for resource in task.resources:
+                # Download of all corpus files which were created within the TPW
+                loc_corp_path = "/data_prep_worker/in/{}_corpus.txt".format(
+                    resource)
+                download_results.append(download_from_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"],
+                                                            "{}/corpus.txt".format(resource), loc_corp_path))
+                corpus_list.append(loc_corp_path)
 
-                # Step 3: Create the lexicon file by using the combined corpus
-                lexicon = create_unique_word_list("/data_prep_worker/out/corpus.txt")
-                save_txt_file("/data_prep_worker/out/final_word_list", lexicon)
+            # If any download did not finish --> Set task status to: Failure
+            for download in download_results:
+                if not download[0]:
+                    status_queue.submit(DataPrepStatus(
+                        id=DataPrepStatusCode.FAILURE, training_id=task.training_id, message="Download failed"))
 
-                # Step 4: Execute Phonetisaurus and create phones for the unique word
-                execute_phonetisaurus()
-                print("Finished creating lexicon.txt")
+            # Step 2: Merge all corpus-files into one final corpus and save the file locally
+            corpus = merge_corpus_list(corpus_list)
+            save_txt_file("/data_prep_worker/out/corpus.txt", corpus)
 
-                # Step 5: Upload lexicon which was retrieved by phonetisaurus-apply and its graph
-                #TODO: Check whether the upload is successfull
-                upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], id + "/lexicon.txt", "/data_prep_worker/out/lexicon.txt")
-                upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], id + "/corpus.txt", "/data_prep_worker/out/corpus.txt")
+            # Step 3: Create the lexicon file by using the combined corpus
+            lexicon = create_unique_word_list(
+                "/data_prep_worker/out/corpus.txt")
+            save_txt_file("/data_prep_worker/out/final_word_list", lexicon)
 
-                # Step 6: Delete all files which were downloaded or created for this task
-                remove_local_files("/data_prep_worker/in/")
-                remove_local_files("/data_prep_worker/out/")
+            # Step 4: Execute Phonetisaurus and create phones for the unique word
+            execute_phonetisaurus()
+            print("Finished creating lexicon.txt")
 
-                # Step 7: Update status queue to: Successfull if this point is reached
-                report_status_to_API(queue_status=200, status_queue=status_queue, filename="success")
-            else:
-                # At least one parameter is missing --> Update status queue and set task to: Failure
-                report_status_to_API(queue_status=22, status_queue=status_queue, filename="failure", message=message)
-        except:
-            # Received object is not valid JSONO --> Update status queue and set task to: Failure
-            report_status_to_API(queue_status=22, status_queue=status_queue, filename="failure", message="Data is not valid JSON. Processing cancelled")
+            # Step 5: Upload lexicon which was retrieved by phonetisaurus-apply and its graph
+            # TODO: Check whether the upload is successfull
+            upload_to_bucket(
+                minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "{}/lexicon.txt".format(task.training_id), "/data_prep_worker/out/lexicon.txt")
+            upload_to_bucket(
+                minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "{}/corpus.txt".format(task.training_id), "/data_prep_worker/out/corpus.txt")
+
+            # Step 6: Delete all files which were downloaded or created for this task
+            remove_local_files("/data_prep_worker/in/")
+            remove_local_files("/data_prep_worker/out/")
+
+            # Step 7: Update status queue to: Successfull if this point is reached
+            status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.SUCCESS,
+                                               training_id=task.training_id, message="Task finished successfully"))
+        except Exception as e:
+            status_queue.submit(DataPrepStatus(
+                id=DataPrepStatusCode.FAILURE,
+                training_id=task.training_id if task else None,
+                message=str(e)
+            ))
+            raise e
 
 
 if __name__ == "__main__":
