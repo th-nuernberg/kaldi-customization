@@ -24,9 +24,7 @@ def get_filetype(filename):
     Returns the filetype or None, if it cannot be processed by the text preperation worker.
     '''
     if '.' in filename:
-        filetype = filename.rsplit('.', 1)[1].lower()
-        if filetype in DB_ResourceType.__members__:
-            return DB_ResourceType[filetype]
+        return filename.rsplit('.', 1)[1].lower()
     return None
 
 def get_decode_result(project_uuid, training_version, decode_uuid):  # noqa: E501
@@ -97,8 +95,7 @@ def start_decode(project_uuid, training_version, audio_file):  # noqa: E501
 
     db_file = DB_Decoding(
         training = db_training,
-        status = DB_DecodingStateEnum.Init,
-        upload_date = datetime.datetime.now()
+        status = DB_DecodingStateEnum.Init
     )
     db.session.add(db_file)
     db.session.commit()
@@ -142,4 +139,4 @@ def start_decode(project_uuid, training_version, audio_file):  # noqa: E501
 
         print('Created Decoding job: ' + str(db_file))
 
-    return InlineResponse202(decode_uuid=db_file.uuid)
+    return DecodeMessage(uuid=db_file.uuid, transcripts=[])
