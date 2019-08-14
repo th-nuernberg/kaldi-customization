@@ -33,18 +33,11 @@ def save_txt_file(file_path, content_list):
                 file_writer.write(item + "\n")
 
 
-def retrieve_all_words(text):
-    remove_newline_after_minus = re.sub("[--–—−]\n[a-z]+", "", text)
-    regex = r"[^a-zA-ZäöüÄÖÜß]+"
-    all_words = re.split(regex, remove_newline_after_minus)
-    return all_words
-
-
 def create_unique_word_list(file_path):
     with open(file_path, "r") as file_handler:
         text = file_handler.read()
 
-        all_words = retrieve_all_words(text)
+        all_words = text.split()
         unique_word_list = sorted(list(set(all_words)))
 
     return unique_word_list
