@@ -21,7 +21,7 @@ def create_dataprep_job(acoustic_model_id, corpi, training_id):
     Creates a new job in the queue for a g2p worker.
     '''
     entry = {
-        "acoustic_model": acoustic_model_id,
+        "acoustic_model_id": acoustic_model_id,
         "resources": corpi,
         "training_id": training_id,
     }

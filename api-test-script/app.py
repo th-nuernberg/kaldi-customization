@@ -101,10 +101,12 @@ if __name__ == "__main__":
 
     while last_status != TrainingStatus.Training_Success and last_status != TrainingStatus.Training_Failure:
         if training_session.status != last_status:
-            print('Training status: ', last_status)
             last_status = training_session.status
+            print('Training status: ', last_status)
     
         time.sleep(5)
+        training_session = training_instance.get_training_by_version(
+            project.uuid, training.version)
 
     if last_status != TrainingStatus.Training_Success:
         exit(1)
