@@ -115,10 +115,15 @@ if __name__ == "__main__":
     decode_session = decode_api_instance.start_decode(project.uuid, training.version, '../initialization/example/test.wav')
     print(decode_session)
 
+    decode_uuid = decode_session.decode_uuid
+
+    decode_session = decode_api_instance.get_decode_result(
+        project.uuid, training.version, decode_uuid)
+
     while not decode_session.transcripts:
         time.sleep(5)
 
         decode_session = decode_api_instance.get_decode_result(
-            project.uuid, training.version, decode_session.uuid)
+            project.uuid, training.version, decode_uuid)
 
     print(decode_session)

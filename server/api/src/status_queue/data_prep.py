@@ -2,8 +2,6 @@ from connector import *
 from models import Training, TrainingStateEnum
 from redis_communication import create_kaldi_job
 
-import uuid
-
 
 data_prep_status_mapping = {
     DataPrepStatusCode.IN_PROGRESS: TrainingStateEnum.Training_DataPrep_InProgress,

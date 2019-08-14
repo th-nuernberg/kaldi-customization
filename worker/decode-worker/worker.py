@@ -10,7 +10,7 @@ import json
 
 acoustic_model_bucket = minio_buckets['ACOUSTIC_MODELS_BUCKET']
 decode_bucket = minio_buckets["DECODING_BUCKET"]
-training_bucket = minio_buckets["TRAINING_BUCKET"]
+training_bucket = minio_buckets["TRAINING_RESOURCE_BUCKET"]
 
 script_root_path = os.path.dirname(os.path.realpath(__file__))
 workspace_path = os.path.join(script_root_path, 'workspace')
@@ -101,6 +101,8 @@ if __name__ == "__main__":
             # unload resources
             shutil.rmtree(workspace_path)
             shutil.rmtree(decode_path)
+
+            status.submit(DecodeStatus(id=DecodeStatusCode.SUCCESS, decode_uuid=decode_file, transcripts=[result]))
 
     except KeyboardInterrupt:
         #cleanup

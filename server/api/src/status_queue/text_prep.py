@@ -1,6 +1,5 @@
 from connector import *
 from models import Resource, ResourceStateEnum, ResourceTypeEnum, Training, TrainingStateEnum, TrainingResource
-import uuid
 
 
 text_prep_status_mapping = {
