@@ -40,10 +40,8 @@ if __name__ == "__main__":
                 os.makedirs(workspace_path)
 
             # cache models when used once and reduce download
-            cur_acoustic_model_path = os.path.join(
-                acoustic_model_folder, acoustic_model_id)
-            phone_symbol_table = os.path.join(
-                cur_acoustic_model_path, "phones.txt")
+            cur_acoustic_model_path = os.path.join(acoustic_model_folder,str(acoustic_model_id))
+            phone_symbol_table = os.path.join(cur_acoustic_model_path,"phones.txt")
             if(acoustic_model_id not in downloaded_acoustic_models):
                 os.makedirs(cur_acoustic_model_path)
                 download_from_bucket(minio_client, acoustic_model_bucket, acoustic_model_id +

@@ -36,15 +36,15 @@ if __name__ == "__main__":
             print("Read task from queue:")
             print(task)
 
-            acoustic_model_id = task["acoustic_model_id"]
+            acoustic_model_id = str(task["acoustic_model_id"])
             decode_file = task["decode_file"]
-            training_id = task["training_id"]
+            training_id = str(task["training_id"])
 
             if not os.path.exists(acoustic_model_folder):
                         os.makedirs(workspace_path)
 
             # cache acoustic models when used once and reduce download
-            cur_acoustic_model_path = os.path.join(acoustic_model_folder,acoustic_model_id)
+            cur_acoustic_model_path = os.path.join(acoustic_model_folder,str(acoustic_model_id))
             ivector_extractor_path = os.path.join(cur_acoustic_model_path,"extractor")
             if(acoustic_model_id not in downloaded_acoustic_models):
                 os.makedirs(cur_acoustic_model_path)
