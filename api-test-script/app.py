@@ -110,7 +110,7 @@ if __name__ == "__main__":
         exit(1)
 
     print('Start decoding:')
-    decode_session = decode_api_instance.start_decode(project.uuid, training.version, '')
+    decode_session = decode_api_instance.start_decode(project.uuid, training.version, '../initialization/example/test.wav')
     print(decode_session)
 
     while not decode_session.transcripts:
