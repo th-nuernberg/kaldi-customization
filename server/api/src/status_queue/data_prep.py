@@ -1,5 +1,5 @@
 from connector import *
-from models import Resource, ResourceStateEnum, ResourceTypeEnum, Training, TrainingStateEnum, TrainingResource
+from models import Training, TrainingStateEnum
 from redis_communication import create_kaldi_job
 
 import uuid

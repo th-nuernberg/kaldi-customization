@@ -8,11 +8,11 @@ class DataPrepTask(dict):
        The dict-type ensures that the class can be handled by the json
        package without special handling.
     """
-    def __init__(self, training_id, resources, acoustic_model):
+    def __init__(self, training_id, resources, acoustic_model_id):
         dict.__init__(self,
                       training_id=training_id,
                       resources=resources,
-                      acoustic_model=acoustic_model)
+                      acoustic_model_id=acoustic_model_id)
 
     @property
     def training_id(self):
@@ -23,8 +23,8 @@ class DataPrepTask(dict):
         return self['resources']
 
     @property
-    def acoustic_model(self):
-        return self['acoustic_model']
+    def acoustic_model_id(self):
+        return self['acoustic_model_id']
 
 
 class DataPrepStatusCode(IntEnum):

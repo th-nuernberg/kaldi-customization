@@ -35,7 +35,7 @@ def infinite_loop():
             #         In addition to that, download the G2P-graph from the acoustic-bucket:
             # Download of the graph
             download_results.append(download_from_bucket(minio_client, minio_buckets["ACOUSTIC_MODELS_BUCKET"],
-                                                        "{}/g2p_model.fst".format(task.acoustic_model), "/data_prep_worker/in/g2p_model.fst"))
+                                                        "{}/g2p_model.fst".format(task.acoustic_model_id), "/data_prep_worker/in/g2p_model.fst"))
 
             corpus_list = list()
             for resource in task.resources:

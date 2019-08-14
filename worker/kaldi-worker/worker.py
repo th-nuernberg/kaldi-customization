@@ -33,31 +33,25 @@ if __name__ == "__main__":
             print("Read task from queue:")
             print(task)
 
-            acoustic_model_id = str(task["acoustic_model_id"])
-            training_id = str(task["training_id"])
+            task = KaldiTask(**task)
 
             if not os.path.exists(acoustic_model_folder):
                 os.makedirs(workspace_path)
 
             # cache models when used once and reduce download
-            cur_acoustic_model_path = os.path.join(acoustic_model_folder,str(acoustic_model_id))
+            cur_acoustic_model_path = os.path.join(acoustic_model_folder, str(task.acoustic_model_id))
             phone_symbol_table = os.path.join(cur_acoustic_model_path,"phones.txt")
-            if(acoustic_model_id not in downloaded_acoustic_models):
+            if task.acoustic_model_id not in downloaded_acoustic_models:
                 os.makedirs(cur_acoustic_model_path)
-                download_from_bucket(minio_client, acoustic_model_bucket, acoustic_model_id +
-                                     "/final.mdl", os.path.join(cur_acoustic_model_path, "final.mdl"))
-                download_from_bucket(minio_client, acoustic_model_bucket, acoustic_model_id +
-                                     "/tree", os.path.join(cur_acoustic_model_path, "tree"))
-                download_from_bucket(minio_client, acoustic_model_bucket,
-                                     acoustic_model_id + "/phones.txt", phone_symbol_table)
+                download_from_bucket(minio_client, acoustic_model_bucket, "{}/final.mdl".format(task.acoustic_model_id), os.path.join(cur_acoustic_model_path, "final.mdl"))
+                download_from_bucket(minio_client, acoustic_model_bucket, "{}/tree".format(task.acoustic_model_id), os.path.join(cur_acoustic_model_path, "tree"))
+                download_from_bucket(minio_client, acoustic_model_bucket, "{}/phones.txt".format(task.acoustic_model_id), phone_symbol_table)
 
-                downloaded_acoustic_models.add(acoustic_model_id)
+                downloaded_acoustic_models.add(task.acoustic_model_id)
 
             # load resources
-            download_from_bucket(minio_client, training_bucket,
-                                 training_id + "/lexicon.txt", lexicon_path)
-            download_from_bucket(minio_client, training_bucket,
-                                 training_id + "/corpus.txt", corpus_path)
+            download_from_bucket(minio_client, training_bucket, "{}/lexicon.txt".format(task.training_id), lexicon_path)
+            download_from_bucket(minio_client, training_bucket, "{}/corpus.txt".format(task.training_id), corpus_path)
 
             # train resources
             new_graph_dir = os.path.join(script_root_path, "new_graph")
@@ -71,14 +65,13 @@ if __name__ == "__main__":
             archive_format = "zip"
             shutil.make_archive(base_name=new_graph_archive,
                                 format=archive_format, root_dir=new_graph_dir, base_dir="./")
-            upload_to_bucket(minio_client, training_bucket, training_id +
-                             "/graph.zip", new_graph_archive + "." + archive_format)
+            upload_to_bucket(minio_client, training_bucket, "{}/graph.zip".format(task.training_id), new_graph_archive + "." + archive_format)
 
             # unload resources
             shutil.rmtree(workspace_path)
 
             # write in status queue
-            status.submit(KaldiStatus(id=KaldiStatusCode.SUCCESS))
+            status.submit(KaldiStatus(id=KaldiStatusCode.SUCCESS, training_id=task.training_id))
 
     except KeyboardInterrupt:
         shutil.rmtree(acoustic_model_folder)
