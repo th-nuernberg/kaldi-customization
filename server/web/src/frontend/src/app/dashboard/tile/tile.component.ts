@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { TileData, ModelData } from './tile-data';
+import { Project } from 'swagger-client';
 
 @Component({
   selector: 'app-tile',
@@ -8,7 +8,7 @@ import { TileData, ModelData } from './tile-data';
 })
 export class TileComponent implements OnInit {
   // TODO check for future details/data that is necessary for the dashboard tiles
-  @Input() tileData: TileData;
+  @Input() tileData: Project;
 
   constructor() { }
 
