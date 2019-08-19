@@ -52,7 +52,7 @@ export class DashboardComponent implements OnInit {
     this.projectService.createProject(
       {
         name: projectName,
-        acousticModel: acousticModelUuid
+        acoustic_model: acousticModelUuid
       }
     )
     .subscribe(this.gridProjectTiles.push);

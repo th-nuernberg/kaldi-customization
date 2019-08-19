@@ -11,9 +11,10 @@ export class IdentityService {
   static getApiConfiguration(): Configuration {
     return new Configuration(
       {
+        basePath: "/api/v1",
         username: "kaldi",
         password: "valid",
-        accessToken: "qprh9NFxUPowrosvoXsTn7nEGkKESFiLlApkCBuPwO"
+        accessToken: "qprh9NFxUPowrosvoXsTn7nEGkKESFiLlApkCBuPwO",
     });
   }
 }
