@@ -4,8 +4,14 @@ import six
 from openapi_server.models.user import User  # noqa: E501
 from openapi_server import util
 
+from models import db
+from models.user import User as DB_User
 
-def create_user(user):  # noqa: E501
+from sqlalchemy import exc
+from passlib.hash import sha256_crypt
+
+
+def create_user(user=None):  # noqa: E501
     """Create user
 
     This can only be done by the logged in user. # noqa: E501
@@ -17,7 +23,25 @@ def create_user(user):  # noqa: E501
     """
     if connexion.request.is_json:
         user = User.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+
+    # TODO: implement more intelligent checks for valid email addresses
+    #       and secure passwords
+    if not user.username or not user.password or not user.user_email:
+        return ("Invalid username/password/email", 400)
+
+    db_user = DB_User(username=user.username,
+                      user_email=user.user_email,
+                      pw_hash=sha256_crypt.encrypt(user.password))
+
+    db.session.add(db_user)
+
+    try:
+        db.session.commit()
+    except exc.SQLAlchemyError as e:
+        print("Failed to insert user into database: ", e)
+        return ("Cannot create user", 400)
+
+    return User(username=db_user.username, user_email=db_user.user_email)
 
 
 def get_user():  # noqa: E501

@@ -839,7 +839,7 @@ paths:
       operationId: create_user
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
               $ref: '#/components/schemas/User'
         description: Created user object
