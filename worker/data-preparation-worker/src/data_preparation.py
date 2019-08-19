@@ -42,7 +42,7 @@ def infinite_loop():
                 # Download of all corpus files which were created within the TPW
                 loc_corp_path = "/data_prep_worker/in/{}_corpus.txt".format(
                     resource)
-                download_results.append(download_from_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"],
+                download_results.append(download_from_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"],
                                                             "{}/corpus.txt".format(resource), loc_corp_path))
                 corpus_list.append(loc_corp_path)
 
@@ -68,9 +68,9 @@ def infinite_loop():
             # Step 5: Upload lexicon which was retrieved by phonetisaurus-apply and its graph
             # TODO: Check whether the upload is successfull
             upload_to_bucket(
-                minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "{}/lexicon.txt".format(task.training_id), "/data_prep_worker/out/lexicon.txt")
+                minio_client, minio_buckets["TRAINING_BUCKET"], "{}/lexicon.txt".format(task.training_id), "/data_prep_worker/out/lexicon.txt")
             upload_to_bucket(
-                minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "{}/corpus.txt".format(task.training_id), "/data_prep_worker/out/corpus.txt")
+                minio_client, minio_buckets["TRAINING_BUCKET"], "{}/corpus.txt".format(task.training_id), "/data_prep_worker/out/corpus.txt")
 
             # Step 6: Delete all files which were downloaded or created for this task
             remove_local_files("/data_prep_worker/in/")

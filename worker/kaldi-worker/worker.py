@@ -9,7 +9,7 @@ import redis_config
 import json
 
 acoustic_model_bucket = minio_buckets['ACOUSTIC_MODELS_BUCKET']
-training_bucket = minio_buckets["TRAINING_RESOURCE_BUCKET"]
+training_bucket = minio_buckets["TRAINING_BUCKET"]
 
 script_root_path = os.path.dirname(os.path.realpath(__file__))
 workspace_path = os.path.join(script_root_path, 'workspace')
