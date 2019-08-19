@@ -64,7 +64,18 @@ def get_decodings(project_uuid, training_version):  # noqa: E501
 
     :rtype: List[DecodeMessage]
     """
-    return 'do some magic!'
+    db_decodings = DB_Decoding.query \
+        .join(DB_Training, DB_Training.id == DB_Decoding.training_id) \
+        .join(DB_Project, DB_Training.project_id == DB_Project.id) \
+        .filter(DB_Project.uuid == project_uuid and DB_Training.version == training_version) \
+        .all()
+
+    decoding_list = list()
+
+    for decoding in db_decodings:
+        decoding_list.append(DecodeMessage(uuid=decoding.uuid, transcripts=json.loads(decoding.transcripts)))
+
+    return decoding_list
 
 
 def start_decode(project_uuid, training_version, audio_file):  # noqa: E501

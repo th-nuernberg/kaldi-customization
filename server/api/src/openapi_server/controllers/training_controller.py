@@ -15,9 +15,13 @@ from models.training import Training as DB_Training, TrainingStateEnum as DB_Tra
 from models.training_resource import TrainingResource as DB_TrainingResource
 
 from redis_communication import create_dataprep_job
+from minio_communication import upload_to_bucket, download_from_bucket, minio_buckets, copy_object_in_bucket
+from config import minio_client
 
+import os
 from mapper import mapper
 
+TEMP_CORPUS_FOLDER = '/tmp/corpus'
 
 def assign_resource_to_training(project_uuid, training_version, resource_reference_object=None):  # noqa: E501
     """Assign a resource to the training
@@ -59,17 +63,22 @@ def assign_resource_to_training(project_uuid, training_version, resource_referen
     if db_resource.has_error():
         return ("Resource has errors", 400)
 
+    #if the resource is already added, return the previous
     db_training_resource = DB_TrainingResource.query.filter_by(
         training_id=db_training.id, origin_id=db_resource.id).first()
-
     if db_training_resource:
         return mapper.db_training_resource_to_front(db_training_resource)
 
     db_training_resource = DB_TrainingResource(
         training=db_training, origin=db_resource)
-
     db.session.add(db_training_resource)
+    db.session.commit()
 
+    #if text prep is already done, we should copy corpus to the new training_resource
+    if db_resource.status == DB_ResourceStateEnum.TextPreparation_Success:
+        copy_object_in_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], db_resource.uuid + "/corpus.txt", minio_buckets["TRAINING_RESOURCE_BUCKET"], db_training_resource.id + "/corpus.txt")
+
+    
     if db_resource.status != DB_ResourceStateEnum.TextPreparation_Success:
         db_training.status = DB_TrainingStateEnum.TextPrep_Pending
     elif db_training.status == DB_TrainingStateEnum.Init:
@@ -144,6 +153,8 @@ def get_corpus_of_training_resource(project_uuid, training_version, resource_uui
 
     :rtype: str
     """
+    target_path = os.path.join(TEMP_CORPUS_FOLDER,"{resource}".format())
+    download_from_bucket(minio_client,minio_buckets["TRAINING_RESOURCE_BUCKET"],"TODO","TODO")
     return 'do some magic!'
 
 
@@ -212,19 +223,15 @@ def start_training_by_version(project_uuid, training_version):  # noqa: E501
         return ("training already done or pending", 400)
 
     db_training.status = DB_TrainingStateEnum.Training_Pending
-    db_training_resources = DB_Resource.query.filter(DB_Resource.id == DB_TrainingResource.origin_id) \
-                                             .filter(DB_TrainingResource.training_id == db_training.id) \
-                                             .all()
+    db_training_resources = DB_TrainingResource.query.filter(DB_TrainingResource.training_id == db_training.id).all()
 
     db.session.add(db_training)
     db.session.commit()
 
     create_dataprep_job(
         acoustic_model_id=db_project.acoustic_model_id,
-        corpi=[r.uuid for r in db_training_resources],
+        corpi=[r.id for r in db_training_resources],
         training_id=db_training.id
     )
-    # create_kaldi_job(training_id=db_training.id,
-    #                  acoustic_model_id=db_project.acoustic_model_id)
 
     return mapper.db_training_to_front(db_training)
