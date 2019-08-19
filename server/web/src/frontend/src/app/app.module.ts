@@ -33,7 +33,7 @@ import { CoverComponent } from './cover/cover.component';
 import { DecodingUploadComponent } from './upload/decoding/decoding.upload.component';
 import { TrainingUploadComponent } from './upload/training/training.upload.component';
 import { AccountComponent } from './account/account.component';
-import { ApiModule } from '../../projects/swagger-client/src';
+import { ApiModule } from 'swagger-client';
 import { IdentityService } from '../identity.service';
 
 import { TileComponent } from './dashboard/tile/tile.component';

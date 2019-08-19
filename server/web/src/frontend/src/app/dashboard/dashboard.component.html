@@ -1,47 +1,47 @@
 <div style="height:calc(100vh - 56px);">
-   
-  <div 
+
+  <div
     class="tilesWrapper"
     fxLayout="center center">
 
     <mat-card class="tile">
 
         <mat-form-field>
-          <input 
-            matInput 
-            placeholder="Project name"
-            (keyup)="onKey($event)">
+          <input
+            matInput
+            #projectName
+            placeholder="Projektname">
         </mat-form-field>
-    
+
         <mat-form-field>
-          <mat-select 
-            placeholder="Select Trained Model"
-            [(ngModel)]="selectedPrevTrain"
+          <mat-select
+            #modelValue
+            placeholder="Akustisches Modell"
             name="model">
-            <mat-option 
-              *ngFor="let model of prevTrainedModels"
-              [value]="model.value">
+            <mat-option
+              *ngFor="let model of acousticModels"
+              [value]="model">
               {{model.name}}
             </mat-option>
           </mat-select>
         </mat-form-field>
-    
-        <button 
-          mat-raised-button 
-          color="primary" 
+
+        <button
+          mat-raised-button
+          color="primary"
           class="newProjectButton"
-          
-          (click)="newProject()">
+
+          (click)="createProject(projectName.value, modelValue.value.uuid)">
             <!-- TODO add behavior to call the api-->
             <mat-icon aria-hidden="false" aria-label="Example add icon">create</mat-icon>
              Projekt
           </button>
-    
+
     </mat-card>
 
-    <app-tile 
-      *ngFor="let tile of gridTiles" 
-      [tileData]="tile"></app-tile>   
+    <app-tile
+      *ngFor="let tile of gridTiles"
+      [tileData]="tile"></app-tile>
   </div>
 
 </div>
