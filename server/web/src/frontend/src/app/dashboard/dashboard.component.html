@@ -5,38 +5,43 @@
     fxLayout="center center">
 
     <mat-card class="tile">
-
+      <form [formGroup]="createProjectForm" (ngSubmit)="createProject()">
         <mat-form-field>
           <input
             matInput
-            #projectName
-            placeholder="Projektname">
+            formControlName="projectName"
+            placeholder="Projektname"
+            required>
+          <mat-error *ngIf="createProjectSubmitted && f.projectName.errors">
+            <div *ngIf="f.projectName.errors.required">Projektname wird benötigt</div>
+          </mat-error>
         </mat-form-field>
 
         <mat-form-field>
           <mat-select
-            #modelValue
+            formControlName="modelValue"
             placeholder="Akustisches Modell"
-            name="model">
+            name="model"
+            required>
             <mat-option
               *ngFor="let model of acousticModels"
               [value]="model">
               {{model.name}}
             </mat-option>
           </mat-select>
+          <mat-error *ngIf="createProjectSubmitted && f.modelValue.errors">
+            <div *ngIf="f.modelValue.errors.required">Akustischs Modell wird benötigt</div>
+          </mat-error>
         </mat-form-field>
 
         <button
           mat-raised-button
           color="primary"
-          class="newProjectButton"
-
-          (click)="createProject(projectName.value, modelValue.value.uuid)">
-            <!-- TODO add behavior to call the api-->
-            <mat-icon aria-hidden="false" aria-label="Example add icon">create</mat-icon>
+          class="newProjectButton">
+            <mat-icon aria-hidden="false">add</mat-icon>
              Projekt
-          </button>
-
+        </button>
+      </form>
     </mat-card>
 
     <app-tile

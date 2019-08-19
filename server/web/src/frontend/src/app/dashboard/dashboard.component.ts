@@ -5,6 +5,7 @@ import {
   GlobalService,
   AcousticModel
 } from 'swagger-client';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';;
 
 @Component({
   selector: 'app-dashboard',
@@ -17,14 +18,25 @@ export class DashboardComponent implements OnInit {
   public acousticModels: AcousticModel[];
   public maxCols: 4;
 
-  constructor(private projectService: ProjectService, private globalService: GlobalService){
+  createProjectSubmitted = false;
+  createProjectForm: FormGroup;
 
+  constructor(
+    private projectService: ProjectService,
+     private globalService: GlobalService,
+     private formBuilder: FormBuilder,){
   }
 
   ngOnInit() {
     this.gridProjectTiles = [];
     this.acousticModels = [];
 
+    this.createProjectForm = this.formBuilder.group({
+      projectName: ['', Validators.required],
+      modelValue: ['', Validators.required]
+    });
+
+    // gets all existing projects
     this.projectService.getProjects().subscribe(project => {
       this.gridProjectTiles = project;
     });
@@ -35,26 +47,31 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  get f() { return this.createProjectForm.controls; }
 
+  // creates a new project with the passed project name and acoustic model uuid
+  createProject() {
 
-  createProject(projectName: string, acousticModelUuid: string) {
-    if(projectName === "") {
-      projectName = "Project Name placeholder";
+    this.createProjectSubmitted = true;
+
+    // stop here if form is invalid
+    if (this.createProjectForm.invalid) {
+        return;
     }
-
-    // todo: make selection of acoustic model mandatory!!!
-    if(acousticModelUuid === "") {
-      acousticModelUuid = "Acoustic Model placeholder";
-    }
-    console.log(projectName, acousticModelUuid);
-    console.log("Creates new project...");
-
+    const projectName = this.f.projectName.value;
+    const acousticModelUuid = this.f.modelValue.value.uuid;
+    console.log("Creates new project: " + projectName + " with uuid: " + acousticModelUuid);
     this.projectService.createProject(
       {
         name: projectName,
         acoustic_model: acousticModelUuid
       }
     )
-    .subscribe(this.gridProjectTiles.push);
+    .subscribe(project => {
+      this.gridProjectTiles.push(project);
+      this.createProjectSubmitted = false;
+      this.createProjectForm.reset();
+     });
+
   }
 }
