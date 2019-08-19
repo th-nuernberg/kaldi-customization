@@ -9,9 +9,11 @@ export class IdentityService {
   constructor() { }
 
   static getApiConfiguration(): Configuration {
-    return new Configuration({
-      apiKeys: {
-      },
+    return new Configuration(
+      {
+        username: "kaldi",
+        password: "valid",
+        accessToken: "rusHuf8rF3WHLvIKDo8BOEnfQ3xBmivb9gprfI04v2"
     });
   }
 }
