@@ -10,32 +10,21 @@
             <mat-icon mat-list-icon>folder</mat-icon>
             <h4 mat-line>{{model.name}}</h4>
             <p mat-line>{{model.fileResultName}}</p>
+            <p mat-line>{{model.date}}</p>
             <button
               mat-flat-button
               color="primary"
               class="tabButton">
               <!-- TODO: ADD download behavior of model files-->
-              <mat-icon aria-hidden="false" aria-label="Example download icon">cloud_download</mat-icon>
+              <mat-icon aria-hidden="false">cloud_download</mat-icon>
             </button>
-            <mat-divider></mat-divider>
-          </mat-list-item>
-        </mat-list>
-      </mat-tab>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          Modell
-        </ng-template>
-        <mat-list>
-          <mat-list-item *ngFor='let model of models'>
-            <h4 mat-line>{{model.name}}</h4>
-            <p mat-line>{{model.date}}</p>
             <button
               mat-flat-button
               color="accent"
               class="tabButton"
               (click)="openModelOverviewDialog()">
               <!-- TODO add behavior to open extended model overview-->
-                <mat-icon aria-hidden="false" aria-label="Example open icon">open_in_browser</mat-icon>
+                <mat-icon aria-hidden="false">open_in_browser</mat-icon>
               </button>
             <mat-divider></mat-divider>
           </mat-list-item>
@@ -54,16 +43,21 @@
               color="warn"
               class="tabButton">
               <!-- TODO: ADD behavior to show the encoded text-->
-              <mat-icon aria-hidden="false" aria-label="Example view icon">pageview</mat-icon>
+              <mat-icon aria-hidden="false">pageview</mat-icon>
             </button>
             <mat-divider></mat-divider>
           </mat-list-item>
         </mat-list>
       </mat-tab>
     </mat-tab-group>
-    <button mat-flat-button class="tabGroupHeaderButton" color="primary" routerLink="/upload/training/_">
+    <button
+    mat-flat-button
+    class="tabGroupHeaderButton"
+    color="primary"
+    (click)="createTraining()"
+    >
       <!-- TODO add create new model behavior-->
-      <mat-icon aria-hidden="false" aria-label="Example add icon">add</mat-icon>
+      <mat-icon aria-hidden="false">add</mat-icon>
     </button>
 </div>
 

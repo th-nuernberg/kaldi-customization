@@ -13,6 +13,7 @@ export class TileComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    console.log("Project: " + this.tileData.name + " TileData-Uuid: " + this.tileData.uuid);
   }
 
 }

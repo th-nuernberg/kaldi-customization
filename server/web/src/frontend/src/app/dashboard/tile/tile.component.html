@@ -10,7 +10,7 @@
       </span>
     </div>
     <p>Erstellungsdatum: {{tileData.creation_timestamp}}</p>
-    <button mat-stroked-button routerLink="/project/_" class="tileButton">
-      <mat-icon aria-hidden="false" aria-label="Example open project">open_in_new</mat-icon>
+    <button mat-stroked-button routerLink="/project/{{tileData.uuid}}" class="tileButton">
+      <mat-icon aria-hidden="false">open_in_new</mat-icon>
     </button>
 </mat-card>

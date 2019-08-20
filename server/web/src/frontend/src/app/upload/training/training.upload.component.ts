@@ -1,31 +1,14 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatTableDataSource } from '@angular/material/table';
 
-export interface HistoryFile {
-  name: string;
-  position: number;
-  uploaded: string;
+import {
+  TrainingService, Training,
+  ResourceService, Resource,
+  ProjectService, Project
 }
-
-export interface FileDetails {
-  project: number,
-  model: number,
-  numberFilesName: string;
-  numberFiles: number;
-  numberSentencesName: string;
-  numberSentences: number;
-  numberWordsName: string;
-  numberWords: number;
-}
-
-// TODO: adapt to information from database
-const FILE_DATA: HistoryFile[] = [
-  {position: 1, name: 'Kafka1', uploaded: "01.01.1970"},
-  {position: 2, name: 'Kant1', uploaded: "01.01.1970"},
-  {position: 3, name: 'Text', uploaded: "01.01.1970"},
-  {position: 4, name: 'Portal', uploaded: "01.01.1970"},
-];
+from 'swagger-client'
 
 @Component({
   selector: 'app-dashboard',
@@ -34,83 +17,65 @@ const FILE_DATA: HistoryFile[] = [
 })
 
 export class TrainingUploadComponent implements OnInit {
-  private fileContent;
+  projectUuid:string;
+  trainingVersion:number;
 
-  public show:boolean = false;
-  public showContentPreview:boolean = false;
+  project$:Observable<Project>;
+  training$:Observable<Training>;
+  resources$:Observable<Array<Resource>>;
 
-  public displayedColumns: string[] = ['select', 'position', 'name', 'uploaded'];
+  currentTrainingResources:Resource[];
+  allResources:MatTableDataSource<Resource>;
 
-  public dataSource = new MatTableDataSource<HistoryFile>(FILE_DATA);
-  public historySelection = new SelectionModel<HistoryFile>(true, []);
-  
-  public currentFiles: string[] = [];
-  public uploadedFiles : { name: string, selected: boolean; }[] = [];
+  displayedColumns: string[] = ['select', 'name', 'type'];
+  show:boolean = true;
+  showContentPreview:boolean;
+  fileContent: string | ArrayBuffer;
 
-  constructor() {
+  public historySelection = new SelectionModel<Resource>(true, []);
+
+  constructor(
+    private route: ActivatedRoute,
+    private trainingService: TrainingService,
+    private resourceService: ResourceService,
+    private projectService: ProjectService
+    ) {
   }
   // TODO post model information to the API: text files, project name, model name, prev model etc..
   ngOnInit() {
+    this.projectUuid = this.route.snapshot.paramMap.get('uuid');
+    this.trainingVersion =  +this.route.snapshot.paramMap.get('id');
+
+    console.log("Project: " + this.projectUuid + " Trainingsversion: " + this.trainingVersion);
+
+    // init obeservables
+    this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
+    this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
+    this.resources$ = this.resourceService.getResource();
+
+    // init all training resources - first view
+    this.resources$.subscribe(resources => {
+      this.allResources = new MatTableDataSource<Resource>(resources);
+    });
+
+    // init current training resources - second view
+    this.training$.subscribe(training => {
+      console.log("Init: Get Training resource:")
+      for(let res of training.resources) {
+        console.log(res.name);
+      }
+      this.currentTrainingResources = training.resources;
+    });
+
+    // init preview
     this.fileContent = "";
     this.showContentPreview = false;
-  }
-
-  fileDetails: FileDetails[] = [
-    { project: 815, model: 1337, numberFilesName: "Anzahl Dateien: ", numberFiles: 5, numberSentencesName: "Anzahl Sätze: ", numberSentences: 100, numberWordsName: "Anzahl Wörter: ", numberWords: 5000 }
-  ]
-
-  // enables single selection for current panel list
-  handleSelection(event) {
-    // TODO: show and clean preview content of selected file
-    console.log(event);
-    if (event.option.selected) {
-      event.source.deselectAll();      
-      event.option._setSelected(true);
-
-      // update select in uploaded file list
-      let selectedItemName: string;
-      event.source.selectedOptions.selected.forEach(s => {
-        if (s.selected === true) {
-          selectedItemName = s.value;
-        }
-      });
-
-      this.uploadedFiles.forEach(f => {
-        if(f.name === selectedItemName) {
-          f.selected = true;
-        }
-      });
-
-      //if(file !== null) {
-        //this.showPreview(file);
-        this.showContentPreview = true;
-      //}
-      
-    }
-    else {
-      this.fileContent = null;
-      this.showContentPreview = false;
-
-      // update deselect in uploaded file list
-      let selectedItemName: string;
-      event.source.selectedOptions.selected.forEach(s => {
-        if (s.selected === false) {
-          selectedItemName = s.value;
-        }
-      });
-
-      this.uploadedFiles.forEach(f => {
-        if(f.name === selectedItemName) {
-          f.selected = false;
-        }
-      });
-    }
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.historySelection.selected.length;
-    const numRows = this.dataSource.data.length;
+    const numRows = this.allResources.data.length;
     return numSelected === numRows;
   }
 
@@ -118,93 +83,120 @@ export class TrainingUploadComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
         this.historySelection.clear() :
-        this.dataSource.data.forEach(row => this.historySelection.select(row));
+        this.allResources.data.forEach(row => this.historySelection.select(row));
   }
 
   /** The label for the checkbox on the passed row */
-  checkboxLabel(row?: HistoryFile): string {
+  checkboxLabel(row?: Resource): string {
     if (!row) {
-      return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
+      return "${this.isAllSelected() ? 'select' : 'deselect'} all";
     }
-    return `${this.historySelection.isSelected(row) ? 'deselect' : 'select'} row ${row.position + 1}`;
+
+    return "${this.historySelection.isSelected(row) ? 'deselect' : 'select'} row ${row}";
   }
 
   // copies selected history elements to current panel
-  copy() {
-    // TODO: do not copy text files only unique_word_list and corpuses
-    this.historySelection.selected.forEach(file => {
-      if(!this.uploadedFiles.includes( { name:file.name, selected:true }))
-      {
-        this.uploadedFiles.push({ name:file.name, selected:false });
+  copyResource() {
+    this.historySelection.selected.forEach(resource => {
 
-        this.currentFiles = this.uploadedFiles
-        .filter(item => item.selected)
-        .map(item => item.name);
-      }
+      console.log("Copied Resource: " + resource.uuid);
+      this.currentTrainingResources.push(resource);
+
+      console.log("Assgin resource: " + resource.uuid + "Name: " + resource.name + " to training: " + this.trainingVersion);
+      this.trainingService.assignResourceToTraining(
+        this.projectUuid,
+        this.trainingVersion,
+        { resource_uuid: resource.uuid });
     });
   }
 
-  // removes selected history elements
-  remove() {
-    let delecteCount = 1;
-    this.uploadedFiles.forEach(file => {      
-      if(file.selected === true) {
-        let index = this.uploadedFiles.indexOf(file);
-        console.log("Name: " + file.name + " selected: " + file.selected + " Index: " + index);
-        this.uploadedFiles.splice(index, delecteCount);
-      }
-    });
+  onSelectionChange(ev, selectedResources) {
+    console.log(ev);
+    if(ev.option.selected === false) {
+      this.showContentPreview = false;
+      this.fileContent = "";
+    } else {
+      selectedResources.forEach(element => {
+        console.log("Selected: " + element.selected);
+        const resource:Resource = element.value;
+        this.resourceService.getResourceData(resource.uuid)
+          .subscribe(data => {
+            console.log("Show preview of resource data: " + data);
+            this.showPreview(data);
+        });
+      });
+    }
   }
 
-  // toggles remove button (disabled if nothing is selected)
-  isRemoveDisabled() {
-    // return true => disables button | return false => enables button
-    let isDisabled: Boolean = true;
-    this.uploadedFiles.forEach(file => {
-       if(file.selected === true) {
-        isDisabled = false; 
-      } 
-    });
+  showPreview(data:Blob) {
+    var reader = new FileReader();
+    var me = this;
 
-    return isDisabled;
+    reader.readAsText(data);
+    reader.onload = function () {
+      me.fileContent = reader.result;
+    }
+    this.showContentPreview = true;
+  }
+
+  // removes selected training resources
+  remove(selectedResources) {
+
+    selectedResources.forEach(item => {
+      const resource:Resource = item.value;
+      let index:number = this.currentTrainingResources.findIndex(d => d === resource);
+
+      if(index > -1) {
+        this.trainingService.deleteAssignedResourceFromTraining(
+          this.projectUuid,
+          this.trainingVersion,
+          resource.uuid
+        ).subscribe(r => {
+          console.log("Removed resource: " + r.name + " from training: " + this.projectUuid);
+          this.currentTrainingResources.splice(index, 1);
+        });
+      }
+    });
   }
 
   // uploads file and show preview
   loadFile(file:HTMLInputElement) {
-
-    // TODO: API - TPW Results as uploaded files in current file list
-    this.dummyShowUploadedFile(file);
-
-    // loads content of uploaded file into preview
-    if(file !== null) {
-      this.showPreview(file);
-    }
-    this.show = false;
+    this.uploadResource(file);
   }
 
-  dummyShowUploadedFile(file) {
-    let fileName = file.files[0].name;
-    // add uploaded file to current file list
-    this.uploadedFiles.push({ name:fileName, selected:true });
-    
-    // selects element in current panel
-    this.currentFiles.push(fileName);
-    this.currentFiles = this.uploadedFiles.map(item => item.name);
+  uploadResource(file) {
+    console.log("Uploaded resource: " + file.files[0].name);
+    const blobFile:Blob = file.files[0] as Blob;
+
+    // TODO: call TextPrepWorker
+    // TODO: set TextPrepWorkerResult as TrainingResource
+
+    this.resourceService.createResource(blobFile)
+      .subscribe(resource => {
+        console.log("Created Resource: " + resource.uuid);
+        this.currentTrainingResources.push(resource);console.log("Assgin resource: " + resource.uuid + "Name: " + resource.name + " to training: " + this.trainingVersion);
+        this.trainingService.assignResourceToTraining(
+          this.projectUuid,
+          this.trainingVersion,
+          { resource_uuid: resource.uuid });
+    });
   }
 
-  // toggles start and verify button in current panel
-  toggleSave() {
-    this.show = !this.show;
+  reloadProject() {
+
+    console.log("Reload values on next..");
+    this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
+    this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
+
+    // init current training resources - second view
+    this.training$.subscribe(training => {
+      this.currentTrainingResources = training.resources;
+    });
   }
 
-  showPreview(file:any) {
-    // loads content of uploaded file into preview
-    var reader = new FileReader();
-    var me = this;
-    
-    reader.readAsText(file.files[0]);
-    reader.onload = function () {
-      me.fileContent = reader.result;
-    }
+  startTraining() {
+    console.log("Start Training: " + this.trainingVersion + " of Project: " + this.projectUuid);
+    console.log(this.project$);
+    //this.trainingService.startTrainingByVersion(this.projectUuid, this.trainingVersion);
   }
 }

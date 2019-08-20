@@ -1,6 +1,14 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import {
+  TrainingService,
+  Training,
+  DecodeService,
+  DecodeMessage,
+  Project,
+  ProjectService }
+from 'swagger-client';
 
 export interface ModelOverviewDialogData {
   id: number,
@@ -24,21 +32,50 @@ export interface TrainingsModel {
 })
 export class ProjectComponent implements OnInit {
   uuid: string;
+  project: Project;
+  newTraining: Training;
+  training_version: number;
+  decodings: DecodeMessage[];
 
-  /* TODO
-    - create new model +  open model view
-    - get user data
-    - get project/model information -> using an existing model
-    - get status of project / model training
-    - provide direct file download: model & decoded text
-    - provide detailed model info
-  */
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    public dialog: MatDialog,
+    public trainingService: TrainingService,
+    public decodeService: DecodeService,
+    public projectService: ProjectService
+    ) { }
 
-  constructor(private route: ActivatedRoute, public dialog: MatDialog) { }
-  
   ngOnInit() {
     this.uuid = this.route.snapshot.paramMap.get('uuid');
-  }  
+    console.log("Passed uuid: " + this.uuid);
+
+    this.projectService.getProjectByUuid(this.uuid)
+      .subscribe(project => {
+        console.log(project);
+        this.project = project;
+
+        // get all decodings of a project/training
+        this.decodeService.getDecodings(
+          this.project.uuid,
+          this.project.trainings[0].version)
+          .subscribe(decodings => {
+            console.log("Decodings: " + decodings);
+            this.decodings =decodings;
+          });
+      });
+  }
+
+  // creates a new training and opens the training page
+  createTraining() {
+    this.trainingService.createTraining(this.uuid)
+      .subscribe(training => {
+        console.log("Created Training: " + training.version);
+        this.newTraining = training;
+        // opens training dialog
+        this.router.navigate(['/upload/training/' +this.project.uuid + "/" + this.newTraining.version]);
+      });
+  }
 
   models: TrainingsModel[] =  [
     {
@@ -47,29 +84,15 @@ export class ProjectComponent implements OnInit {
       date: "01.01.1970",
       link: "/upload/_/decoding",
       texte: "Reißverschlussverfahren"
-    },
-    {
-      name: "Model 2",
-      fileResultName: "model2.pdf",
-      date: "01.01.1970",
-      link: "/upload/_/training",
-      texte: "Bla bla bla Mr. Freeman"
-    },
-    {
-      name: "Model 3",
-      fileResultName: "model3.pdf",
-      date: "01.01.1970",
-      link: "/upload/_/decoding",
-      texte: "Moin moin und Hallo!"
     }
-  ];
+];
 
   openModelOverviewDialog(): void {
     const dialogRef = this.dialog.open(ModelOverviewDialog, {
       width: '250px',
       data: {id: 1337, project: "Project 0815", prevModel: "default", status: "Running" }
     });
-  
+
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
     });
