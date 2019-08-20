@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TileData, ModelData } from './tile/tile-data';
+import { ProjectService } from 'projects/swagger-client/src';
 
 export interface TrainingModel {
   name:string;
@@ -27,12 +28,14 @@ export class DashboardComponent implements OnInit {
     { name: "Kaldi 2", value: "advanced" },
   ];
 
-  constructor(){}
+  constructor(private project: ProjectService){}
 
   ngOnInit() {
     this.gridTiles = [];
     this.selectedPrevTrain = "";
     this.newProjectName = "";
+
+    this.project.getProjects().subscribe(console.log);
   }
   
   onKey(event) {
