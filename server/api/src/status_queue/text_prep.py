@@ -46,8 +46,16 @@ def handle_text_prep_status(msg_data, db_session):
                 .all()
             
             #copy corpus to all affected trainings
-            db_training_resource = TrainingResource.query.filter(TrainingResource.training_id == db_training.id and TrainingResource.resource_id == db_resource.id).first()
-            copy_object_in_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], db_resource.uuid + "/corpus.txt", minio_buckets["TRAINING_RESOURCE_BUCKET"], str(db_training_resource.id) + "/corpus.txt")
+            db_training_resource = db_session.query(TrainingResource) \
+                                    .filter_by(training_id=db_training.id) \
+                                    .filter_by(origin_id=db_resource.id) \
+                                    .first()
+
+            copy_object_in_bucket(minio_client,
+                old_bucket=minio_buckets["RESOURCE_BUCKET"],
+                old_file="{}/corpus.txt".format(db_resource.uuid),
+                new_bucket=minio_buckets["TRAINING_RESOURCE_BUCKET"],
+                new_file="{}/corpus.txt".format(db_training_resource.id))
 
             training_status = TrainingStateEnum.Trainable
             for db_resource in db_resources:
