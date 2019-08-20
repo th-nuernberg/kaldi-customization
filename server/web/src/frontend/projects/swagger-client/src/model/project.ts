@@ -17,13 +17,13 @@ import { User } from './user';
 export interface Project { 
     name: string;
     uuid: string;
-    acousticModel: AcousticModel;
+    acoustic_model: AcousticModel;
     /**
      * UUID of the parent project
      */
     parent?: string;
     trainings?: Array<Training>;
-    creationTimestamp?: Date;
+    creation_timestamp?: Date;
     owner: User;
 }
 

@@ -15,6 +15,6 @@ export interface ResourceReferenceObject {
     /**
      * UUID of the resource
      */
-    resourceUuid: string;
+    resource_uuid: string;
 }
 

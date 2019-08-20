@@ -64,21 +64,21 @@ export class TrainingService {
     /**
      * Assign a resource to the training
      * Assign the specified resource to the training
-     * @param projectUuid UUID of the project
-     * @param trainingVersion Training version of the project
-     * @param resourceReferenceObject Resource that needs to be added
+     * @param project_uuid UUID of the project
+     * @param training_version Training version of the project
+     * @param resource_reference_object Resource that needs to be added
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public assignResourceToTraining(projectUuid: string, trainingVersion: number, resourceReferenceObject?: ResourceReferenceObject, observe?: 'body', reportProgress?: boolean): Observable<Resource>;
-    public assignResourceToTraining(projectUuid: string, trainingVersion: number, resourceReferenceObject?: ResourceReferenceObject, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Resource>>;
-    public assignResourceToTraining(projectUuid: string, trainingVersion: number, resourceReferenceObject?: ResourceReferenceObject, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Resource>>;
-    public assignResourceToTraining(projectUuid: string, trainingVersion: number, resourceReferenceObject?: ResourceReferenceObject, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (projectUuid === null || projectUuid === undefined) {
-            throw new Error('Required parameter projectUuid was null or undefined when calling assignResourceToTraining.');
+    public assignResourceToTraining(project_uuid: string, training_version: number, resource_reference_object?: ResourceReferenceObject, observe?: 'body', reportProgress?: boolean): Observable<Resource>;
+    public assignResourceToTraining(project_uuid: string, training_version: number, resource_reference_object?: ResourceReferenceObject, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Resource>>;
+    public assignResourceToTraining(project_uuid: string, training_version: number, resource_reference_object?: ResourceReferenceObject, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Resource>>;
+    public assignResourceToTraining(project_uuid: string, training_version: number, resource_reference_object?: ResourceReferenceObject, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling assignResourceToTraining.');
         }
-        if (trainingVersion === null || trainingVersion === undefined) {
-            throw new Error('Required parameter trainingVersion was null or undefined when calling assignResourceToTraining.');
+        if (training_version === null || training_version === undefined) {
+            throw new Error('Required parameter training_version was null or undefined when calling assignResourceToTraining.');
         }
 
         let headers = this.defaultHeaders;
@@ -109,8 +109,8 @@ export class TrainingService {
             headers = headers.set('Content-Type', httpContentTypeSelected);
         }
 
-        return this.httpClient.post<Resource>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}/training/${encodeURIComponent(String(trainingVersion))}/resource`,
-            resourceReferenceObject,
+        return this.httpClient.post<Resource>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/resource`,
+            resource_reference_object,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -123,16 +123,16 @@ export class TrainingService {
     /**
      * Create a new training
      * 
-     * @param projectUuid Project object that needs to be trained
+     * @param project_uuid Project object that needs to be trained
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createTraining(projectUuid: string, observe?: 'body', reportProgress?: boolean): Observable<Training>;
-    public createTraining(projectUuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Training>>;
-    public createTraining(projectUuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Training>>;
-    public createTraining(projectUuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (projectUuid === null || projectUuid === undefined) {
-            throw new Error('Required parameter projectUuid was null or undefined when calling createTraining.');
+    public createTraining(project_uuid: string, observe?: 'body', reportProgress?: boolean): Observable<Training>;
+    public createTraining(project_uuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Training>>;
+    public createTraining(project_uuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Training>>;
+    public createTraining(project_uuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling createTraining.');
         }
 
         let headers = this.defaultHeaders;
@@ -158,7 +158,7 @@ export class TrainingService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.post<Training>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}/training`,
+        return this.httpClient.post<Training>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training`,
             null,
             {
                 withCredentials: this.configuration.withCredentials,
@@ -172,24 +172,24 @@ export class TrainingService {
     /**
      * Remove a resource from the training
      * Removes the assigned resource from the training
-     * @param projectUuid UUID of the project
-     * @param trainingVersion Training version of the project
-     * @param resourceUuid UUID of the resource
+     * @param project_uuid UUID of the project
+     * @param training_version Training version of the project
+     * @param resource_uuid UUID of the resource
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public deleteAssignedResourceFromTraining(projectUuid: string, trainingVersion: number, resourceUuid: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public deleteAssignedResourceFromTraining(projectUuid: string, trainingVersion: number, resourceUuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public deleteAssignedResourceFromTraining(projectUuid: string, trainingVersion: number, resourceUuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public deleteAssignedResourceFromTraining(projectUuid: string, trainingVersion: number, resourceUuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (projectUuid === null || projectUuid === undefined) {
-            throw new Error('Required parameter projectUuid was null or undefined when calling deleteAssignedResourceFromTraining.');
+    public deleteAssignedResourceFromTraining(project_uuid: string, training_version: number, resource_uuid: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public deleteAssignedResourceFromTraining(project_uuid: string, training_version: number, resource_uuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public deleteAssignedResourceFromTraining(project_uuid: string, training_version: number, resource_uuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public deleteAssignedResourceFromTraining(project_uuid: string, training_version: number, resource_uuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling deleteAssignedResourceFromTraining.');
         }
-        if (trainingVersion === null || trainingVersion === undefined) {
-            throw new Error('Required parameter trainingVersion was null or undefined when calling deleteAssignedResourceFromTraining.');
+        if (training_version === null || training_version === undefined) {
+            throw new Error('Required parameter training_version was null or undefined when calling deleteAssignedResourceFromTraining.');
         }
-        if (resourceUuid === null || resourceUuid === undefined) {
-            throw new Error('Required parameter resourceUuid was null or undefined when calling deleteAssignedResourceFromTraining.');
+        if (resource_uuid === null || resource_uuid === undefined) {
+            throw new Error('Required parameter resource_uuid was null or undefined when calling deleteAssignedResourceFromTraining.');
         }
 
         let headers = this.defaultHeaders;
@@ -214,7 +214,7 @@ export class TrainingService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.delete<any>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}/training/${encodeURIComponent(String(trainingVersion))}/resource/${encodeURIComponent(String(resourceUuid))}`,
+        return this.httpClient.delete<any>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/resource/${encodeURIComponent(String(resource_uuid))}`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -227,24 +227,24 @@ export class TrainingService {
     /**
      * Get the corpus of the resource
      * Returns the corpus of the specified resource for this training
-     * @param projectUuid UUID of the project
-     * @param trainingVersion Training version of the project
-     * @param resourceUuid UUID of the resource
+     * @param project_uuid UUID of the project
+     * @param training_version Training version of the project
+     * @param resource_uuid UUID of the resource
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getCorpusOfTrainingResource(projectUuid: string, trainingVersion: number, resourceUuid: string, observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public getCorpusOfTrainingResource(projectUuid: string, trainingVersion: number, resourceUuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public getCorpusOfTrainingResource(projectUuid: string, trainingVersion: number, resourceUuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public getCorpusOfTrainingResource(projectUuid: string, trainingVersion: number, resourceUuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (projectUuid === null || projectUuid === undefined) {
-            throw new Error('Required parameter projectUuid was null or undefined when calling getCorpusOfTrainingResource.');
+    public getCorpusOfTrainingResource(project_uuid: string, training_version: number, resource_uuid: string, observe?: 'body', reportProgress?: boolean): Observable<string>;
+    public getCorpusOfTrainingResource(project_uuid: string, training_version: number, resource_uuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
+    public getCorpusOfTrainingResource(project_uuid: string, training_version: number, resource_uuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
+    public getCorpusOfTrainingResource(project_uuid: string, training_version: number, resource_uuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling getCorpusOfTrainingResource.');
         }
-        if (trainingVersion === null || trainingVersion === undefined) {
-            throw new Error('Required parameter trainingVersion was null or undefined when calling getCorpusOfTrainingResource.');
+        if (training_version === null || training_version === undefined) {
+            throw new Error('Required parameter training_version was null or undefined when calling getCorpusOfTrainingResource.');
         }
-        if (resourceUuid === null || resourceUuid === undefined) {
-            throw new Error('Required parameter resourceUuid was null or undefined when calling getCorpusOfTrainingResource.');
+        if (resource_uuid === null || resource_uuid === undefined) {
+            throw new Error('Required parameter resource_uuid was null or undefined when calling getCorpusOfTrainingResource.');
         }
 
         let headers = this.defaultHeaders;
@@ -270,7 +270,7 @@ export class TrainingService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<string>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}/training/${encodeURIComponent(String(trainingVersion))}/resource/${encodeURIComponent(String(resourceUuid))}/corpus`,
+        return this.httpClient.get<string>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/resource/${encodeURIComponent(String(resource_uuid))}/corpus`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -283,20 +283,20 @@ export class TrainingService {
     /**
      * Find project training results by UUID
      * Returns the training object
-     * @param projectUuid UUID of the project
-     * @param trainingVersion Training version of the project
+     * @param project_uuid UUID of the project
+     * @param training_version Training version of the project
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getTrainingByVersion(projectUuid: string, trainingVersion: number, observe?: 'body', reportProgress?: boolean): Observable<Training>;
-    public getTrainingByVersion(projectUuid: string, trainingVersion: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Training>>;
-    public getTrainingByVersion(projectUuid: string, trainingVersion: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Training>>;
-    public getTrainingByVersion(projectUuid: string, trainingVersion: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (projectUuid === null || projectUuid === undefined) {
-            throw new Error('Required parameter projectUuid was null or undefined when calling getTrainingByVersion.');
+    public getTrainingByVersion(project_uuid: string, training_version: number, observe?: 'body', reportProgress?: boolean): Observable<Training>;
+    public getTrainingByVersion(project_uuid: string, training_version: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Training>>;
+    public getTrainingByVersion(project_uuid: string, training_version: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Training>>;
+    public getTrainingByVersion(project_uuid: string, training_version: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling getTrainingByVersion.');
         }
-        if (trainingVersion === null || trainingVersion === undefined) {
-            throw new Error('Required parameter trainingVersion was null or undefined when calling getTrainingByVersion.');
+        if (training_version === null || training_version === undefined) {
+            throw new Error('Required parameter training_version was null or undefined when calling getTrainingByVersion.');
         }
 
         let headers = this.defaultHeaders;
@@ -322,7 +322,7 @@ export class TrainingService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<Training>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}/training/${encodeURIComponent(String(trainingVersion))}`,
+        return this.httpClient.get<Training>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -335,25 +335,25 @@ export class TrainingService {
     /**
      * Set the corpus of the resource
      * Updates the corpus of the specified resource for this training
-     * @param projectUuid UUID of the project
-     * @param trainingVersion Training version of the project
-     * @param resourceUuid UUID of the resource
+     * @param project_uuid UUID of the project
+     * @param training_version Training version of the project
+     * @param resource_uuid UUID of the resource
      * @param body New or updated corpus as plain text
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public setCorpusOfTrainingResource(projectUuid: string, trainingVersion: number, resourceUuid: string, body: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public setCorpusOfTrainingResource(projectUuid: string, trainingVersion: number, resourceUuid: string, body: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public setCorpusOfTrainingResource(projectUuid: string, trainingVersion: number, resourceUuid: string, body: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public setCorpusOfTrainingResource(projectUuid: string, trainingVersion: number, resourceUuid: string, body: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (projectUuid === null || projectUuid === undefined) {
-            throw new Error('Required parameter projectUuid was null or undefined when calling setCorpusOfTrainingResource.');
+    public setCorpusOfTrainingResource(project_uuid: string, training_version: number, resource_uuid: string, body: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public setCorpusOfTrainingResource(project_uuid: string, training_version: number, resource_uuid: string, body: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public setCorpusOfTrainingResource(project_uuid: string, training_version: number, resource_uuid: string, body: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public setCorpusOfTrainingResource(project_uuid: string, training_version: number, resource_uuid: string, body: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling setCorpusOfTrainingResource.');
         }
-        if (trainingVersion === null || trainingVersion === undefined) {
-            throw new Error('Required parameter trainingVersion was null or undefined when calling setCorpusOfTrainingResource.');
+        if (training_version === null || training_version === undefined) {
+            throw new Error('Required parameter training_version was null or undefined when calling setCorpusOfTrainingResource.');
         }
-        if (resourceUuid === null || resourceUuid === undefined) {
-            throw new Error('Required parameter resourceUuid was null or undefined when calling setCorpusOfTrainingResource.');
+        if (resource_uuid === null || resource_uuid === undefined) {
+            throw new Error('Required parameter resource_uuid was null or undefined when calling setCorpusOfTrainingResource.');
         }
         if (body === null || body === undefined) {
             throw new Error('Required parameter body was null or undefined when calling setCorpusOfTrainingResource.');
@@ -386,7 +386,7 @@ export class TrainingService {
             headers = headers.set('Content-Type', httpContentTypeSelected);
         }
 
-        return this.httpClient.put<any>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}/training/${encodeURIComponent(String(trainingVersion))}/resource/${encodeURIComponent(String(resourceUuid))}/corpus`,
+        return this.httpClient.put<any>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/resource/${encodeURIComponent(String(resource_uuid))}/corpus`,
             body,
             {
                 withCredentials: this.configuration.withCredentials,
@@ -400,20 +400,20 @@ export class TrainingService {
     /**
      * Start the specified training
      * Start the training process for the specified training
-     * @param projectUuid UUID of the project
-     * @param trainingVersion Training version of the project
+     * @param project_uuid UUID of the project
+     * @param training_version Training version of the project
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public startTrainingByVersion(projectUuid: string, trainingVersion: number, observe?: 'body', reportProgress?: boolean): Observable<Training>;
-    public startTrainingByVersion(projectUuid: string, trainingVersion: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Training>>;
-    public startTrainingByVersion(projectUuid: string, trainingVersion: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Training>>;
-    public startTrainingByVersion(projectUuid: string, trainingVersion: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (projectUuid === null || projectUuid === undefined) {
-            throw new Error('Required parameter projectUuid was null or undefined when calling startTrainingByVersion.');
+    public startTrainingByVersion(project_uuid: string, training_version: number, observe?: 'body', reportProgress?: boolean): Observable<Training>;
+    public startTrainingByVersion(project_uuid: string, training_version: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Training>>;
+    public startTrainingByVersion(project_uuid: string, training_version: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Training>>;
+    public startTrainingByVersion(project_uuid: string, training_version: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling startTrainingByVersion.');
         }
-        if (trainingVersion === null || trainingVersion === undefined) {
-            throw new Error('Required parameter trainingVersion was null or undefined when calling startTrainingByVersion.');
+        if (training_version === null || training_version === undefined) {
+            throw new Error('Required parameter training_version was null or undefined when calling startTrainingByVersion.');
         }
 
         let headers = this.defaultHeaders;
@@ -439,7 +439,7 @@ export class TrainingService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.post<Training>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}/training/${encodeURIComponent(String(trainingVersion))}`,
+        return this.httpClient.post<Training>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}`,
             null,
             {
                 withCredentials: this.configuration.withCredentials,

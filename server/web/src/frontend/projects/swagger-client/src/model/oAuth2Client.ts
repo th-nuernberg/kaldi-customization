@@ -15,27 +15,27 @@ export interface OAuth2Client {
     /**
      * Readable name for OAuth2 client
      */
-    clientName: string;
+    client_name: string;
     /**
      * URI for OAuth2 client
      */
-    clientUri: object;
+    client_uri: object;
     /**
      * OAuth2 client id
      */
-    clientId?: string;
+    client_id?: string;
     /**
      * OAuth2 client secret
      */
-    clientSecret?: string;
+    client_secret?: string;
     /**
      * OAuth2 redirect URI
      */
-    redirectUri?: string;
+    redirect_uri?: string;
     /**
      * OAuth2 grant type
      */
-    grantType: Array<string>;
+    grant_type: Array<string>;
     /**
      * Granted OAuth2 scopes
      */
@@ -43,10 +43,10 @@ export interface OAuth2Client {
     /**
      * When the OAuth2 client has been issued
      */
-    issuedAt?: Date;
+    issued_at?: Date;
     /**
      * When the OAuth2 client expires
      */
-    expiresAt?: Date;
+    expires_at?: Date;
 }
 

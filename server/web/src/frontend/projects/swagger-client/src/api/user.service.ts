@@ -64,16 +64,16 @@ export class UserService {
     /**
      * Create a client
      * 
-     * @param oAuth2Client Client object that needs to be created
+     * @param o_auth2_client Client object that needs to be created
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createClient(oAuth2Client: OAuth2Client, observe?: 'body', reportProgress?: boolean): Observable<OAuth2Client>;
-    public createClient(oAuth2Client: OAuth2Client, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<OAuth2Client>>;
-    public createClient(oAuth2Client: OAuth2Client, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<OAuth2Client>>;
-    public createClient(oAuth2Client: OAuth2Client, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (oAuth2Client === null || oAuth2Client === undefined) {
-            throw new Error('Required parameter oAuth2Client was null or undefined when calling createClient.');
+    public createClient(o_auth2_client: OAuth2Client, observe?: 'body', reportProgress?: boolean): Observable<OAuth2Client>;
+    public createClient(o_auth2_client: OAuth2Client, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<OAuth2Client>>;
+    public createClient(o_auth2_client: OAuth2Client, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<OAuth2Client>>;
+    public createClient(o_auth2_client: OAuth2Client, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (o_auth2_client === null || o_auth2_client === undefined) {
+            throw new Error('Required parameter o_auth2_client was null or undefined when calling createClient.');
         }
 
         let headers = this.defaultHeaders;
@@ -105,7 +105,7 @@ export class UserService {
         }
 
         return this.httpClient.post<OAuth2Client>(`${this.configuration.basePath}/user/client`,
-            oAuth2Client,
+            o_auth2_client,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -118,16 +118,16 @@ export class UserService {
     /**
      * Create user
      * This can only be done by the logged in user.
-     * @param inlineObject 
+     * @param inline_object 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createUser(inlineObject: InlineObject, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public createUser(inlineObject: InlineObject, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public createUser(inlineObject: InlineObject, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public createUser(inlineObject: InlineObject, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (inlineObject === null || inlineObject === undefined) {
-            throw new Error('Required parameter inlineObject was null or undefined when calling createUser.');
+    public createUser(inline_object: InlineObject, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public createUser(inline_object: InlineObject, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public createUser(inline_object: InlineObject, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public createUser(inline_object: InlineObject, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (inline_object === null || inline_object === undefined) {
+            throw new Error('Required parameter inline_object was null or undefined when calling createUser.');
         }
 
         let headers = this.defaultHeaders;
@@ -150,7 +150,7 @@ export class UserService {
         }
 
         return this.httpClient.post<any>(`${this.configuration.basePath}/user`,
-            inlineObject,
+            inline_object,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -163,16 +163,16 @@ export class UserService {
     /**
      * Delete a client
      * 
-     * @param clientId Id of OAuth2Client to delete
+     * @param client_id Id of OAuth2Client to delete
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public deleteClient(clientId: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public deleteClient(clientId: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public deleteClient(clientId: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public deleteClient(clientId: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (clientId === null || clientId === undefined) {
-            throw new Error('Required parameter clientId was null or undefined when calling deleteClient.');
+    public deleteClient(client_id: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public deleteClient(client_id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public deleteClient(client_id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public deleteClient(client_id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (client_id === null || client_id === undefined) {
+            throw new Error('Required parameter client_id was null or undefined when calling deleteClient.');
         }
 
         let headers = this.defaultHeaders;
@@ -197,7 +197,7 @@ export class UserService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.delete<any>(`${this.configuration.basePath}/user/client/${encodeURIComponent(String(clientId))}`,
+        return this.httpClient.delete<any>(`${this.configuration.basePath}/user/client/${encodeURIComponent(String(client_id))}`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -210,16 +210,16 @@ export class UserService {
     /**
      * Get a client
      * 
-     * @param clientId Id of OAuth2Client to return
+     * @param client_id Id of OAuth2Client to return
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getClient(clientId: string, observe?: 'body', reportProgress?: boolean): Observable<OAuth2Client>;
-    public getClient(clientId: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<OAuth2Client>>;
-    public getClient(clientId: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<OAuth2Client>>;
-    public getClient(clientId: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (clientId === null || clientId === undefined) {
-            throw new Error('Required parameter clientId was null or undefined when calling getClient.');
+    public getClient(client_id: string, observe?: 'body', reportProgress?: boolean): Observable<OAuth2Client>;
+    public getClient(client_id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<OAuth2Client>>;
+    public getClient(client_id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<OAuth2Client>>;
+    public getClient(client_id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (client_id === null || client_id === undefined) {
+            throw new Error('Required parameter client_id was null or undefined when calling getClient.');
         }
 
         let headers = this.defaultHeaders;
@@ -245,7 +245,7 @@ export class UserService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<OAuth2Client>(`${this.configuration.basePath}/user/client/${encodeURIComponent(String(clientId))}`,
+        return this.httpClient.get<OAuth2Client>(`${this.configuration.basePath}/user/client/${encodeURIComponent(String(client_id))}`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,

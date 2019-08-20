@@ -63,16 +63,16 @@ export class ProjectService {
     /**
      * Create a new project
      * 
-     * @param createProjectObject Project object that needs to be created
+     * @param create_project_object Project object that needs to be created
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createProject(createProjectObject: CreateProjectObject, observe?: 'body', reportProgress?: boolean): Observable<Project>;
-    public createProject(createProjectObject: CreateProjectObject, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Project>>;
-    public createProject(createProjectObject: CreateProjectObject, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Project>>;
-    public createProject(createProjectObject: CreateProjectObject, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (createProjectObject === null || createProjectObject === undefined) {
-            throw new Error('Required parameter createProjectObject was null or undefined when calling createProject.');
+    public createProject(create_project_object: CreateProjectObject, observe?: 'body', reportProgress?: boolean): Observable<Project>;
+    public createProject(create_project_object: CreateProjectObject, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Project>>;
+    public createProject(create_project_object: CreateProjectObject, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Project>>;
+    public createProject(create_project_object: CreateProjectObject, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (create_project_object === null || create_project_object === undefined) {
+            throw new Error('Required parameter create_project_object was null or undefined when calling createProject.');
         }
 
         let headers = this.defaultHeaders;
@@ -104,7 +104,7 @@ export class ProjectService {
         }
 
         return this.httpClient.post<Project>(`${this.configuration.basePath}/project`,
-            createProjectObject,
+            create_project_object,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -117,16 +117,16 @@ export class ProjectService {
     /**
      * Find project by UUID
      * Returns a single project
-     * @param projectUuid UUID of project to return
+     * @param project_uuid UUID of project to return
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getProjectByUuid(projectUuid: string, observe?: 'body', reportProgress?: boolean): Observable<Project>;
-    public getProjectByUuid(projectUuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Project>>;
-    public getProjectByUuid(projectUuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Project>>;
-    public getProjectByUuid(projectUuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (projectUuid === null || projectUuid === undefined) {
-            throw new Error('Required parameter projectUuid was null or undefined when calling getProjectByUuid.');
+    public getProjectByUuid(project_uuid: string, observe?: 'body', reportProgress?: boolean): Observable<Project>;
+    public getProjectByUuid(project_uuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Project>>;
+    public getProjectByUuid(project_uuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Project>>;
+    public getProjectByUuid(project_uuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling getProjectByUuid.');
         }
 
         let headers = this.defaultHeaders;
@@ -152,7 +152,7 @@ export class ProjectService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<Project>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}`,
+        return this.httpClient.get<Project>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,

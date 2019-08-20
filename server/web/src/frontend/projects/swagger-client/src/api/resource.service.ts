@@ -63,21 +63,21 @@ export class ResourceService {
     /**
      * Assign a resource to the training
      * Assign the specified resource to the training
-     * @param projectUuid UUID of the project
-     * @param trainingVersion Training version of the project
-     * @param resourceReferenceObject Resource that needs to be added
+     * @param project_uuid UUID of the project
+     * @param training_version Training version of the project
+     * @param resource_reference_object Resource that needs to be added
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public assignResourceToTraining(projectUuid: string, trainingVersion: number, resourceReferenceObject?: ResourceReferenceObject, observe?: 'body', reportProgress?: boolean): Observable<Resource>;
-    public assignResourceToTraining(projectUuid: string, trainingVersion: number, resourceReferenceObject?: ResourceReferenceObject, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Resource>>;
-    public assignResourceToTraining(projectUuid: string, trainingVersion: number, resourceReferenceObject?: ResourceReferenceObject, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Resource>>;
-    public assignResourceToTraining(projectUuid: string, trainingVersion: number, resourceReferenceObject?: ResourceReferenceObject, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (projectUuid === null || projectUuid === undefined) {
-            throw new Error('Required parameter projectUuid was null or undefined when calling assignResourceToTraining.');
+    public assignResourceToTraining(project_uuid: string, training_version: number, resource_reference_object?: ResourceReferenceObject, observe?: 'body', reportProgress?: boolean): Observable<Resource>;
+    public assignResourceToTraining(project_uuid: string, training_version: number, resource_reference_object?: ResourceReferenceObject, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Resource>>;
+    public assignResourceToTraining(project_uuid: string, training_version: number, resource_reference_object?: ResourceReferenceObject, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Resource>>;
+    public assignResourceToTraining(project_uuid: string, training_version: number, resource_reference_object?: ResourceReferenceObject, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling assignResourceToTraining.');
         }
-        if (trainingVersion === null || trainingVersion === undefined) {
-            throw new Error('Required parameter trainingVersion was null or undefined when calling assignResourceToTraining.');
+        if (training_version === null || training_version === undefined) {
+            throw new Error('Required parameter training_version was null or undefined when calling assignResourceToTraining.');
         }
 
         let headers = this.defaultHeaders;
@@ -108,8 +108,8 @@ export class ResourceService {
             headers = headers.set('Content-Type', httpContentTypeSelected);
         }
 
-        return this.httpClient.post<Resource>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}/training/${encodeURIComponent(String(trainingVersion))}/resource`,
-            resourceReferenceObject,
+        return this.httpClient.post<Resource>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/resource`,
+            resource_reference_object,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -190,24 +190,24 @@ export class ResourceService {
     /**
      * Remove a resource from the training
      * Removes the assigned resource from the training
-     * @param projectUuid UUID of the project
-     * @param trainingVersion Training version of the project
-     * @param resourceUuid UUID of the resource
+     * @param project_uuid UUID of the project
+     * @param training_version Training version of the project
+     * @param resource_uuid UUID of the resource
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public deleteAssignedResourceFromTraining(projectUuid: string, trainingVersion: number, resourceUuid: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public deleteAssignedResourceFromTraining(projectUuid: string, trainingVersion: number, resourceUuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public deleteAssignedResourceFromTraining(projectUuid: string, trainingVersion: number, resourceUuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public deleteAssignedResourceFromTraining(projectUuid: string, trainingVersion: number, resourceUuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (projectUuid === null || projectUuid === undefined) {
-            throw new Error('Required parameter projectUuid was null or undefined when calling deleteAssignedResourceFromTraining.');
+    public deleteAssignedResourceFromTraining(project_uuid: string, training_version: number, resource_uuid: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public deleteAssignedResourceFromTraining(project_uuid: string, training_version: number, resource_uuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public deleteAssignedResourceFromTraining(project_uuid: string, training_version: number, resource_uuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public deleteAssignedResourceFromTraining(project_uuid: string, training_version: number, resource_uuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling deleteAssignedResourceFromTraining.');
         }
-        if (trainingVersion === null || trainingVersion === undefined) {
-            throw new Error('Required parameter trainingVersion was null or undefined when calling deleteAssignedResourceFromTraining.');
+        if (training_version === null || training_version === undefined) {
+            throw new Error('Required parameter training_version was null or undefined when calling deleteAssignedResourceFromTraining.');
         }
-        if (resourceUuid === null || resourceUuid === undefined) {
-            throw new Error('Required parameter resourceUuid was null or undefined when calling deleteAssignedResourceFromTraining.');
+        if (resource_uuid === null || resource_uuid === undefined) {
+            throw new Error('Required parameter resource_uuid was null or undefined when calling deleteAssignedResourceFromTraining.');
         }
 
         let headers = this.defaultHeaders;
@@ -232,7 +232,7 @@ export class ResourceService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.delete<any>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}/training/${encodeURIComponent(String(trainingVersion))}/resource/${encodeURIComponent(String(resourceUuid))}`,
+        return this.httpClient.delete<any>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/resource/${encodeURIComponent(String(resource_uuid))}`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -245,16 +245,16 @@ export class ResourceService {
     /**
      * Get the corpus of the resource
      * Returns the corpus of the specified resource
-     * @param resourceUuid UUID of the resource
+     * @param resource_uuid UUID of the resource
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getCorpusOfResource(resourceUuid: string, observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public getCorpusOfResource(resourceUuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public getCorpusOfResource(resourceUuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public getCorpusOfResource(resourceUuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (resourceUuid === null || resourceUuid === undefined) {
-            throw new Error('Required parameter resourceUuid was null or undefined when calling getCorpusOfResource.');
+    public getCorpusOfResource(resource_uuid: string, observe?: 'body', reportProgress?: boolean): Observable<string>;
+    public getCorpusOfResource(resource_uuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
+    public getCorpusOfResource(resource_uuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
+    public getCorpusOfResource(resource_uuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (resource_uuid === null || resource_uuid === undefined) {
+            throw new Error('Required parameter resource_uuid was null or undefined when calling getCorpusOfResource.');
         }
 
         let headers = this.defaultHeaders;
@@ -280,7 +280,7 @@ export class ResourceService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<string>(`${this.configuration.basePath}/resource/${encodeURIComponent(String(resourceUuid))}/corpus`,
+        return this.httpClient.get<string>(`${this.configuration.basePath}/resource/${encodeURIComponent(String(resource_uuid))}/corpus`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -293,24 +293,24 @@ export class ResourceService {
     /**
      * Get the corpus of the resource
      * Returns the corpus of the specified resource for this training
-     * @param projectUuid UUID of the project
-     * @param trainingVersion Training version of the project
-     * @param resourceUuid UUID of the resource
+     * @param project_uuid UUID of the project
+     * @param training_version Training version of the project
+     * @param resource_uuid UUID of the resource
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getCorpusOfTrainingResource(projectUuid: string, trainingVersion: number, resourceUuid: string, observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public getCorpusOfTrainingResource(projectUuid: string, trainingVersion: number, resourceUuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public getCorpusOfTrainingResource(projectUuid: string, trainingVersion: number, resourceUuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public getCorpusOfTrainingResource(projectUuid: string, trainingVersion: number, resourceUuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (projectUuid === null || projectUuid === undefined) {
-            throw new Error('Required parameter projectUuid was null or undefined when calling getCorpusOfTrainingResource.');
+    public getCorpusOfTrainingResource(project_uuid: string, training_version: number, resource_uuid: string, observe?: 'body', reportProgress?: boolean): Observable<string>;
+    public getCorpusOfTrainingResource(project_uuid: string, training_version: number, resource_uuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
+    public getCorpusOfTrainingResource(project_uuid: string, training_version: number, resource_uuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
+    public getCorpusOfTrainingResource(project_uuid: string, training_version: number, resource_uuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling getCorpusOfTrainingResource.');
         }
-        if (trainingVersion === null || trainingVersion === undefined) {
-            throw new Error('Required parameter trainingVersion was null or undefined when calling getCorpusOfTrainingResource.');
+        if (training_version === null || training_version === undefined) {
+            throw new Error('Required parameter training_version was null or undefined when calling getCorpusOfTrainingResource.');
         }
-        if (resourceUuid === null || resourceUuid === undefined) {
-            throw new Error('Required parameter resourceUuid was null or undefined when calling getCorpusOfTrainingResource.');
+        if (resource_uuid === null || resource_uuid === undefined) {
+            throw new Error('Required parameter resource_uuid was null or undefined when calling getCorpusOfTrainingResource.');
         }
 
         let headers = this.defaultHeaders;
@@ -336,7 +336,7 @@ export class ResourceService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<string>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}/training/${encodeURIComponent(String(trainingVersion))}/resource/${encodeURIComponent(String(resourceUuid))}/corpus`,
+        return this.httpClient.get<string>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/resource/${encodeURIComponent(String(resource_uuid))}/corpus`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -393,16 +393,16 @@ export class ResourceService {
     /**
      * Find resource by UUID
      * Returns a single resource
-     * @param resourceUuid UUID of resource to return
+     * @param resource_uuid UUID of resource to return
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getResourceByUuid(resourceUuid: string, observe?: 'body', reportProgress?: boolean): Observable<Resource>;
-    public getResourceByUuid(resourceUuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Resource>>;
-    public getResourceByUuid(resourceUuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Resource>>;
-    public getResourceByUuid(resourceUuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (resourceUuid === null || resourceUuid === undefined) {
-            throw new Error('Required parameter resourceUuid was null or undefined when calling getResourceByUuid.');
+    public getResourceByUuid(resource_uuid: string, observe?: 'body', reportProgress?: boolean): Observable<Resource>;
+    public getResourceByUuid(resource_uuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Resource>>;
+    public getResourceByUuid(resource_uuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Resource>>;
+    public getResourceByUuid(resource_uuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (resource_uuid === null || resource_uuid === undefined) {
+            throw new Error('Required parameter resource_uuid was null or undefined when calling getResourceByUuid.');
         }
 
         let headers = this.defaultHeaders;
@@ -428,7 +428,7 @@ export class ResourceService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<Resource>(`${this.configuration.basePath}/resource/${encodeURIComponent(String(resourceUuid))}`,
+        return this.httpClient.get<Resource>(`${this.configuration.basePath}/resource/${encodeURIComponent(String(resource_uuid))}`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -441,16 +441,16 @@ export class ResourceService {
     /**
      * Returns the resource content
      * Returns the resource content
-     * @param resourceUuid UUID of resource to return
+     * @param resource_uuid UUID of resource to return
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getResourceData(resourceUuid: string, observe?: 'body', reportProgress?: boolean): Observable<Blob>;
-    public getResourceData(resourceUuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Blob>>;
-    public getResourceData(resourceUuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Blob>>;
-    public getResourceData(resourceUuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (resourceUuid === null || resourceUuid === undefined) {
-            throw new Error('Required parameter resourceUuid was null or undefined when calling getResourceData.');
+    public getResourceData(resource_uuid: string, observe?: 'body', reportProgress?: boolean): Observable<Blob>;
+    public getResourceData(resource_uuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Blob>>;
+    public getResourceData(resource_uuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Blob>>;
+    public getResourceData(resource_uuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (resource_uuid === null || resource_uuid === undefined) {
+            throw new Error('Required parameter resource_uuid was null or undefined when calling getResourceData.');
         }
 
         let headers = this.defaultHeaders;
@@ -481,7 +481,7 @@ export class ResourceService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get(`${this.configuration.basePath}/resource/${encodeURIComponent(String(resourceUuid))}/data`,
+        return this.httpClient.get(`${this.configuration.basePath}/resource/${encodeURIComponent(String(resource_uuid))}/data`,
             {
                 responseType: "blob",
                 withCredentials: this.configuration.withCredentials,
@@ -495,17 +495,17 @@ export class ResourceService {
     /**
      * Set the corpus of the resource
      * Updates the corpus of the specified resource
-     * @param resourceUuid UUID of the resource
+     * @param resource_uuid UUID of the resource
      * @param body New or updated corpus as plain text
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public setCorpusOfResource(resourceUuid: string, body: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public setCorpusOfResource(resourceUuid: string, body: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public setCorpusOfResource(resourceUuid: string, body: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public setCorpusOfResource(resourceUuid: string, body: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (resourceUuid === null || resourceUuid === undefined) {
-            throw new Error('Required parameter resourceUuid was null or undefined when calling setCorpusOfResource.');
+    public setCorpusOfResource(resource_uuid: string, body: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public setCorpusOfResource(resource_uuid: string, body: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public setCorpusOfResource(resource_uuid: string, body: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public setCorpusOfResource(resource_uuid: string, body: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (resource_uuid === null || resource_uuid === undefined) {
+            throw new Error('Required parameter resource_uuid was null or undefined when calling setCorpusOfResource.');
         }
         if (body === null || body === undefined) {
             throw new Error('Required parameter body was null or undefined when calling setCorpusOfResource.');
@@ -538,7 +538,7 @@ export class ResourceService {
             headers = headers.set('Content-Type', httpContentTypeSelected);
         }
 
-        return this.httpClient.put<any>(`${this.configuration.basePath}/resource/${encodeURIComponent(String(resourceUuid))}/corpus`,
+        return this.httpClient.put<any>(`${this.configuration.basePath}/resource/${encodeURIComponent(String(resource_uuid))}/corpus`,
             body,
             {
                 withCredentials: this.configuration.withCredentials,
@@ -552,25 +552,25 @@ export class ResourceService {
     /**
      * Set the corpus of the resource
      * Updates the corpus of the specified resource for this training
-     * @param projectUuid UUID of the project
-     * @param trainingVersion Training version of the project
-     * @param resourceUuid UUID of the resource
+     * @param project_uuid UUID of the project
+     * @param training_version Training version of the project
+     * @param resource_uuid UUID of the resource
      * @param body New or updated corpus as plain text
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public setCorpusOfTrainingResource(projectUuid: string, trainingVersion: number, resourceUuid: string, body: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public setCorpusOfTrainingResource(projectUuid: string, trainingVersion: number, resourceUuid: string, body: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public setCorpusOfTrainingResource(projectUuid: string, trainingVersion: number, resourceUuid: string, body: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public setCorpusOfTrainingResource(projectUuid: string, trainingVersion: number, resourceUuid: string, body: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (projectUuid === null || projectUuid === undefined) {
-            throw new Error('Required parameter projectUuid was null or undefined when calling setCorpusOfTrainingResource.');
+    public setCorpusOfTrainingResource(project_uuid: string, training_version: number, resource_uuid: string, body: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public setCorpusOfTrainingResource(project_uuid: string, training_version: number, resource_uuid: string, body: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public setCorpusOfTrainingResource(project_uuid: string, training_version: number, resource_uuid: string, body: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public setCorpusOfTrainingResource(project_uuid: string, training_version: number, resource_uuid: string, body: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling setCorpusOfTrainingResource.');
         }
-        if (trainingVersion === null || trainingVersion === undefined) {
-            throw new Error('Required parameter trainingVersion was null or undefined when calling setCorpusOfTrainingResource.');
+        if (training_version === null || training_version === undefined) {
+            throw new Error('Required parameter training_version was null or undefined when calling setCorpusOfTrainingResource.');
         }
-        if (resourceUuid === null || resourceUuid === undefined) {
-            throw new Error('Required parameter resourceUuid was null or undefined when calling setCorpusOfTrainingResource.');
+        if (resource_uuid === null || resource_uuid === undefined) {
+            throw new Error('Required parameter resource_uuid was null or undefined when calling setCorpusOfTrainingResource.');
         }
         if (body === null || body === undefined) {
             throw new Error('Required parameter body was null or undefined when calling setCorpusOfTrainingResource.');
@@ -603,7 +603,7 @@ export class ResourceService {
             headers = headers.set('Content-Type', httpContentTypeSelected);
         }
 
-        return this.httpClient.put<any>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}/training/${encodeURIComponent(String(trainingVersion))}/resource/${encodeURIComponent(String(resourceUuid))}/corpus`,
+        return this.httpClient.put<any>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/resource/${encodeURIComponent(String(resource_uuid))}/corpus`,
             body,
             {
                 withCredentials: this.configuration.withCredentials,

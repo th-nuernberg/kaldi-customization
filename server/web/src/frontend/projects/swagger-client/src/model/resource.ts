@@ -17,7 +17,7 @@ export interface Resource {
     uuid: string;
     name: string;
     status?: ResourceStatus;
-    resourceType: ResourceType;
-    creationTimestamp?: Date;
+    resource_type: ResourceType;
+    creation_timestamp?: Date;
 }
 

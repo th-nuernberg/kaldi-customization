@@ -15,7 +15,7 @@ import { TrainingStatus } from './trainingStatus';
 
 export interface Training { 
     version?: number;
-    creationTimestamp?: Date;
+    creation_timestamp?: Date;
     status?: TrainingStatus;
     resources?: Array<Resource>;
 }

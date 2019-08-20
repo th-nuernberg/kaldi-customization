@@ -63,24 +63,24 @@ export class DecodeService {
     /**
      * Get the result of a decoding task
      * Returns the result of a decoding task
-     * @param projectUuid UUID of the project
-     * @param trainingVersion Training version of the project
-     * @param decodeUuid UUID of the decoding task
+     * @param project_uuid UUID of the project
+     * @param training_version Training version of the project
+     * @param decode_uuid UUID of the decoding task
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getDecodeResult(projectUuid: string, trainingVersion: number, decodeUuid: string, observe?: 'body', reportProgress?: boolean): Observable<DecodeMessage>;
-    public getDecodeResult(projectUuid: string, trainingVersion: number, decodeUuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DecodeMessage>>;
-    public getDecodeResult(projectUuid: string, trainingVersion: number, decodeUuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DecodeMessage>>;
-    public getDecodeResult(projectUuid: string, trainingVersion: number, decodeUuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (projectUuid === null || projectUuid === undefined) {
-            throw new Error('Required parameter projectUuid was null or undefined when calling getDecodeResult.');
+    public getDecodeResult(project_uuid: string, training_version: number, decode_uuid: string, observe?: 'body', reportProgress?: boolean): Observable<DecodeMessage>;
+    public getDecodeResult(project_uuid: string, training_version: number, decode_uuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DecodeMessage>>;
+    public getDecodeResult(project_uuid: string, training_version: number, decode_uuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DecodeMessage>>;
+    public getDecodeResult(project_uuid: string, training_version: number, decode_uuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling getDecodeResult.');
         }
-        if (trainingVersion === null || trainingVersion === undefined) {
-            throw new Error('Required parameter trainingVersion was null or undefined when calling getDecodeResult.');
+        if (training_version === null || training_version === undefined) {
+            throw new Error('Required parameter training_version was null or undefined when calling getDecodeResult.');
         }
-        if (decodeUuid === null || decodeUuid === undefined) {
-            throw new Error('Required parameter decodeUuid was null or undefined when calling getDecodeResult.');
+        if (decode_uuid === null || decode_uuid === undefined) {
+            throw new Error('Required parameter decode_uuid was null or undefined when calling getDecodeResult.');
         }
 
         let headers = this.defaultHeaders;
@@ -106,7 +106,7 @@ export class DecodeService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<DecodeMessage>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}/training/${encodeURIComponent(String(trainingVersion))}/decode/${encodeURIComponent(String(decodeUuid))}`,
+        return this.httpClient.get<DecodeMessage>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/decode/${encodeURIComponent(String(decode_uuid))}`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -119,20 +119,20 @@ export class DecodeService {
     /**
      * List of all decodings
      * Returns a list of all decodings for this training version
-     * @param projectUuid UUID of the project
-     * @param trainingVersion Training version of the project
+     * @param project_uuid UUID of the project
+     * @param training_version Training version of the project
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getDecodings(projectUuid: string, trainingVersion: number, observe?: 'body', reportProgress?: boolean): Observable<Array<DecodeMessage>>;
-    public getDecodings(projectUuid: string, trainingVersion: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DecodeMessage>>>;
-    public getDecodings(projectUuid: string, trainingVersion: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DecodeMessage>>>;
-    public getDecodings(projectUuid: string, trainingVersion: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (projectUuid === null || projectUuid === undefined) {
-            throw new Error('Required parameter projectUuid was null or undefined when calling getDecodings.');
+    public getDecodings(project_uuid: string, training_version: number, observe?: 'body', reportProgress?: boolean): Observable<Array<DecodeMessage>>;
+    public getDecodings(project_uuid: string, training_version: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DecodeMessage>>>;
+    public getDecodings(project_uuid: string, training_version: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DecodeMessage>>>;
+    public getDecodings(project_uuid: string, training_version: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling getDecodings.');
         }
-        if (trainingVersion === null || trainingVersion === undefined) {
-            throw new Error('Required parameter trainingVersion was null or undefined when calling getDecodings.');
+        if (training_version === null || training_version === undefined) {
+            throw new Error('Required parameter training_version was null or undefined when calling getDecodings.');
         }
 
         let headers = this.defaultHeaders;
@@ -158,7 +158,7 @@ export class DecodeService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<Array<DecodeMessage>>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}/training/${encodeURIComponent(String(trainingVersion))}/decode`,
+        return this.httpClient.get<Array<DecodeMessage>>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/decode`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -171,24 +171,24 @@ export class DecodeService {
     /**
      * Decode audio to text
      * Decode audio data to text using the trained project
-     * @param projectUuid UUID of the project
-     * @param trainingVersion Training version of the project
-     * @param audioFile Audio file for decoding
+     * @param project_uuid UUID of the project
+     * @param training_version Training version of the project
+     * @param audio_file Audio file for decoding
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public startDecode(projectUuid: string, trainingVersion: number, audioFile: Blob, observe?: 'body', reportProgress?: boolean): Observable<DecodeTaskReference>;
-    public startDecode(projectUuid: string, trainingVersion: number, audioFile: Blob, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DecodeTaskReference>>;
-    public startDecode(projectUuid: string, trainingVersion: number, audioFile: Blob, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DecodeTaskReference>>;
-    public startDecode(projectUuid: string, trainingVersion: number, audioFile: Blob, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (projectUuid === null || projectUuid === undefined) {
-            throw new Error('Required parameter projectUuid was null or undefined when calling startDecode.');
+    public startDecode(project_uuid: string, training_version: number, audio_file: Blob, observe?: 'body', reportProgress?: boolean): Observable<DecodeTaskReference>;
+    public startDecode(project_uuid: string, training_version: number, audio_file: Blob, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DecodeTaskReference>>;
+    public startDecode(project_uuid: string, training_version: number, audio_file: Blob, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DecodeTaskReference>>;
+    public startDecode(project_uuid: string, training_version: number, audio_file: Blob, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling startDecode.');
         }
-        if (trainingVersion === null || trainingVersion === undefined) {
-            throw new Error('Required parameter trainingVersion was null or undefined when calling startDecode.');
+        if (training_version === null || training_version === undefined) {
+            throw new Error('Required parameter training_version was null or undefined when calling startDecode.');
         }
-        if (audioFile === null || audioFile === undefined) {
-            throw new Error('Required parameter audioFile was null or undefined when calling startDecode.');
+        if (audio_file === null || audio_file === undefined) {
+            throw new Error('Required parameter audio_file was null or undefined when calling startDecode.');
         }
 
         let headers = this.defaultHeaders;
@@ -229,11 +229,11 @@ export class DecodeService {
             formParams = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
         }
 
-        if (audioFile !== undefined) {
-            formParams = formParams.append('audio_file', <any>audioFile) as any || formParams;
+        if (audio_file !== undefined) {
+            formParams = formParams.append('audio_file', <any>audio_file) as any || formParams;
         }
 
-        return this.httpClient.post<DecodeTaskReference>(`${this.configuration.basePath}/project/${encodeURIComponent(String(projectUuid))}/training/${encodeURIComponent(String(trainingVersion))}/decode`,
+        return this.httpClient.post<DecodeTaskReference>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/decode`,
             convertFormParamsToString ? formParams.toString() : formParams,
             {
                 withCredentials: this.configuration.withCredentials,

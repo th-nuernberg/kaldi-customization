@@ -15,19 +15,19 @@ export interface OAuth2Token {
     /**
      * OAuth2 client id
      */
-    clientId?: string;
+    client_id?: string;
     /**
      * OAuth2 token type
      */
-    tokenType: string;
+    token_type: string;
     /**
      * OAuth2 access token
      */
-    accessToken: string;
+    access_token: string;
     /**
      * OAuth2 refresh token
      */
-    refreshToken?: string;
+    refresh_token?: string;
     /**
      * Granted OAuth2 scopes
      */
@@ -35,10 +35,10 @@ export interface OAuth2Token {
     /**
      * When the OAuth2 client has been issued
      */
-    issuedAt?: Date;
+    issued_at?: Date;
     /**
      * When the OAuth2 client expires
      */
-    expiresIn?: number;
+    expires_in?: number;
 }
 

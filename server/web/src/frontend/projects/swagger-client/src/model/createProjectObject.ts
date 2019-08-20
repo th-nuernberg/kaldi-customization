@@ -19,7 +19,7 @@ export interface CreateProjectObject {
     /**
      * UUID of the acoustic model
      */
-    acousticModel: string;
+    acoustic_model: string;
     /**
      * UUID of the optional parent project
      */

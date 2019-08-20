@@ -16,7 +16,7 @@ import { Language } from './language';
 export interface AcousticModel { 
     name: string;
     language: Language;
-    modelType: AcousticModelType;
+    model_type: AcousticModelType;
     uuid: string;
 }
 

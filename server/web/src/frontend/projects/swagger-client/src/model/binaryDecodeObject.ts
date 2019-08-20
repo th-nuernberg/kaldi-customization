@@ -15,6 +15,6 @@ export interface BinaryDecodeObject {
     /**
      * Audio file for decoding
      */
-    audioFile: Blob;
+    audio_file: Blob;
 }
 

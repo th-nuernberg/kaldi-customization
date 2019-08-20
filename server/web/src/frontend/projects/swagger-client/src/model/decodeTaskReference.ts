@@ -12,6 +12,6 @@
 
 
 export interface DecodeTaskReference { 
-    decodeUuid?: string;
+    decode_uuid?: string;
 }
 
