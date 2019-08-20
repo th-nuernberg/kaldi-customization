@@ -153,9 +153,38 @@ def get_corpus_of_training_resource(project_uuid, training_version, resource_uui
 
     :rtype: str
     """
-    target_path = os.path.join(TEMP_CORPUS_FOLDER,"{resource}".format())
-    download_from_bucket(minio_client,minio_buckets["TRAINING_RESOURCE_BUCKET"],"TODO","TODO")
-    return 'do some magic!'
+    if not os.path.exists(TEMP_CORPUS_FOLDER):
+        os.makedirs(TEMP_CORPUS_FOLDER)
+    
+    db_project = DB_Project.query.filter(DB_Project.uuid == project_uuid).first()
+
+    if db_project is None:
+        return ("Project not found", 404)
+
+    db_training = DB_Training.query.filter(DB_Training.version == training_version and DB_Training.project_id == db_training.id).first()
+
+    if db_training is None:
+        return ("Training not found", 404)
+    
+    db_resource = DB_Resource.query.filter(DB_Resource.uuid == resource_uuid).first()
+
+    if db_resource is None:
+        return ("Resource not found", 404)
+
+    db_training_resource = DB_TrainingResource.query.filter(DB_TrainingResource.origin_id == db_resource.id and DB_TrainingResource.training_id == db_training.id).first()
+
+    if db_resource is None:
+        return ("Resource not assigned to this Training", 404)
+
+    target_path = os.path.join(TEMP_CORPUS_FOLDER,"{}".format("tmp.txt"))
+    download_from_bucket(minio_client,minio_buckets["TRAINING_RESOURCE_BUCKET"],str(db_training_resource.id) + "/corpus.txt",target_path)
+    
+    ret_val = "Error!"
+    with open(target_path) as f:
+        ret_val = f.read()
+
+    os.remove(target_path)
+    return ret_val
 
 
 def get_training_by_version(project_uuid, training_version):  # noqa: E501
@@ -200,7 +229,43 @@ def set_corpus_of_training_resource(project_uuid, training_version, resource_uui
 
     :rtype: None
     """
-    return "do some magic!"
+    if not os.path.exists(TEMP_CORPUS_FOLDER):
+        os.makedirs(TEMP_CORPUS_FOLDER)
+    
+    db_project = DB_Project.query.filter(DB_Project.uuid == project_uuid).first()
+
+    if db_project is None:
+        return ("Project not found", 404)
+
+    db_training = DB_Training.query.filter(DB_Training.version == training_version and DB_Training.project_id == db_training.id).first()
+
+    if db_training is None:
+        return ("Training not found", 404)
+
+    print(db_training.status)
+    if db_training.status not in (DB_TrainingStateEnum.Init,DB_TrainingStateEnum.Trainable,DB_TrainingStateEnum.TextPrep_Pending, DB_TrainingStateEnum.TextPrep_Failure):
+        return ("Training already started or done", 409)
+    
+    db_resource = DB_Resource.query.filter(DB_Resource.uuid == resource_uuid).first()
+
+    if db_resource is None:
+        return ("Resource not found", 404)
+
+    db_training_resource = DB_TrainingResource.query.filter(DB_TrainingResource.origin_id == db_resource.id and DB_TrainingResource.training_id == db_training.id).first()
+
+    if db_resource is None:
+        return ("Resource not assigned to this Training", 404)
+
+
+    target_path = os.path.join(TEMP_CORPUS_FOLDER,"{}".format("tmp.txt"))
+
+    with open(target_path,"wb") as f:
+        f.write(body)
+
+    upload_to_bucket(minio_client,minio_buckets["TRAINING_RESOURCE_BUCKET"],str(db_training_resource.id) + "/corpus.txt",target_path)
+    
+    os.remove(target_path)
+    return ("Success",200)
 
 
 def start_training_by_version(project_uuid, training_version):  # noqa: E501
