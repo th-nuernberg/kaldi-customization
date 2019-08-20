@@ -9,14 +9,12 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { Resource } from './resource';
-import { TrainingStatus } from './trainingStatus';
 
 
-export interface Training { 
-    version?: number;
-    creationTimestamp?: Date;
-    status?: TrainingStatus;
-    resources?: Array<Resource>;
+export interface ResourceReferenceObject { 
+    /**
+     * UUID of the resource
+     */
+    resourceUuid: string;
 }
 

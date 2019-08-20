@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TileData, ModelData } from './tile/tile-data';
-import { ProjectService } from 'projects/swagger-client/src';
+import { ProjectService } from 'swagger-client';
 
 export interface TrainingModel {
   name:string;
