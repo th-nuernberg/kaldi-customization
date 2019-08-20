@@ -1,15 +1,17 @@
 <mat-card class="tile">
-    <mat-card-title>Projekt #{{tileData.projectNumber}}</mat-card-title>
-    <p>{{tileData.projectName}}</p>
-    <p>{{tileData.previousTrainedModel}}</p>
-    <p>{{tileData.comments}}</p>
-    <div *ngFor="let modelData of tileData.model">
-      <span>{{modelData.name}}:</span>
-      <span [ngClass]="{'color-orange': modelData.status === 'Running', 'color-green': modelData.status === 'Done'}">
+    <mat-card-title>Projekt #{{tileData.uuid}}</mat-card-title>
+    <p>{{tileData.name}}</p>
+    <p>{{tileData.acousticModel}}</p>
+    <p>{{tileData.parent}}</p>
+    <div *ngFor="let training of tileData.trainings">
+      <span>{{training.number}}:</span>
+      <span>{{training.creationTimestamp}}:</span>
+      <span [ngClass]="{'color-orange': training.status === 'Running', 'color-green': training.status === 'Done'}">
         {{modelData.status}}
       </span>
     </div>
-    <button mat-stroked-button routerLink="/project/_" class="tileButton">        
+    <p>{{tileData.creationTimestamp}}</p>
+    <button mat-stroked-button routerLink="/project/_" class="tileButton">
       <mat-icon aria-hidden="false" aria-label="Example open project">open_in_new</mat-icon>
-    </button> 
+    </button>
 </mat-card>

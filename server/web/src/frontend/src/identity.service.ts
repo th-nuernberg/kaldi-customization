@@ -13,7 +13,7 @@ export class IdentityService {
       {
         username: "kaldi",
         password: "valid",
-        accessToken: "rusHuf8rF3WHLvIKDo8BOEnfQ3xBmivb9gprfI04v2"
+        accessToken: "qprh9NFxUPowrosvoXsTn7nEGkKESFiLlApkCBuPwO"
     });
   }
 }
