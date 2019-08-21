@@ -4,11 +4,26 @@ from minio import Minio
 
 
 def create_all_buckets(minio_client):
-    minio_client.make_bucket("resources")
-    minio_client.make_bucket("training-resources")
-    minio_client.make_bucket("decodings")
-    minio_client.make_bucket("acoustic-models")
-    minio_client.make_bucket("trainings")
+    try:
+        minio_client.make_bucket("resources")
+    except Exception as e:
+        pass
+    try:
+        minio_client.make_bucket("training-resources")
+    except Exception as e:
+        pass
+    try:
+        minio_client.make_bucket("decodings")
+    except Exception as e:
+        pass
+    try:
+        minio_client.make_bucket("acoustic-models")
+    except Exception as e:
+        pass
+    try:
+        minio_client.make_bucket("trainings")
+    except Exception as e:
+        pass
 
 
 def upload_all_text_prep_files(minio_client):

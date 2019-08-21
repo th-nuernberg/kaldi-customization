@@ -1,6 +1,5 @@
 import redis
 import sys
-import unittest
 import minio
 import json
 from minio import Minio
@@ -41,7 +40,7 @@ def test_text_prep(redis_client, minio_client):
     }
 
     # Step 2: Subscribe to the status-queue channel
-    pubsub = redis_client.pubsub()
+    pubsub = redis_client.pubsub(ignore_subscribe_messages=True)
     pubsub.subscribe('Status-Queue')
     
     # Step 3: Send all tasks for text-prep-worker into the queue
@@ -52,8 +51,23 @@ def test_text_prep(redis_client, minio_client):
     redis_client.rpush('Text-Prep-Queue', json.dumps(png_file_task))
     redis_client.rpush('Text-Prep-Queue', json.dumps(html_file_task))
 
+
+    '''
+    {'type': 'message', 'pattern': None, 'channel': b'Status-Queue', 
+    'data': b'{"__queue__": "text_prep", "id": 200, "message": "Task finished successfully", "resource_uuid": "1"}'}
+    '''
     # Step 4: Listen to all incoming Status-queue messages
-    for msg in pubsub.listen(): print(msg)
+    count = 0
+    for msg in pubsub.listen(): 
+        print("Received the following message via Status-Queue")
+        print(msg)
+        data_part = json.loads(msg['data'])
+        if data_part['id'] == 200:
+            count += 1
+        if count == 6:
+            print("All tasks finished successfully")
+            break
+    exit(0)
 
 
 
