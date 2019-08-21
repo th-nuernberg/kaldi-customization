@@ -71,7 +71,7 @@ def test_text_prep(redis_client, minio_client):
     # Step 6: Listen to all incoming Status-queue messages
     count = 0
     for msg in pubsub.listen(): 
-        print("Received the following message:")        
+        print("Received the following message:")
         print(msg)
         data_part = json.loads(msg['data'])
         if data_part['id'] == 10:
