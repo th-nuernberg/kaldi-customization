@@ -29,8 +29,12 @@ def test_data_prep_worker(redis_client, minio_client):
 
     # Step 2: Upload all needed files for the data-prep-worker
     # upload_to_bucket(minio_client, bucket, filename, file_path):
-    upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "kafka/corpus.txt", "test-files/kafka_corpus.txt")
-    upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "text_generator/corpus.txt", "test-files/text_generator_corpus.txt")
+    upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "1/corpus.txt", "test-files/1/corpus.txt")
+    upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "2/corpus.txt", "test-files/2/corpus.txt")
+    upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "3/corpus.txt", "test-files/3/corpus.txt")
+    upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "4/corpus.txt", "test-files/4/corpus.txt")
+    upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "5/corpus.txt", "test-files/5/corpus.txt")
+    upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "6/corpus.txt", "test-files/6/corpus.txt")
     upload_to_bucket(minio_client, minio_buckets["ACOUSTIC_MODELS_BUCKET"], "Voxforge-RNN/g2p_model.fst", "test-files/g2p_model.fst")
 
     # Step 3: Subscribe to the status-queue
@@ -39,7 +43,7 @@ def test_data_prep_worker(redis_client, minio_client):
 
     # Step 4: Create JSON object which will be used for the data-prep-queue
     task = {
-        'resources': ['kafka', 'text_generator'],
+        'resources': ['1', '2', '3', '4', '5', '6'],
         'acoustic_model_id': 'Voxforge-RNN',
         'training_id': 'test'
     }

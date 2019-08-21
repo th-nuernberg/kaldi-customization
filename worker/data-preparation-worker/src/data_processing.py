@@ -39,6 +39,8 @@ def create_unique_word_list(file_path):
 
         all_words = text.split()
         unique_word_list = sorted(list(set(all_words)))
+        if "\xc2\xa0" in unique_word_list:
+            unique_word_list.remove("\xc2\xa0")
 
     return unique_word_list
 
@@ -65,7 +67,8 @@ def merge_corpus_list(corpus_list):
 
         # Appends all sentences of the second corpus to the first one
         for sentence in second_corpus_list:
-            return_corpus_list.append(sentence)
+            if sentence != " " or sentence != "":
+                return_corpus_list.append(sentence)
 
     return return_corpus_list
 
