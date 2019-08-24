@@ -13,7 +13,7 @@ const routes: Routes = [
   { path: '', component: CoverComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'project/:uuid', component: ProjectComponent, canActivate: [AuthGuard] },
-  { path: 'upload/decoding/:uuid', component: DecodingUploadComponent, canActivate: [AuthGuard] },
+  { path: 'upload/decoding/:uuid/:id', component: DecodingUploadComponent, canActivate: [AuthGuard] },
   { path: 'upload/training/:uuid/:id', component: TrainingUploadComponent, canActivate: [AuthGuard] },
   { path: 'account',   component: AccountComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },

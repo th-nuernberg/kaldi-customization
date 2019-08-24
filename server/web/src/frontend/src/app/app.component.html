@@ -12,7 +12,6 @@
   <div fxShow="true" fxHide.lt-md="true"
        *ngIf="currentUser != null">
     <a mat-button routerLink="/dashboard">Übersicht</a>
-    <a mat-button routerLink="/project/_">Projekte</a>
     <a mat-button routerLink="/account">Account</a>
     <a mat-button (click)="logout()">Abmelden</a>
   </div>
@@ -26,7 +25,6 @@
   <mat-sidenav color="primary" #sidenav fxLayout="column" mode="side" opened="false">
     <div fxLayout="column" *ngIf="currentUser != null">
       <a mat-button routerLink="/dashboard">Übersicht</a>
-      <a mat-button routerLink="/project/_">Projekte</a>
       <a mat-button routerLink="/account">Account</a>
       <a mat-button (click)="logout()">Abmelden</a>
     </div>
