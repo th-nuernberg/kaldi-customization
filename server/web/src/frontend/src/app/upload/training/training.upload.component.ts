@@ -5,10 +5,13 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSnackBar } from '@angular/material';
 
-import {
-  TrainingService, Training,
-  ResourceService, Resource,
-  ProjectService, Project
+import {  
+  Project,
+  Resource,
+  Training,
+  ProjectService,
+  ResourceService,
+  TrainingService,
 }
 from 'swagger-client'
 
@@ -208,7 +211,6 @@ export class TrainingUploadComponent implements OnInit {
 
   startTraining() {
     console.log("Start Training: " + this.trainingVersion + " of Project: " + this.projectUuid);
-    console.log(this.project$);
     this.trainingService.startTrainingByVersion(this.projectUuid, this.trainingVersion);
   }
 }
