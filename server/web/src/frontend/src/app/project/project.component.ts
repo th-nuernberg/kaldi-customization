@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -31,11 +32,14 @@ export interface TrainingsModel {
   styleUrls: ['./project.component.less']
 })
 export class ProjectComponent implements OnInit {
-  uuid: string;
-  project: Project;
-  newTraining: Training;
+  projectUuid: string;
   training_version: number;
+
+  training: Training;
   decodings: DecodeMessage[];
+
+  project$: Observable<Project>;
+  decodings$: Observable<DecodeMessage[]>;
 
   constructor(
     private route: ActivatedRoute,
@@ -47,36 +51,37 @@ export class ProjectComponent implements OnInit {
     ) { }
 
   ngOnInit() {
-    this.uuid = this.route.snapshot.paramMap.get('uuid');
-    console.log("Passed uuid: " + this.uuid);
-
-    this.projectService.getProjectByUuid(this.uuid)
-      .subscribe(project => {
-        console.log(project);
-        this.project = project;
-
-        if (project.trainings.length) {
-          // get all decodings of a project/training
+    this.decodings = [];
+    this.projectUuid = this.route.snapshot.paramMap.get('uuid');
+    this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
+    this.project$.subscribe(project => {
+      if (project.trainings.length) {
+        project.trainings.forEach(training => {
           this.decodeService.getDecodings(
-            this.project.uuid,
-            this.project.trainings[0].version)
+            this.projectUuid,
+            training.version)
             .subscribe(decodings => {
               console.log("Decodings: " + decodings);
-              this.decodings =decodings;
+              this.decodings.concat(decodings);
             });
-        }
-      });
+        });
+      }
+    });
   }
 
   // creates a new training and opens the training page
   createTraining() {
-    this.trainingService.createTraining(this.uuid)
+    this.trainingService.createTraining(this.projectUuid)
       .subscribe(training => {
         console.log("Created Training: " + training.version);
-        this.newTraining = training;
+        this.training = training;
         // opens training dialog
-        this.router.navigate(['/upload/training/' +this.project.uuid + "/" + this.newTraining.version]);
+        this.router.navigate(['/upload/training/' + this.projectUuid + "/" + this.training.version]);
       });
+  }
+
+  openTraining(trainingVersion:number) {
+    this.router.navigate(['/upload/training/' + this.projectUuid + "/" + trainingVersion]);
   }
 
   models: TrainingsModel[] =  [

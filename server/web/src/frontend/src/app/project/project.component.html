@@ -5,44 +5,50 @@
         <ng-template mat-tab-label>
           Übersicht
         </ng-template>
-        <mat-list>
-          <mat-list-item *ngFor='let model of models'>
-            <mat-icon mat-list-icon>folder</mat-icon>
-            <h4 mat-line>{{model.name}}</h4>
-            <p mat-line>{{model.fileResultName}}</p>
-            <p mat-line>{{model.date}}</p>
-            <button
-              mat-flat-button
-              color="primary"
-              class="tabButton">
-              <!-- TODO: ADD download behavior of model files-->
-              <mat-icon aria-hidden="false">cloud_download</mat-icon>
-            </button>
-            <button
-              mat-flat-button
-              color="accent"
-              class="tabButton"
-              (click)="openModelOverviewDialog()">
-              <!-- TODO add behavior to open extended model overview-->
-                <mat-icon aria-hidden="false">open_in_browser</mat-icon>
+        <ng-container *ngIf="{
+                  project: project$ | async } as overview;">
+          <mat-list>
+            <mat-list-item *ngFor='let training of overview?.project?.trainings'>
+              <mat-icon mat-list-icon>folder</mat-icon>
+              <h4 mat-line>Version:{{training.version}}</h4>
+              <p mat-line>Status: {{training.status}}</p>
+              <button
+                mat-flat-button
+                color="primary"
+                class="tabButton">
+                <mat-icon aria-hidden="false">D</mat-icon>
               </button>
-            <mat-divider></mat-divider>
-          </mat-list-item>
-        </mat-list>
+              <button
+                mat-flat-button
+                color="accent"
+                class="tabButton"
+                (click)="openModelOverviewDialog()">
+                  <mat-icon aria-hidden="false">E</mat-icon>
+              </button>
+              <button
+                mat-flat-button
+                color="warning"
+                class="tabButton"
+                (click)="openTraining(training.version)">
+                  <mat-icon aria-hidden="false">O</mat-icon>
+              </button>
+              <mat-divider></mat-divider>
+            </mat-list-item>
+          </mat-list>
+        </ng-container>
       </mat-tab>
       <mat-tab>
         <ng-template mat-tab-label>
           Texte
         </ng-template>
         <mat-list>
+          <!--<mat-list-item *ngFor='let decoding of decodings'>-->
           <mat-list-item *ngFor='let model of models'>
             <h4 mat-line>{{model.name}}</h4>
-            <p mat-line>{{model.texte}}</p>
             <button
               mat-flat-button
               color="warn"
               class="tabButton">
-              <!-- TODO: ADD behavior to show the encoded text-->
               <mat-icon aria-hidden="false">pageview</mat-icon>
             </button>
             <mat-divider></mat-divider>
@@ -54,9 +60,7 @@
     mat-flat-button
     class="tabGroupHeaderButton"
     color="primary"
-    (click)="createTraining()"
-    >
-      <!-- TODO add create new model behavior-->
+    (click)="createTraining()">
       <mat-icon aria-hidden="false">add</mat-icon>
     </button>
 </div>
