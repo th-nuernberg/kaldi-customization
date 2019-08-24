@@ -49,6 +49,9 @@ class TrainingStateEnum(enum.IntEnum):
         return {
             100: "Init",
 
+            150: "TextPrep_Pending",
+            151: "TextPrep_Failure",
+
             200: "Trainable",
             205: "Training_DataPrep_Pending",
             206: "Training_DataPrep_InProgress",
@@ -77,6 +80,8 @@ class Training(db.Model):
 
     def can_assign_resource(self):
         return self.status == TrainingStateEnum.Init \
+            or self.status == TrainingStateEnum.TextPrep_Pending \
+            or self.status == TrainingStateEnum.TextPrep_Failure \
             or self.status == TrainingStateEnum.Trainable
 
     def __repr__(self):
