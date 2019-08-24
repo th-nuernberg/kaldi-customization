@@ -11,13 +11,6 @@ import {
   ProjectService }
 from 'swagger-client';
 
-export interface ModelOverviewDialogData {
-  id: number,
-  project: string,
-  prevModel: string,
-  status: string,
-}
-
 export interface TrainingsModel {
   name: string;
   fileResultName: string;
@@ -94,10 +87,10 @@ export class ProjectComponent implements OnInit {
     }
 ];
 
-  openModelOverviewDialog(): void {
+  openModelOverviewDialog(trainingVersion:number): void {
     const dialogRef = this.dialog.open(ModelOverviewDialog, {
       width: '250px',
-      data: {id: 1337, project: "Project 0815", prevModel: "default", status: "Running" }
+      data: [this.project$, trainingVersion]
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -112,11 +105,25 @@ export class ProjectComponent implements OnInit {
 })
 export class ModelOverviewDialog {
 
+  projectUuid: string;
+  trainingVersion: number;
+
   constructor(
+    public router: Router,
     public dialogRef: MatDialogRef<ModelOverviewDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: ModelOverviewDialogData) {}
+    @Inject(MAT_DIALOG_DATA) public data: [Observable<Project>, number]) {
+      this.trainingVersion = this.data[1];
+      this.data[0].subscribe(project => {
+        this.projectUuid = project.uuid;
+    }); 
+  }
 
   onOkClick(): void {
+    this.dialogRef.close();
+  }
+
+  onDecodeClick(): void {
+    this.router.navigate(['/upload/decoding/' + this.projectUuid + "/" + this.trainingVersion]);
     this.dialogRef.close();
   }
 }

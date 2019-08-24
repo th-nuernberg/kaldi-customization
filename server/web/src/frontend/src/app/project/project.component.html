@@ -3,7 +3,7 @@
   <mat-tab-group>
       <mat-tab>
         <ng-template mat-tab-label>
-          Übersicht
+          Trainings
         </ng-template>
         <ng-container *ngIf="{
                   project: project$ | async } as overview;">
@@ -22,7 +22,7 @@
                 mat-flat-button
                 color="accent"
                 class="tabButton"
-                (click)="openModelOverviewDialog()">
+                (click)="openModelOverviewDialog(training.version)">
                   <mat-icon aria-hidden="false">E</mat-icon>
               </button>
               <button
@@ -39,7 +39,25 @@
       </mat-tab>
       <mat-tab>
         <ng-template mat-tab-label>
-          Texte
+          Decodings
+        </ng-template>
+        <mat-list>
+          <!--<mat-list-item *ngFor='let decoding of decodings'>-->
+          <mat-list-item *ngFor='let model of models'>
+            <h4 mat-line>{{model.name}}</h4>
+            <button
+              mat-flat-button
+              color="warn"
+              class="tabButton">
+              <mat-icon aria-hidden="false">pageview</mat-icon>
+            </button>
+            <mat-divider></mat-divider>
+          </mat-list-item>
+        </mat-list>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Models
         </ng-template>
         <mat-list>
           <!--<mat-list-item *ngFor='let decoding of decodings'>-->
