@@ -26,7 +26,7 @@ export class DecodingUploadComponent implements OnInit {
   project$:Observable<Project>;
   training$:Observable<Training>;
   //resources$:Observable<Array<Resource>>;
-  decodings$:Observable<Arraay<DecodeMessage>>;
+  decodings$:Observable<Array<DecodeMessage>>;
 
   currentDecodingResources:Blob[];
   
@@ -84,7 +84,7 @@ export class DecodingUploadComponent implements OnInit {
       audioFile);
 
     this.currentDecodingResources.push(audioFile);
-    this.snackBar.open("Added audio to decoding...", "", { duration: 3000 });
+    this.snackBar.open("Start audio decoding...", "", { duration: 3000 });
   }
 
   reloadProject() {
@@ -92,5 +92,6 @@ export class DecodingUploadComponent implements OnInit {
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
     this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
     this.decodings$ = this.decodeService.getDecodings(this.projectUuid, this.trainingVersion);
+    let decodingResults = this.decodeService.getDecodeResult(this.projectUuid, this.trainingVersion, "")
   }
 }

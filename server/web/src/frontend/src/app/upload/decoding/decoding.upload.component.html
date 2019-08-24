@@ -70,14 +70,13 @@
                     color="primary" 
                     class="uploadFile_Button" 
                     onclick="document.getElementById('fileInput').click()">
-                    <mat-icon aria-hidden="false">cloud_upload</mat-icon>
+                    <mat-icon aria-hidden="false">Add</mat-icon>
                   </button>
                   <button
                     mat-flat-button
                     class="uploadFile_Button" 
                     color="warn"        
                     (click)="remove(resources.selectedOptions.selected)">
-                    <!-- TODO update to new file format / resource format-->
                     <mat-icon aria-hidden="false">delete</mat-icon>
                   </button>
                 </div>
@@ -132,7 +131,7 @@
                       <p>Anzahl Audio Dateien: {{currentDecodingResources.length}}</p>
                     </mat-list-item>
                     <mat-divider></mat-divider>
-                    <mat-list-item *ngFor="let decoding of overview?.decodings?.decodings">
+                    <mat-list-item *ngFor="let decoding of overview?.decodings">
                       <p>Audio Dateien: {{decoding}}</p>
                     </mat-list-item>
                   </mat-list>
@@ -146,11 +145,6 @@
                 matStepperPrevious
                 class="uploadFile_Button"
                 color="primary">Back</button>
-                <button
-                mat-flat-button
-                class="uploadFile_Button"
-                color="primary"
-                (click)="startDecode()">Start Decode</button>
           </div>
       </mat-step>
   </mat-horizontal-stepper>
