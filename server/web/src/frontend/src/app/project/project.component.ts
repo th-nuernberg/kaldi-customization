@@ -77,19 +77,9 @@ export class ProjectComponent implements OnInit {
     this.router.navigate(['/upload/training/' + this.projectUuid + "/" + trainingVersion]);
   }
 
-  models: TrainingsModel[] =  [
-    {
-      name: "Model 1",
-      fileResultName: "model1.pdf",
-      date: "01.01.1970",
-      link: "/upload/_/decoding",
-      texte: "Reißverschlussverfahren"
-    }
-];
-
   openModelOverviewDialog(trainingVersion:number): void {
     const dialogRef = this.dialog.open(ModelOverviewDialog, {
-      width: '250px',
+      width: '400px',
       data: [this.project$, trainingVersion]
     });
 
