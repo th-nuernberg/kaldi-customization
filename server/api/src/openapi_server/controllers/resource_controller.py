@@ -41,60 +41,18 @@ def get_db_project_training(project_uuid, training_version):
     Queries the database and returns the specified project / training.
     Returns None if not found
     """
-    #TODO: check the ownership / permission
+    current_user = connexion.context['token_info']['user']
 
-    db_proj = DB_Project.query.filter_by(uuid=project_uuid).first()
+    db_proj = DB_Project.query.filter_by(
+        uuid=project_uuid, owner_id=current_user.id).first()
     if db_proj is None:
         return None, None
 
-    db_train = DB_Training.query.filter_by(and_(project=db_proj, version=training_version))
+    db_train = DB_Training.query.filter_by(
+        and_(project=db_proj, version=training_version))
 
     return db_proj, db_train
 
-#DEPRECATED?
-'''
-def assign_resource_to_training(project_uuid, training_version, resource_reference_object=None):  # noqa: E501
-    """Assign a resource to the training
-
-    Assign the specified resource to the training # noqa: E501
-
-    :param project_uuid: UUID of the project
-    :type project_uuid: 
-    :param training_version: Training version of the project
-    :type training_version: int
-    :param resource_reference_object: Resource that needs to be added
-    :type resource_reference_object: dict | bytes
-
-    :rtype: Resource
-    #"""
-    if connexion.request.is_json:
-        resource_reference_object = ResourceReferenceObject.from_dict(connexion.request.get_json())  # noqa: E501
-
-    db_res = DB_Resource.query.filter_by(uuid=resource_reference_object.resource_uuid)
-    if db_res is None:
-        return ("Resource not found", 404)
-
-    db_proj, db_train = get_db_project_training(project_uuid, training_version)
-    if db_proj is None:
-        return ("Project not found", 404)
-    if db_train is None:
-        return ("Training not found", 404)
-
-    # check if already assigned
-    db_train_res = DB_TrainingResource.query.filter_by(and_(training=db_train, origin=db_res))
-    
-    if db_train_res is not None:
-        return ("Resource already in training", 400)
-
-    db_train_res = DB_TrainingResource(
-        training=db_train,
-        origin=db_res
-    )
-    db.session.add(db_train_res)
-    db.session.commit()
-
-    return mapper.db_resource_to_front(db_res)
-'''
 
 def get_filetype(filename):
     '''
@@ -106,6 +64,7 @@ def get_filetype(filename):
             return DB_ResourceType[filetype]
     return None
 
+
 def create_resource(upfile):  # noqa: E501
     """Create/Upload a new resource
 
@@ -116,6 +75,7 @@ def create_resource(upfile):  # noqa: E501
 
     :rtype: Resource
     """
+    current_user = connexion.context['token_info']['user']
 
     print('Received new file: ' + str(upfile))
 
@@ -132,14 +92,13 @@ def create_resource(upfile):  # noqa: E501
 
     # file is okay: create db entry, store to dfs and create textprep job
 
-    my_user = DB_User.query.get(1)
     print('Set ownership to user 1')
 
     db_resource = DB_Resource(
         name=filename,
         status=DB_ResourceState.Upload_InProgress,
         resource_type=filetype,
-        owner=my_user  # TODO: wie kann der Benutzer ermittelt werden?
+        owner=current_user
     )
     db.session.add(db_resource)
     db.session.commit()
@@ -185,46 +144,6 @@ def create_resource(upfile):  # noqa: E501
 
     return mapper.db_resource_to_front(db_resource)
 
-def delete_assigned_resource_from_training(project_uuid, training_version, resource_uuid):  # noqa: E501
-    """Remove a resource from the training
-
-    Removes the assigned resource from the training # noqa: E501
-
-    :param project_uuid: UUID of the project
-    :type project_uuid: 
-    :param training_version: Training version of the project
-    :type training_version: int
-    :param resource_uuid: UUID of the resource
-    :type resource_uuid: 
-
-    :rtype: None
-    """
-
-    db_res = DB_Resource.query.filter_by(uuid=resource_uuid)
-    if db_res is None:
-        return ("Resource not found", 404)
-
-    db_proj, db_train = get_db_project_training(project_uuid, training_version)
-    if db_proj is None:
-        return ("Project not found", 404)
-    if db_train is None:
-        return ("Training not found", 404)
-
-    # check if training already started
-    if not (db_train.status == DB_TrainingStateEnum.Init or db_train.status == DB_TrainingStateEnum.Trainable):
-        return ("Conflict: already in training", 409)
-
-    # check if already assigned
-    db_train_res = DB_TrainingResource.query.filter_by(and_(training=db_train, origin=db_res))
-    
-    if db_train_res is None:
-        return ("Resource was not in training", 400)
-
-    db.session.delete(db_train_res)
-    db.session.commit()
-
-    return ("Resource assignment successfully removed", 200)
-
 
 def get_resource():  # noqa: E501
     """Returns a list of available resources
@@ -234,11 +153,11 @@ def get_resource():  # noqa: E501
 
     :rtype: List[Resource]
     """
+    current_user = connexion.context['token_info']['user']
 
-    #TODO filter by user
-    db_resources = DB_Resource.query.all()
+    db_resources = DB_Resource.query.filter_by(owner_id=current_user.id).all()
 
-    return [ mapper.db_resource_to_front(r) for r in db_resources ]
+    return [mapper.db_resource_to_front(r) for r in db_resources]
 
 
 def get_resource_by_uuid(resource_uuid):  # noqa: E501
@@ -251,11 +170,10 @@ def get_resource_by_uuid(resource_uuid):  # noqa: E501
 
     :rtype: Resource
     """
+    current_user = connexion.context['token_info']['user']
 
-    #TODO: check the ownership of the file
-    # db_resource.owner
-
-    db_resource = DB_Resource.query.filter_by(uuid=resource_uuid).first()
+    db_resource = DB_Resource.query.filter_by(
+        uuid=resource_uuid, owner_id=current_user.id).first()
 
     if (db_resource is None):
         return ("File not found", 404)
@@ -273,16 +191,17 @@ def get_resource_data(resource_uuid):  # noqa: E501
 
     :rtype: file
     """
+    current_user = connexion.context['token_info']['user']
 
-    #TODO: check the ownership of the file
-    db_resource = DB_Resource.query.filter_by(uuid=resource_uuid).first()
+    db_resource = DB_Resource.query.filter_by(
+        uuid=resource_uuid, owner_id=current_user.id).first()
 
     if (db_resource is None):
         print('Resource {} in DB not found'.format(resource_uuid))
         return ("File not found", 404)
-    
-    minio_file_path = str(db_resource.uuid) + '/source'
-    
+
+    minio_file_path = str(db_resource.uuid) + '/' + str(db_resource.uuid)
+
     if not os.path.exists(TEMP_UPLOAD_FOLDER):
         os.makedirs(TEMP_UPLOAD_FOLDER)
 
@@ -297,7 +216,7 @@ def get_resource_data(resource_uuid):  # noqa: E501
             target_path=local_file_path
         )
 
-        if not download_result[0]: # means no success
+        if not download_result[0]:  # means no success
             print('Resource {} in MinIO not found'.format(resource_uuid))
             return ("File not found", 404)
 
