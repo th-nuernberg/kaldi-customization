@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatTableDataSource } from '@angular/material/table';
+import { MatSnackBar } from '@angular/material';
 
 import {
   TrainingService, Training,
@@ -39,15 +40,15 @@ export class TrainingUploadComponent implements OnInit {
     private route: ActivatedRoute,
     private trainingService: TrainingService,
     private resourceService: ResourceService,
-    private projectService: ProjectService
-    ) {
-  }
+    private projectService: ProjectService,
+    private snackBar: MatSnackBar
+    ) {}
   // TODO post model information to the API: text files, project name, model name, prev model etc..
   ngOnInit() {
     this.projectUuid = this.route.snapshot.paramMap.get('uuid');
     this.trainingVersion =  +this.route.snapshot.paramMap.get('id');
 
-    console.log("Project: " + this.projectUuid + " Trainingsversion: " + this.trainingVersion);
+    //console.log("Project: " + this.projectUuid + " Trainingsversion: " + this.trainingVersion);
 
     // init obeservables
     this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
@@ -61,10 +62,6 @@ export class TrainingUploadComponent implements OnInit {
 
     // init current training resources - second view
     this.training$.subscribe(training => {
-      console.log("Init: Get Training resource:")
-      for(let res of training.resources) {
-        console.log(res.name);
-      }
       this.currentTrainingResources = training.resources;
     });
 
@@ -99,10 +96,7 @@ export class TrainingUploadComponent implements OnInit {
   // copies selected history elements to current panel
   copyResource() {
     this.historySelection.selected.forEach(resource => {
-
-      console.log("Copied Resource: " + resource.uuid);
       this.currentTrainingResources.push(resource);
-
       console.log("Assgin resource: " + resource.uuid + "Name: " + resource.name + " to training: " + this.trainingVersion);
       this.trainingService.assignResourceToTraining(
         this.projectUuid,
@@ -110,20 +104,21 @@ export class TrainingUploadComponent implements OnInit {
         { resource_uuid: resource.uuid })
       .subscribe(this.currentTrainingResources.push);
     });
+
+    this.snackBar.open("Copied resource to training...", "", { duration: 3000 });
   }
 
   onSelectionChange(ev, selectedResources) {
-    console.log(ev);
     if(ev.option.selected === false) {
       this.showContentPreview = false;
       this.fileContent = "";
     } else {
       selectedResources.forEach(element => {
-        console.log("Selected: " + element.selected);
+        //console.log("Selected: " + element.selected);
         const resource:Resource = element.value;
         this.resourceService.getResourceData(resource.uuid)
           .subscribe(data => {
-            console.log("Show preview of resource data: " + data);
+            //console.log("Show preview of resource data: " + data);
             this.showPreview(data);
         });
       });
@@ -159,6 +154,8 @@ export class TrainingUploadComponent implements OnInit {
         });
       }
     });
+
+    this.snackBar.open("Removed resource from training...", "", { duration: 3000 });
   }
 
   // uploads file and show preview
@@ -170,23 +167,36 @@ export class TrainingUploadComponent implements OnInit {
     console.log("Uploaded resource: " + file.files[0].name);
     const blobFile:Blob = file.files[0] as Blob;
 
-    // TODO: call TextPrepWorker
-    // TODO: set TextPrepWorkerResult as TrainingResource
-
     this.resourceService.createResource(blobFile)
       .subscribe(resource => {
         console.log("Created Resource: " + resource.uuid);
-        this.currentTrainingResources.push(resource);console.log("Assgin resource: " + resource.uuid + "Name: " + resource.name + " to training: " + this.trainingVersion);
+        this.currentTrainingResources.push(resource);
+        //console.log("Assgin resource: " + resource.uuid + "Name: " + resource.name + " to training: " + this.trainingVersion);
         this.trainingService.assignResourceToTraining(
           this.projectUuid,
           this.trainingVersion,
-          { resource_uuid: resource.uuid });
+          { resource_uuid: resource.uuid })
+        .subscribe(this.currentTrainingResources.push);
+
+        // TODO: call TextPrepWorker
+        // TODO: set TextPrepWorkerResult as TrainingResource
+        /*let content;
+        this.resourceService.getResourceData(resource.uuid).subscribe(data => content);
+        this.trainingService.setCorpusOfTrainingResource(
+          this.projectUuid,
+          this.trainingVersion,
+          resource.uuid,
+          content);
+          this.resourceService.getCorpusOfResource(
+            resource.uuid);*/
     });
+
+    this.snackBar.open("Added resource to training...", "", { duration: 3000 });
   }
 
   reloadProject() {
 
-    console.log("Reload values on next..");
+    //console.log("Reload values on next..");
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
     this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
 
@@ -199,6 +209,6 @@ export class TrainingUploadComponent implements OnInit {
   startTraining() {
     console.log("Start Training: " + this.trainingVersion + " of Project: " + this.projectUuid);
     console.log(this.project$);
-    //this.trainingService.startTrainingByVersion(this.projectUuid, this.trainingVersion);
+    this.trainingService.startTrainingByVersion(this.projectUuid, this.trainingVersion);
   }
 }
