@@ -30,6 +30,7 @@ export class TrainingUploadComponent implements OnInit {
   resources$:Observable<Array<Resource>>;
 
   currentTrainingResources:Resource[];
+  currentTrainingResourcesWithCorupus: [Resource, string][];
   allResources:MatTableDataSource<Resource>;
 
   displayedColumns: string[] = ['select', 'name', 'type'];
@@ -71,6 +72,10 @@ export class TrainingUploadComponent implements OnInit {
     // init preview
     this.fileContent = "";
     this.showContentPreview = false;
+
+    setInterval(
+      () => this.getResourceCorpusResult(),
+      10000);
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -129,6 +134,7 @@ export class TrainingUploadComponent implements OnInit {
   }
 
   showPreview(data:Blob) {
+    // TODO: SHOW CONTENT OF CORPUS OF THE RESOURCE AND NOT OF THE RESOURCE ITSSELF
     var reader = new FileReader();
     var me = this;
 
@@ -147,6 +153,7 @@ export class TrainingUploadComponent implements OnInit {
       let index:number = this.currentTrainingResources.findIndex(d => d === resource);
 
       if(index > -1) {
+        // TODO: EXTEND API TO REMOVE ADDED RESOURCES FROM THE TRAINING!!
         this.trainingService.deleteAssignedResourceFromTraining(
           this.projectUuid,
           this.trainingVersion,
@@ -170,6 +177,7 @@ export class TrainingUploadComponent implements OnInit {
     console.log("Uploaded resource: " + file.files[0].name);
     const blobFile:Blob = file.files[0] as Blob;
 
+    // creates resource and starts the TextPrepWorker to create the corupus
     this.resourceService.createResource(blobFile)
       .subscribe(resource => {
         console.log("Created Resource: " + resource.uuid);
@@ -180,18 +188,6 @@ export class TrainingUploadComponent implements OnInit {
           this.trainingVersion,
           { resource_uuid: resource.uuid })
         .subscribe(this.currentTrainingResources.push);
-
-        // TODO: call TextPrepWorker
-        // TODO: set TextPrepWorkerResult as TrainingResource
-        /*let content;
-        this.resourceService.getResourceData(resource.uuid).subscribe(data => content);
-        this.trainingService.setCorpusOfTrainingResource(
-          this.projectUuid,
-          this.trainingVersion,
-          resource.uuid,
-          content);
-          this.resourceService.getCorpusOfResource(
-            resource.uuid);*/
     });
 
     this.snackBar.open("Added resource to training...", "", { duration: 3000 });
@@ -206,6 +202,19 @@ export class TrainingUploadComponent implements OnInit {
     // init current training resources - second view
     this.training$.subscribe(training => {
       this.currentTrainingResources = training.resources;
+    });
+  }
+
+  getResourceCorpusResult() {
+    this.currentTrainingResources.forEach(resource => {
+      console.log("Use resource to find corpus: " + resource.name);
+      this.resourceService.getCorpusOfTrainingResource(
+        this.projectUuid,
+        this.trainingVersion,
+        resource.uuid).subscribe(corpus => {
+          console.log("Found corpus of: " + resource.name)
+          this.currentTrainingResourcesWithCorupus.push([resource, corpus])
+      });
     });
   }
 
