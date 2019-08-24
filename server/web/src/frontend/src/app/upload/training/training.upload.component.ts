@@ -49,6 +49,9 @@ export class TrainingUploadComponent implements OnInit {
     ) {}
   // TODO post model information to the API: text files, project name, model name, prev model etc..
   ngOnInit() {
+    this.currentTrainingResources = [];
+    this.currentTrainingResourcesWithCorupus = [];
+
     this.projectUuid = this.route.snapshot.paramMap.get('uuid');
     this.trainingVersion =  +this.route.snapshot.paramMap.get('id');
 
