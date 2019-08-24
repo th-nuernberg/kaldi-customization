@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -106,7 +107,8 @@ export class TrainingUploadComponent implements OnInit {
       this.trainingService.assignResourceToTraining(
         this.projectUuid,
         this.trainingVersion,
-        { resource_uuid: resource.uuid });
+        { resource_uuid: resource.uuid })
+      .subscribe(this.currentTrainingResources.push);
     });
   }
 

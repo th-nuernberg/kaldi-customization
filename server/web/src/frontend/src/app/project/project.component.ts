@@ -55,14 +55,16 @@ export class ProjectComponent implements OnInit {
         console.log(project);
         this.project = project;
 
-        // get all decodings of a project/training
-        this.decodeService.getDecodings(
-          this.project.uuid,
-          this.project.trainings[0].version)
-          .subscribe(decodings => {
-            console.log("Decodings: " + decodings);
-            this.decodings =decodings;
-          });
+        if (project.trainings.length) {
+          // get all decodings of a project/training
+          this.decodeService.getDecodings(
+            this.project.uuid,
+            this.project.trainings[0].version)
+            .subscribe(decodings => {
+              console.log("Decodings: " + decodings);
+              this.decodings =decodings;
+            });
+        }
       });
   }
 
