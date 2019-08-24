@@ -279,7 +279,7 @@ def get_resource_data(resource_uuid):  # noqa: E501
         print('Resource {} in DB not found'.format(resource_uuid))
         return ("File not found", 404)
     
-    minio_file_path = str(db_resource.uuid) + '/' + str(db_resource.uuid)
+    minio_file_path = str(db_resource.uuid) + '/source'
     
     if not os.path.exists(TEMP_UPLOAD_FOLDER):
         os.makedirs(TEMP_UPLOAD_FOLDER)
