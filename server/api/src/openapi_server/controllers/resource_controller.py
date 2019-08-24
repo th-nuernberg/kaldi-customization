@@ -51,7 +51,8 @@ def get_db_project_training(project_uuid, training_version):
 
     return db_proj, db_train
 
-
+#DEPRECATED?
+'''
 def assign_resource_to_training(project_uuid, training_version, resource_reference_object=None):  # noqa: E501
     """Assign a resource to the training
 
@@ -65,7 +66,7 @@ def assign_resource_to_training(project_uuid, training_version, resource_referen
     :type resource_reference_object: dict | bytes
 
     :rtype: Resource
-    """
+    #"""
     if connexion.request.is_json:
         resource_reference_object = ResourceReferenceObject.from_dict(connexion.request.get_json())  # noqa: E501
 
@@ -93,6 +94,7 @@ def assign_resource_to_training(project_uuid, training_version, resource_referen
     db.session.commit()
 
     return mapper.db_resource_to_front(db_res)
+'''
 
 def get_filetype(filename):
     '''
@@ -286,7 +288,7 @@ def get_resource_data(resource_uuid):  # noqa: E501
 
     # use local file system as file cache?
     local_file_path = os.path.join(TEMP_UPLOAD_FOLDER, str(db_resource.uuid))
-    
+
     if not os.path.exists(local_file_path):
         download_result = download_from_bucket(
             minio_client=minio_client,
@@ -299,4 +301,5 @@ def get_resource_data(resource_uuid):  # noqa: E501
             print('Resource {} in MinIO not found'.format(resource_uuid))
             return ("File not found", 404)
 
+    # TODO delete file
     return send_file(local_file_path, as_attachment=True, attachment_filename=db_resource.name)

@@ -34,7 +34,7 @@ def download_from_bucket(minio_client, bucket, filename, target_path):
         print(err)
         return (False, err)
 
-    print("Download of " + filename + " was successfull.")
+    print("Download of /" + bucket + "/" + filename + " was successfull.")
     return (True, "")
 
 
@@ -45,5 +45,15 @@ def upload_to_bucket(minio_client, bucket, filename, file_path):
         print(err)
         return (False, err)
 
-    print("Upload of " + filename + " was successfull.")
+    print("Upload of /" + bucket + "/" + filename + " was successfull.")
     return (True, "")
+
+def copy_object_in_bucket(minio_client, old_bucket, old_file, new_bucket, new_file):
+    try:
+        minio_client.copy_object(new_bucket,new_file,"/{}/{}".format(old_bucket,old_file))
+    except ResponseError as err:
+        print(err)
+        return (False,err)
+
+    print("Copy of {} was successfull.".format(new_file))
+    return (True,"")

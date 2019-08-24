@@ -15,9 +15,13 @@ from models.training import Training as DB_Training, TrainingStateEnum as DB_Tra
 from models.training_resource import TrainingResource as DB_TrainingResource
 
 from redis_communication import create_dataprep_job
+from minio_communication import upload_to_bucket, download_from_bucket, minio_buckets, copy_object_in_bucket
+from config import minio_client
 
+import os
 from mapper import mapper
 
+TEMP_CORPUS_FOLDER = '/tmp/corpus'
 
 def assign_resource_to_training(project_uuid, training_version, resource_reference_object=None):  # noqa: E501
     """Assign a resource to the training
@@ -59,17 +63,22 @@ def assign_resource_to_training(project_uuid, training_version, resource_referen
     if db_resource.has_error():
         return ("Resource has errors", 400)
 
+    #if the resource is already added, return the previous
     db_training_resource = DB_TrainingResource.query.filter_by(
         training_id=db_training.id, origin_id=db_resource.id).first()
-
     if db_training_resource:
         return mapper.db_training_resource_to_front(db_training_resource)
 
     db_training_resource = DB_TrainingResource(
         training=db_training, origin=db_resource)
-
     db.session.add(db_training_resource)
+    db.session.commit()
 
+    #if text prep is already done, we should copy corpus to the new training_resource
+    if db_resource.status == DB_ResourceStateEnum.TextPreparation_Success:
+        copy_object_in_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], db_resource.uuid + "/corpus.txt", minio_buckets["TRAINING_RESOURCE_BUCKET"], db_training_resource.id + "/corpus.txt")
+
+    
     if db_resource.status != DB_ResourceStateEnum.TextPreparation_Success:
         db_training.status = DB_TrainingStateEnum.TextPrep_Pending
     elif db_training.status == DB_TrainingStateEnum.Init:
@@ -144,7 +153,45 @@ def get_corpus_of_training_resource(project_uuid, training_version, resource_uui
 
     :rtype: str
     """
-    return 'do some magic!'
+    if not os.path.exists(TEMP_CORPUS_FOLDER):
+        os.makedirs(TEMP_CORPUS_FOLDER)
+    
+    db_project = DB_Project.query.filter_by(uuid=project_uuid).first()
+
+    if db_project is None:
+        return ("Project not found", 404)
+
+    db_training = DB_Training.query.filter_by(version=training_version) \
+        .filter_by(project_id=db_project.id).first()
+
+    if db_training is None:
+        return ("Training not found", 404)
+
+    print(db_training)
+    print(db_training.status)
+    if db_training.status not in (DB_TrainingStateEnum.Init,DB_TrainingStateEnum.Trainable,DB_TrainingStateEnum.TextPrep_Pending, DB_TrainingStateEnum.TextPrep_Failure):
+        return ("Training already started or done", 409)
+    
+    db_resource = DB_Resource.query.filter(DB_Resource.uuid == resource_uuid).first()
+
+    if db_resource is None:
+        return ("Resource not found", 404)
+
+    db_training_resource = DB_TrainingResource.query.filter_by(origin_id=db_resource.id) \
+        .filter_by(training_id=db_training.id).first()
+
+    if db_resource is None:
+        return ("Resource not assigned to this Training", 404)
+
+    target_path = os.path.join(TEMP_CORPUS_FOLDER,"{}".format("tmp.txt"))
+    download_from_bucket(minio_client,minio_buckets["TRAINING_RESOURCE_BUCKET"],str(db_training_resource.id) + "/corpus.txt",target_path)
+    
+    ret_val = "Error!"
+    with open(target_path) as f:
+        ret_val = f.read()
+
+    os.remove(target_path)
+    return ret_val
 
 
 def get_training_by_version(project_uuid, training_version):  # noqa: E501
@@ -189,7 +236,44 @@ def set_corpus_of_training_resource(project_uuid, training_version, resource_uui
 
     :rtype: None
     """
-    return "do some magic!"
+    if not os.path.exists(TEMP_CORPUS_FOLDER):
+        os.makedirs(TEMP_CORPUS_FOLDER)
+    
+    db_project = DB_Project.query.filter_by(uuid=project_uuid).first()
+
+    if db_project is None:
+        return ("Project not found", 404)
+
+    db_training = DB_Training.query.filter_by(version=training_version) \
+        .filter_by(project_id=db_project.id).first()
+
+    if db_training is None:
+        return ("Training not found", 404)
+
+    if db_training.status not in (DB_TrainingStateEnum.Init,DB_TrainingStateEnum.Trainable,DB_TrainingStateEnum.TextPrep_Pending, DB_TrainingStateEnum.TextPrep_Failure):
+        return ("Training already started or done", 409)
+    
+    db_resource = DB_Resource.query.filter(DB_Resource.uuid == resource_uuid).first()
+
+    if db_resource is None:
+        return ("Resource not found", 404)
+
+    db_training_resource = DB_TrainingResource.query.filter_by(origin_id=db_resource.id) \
+        .filter_by(training_id=db_training.id).first()
+
+    if db_resource is None:
+        return ("Resource not assigned to this Training", 404)
+
+
+    target_path = os.path.join(TEMP_CORPUS_FOLDER,"{}".format("tmp.txt"))
+
+    with open(target_path,"wb") as f:
+        f.write(body)
+
+    upload_to_bucket(minio_client,minio_buckets["TRAINING_RESOURCE_BUCKET"],str(db_training_resource.id) + "/corpus.txt",target_path)
+    
+    os.remove(target_path)
+    return ("Success",200)
 
 
 def start_training_by_version(project_uuid, training_version):  # noqa: E501
@@ -212,19 +296,15 @@ def start_training_by_version(project_uuid, training_version):  # noqa: E501
         return ("training already done or pending", 400)
 
     db_training.status = DB_TrainingStateEnum.Training_Pending
-    db_training_resources = DB_Resource.query.filter(DB_Resource.id == DB_TrainingResource.origin_id) \
-                                             .filter(DB_TrainingResource.training_id == db_training.id) \
-                                             .all()
+    db_training_resources = DB_TrainingResource.query.filter(DB_TrainingResource.training_id == db_training.id).all()
 
     db.session.add(db_training)
     db.session.commit()
 
     create_dataprep_job(
         acoustic_model_id=db_project.acoustic_model_id,
-        corpi=[r.uuid for r in db_training_resources],
+        corpi=[r.id for r in db_training_resources],
         training_id=db_training.id
     )
-    # create_kaldi_job(training_id=db_training.id,
-    #                  acoustic_model_id=db_project.acoustic_model_id)
 
     return mapper.db_training_to_front(db_training)
