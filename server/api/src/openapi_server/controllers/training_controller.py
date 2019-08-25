@@ -81,7 +81,7 @@ def assign_resource_to_training(project_uuid, training_version, resource_referen
     # if text prep is already done, we should copy corpus to the new training_resource
     if db_resource.status == DB_ResourceStateEnum.TextPreparation_Success:
         copy_object_in_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], db_resource.uuid + "/corpus.txt",
-                              minio_buckets["TRAINING_RESOURCE_BUCKET"], db_training_resource.id + "/corpus.txt")
+                              minio_buckets["TRAINING_RESOURCE_BUCKET"], str(db_training_resource.id) + "/corpus.txt")
 
     if db_resource.status != DB_ResourceStateEnum.TextPreparation_Success:
         db_training.status = DB_TrainingStateEnum.TextPrep_Pending
