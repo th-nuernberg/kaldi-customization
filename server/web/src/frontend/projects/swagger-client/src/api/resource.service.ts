@@ -336,12 +336,13 @@ export class ResourceService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<string>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/resource/${encodeURIComponent(String(resource_uuid))}/corpus`,
+        return this.httpClient.get(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/resource/${encodeURIComponent(String(resource_uuid))}/corpus`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
-                reportProgress: reportProgress
+                reportProgress: reportProgress,
+                responseType: "text"
             }
         );
     }
