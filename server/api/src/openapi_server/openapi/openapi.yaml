@@ -262,6 +262,65 @@ paths:
       tags:
       - training
       x-openapi-router-controller: openapi_server.controllers.training_controller
+  /project/{project_uuid}/training/{training_version}/corpus:
+    get:
+      description: Returns the entire corpus of the specified training
+      operationId: get_corpus_of_training
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                description: Corpus of the resource
+                example: er horte leise schritte hinter sich das bedeutete nichts
+                  gutes wer wurde ihm schon folgen spat in der nacht und dazu noch
+                  in dieser engen gasse mitten im ubel beleumundeten hafenviertel
+                  gerade jetzt wo er das ding seines lebens gedreht hatte und mit
+                  der beute verschwinden wollte hatte einer seiner zahllosen kollegen
+                  dieselbe idee gehabt ihn beobachtet und abgewartet um ihn nun um
+                  die fruchte seiner arbeit zu erleichtern oder gehorten die schritte
+                  hinter ihm zu einem der unzahligen gesetzeshuter dieser stadt und
+                  die stahlerne acht um seine handgelenke wurde gleich zuschnappen
+                  er konnte die aufforderung stehen zu bleiben schon horen gehetzt
+                  sah er sich um plotzlich erblickte er den schmalen durchgang blitzartig
+                  drehte er sich nach rechts und verschwand zwischen den beiden gebauden
+                  beinahe ware er dabei uber den umgesturzten mulleimer gefallen der
+                  mitten im weg lag
+                type: string
+          description: Corpus as plain text
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Get the entire corpus of the specified training
+      tags:
+      - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+
   /project/{project_uuid}/training/{training_version}/decode:
     get:
       description: Returns a list of all decodings for this training version
@@ -311,7 +370,7 @@ paths:
       - decode
       x-openapi-router-controller: openapi_server.controllers.decode_controller
     post:
-      description: Decode audio data to text using the trained project
+      description: Decode audio data to text using the trained project and the given audio
       operationId: start_decode
       parameters:
       - description: UUID of the project
@@ -333,11 +392,11 @@ paths:
           type: integer
         style: simple
       requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/BinaryDecodeObject'
-        required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AudioReferenceObject'
+      description: Audio that needs to be decoded
       responses:
         202:
           content:
@@ -675,6 +734,148 @@ paths:
       - training
       - resource
       x-openapi-router-controller: openapi_server.controllers.training_controller
+  /audio:
+    get:
+      operationId: get_all_audio
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Audio'
+                type: array
+          description: List of resources
+        403:
+          content: {}
+          description: Forbidden
+      security:
+      - oauth:
+        - read:audio
+      summary: Returns a list of available audio
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+    post:
+      operationId: upload_audio
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/BinaryResourceObject'
+                type: array
+          description: List of resources
+        403:
+          content: {}
+          description: Forbidden
+        405:
+          content: {}
+          description: Invalid Input
+      security:
+      - oauth:
+        - write:audio
+      summary: Uploads audio
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+  /audio/{audio_uuid}:
+    get:
+      description: Returns a single audio resource
+      operationId: get_audio_by_uuid
+      parameters:
+      - description: UUID of audio to return
+        explode: false
+        in: path
+        name: audio_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Audio'
+          description: Audio object
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Audio not found
+      security:
+      - oauth:
+        - read:audio
+      summary: Find audio by UUID
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+    delete:
+      description: Delete a single audio resource
+      operationId: delete_audio_by_uuid
+      parameters:
+      - description: UUID of audio to delete
+        explode: false
+        in: path
+        name: audio_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content: {}  
+          description: Success
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Audio not found
+      security:
+      - oauth:
+        - write:audio
+      summary: Delete audio by UUID
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+  /audio/{audio_uuid}/data:
+    get:
+      description: Returns the audio content
+      operationId: get_audio_data
+      parameters:
+      - description: UUID of resource to return
+        explode: false
+        in: path
+        name: audio_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            audio/wav:
+              schema:
+                format: binary
+                type: string
+          description: Uploaded audio content
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Audio not found
+      security:
+      - oauth:
+        - read:audio
+      summary: Returns the audio content
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
   /resource:
     get:
       operationId: get_resource
@@ -1069,6 +1270,30 @@ components:
       - name
       - resource_type
       - uuid
+      - status
+      type: object
+    Audio:
+      example:
+        creation_timestamp: 2000-01-23T04:56:07.000+00:00
+        name: myAudio.wav
+        uuid: 550e8400-e29b-11d4-a716-446655440000
+      properties:
+        uuid:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        name:
+          example: myAudio.wav
+          type: string
+        creation_timestamp:
+          format: date-time
+          type: string
+        status:
+          $ref: '#/components/schemas/AudioStatus'
+      required:
+      - name
+      - uuid
+      - status
       type: object
     ResourceStatus:
       enum:
@@ -1120,6 +1345,18 @@ components:
       - Training_In_Progress
       - Training_Success
       - Training_Failure
+    AudioStatus:
+      enum:
+      - 100
+      - 200
+      - 300
+      - 320
+      type: integer
+      x-enum-varnames:
+      - Init
+      - AudioPrep_Pending
+      - AudioPrep_Success
+      - AudioPrep_Failure
     Training:
       example:
         creation_timestamp: 2000-01-23T04:56:07.000+00:00
@@ -1216,6 +1453,18 @@ components:
       required:
       - resource_uuid
       type: object
+    AudioReferenceObject:
+      example:
+        audio_uuid: 550e8400-e29b-11d4-a716-446655440000
+      properties:
+        resource_uuid:
+          description: UUID of the audio file
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+      required:
+      - audio_uuid
+      type: object
     BinaryResourceObject:
       properties:
         upfile:
@@ -1243,6 +1492,8 @@ components:
             decode:projects: decode audio data using projects in your account
             write:resources: modify resources in your account
             read:resources: read your resources
+            write:audio: modify your audio
+            read:audio: read your audio
           tokenUrl: http://localhost:8080/api/oauth/token
       type: oauth2
       x-tokenInfoFunc: openapi_server.controllers.security_controller_.info_from_oauth
