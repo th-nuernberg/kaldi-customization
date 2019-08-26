@@ -50,7 +50,7 @@ class TrainingStateEnum(enum.IntEnum):
             100: "Init",
 
             150: "TextPrep_Pending",
-            151: "TextPrep_Failure",
+            151: "TextPrep_Failure"
 
             200: "Trainable",
             205: "Training_DataPrep_Pending",
@@ -79,10 +79,10 @@ class Training(db.Model):
     status = db.Column(db.Enum(TrainingStateEnum), default=TrainingStateEnum.Init)
 
     def can_assign_resource(self):
-        return self.status == TrainingStateEnum.Init \
-            or self.status == TrainingStateEnum.TextPrep_Pending \
-            or self.status == TrainingStateEnum.TextPrep_Failure \
-            or self.status == TrainingStateEnum.Trainable
+        return self.status in (TrainingStateEnum.Init,
+                               TrainingStateEnum.TextPrep_Pending,
+                               TrainingStateEnum.TextPrep_Failure,
+                               TrainingStateEnum.Trainable)
 
     def __repr__(self):
         return json.dumps(self, cls=AlchemyEncoder)

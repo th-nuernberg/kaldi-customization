@@ -127,7 +127,33 @@ def delete_assigned_resource_from_training(project_uuid, training_version, resou
 
     :rtype: None
     """
-    return 'do some magic!'
+    current_user = connexion.context['token_info']['user']
+
+    db_res = DB_Resource.query.filter_by(uuid=resource_uuid, owner_id=current_user.id)
+    if db_res is None:
+        return ("Resource not found", 404)
+
+    db_proj, db_train = get_db_project_training(project_uuid, training_version)
+    if db_proj is None:
+        return ("Project not found", 404)
+    if db_train is None:
+        return ("Training not found", 404)
+
+    # check if training already started
+    if not db_train.can_assign_resource():
+        return ("Conflict: already in training", 409)
+
+    # check if already assigned
+    db_train_res = DB_TrainingResource.query.filter_by(
+        and_(training=db_train, origin=db_res))
+
+    if db_train_res is None:
+        return ("Resource was not in training", 400)
+
+    db.session.delete(db_train_res)
+    db.session.commit()
+
+    return ("Resource assignment successfully removed", 200)
 
 
 def get_corpus_of_training_resource(project_uuid, training_version, resource_uuid):  # noqa: E501
@@ -144,7 +170,48 @@ def get_corpus_of_training_resource(project_uuid, training_version, resource_uui
 
     :rtype: str
     """
-    return 'do some magic!'
+    current_user = connexion.context['token_info']['user']
+
+    if not os.path.exists(TEMP_CORPUS_FOLDER):
+        os.makedirs(TEMP_CORPUS_FOLDER)
+
+    db_project = DB_Project.query.filter_by(
+        uuid=project_uuid, owner_id=current_user.id).first()
+
+    if db_project is None:
+        return ("Project not found", 404)
+
+    db_training = DB_Training.query.filter_by(version=training_version) \
+        .filter_by(project_id=db_project.id).first()
+
+    if db_training is None:
+        return ("Training not found", 404)
+
+    db_resource = DB_Resource.query.filter(
+        DB_Resource.uuid == resource_uuid).first()
+
+    if db_resource is None:
+        return ("Resource not found", 404)
+
+    db_training_resource = DB_TrainingResource.query.filter_by(origin_id=db_resource.id) \
+        .filter_by(training_id=db_training.id).first()
+
+    if db_resource is None:
+        return ("Resource not assigned to this Training", 404)
+
+    if db_resource.status != DB_ResourceStateEnum.TextPreparation_Success:
+        return ("TextPreparation not finished (status {})".format(db_resource.status), 404)
+
+    target_path = os.path.join(TEMP_CORPUS_FOLDER, "{}".format("tmp.txt"))
+    download_from_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], str(
+        db_training_resource.id) + "/corpus.txt", target_path)
+
+    ret_val = "Error!"
+    with open(target_path) as f:
+        ret_val = f.read()
+
+    os.remove(target_path)
+    return ret_val
 
 
 def get_training_by_version(project_uuid, training_version):  # noqa: E501
