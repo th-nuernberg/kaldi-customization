@@ -167,9 +167,7 @@
                     <p>Trainingsstatus: {{detail.training?.status}}</p>
                   </div>
                   <div *ngFor="let resource of detail.training?.resources">
-                    <p matLine>Resource Name: {{resource.name}}</p>
-                    <p matLine>Resource Status: {{resource.status}}</p>
-                    <p matLine>Resource Typ: {{resource.resource_type}}</p>
+                    <p>Resource Name: {{resource.name}} Typ: {{resource.resource_type}} Status: {{resource.status}}</p>
                   </div>
                 </ng-container>
               </mat-card-content>
@@ -181,11 +179,6 @@
                 matStepperPrevious
                 class="uploadFile_Button"
                 color="primary">Back</button>
-                <button
-                mat-flat-button
-                class="uploadFile_Button"
-                color="primary"
-                (click)="startTraining()">Start Training</button>
           </div>
         </mat-step>
     </mat-horizontal-stepper>

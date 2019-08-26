@@ -2,35 +2,40 @@
   <mat-horizontal-stepper labelPosition="bottom" #stepper>
       <mat-step class="decodingPage">
         <form>
-          <ng-template matStepLabel>Das Umfeld</ng-template>
-          <div fxLayout="center center">
-            <mat-card class="example-card">
-              <mat-card-content>
-                <h2>Modell</h2>
-                <mat-list *ngFor="let env of environment">
-                  <mat-list-item>
-                    <p>Projekt: {{env.project}}</p>
-                  </mat-list-item>
-                  <mat-divider></mat-divider>
-                  <mat-list-item>
-                    <p>Modell: {{env.model}}</p>
-                  </mat-list-item>
-                  <mat-divider></mat-divider>
-                  <mat-list-item>
-                    <p>Vorheriges Modell: {{env.prevModel}}</p>
-                  </mat-list-item>
-                  <mat-divider></mat-divider>
-                  <mat-list-item>
-                    <p>Status: {{env.modelStatus}}</p>
-                  </mat-list-item>
-                  <mat-divider></mat-divider>
-                  <mat-list-item>
-                    <p>Datum: {{env.date}}</p>
-                  </mat-list-item>
-                </mat-list>
-              </mat-card-content>
-            </mat-card>
-          </div>
+          <ng-template matStepLabel>Überblick</ng-template>
+          <ng-container
+            *ngIf="{
+            project: project$ | async,
+            training: training$ | async } as overview;">
+            <div fxLayout="center center">
+              <mat-card class="example-card">
+                <mat-card-content>
+                  <h2>Modell</h2>
+                  <mat-list>
+                    <mat-list-item>
+                      <p>Projekt: {{overview?.project?.name}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Modell: {{overview?.project?.acoustic_model.name}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Training: {{overview?.training?.version}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Status: {{overview?.training?.status}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Datum: {{overview?.training?.creation_timestamp}}</p>
+                    </mat-list-item>
+                  </mat-list>
+                </mat-card-content>
+              </mat-card>
+            </div>         
+          </ng-container>
           <div>
             <button
               mat-flat-button
@@ -52,32 +57,28 @@
                 <!-- Current File panel -->
                 <div>
                   <mat-selection-list
-                    (selectionChange)="handleSelection($event)">
+                    #resources>
                     <mat-list-option
-                      *ngFor='let file of uploadedFiles'
-                      [selected]='file.selected'
-                      [value]="file.name">
-                      <p mat-line>{{file.name}}</p>
+                      *ngFor='let resource of currentDecodingResources'
+                      [value]="resource">
+                      <p mat-line>{{resource.name}}</p>
                     </mat-list-option>
                   </mat-selection-list>
                   <input #file id="fileInput" type="file" style="display:none" (change)="loadFile(file)" />
                   <button 
                     mat-flat-button 
-                    color="warn" 
+                    color="primary" 
                     class="uploadFile_Button" 
                     onclick="document.getElementById('fileInput').click()">
-                    <!-- TODO update to new file format / resource format -->
-                    <mat-icon aria-hidden="false" aria-label="Example upload icon">cloud_upload</mat-icon>
+                    <mat-icon aria-hidden="false">cloud_upload</mat-icon>
                   </button>
-
                   <button
                     mat-flat-button
                     class="uploadFile_Button" 
-                    color="warn"
-                    [disabled]="isRemoveDisabled()"              
-                    (click)="remove()">
+                    color="warn"        
+                    (click)="remove(resources.selectedOptions.selected)">
                     <!-- TODO update to new file format / resource format-->
-                    <mat-icon aria-hidden="false" aria-label="Example delete icon">delete</mat-icon>
+                    <mat-icon aria-hidden="false">delete</mat-icon>
                   </button>
                 </div>
               </mat-card-content>
@@ -101,42 +102,44 @@
       
       <mat-step>
           <ng-template matStepLabel>Starte das Decoding</ng-template>
-          <div fxLayout="center center">
-            <mat-card class="example-card">
+          <ng-container
+            *ngIf="{
+              decodings: decodings$ | async,
+              project: project$ | async,
+              training: training$ | async } as overview;">
+            <div fxLayout="center center">
+              <mat-card class="example-card">
                 <mat-card-content>
                   <h2>Decode</h2>
-                  <mat-list *ngFor="let env of environment">
+                  <mat-list>
                     <mat-list-item>
-                      <p>Projekt: {{env.project}}</p>
+                      <p>Projekt: {{overview?.project?.name}}</p>
                     </mat-list-item>
                     <mat-divider></mat-divider>
                     <mat-list-item>
-                      <p>Modell: {{env.model}}</p>
+                      <p>Modell: {{overview?.project?.acoustic_model.name}}</p>
                     </mat-list-item>
                     <mat-divider></mat-divider>
                     <mat-list-item>
-                      <p>Vorheriges Modell: {{env.prevModel}}</p>
+                      <p>Training: {{overview?.training?.version}}</p>
                     </mat-list-item>
                     <mat-divider></mat-divider>
                     <mat-list-item>
-                      <p>Status: {{env.modelStatus}}</p>
+                      <p>Status: {{overview?.training?.status}}</p>
                     </mat-list-item>
                     <mat-divider></mat-divider>
                     <mat-list-item>
-                      <p>Datum: {{env.date}}</p>
+                      <p>Anzahl Audio Dateien: {{currentDecodingResources.length}}</p>
                     </mat-list-item>
                     <mat-divider></mat-divider>
-                    <mat-list-item>
-                      <p>Anzahl Audio Dateien: {{env.numberAUdio}}</p>
-                    </mat-list-item>
-                    <mat-divider></mat-divider>
-                    <mat-list-item *ngFor="let file of env.listAudio">
-                      <p>Audio Dateien: {{file}}</p>
+                    <mat-list-item *ngFor="let decoding of overview?.decodings?.decodings">
+                      <p>Audio Dateien: {{decoding}}</p>
                     </mat-list-item>
                   </mat-list>
                 </mat-card-content>
               </mat-card>
-          </div>
+            </div>
+          </ng-container>
           <div>
               <button
                 mat-flat-button
@@ -146,7 +149,8 @@
                 <button
                 mat-flat-button
                 class="uploadFile_Button"
-                color="primary">Start Decode</button>
+                color="primary"
+                (click)="startDecode()">Start Decode</button>
           </div>
       </mat-step>
   </mat-horizontal-stepper>

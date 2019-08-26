@@ -1,19 +1,19 @@
-<h1 mat-dialog-title>Model {{data.id}}</h1>
-<div mat-dialog-content>
-  <p>Projekt: {{data.project}}</p>
-  <p>Model parent: {{data.prevModel}}</p>
-  <p>Status: {{data.status}}</p>
-</div>
-<div mat-dialog-actions>
-  <button
-    mat-button
-    cdkFocusInitial
-    color="primary"
-    (click)="onOkClick()">Ok</button>
-  <button
-    mat-button
-    cdkFocusInitial
-    color="primary"
-    routerLink="/upload/decoding/_"
-    (click)="onOkClick()">Decode Audio</button>
-</div>
+<ng-container *ngIf="data[0] | async as detail">
+  <h1 mat-dialog-title>Model 0815</h1>
+  <div mat-dialog-content>
+    <p>Projekt: {{detail?.project?.name}}</p>
+    <p>Model: {{detail?.project?.acoustic_model}}</p>
+  </div>
+  <div mat-dialog-actions>
+    <button
+      mat-button
+      cdkFocusInitial
+      color="primary"
+      (click)="onOkClick()">Ok</button>
+    <button
+      mat-button
+      cdkFocusInitial
+      color="primary"
+      (click)="onDecodeClick()">Decode Audio</button>
+  </div> 
+</ng-container>

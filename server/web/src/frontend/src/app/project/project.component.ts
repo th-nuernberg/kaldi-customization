@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -9,13 +10,6 @@ import {
   Project,
   ProjectService }
 from 'swagger-client';
-
-export interface ModelOverviewDialogData {
-  id: number,
-  project: string,
-  prevModel: string,
-  status: string,
-}
 
 export interface TrainingsModel {
   name: string;
@@ -31,11 +25,14 @@ export interface TrainingsModel {
   styleUrls: ['./project.component.less']
 })
 export class ProjectComponent implements OnInit {
-  uuid: string;
-  project: Project;
-  newTraining: Training;
+  projectUuid: string;
   training_version: number;
+
+  training: Training;
   decodings: DecodeMessage[];
+
+  project$: Observable<Project>;
+  decodings$: Observable<DecodeMessage[]>;
 
   constructor(
     private route: ActivatedRoute,
@@ -47,36 +44,37 @@ export class ProjectComponent implements OnInit {
     ) { }
 
   ngOnInit() {
-    this.uuid = this.route.snapshot.paramMap.get('uuid');
-    console.log("Passed uuid: " + this.uuid);
-
-    this.projectService.getProjectByUuid(this.uuid)
-      .subscribe(project => {
-        console.log(project);
-        this.project = project;
-
-        if (project.trainings.length) {
-          // get all decodings of a project/training
+    this.decodings = [];
+    this.projectUuid = this.route.snapshot.paramMap.get('uuid');
+    this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
+    this.project$.subscribe(project => {
+      if (project.trainings.length) {
+        project.trainings.forEach(training => {
           this.decodeService.getDecodings(
-            this.project.uuid,
-            this.project.trainings[0].version)
+            this.projectUuid,
+            training.version)
             .subscribe(decodings => {
               console.log("Decodings: " + decodings);
-              this.decodings =decodings;
+              this.decodings.concat(decodings);
             });
-        }
-      });
+        });
+      }
+    });
   }
 
   // creates a new training and opens the training page
   createTraining() {
-    this.trainingService.createTraining(this.uuid)
+    this.trainingService.createTraining(this.projectUuid)
       .subscribe(training => {
         console.log("Created Training: " + training.version);
-        this.newTraining = training;
+        this.training = training;
         // opens training dialog
-        this.router.navigate(['/upload/training/' +this.project.uuid + "/" + this.newTraining.version]);
+        this.router.navigate(['/upload/training/' + this.projectUuid + "/" + this.training.version]);
       });
+  }
+
+  openTraining(trainingVersion:number) {
+    this.router.navigate(['/upload/training/' + this.projectUuid + "/" + trainingVersion]);
   }
 
   models: TrainingsModel[] =  [
@@ -89,10 +87,10 @@ export class ProjectComponent implements OnInit {
     }
 ];
 
-  openModelOverviewDialog(): void {
+  openModelOverviewDialog(trainingVersion:number): void {
     const dialogRef = this.dialog.open(ModelOverviewDialog, {
       width: '250px',
-      data: {id: 1337, project: "Project 0815", prevModel: "default", status: "Running" }
+      data: [this.project$, trainingVersion]
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -107,11 +105,25 @@ export class ProjectComponent implements OnInit {
 })
 export class ModelOverviewDialog {
 
+  projectUuid: string;
+  trainingVersion: number;
+
   constructor(
+    public router: Router,
     public dialogRef: MatDialogRef<ModelOverviewDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: ModelOverviewDialogData) {}
+    @Inject(MAT_DIALOG_DATA) public data: [Observable<Project>, number]) {
+      this.trainingVersion = this.data[1];
+      this.data[0].subscribe(project => {
+        this.projectUuid = project.uuid;
+    }); 
+  }
 
   onOkClick(): void {
+    this.dialogRef.close();
+  }
+
+  onDecodeClick(): void {
+    this.router.navigate(['/upload/decoding/' + this.projectUuid + "/" + this.trainingVersion]);
     this.dialogRef.close();
   }
 }
