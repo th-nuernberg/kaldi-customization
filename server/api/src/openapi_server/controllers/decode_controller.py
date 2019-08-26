@@ -43,8 +43,14 @@ def get_decode_result(project_uuid, training_version, decode_uuid):  # noqa: E50
 
     :rtype: DecodeMessage
     """
+    current_user = connexion.context['token_info']['user']
 
-    db_decoding = DB_Decoding.query.filter_by(uuid=decode_uuid).first()
+    db_decoding = DB_Decoding.query \
+        .join(DB_Training, DB_Training.id == DB_Decoding.training_id) \
+        .join(DB_Project, DB_Training.project_id == DB_Project.id) \
+        .filter(DB_Decoding.uuid == decode_uuid) \
+        .filter(DB_Project.owner_id == current_user.id) \
+        .first()
 
     if not db_decoding:
         return ('Decoding not found', 404)
@@ -64,17 +70,21 @@ def get_decodings(project_uuid, training_version):  # noqa: E501
 
     :rtype: List[DecodeMessage]
     """
+    current_user = connexion.context['token_info']['user']
+
     db_decodings = DB_Decoding.query \
         .join(DB_Training, DB_Training.id == DB_Decoding.training_id) \
         .join(DB_Project, DB_Training.project_id == DB_Project.id) \
         .filter(DB_Project.uuid == project_uuid) \
+        .filter(DB_Project.owner_id == current_user.id) \
         .filter(DB_Training.version == training_version) \
         .all()
 
     decoding_list = list()
 
     for decoding in db_decodings:
-        decoding_list.append(DecodeMessage(uuid=decoding.uuid, transcripts=json.loads(decoding.transcripts)))
+        decoding_list.append(DecodeMessage(
+            uuid=decoding.uuid, transcripts=json.loads(decoding.transcripts)))
 
     return decoding_list
 
@@ -93,12 +103,20 @@ def start_decode(project_uuid, training_version, audio_file):  # noqa: E501
 
     :rtype: DecodeTaskReference
     """
+    current_user = connexion.context['token_info']['user']
 
     print('Received new file for decode: ' + str(audio_file))
 
-    db_project = DB_Project.query.filter_by(uuid=project_uuid).first()
+    db_project = DB_Project.query.filter_by(uuid=project_uuid, owner_id=current_user.id).first()
+
+    if not db_project:
+        return ('Project not found', 404)
+
     db_training = DB_Training.query.filter_by(
         version=training_version, project=db_project).first()
+
+    if not db_training:
+        return ('Training not found', 404)
 
     # if user does not select file, browser also
     # submit an empty part without filename

@@ -1,5 +1,5 @@
 from typing import List
-from models import OAuth2Token
+from models import OAuth2Token, User
 
 import time
 
@@ -22,7 +22,7 @@ def info_from_oauth(token):
     if not token or token.is_refresh_token_expired():
         return None
 
-    return {'scopes': token.scope.split(), 'uid': token.user_id}
+    return { 'scopes': token.scope.split(), 'user': User.query.filter_by(id=token.user_id).first() }
 
 
 def validate_scope_oauth(required_scopes, token_scopes):
