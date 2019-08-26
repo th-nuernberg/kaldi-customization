@@ -13,13 +13,16 @@ from openapi_server.test import BaseTestCase
 class TestUserController(BaseTestCase):
     """UserController integration test stubs"""
 
-    @unittest.skip("*/* not supported by Connexion. Use application/json instead. See https://github.com/zalando/connexion/pull/760")
     def test_create_user(self):
         """Test case for create_user
 
         Create user
         """
-        user = {}
+        user = {
+  "user-email" : "user-email",
+  "password" : "password",
+  "username" : "username"
+}
         headers = { 
             'Content-Type': 'application/json',
         }

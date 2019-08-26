@@ -392,11 +392,12 @@ paths:
           type: integer
         style: simple
       requestBody:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AudioReferenceObject'
-      description: Audio that needs to be decoded
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AudioReferenceObject'
+        description: Audio that needs to be decoded
+        required: true
       responses:
         202:
           content:
@@ -758,14 +759,18 @@ paths:
       x-openapi-router-controller: openapi_server.controllers.decode_controller
     post:
       operationId: upload_audio
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BinaryResourceObject'
+        required: true
       responses:
         200:
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/BinaryResourceObject'
-                type: array
+                $ref: '#/components/schemas/Audio'
           description: List of resources
         403:
           content: {}
@@ -1348,6 +1353,7 @@ components:
     AudioStatus:
       enum:
       - 100
+      - 150
       - 200
       - 300
       - 320
@@ -1355,6 +1361,7 @@ components:
       x-enum-varnames:
       - Init
       - AudioPrep_Pending
+      - AudioPrep_In_Progress
       - AudioPrep_Success
       - AudioPrep_Failure
     Training:
@@ -1457,7 +1464,7 @@ components:
       example:
         audio_uuid: 550e8400-e29b-11d4-a716-446655440000
       properties:
-        resource_uuid:
+        audio_uuid:
           description: UUID of the audio file
           example: 550e8400-e29b-11d4-a716-446655440000
           format: uuid

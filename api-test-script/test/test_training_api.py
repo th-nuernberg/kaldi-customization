@@ -49,6 +49,13 @@ class TestTrainingApi(unittest.TestCase):
         """
         pass
 
+    def test_get_corpus_of_training(self):
+        """Test case for get_corpus_of_training
+
+        Get the entire corpus of the specified training  # noqa: E501
+        """
+        pass
+
     def test_get_corpus_of_training_resource(self):
         """Test case for get_corpus_of_training_resource
 

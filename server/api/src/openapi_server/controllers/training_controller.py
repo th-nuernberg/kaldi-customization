@@ -169,6 +169,19 @@ def delete_assigned_resource_from_training(project_uuid, training_version, resou
 
     return ("Resource assignment successfully removed", 200)
 
+def get_corpus_of_training(project_uuid, training_version):  # noqa: E501
+    """Get the entire corpus of the specified training
+
+    Returns the entire corpus of the specified training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+
+    :rtype: str
+    """
+    return 'do some magic!'
 
 def get_corpus_of_training_resource(project_uuid, training_version, resource_uuid):  # noqa: E501
     """Get the corpus of the resource
