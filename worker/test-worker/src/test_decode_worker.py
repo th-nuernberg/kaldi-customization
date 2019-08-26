@@ -12,14 +12,22 @@ def test_decode_worker(redis_client, minio_client):
     pubsub.subscribe("Status-Queue")
 
     # Step 2: Create JSON object which will be used for the data-prep-queue
+    '''
     task = {
         'decode_file': 'test.wav',
         'acoustic_model_id': '1',
         'training_id': 'test'
     }
+    '''
+    task2 = {
+        'decode_file': 'test2.wav',
+        'acoustic_model_id': '1',
+        'training_id': 'test'
+    }
 
     # Step 3: Send task into the data-prep-queue
-    redis_client.rpush('Decoding-Queue', json.dumps(task))
+    # redis_client.rpush('Decoding-Queue', json.dumps(task))
+    redis_client.rpush('Decoding-Queue', json.dumps(task2))
 
     # Step 4: Check which responses are returned over the status-queue from the data-prep-worker
     exit_code = 0

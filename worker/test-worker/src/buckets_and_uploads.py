@@ -53,6 +53,7 @@ def upload_all_remaining_files(minio_client):
     upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/splice_opts"  , "test-files/remaining_files/voxforge-rnn/extractor/splice_opts")
 
     upload_to_bucket(minio_client,minio_buckets["DECODING_BUCKET"], "test.wav", "test-files/remaining_files/test.wav")
+    upload_to_bucket(minio_client,minio_buckets["DECODING_BUCKET"], "test2.wav", "test-files/remaining_files/test2.wav")
 
 
 if __name__ == "__main__":
