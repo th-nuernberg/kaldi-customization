@@ -9,3 +9,4 @@ Flask-SocketIO
 Flask-Testing
 minio
 mysqlclient
+passlib

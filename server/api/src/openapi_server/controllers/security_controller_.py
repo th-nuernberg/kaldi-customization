@@ -1,27 +1,7 @@
 from typing import List
-from models import OAuth2Token
+from models import OAuth2Token, User
 
 import time
-
-
-def info_from_api_key(api_key, required_scopes):
-    """
-    Check and retrieve authentication information from api_key.
-    Returned value will be passed in 'token_info' parameter of your operation function, if there is one.
-    'sub' or 'uid' will be set in 'user' parameter of your operation function, if there is one.
-
-    :param api_key API key provided by Authorization header
-    :type api_key: str
-    :param required_scopes Always None. Used for other authentication method
-    :type required_scopes: None
-    :return: Information attached to provided api_key or None if api_key is invalid or does not allow access to called API
-    :rtype: dict | None
-    """
-
-    # TODO: implement access by api_key
-
-    return None
-    # return {'uid': token.user_id}
 
 
 def info_from_oauth(token):
@@ -42,7 +22,7 @@ def info_from_oauth(token):
     if not token or token.is_refresh_token_expired():
         return None
 
-    return {'scopes': token.scope.split(), 'uid': token.user_id}
+    return { 'scopes': token.scope.split(), 'user': User.query.filter_by(id=token.user_id).first() }
 
 
 def validate_scope_oauth(required_scopes, token_scopes):
