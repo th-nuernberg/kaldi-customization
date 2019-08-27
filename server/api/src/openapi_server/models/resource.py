@@ -130,6 +130,8 @@ class Resource(Model):
         :param status: The status of this Resource.
         :type status: ResourceStatus
         """
+        if status is None:
+            raise ValueError("Invalid value for `status`, must not be `None`")  # noqa: E501
 
         self._status = status
 

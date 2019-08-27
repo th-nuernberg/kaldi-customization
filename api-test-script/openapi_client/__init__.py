@@ -35,6 +35,9 @@ from openapi_client.exceptions import ApiException
 # import models into sdk package
 from openapi_client.models.acoustic_model import AcousticModel
 from openapi_client.models.acoustic_model_type import AcousticModelType
+from openapi_client.models.audio import Audio
+from openapi_client.models.audio_reference_object import AudioReferenceObject
+from openapi_client.models.audio_status import AudioStatus
 from openapi_client.models.binary_decode_object import BinaryDecodeObject
 from openapi_client.models.binary_resource_object import BinaryResourceObject
 from openapi_client.models.create_project_object import CreateProjectObject

@@ -15,6 +15,7 @@ from models import db, Project as DB_Project, TrainingStateEnum as DB_TrainingSt
 
 from mapper import mapper
 
+
 def create_project(create_project_object=None):  # noqa: E501
     """Create a new project
 
@@ -30,8 +31,11 @@ def create_project(create_project_object=None):  # noqa: E501
     else:
         return ('Invalid input', 405)
 
+    current_user = connexion.context['token_info']['user']
+
     # Resolve acoustic model
-    db_acousticModel = DB_AcousticModel.query.filter_by(uuid=create_project_object.acoustic_model).first()
+    db_acousticModel = DB_AcousticModel.query.filter_by(
+        uuid=create_project_object.acoustic_model).first()
 
     if not db_acousticModel:
         return ("Acoustic Model not found", 404)
@@ -39,15 +43,14 @@ def create_project(create_project_object=None):  # noqa: E501
     # Resolve optional parent project
     db_parent_proj = None
     if create_project_object.parent is not None:
-        db_parent_proj = DB_Project.query.filter_by(uuid=create_project_object.parent).first()
+        db_parent_proj = DB_Project.query.filter_by(
+            uuid=create_project_object.parent, owner_id=current_user.id).first()
         if db_parent_proj is None:
             return ("Parent project not found", 404)
 
-    my_user = DB_User.query.get(1)
-
     db_proj = DB_Project(
         name=create_project_object.name,
-        owner=my_user,
+        owner=current_user,
         acoustic_model=db_acousticModel
     )
 
@@ -70,11 +73,10 @@ def get_project_by_uuid(project_uuid):  # noqa: E501
 
     :rtype: Project
     """
+    current_user = connexion.context['token_info']['user']
 
-    #TODO: check the ownership of the file
-    # db_file.owner
-
-    db_proj = DB_Project.query.filter_by(uuid=project_uuid).first()
+    db_proj = DB_Project.query.filter_by(
+        uuid=project_uuid, owner_id=current_user.id).first()
 
     if (db_proj is None):
         return ("Project not found", 404)
@@ -90,8 +92,8 @@ def get_projects():  # noqa: E501
 
     :rtype: List[Project]
     """
-    #TODO filter by user
+    current_user = connexion.context['token_info']['user']
 
-    db_projects = DB_Project.query.all()
+    db_projects = DB_Project.query.filter_by(owner_id=current_user.id).all()
 
-    return [ mapper.db_project_to_front(db_proj) for db_proj in db_projects ]
+    return [mapper.db_project_to_front(db_proj) for db_proj in db_projects]

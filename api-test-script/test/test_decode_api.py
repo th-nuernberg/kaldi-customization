@@ -28,6 +28,34 @@ class TestDecodeApi(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_delete_audio_by_uuid(self):
+        """Test case for delete_audio_by_uuid
+
+        Delete audio by UUID  # noqa: E501
+        """
+        pass
+
+    def test_get_all_audio(self):
+        """Test case for get_all_audio
+
+        Returns a list of available audio  # noqa: E501
+        """
+        pass
+
+    def test_get_audio_by_uuid(self):
+        """Test case for get_audio_by_uuid
+
+        Find audio by UUID  # noqa: E501
+        """
+        pass
+
+    def test_get_audio_data(self):
+        """Test case for get_audio_data
+
+        Returns the audio content  # noqa: E501
+        """
+        pass
+
     def test_get_decode_result(self):
         """Test case for get_decode_result
 
@@ -46,6 +74,13 @@ class TestDecodeApi(unittest.TestCase):
         """Test case for start_decode
 
         Decode audio to text  # noqa: E501
+        """
+        pass
+
+    def test_upload_audio(self):
+        """Test case for upload_audio
+
+        Uploads audio  # noqa: E501
         """
         pass
 

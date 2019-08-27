@@ -18,6 +18,7 @@ Flask-SocketIO = "*"
 Flask-Testing = "*"
 mysqlclient = "*"
 minio = "*"
+passlib = "*"
 
 [requires]
 python_version = "3.6"

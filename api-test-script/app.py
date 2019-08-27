@@ -22,7 +22,7 @@ if __name__ == "__main__":
     
     data = {
         'grant_type': 'password',
-        'scope': 'decode:projects read:projects train:projects write:projects read:resources write:resources read:user write:user',
+        'scope': 'decode:projects read:projects train:projects write:projects read:resources write:resources read:user write:user write:audio read:audio',
         'username': args.username,
         'password': args.password
     }
@@ -110,9 +110,12 @@ if __name__ == "__main__":
 
     if last_status != TrainingStatus.Training_Success:
         exit(1)
-
+    print("Upload audio:")
+    audio_file = decode_api_instance.upload_audio('../initialization/example/test.wav')
+    print(audio_file)
+    a_ref = AudioReferenceObject(audio_uuid = audio_file.uuid)
     print('Start decoding:')
-    decode_session = decode_api_instance.start_decode(project.uuid, training.version, '../initialization/example/test.wav')
+    decode_session = decode_api_instance.start_decode(project.uuid, training.version, a_ref)
     print(decode_session)
 
     decode_uuid = decode_session.decode_uuid

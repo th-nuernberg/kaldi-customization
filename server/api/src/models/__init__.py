@@ -9,3 +9,4 @@ from .resource import *
 from .user import *
 from .decoding import *
 from .training import *
+from .audioresource import *

@@ -59,16 +59,13 @@ configuration.access_token = 'YOUR_ACCESS_TOKEN'
 configuration.host = "http://localhost:8080/api/v1"
 # Create an instance of the API class
 api_instance = openapi_client.DecodeApi(openapi_client.ApiClient(configuration))
-project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
-training_version = 56 # int | Training version of the project
-decode_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the decoding task
+audio_uuid = 'audio_uuid_example' # str | UUID of audio to delete
 
 try:
-    # Get the result of a decoding task
-    api_response = api_instance.get_decode_result(project_uuid, training_version, decode_uuid)
-    pprint(api_response)
+    # Delete audio by UUID
+    api_instance.delete_audio_by_uuid(audio_uuid)
 except ApiException as e:
-    print("Exception when calling DecodeApi->get_decode_result: %s\n" % e)
+    print("Exception when calling DecodeApi->delete_audio_by_uuid: %s\n" % e)
 
 ```
 
@@ -78,9 +75,14 @@ All URIs are relative to *http://localhost:8080/api/v1*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*DecodeApi* | [**delete_audio_by_uuid**](docs/DecodeApi.md#delete_audio_by_uuid) | **DELETE** /audio/{audio_uuid} | Delete audio by UUID
+*DecodeApi* | [**get_all_audio**](docs/DecodeApi.md#get_all_audio) | **GET** /audio | Returns a list of available audio
+*DecodeApi* | [**get_audio_by_uuid**](docs/DecodeApi.md#get_audio_by_uuid) | **GET** /audio/{audio_uuid} | Find audio by UUID
+*DecodeApi* | [**get_audio_data**](docs/DecodeApi.md#get_audio_data) | **GET** /audio/{audio_uuid}/data | Returns the audio content
 *DecodeApi* | [**get_decode_result**](docs/DecodeApi.md#get_decode_result) | **GET** /project/{project_uuid}/training/{training_version}/decode/{decode_uuid} | Get the result of a decoding task
 *DecodeApi* | [**get_decodings**](docs/DecodeApi.md#get_decodings) | **GET** /project/{project_uuid}/training/{training_version}/decode | List of all decodings
 *DecodeApi* | [**start_decode**](docs/DecodeApi.md#start_decode) | **POST** /project/{project_uuid}/training/{training_version}/decode | Decode audio to text
+*DecodeApi* | [**upload_audio**](docs/DecodeApi.md#upload_audio) | **POST** /audio | Uploads audio
 *GlobalApi* | [**get_acoustic_models**](docs/GlobalApi.md#get_acoustic_models) | **GET** /global/acousticmodels | Returns a list of available acoustic models
 *GlobalApi* | [**get_languages**](docs/GlobalApi.md#get_languages) | **GET** /global/languages | Returns a list of available languages
 *ProjectApi* | [**create_project**](docs/ProjectApi.md#create_project) | **POST** /project | Create a new project
@@ -97,6 +99,7 @@ Class | Method | HTTP request | Description
 *TrainingApi* | [**assign_resource_to_training**](docs/TrainingApi.md#assign_resource_to_training) | **POST** /project/{project_uuid}/training/{training_version}/resource | Assign a resource to the training
 *TrainingApi* | [**create_training**](docs/TrainingApi.md#create_training) | **POST** /project/{project_uuid}/training | Create a new training
 *TrainingApi* | [**delete_assigned_resource_from_training**](docs/TrainingApi.md#delete_assigned_resource_from_training) | **DELETE** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid} | Remove a resource from the training
+*TrainingApi* | [**get_corpus_of_training**](docs/TrainingApi.md#get_corpus_of_training) | **GET** /project/{project_uuid}/training/{training_version}/corpus | Get the entire corpus of the specified training
 *TrainingApi* | [**get_corpus_of_training_resource**](docs/TrainingApi.md#get_corpus_of_training_resource) | **GET** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/corpus | Get the corpus of the resource
 *TrainingApi* | [**get_training_by_version**](docs/TrainingApi.md#get_training_by_version) | **GET** /project/{project_uuid}/training/{training_version} | Find project training results by UUID
 *TrainingApi* | [**set_corpus_of_training_resource**](docs/TrainingApi.md#set_corpus_of_training_resource) | **PUT** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/corpus | Set the corpus of the resource
@@ -111,6 +114,9 @@ Class | Method | HTTP request | Description
 
  - [AcousticModel](docs/AcousticModel.md)
  - [AcousticModelType](docs/AcousticModelType.md)
+ - [Audio](docs/Audio.md)
+ - [AudioReferenceObject](docs/AudioReferenceObject.md)
+ - [AudioStatus](docs/AudioStatus.md)
  - [BinaryDecodeObject](docs/BinaryDecodeObject.md)
  - [BinaryResourceObject](docs/BinaryResourceObject.md)
  - [CreateProjectObject](docs/CreateProjectObject.md)
@@ -151,6 +157,8 @@ Class | Method | HTTP request | Description
  - **decode:projects**: decode audio data using projects in your account
  - **write:resources**: modify resources in your account
  - **read:resources**: read your resources
+ - **write:audio**: modify your audio
+ - **read:audio**: read your audio
 
 
 ## Author

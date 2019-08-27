@@ -7,6 +7,7 @@ Method | HTTP request | Description
 [**assign_resource_to_training**](TrainingApi.md#assign_resource_to_training) | **POST** /project/{project_uuid}/training/{training_version}/resource | Assign a resource to the training
 [**create_training**](TrainingApi.md#create_training) | **POST** /project/{project_uuid}/training | Create a new training
 [**delete_assigned_resource_from_training**](TrainingApi.md#delete_assigned_resource_from_training) | **DELETE** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid} | Remove a resource from the training
+[**get_corpus_of_training**](TrainingApi.md#get_corpus_of_training) | **GET** /project/{project_uuid}/training/{training_version}/corpus | Get the entire corpus of the specified training
 [**get_corpus_of_training_resource**](TrainingApi.md#get_corpus_of_training_resource) | **GET** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/corpus | Get the corpus of the resource
 [**get_training_by_version**](TrainingApi.md#get_training_by_version) | **GET** /project/{project_uuid}/training/{training_version} | Find project training results by UUID
 [**set_corpus_of_training_resource**](TrainingApi.md#set_corpus_of_training_resource) | **PUT** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/corpus | Set the corpus of the resource
@@ -203,6 +204,70 @@ void (empty response body)
 **403** | Forbidden |  -  |
 **404** | Project, training or resource not found |  -  |
 **409** | Conflict: already in training |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **get_corpus_of_training**
+> str get_corpus_of_training(project_uuid, training_version)
+
+Get the entire corpus of the specified training
+
+Returns the entire corpus of the specified training
+
+### Example
+
+* OAuth Authentication (oauth):
+```python
+from __future__ import print_function
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+configuration = openapi_client.Configuration()
+# Configure OAuth2 access token for authorization: oauth
+configuration.access_token = 'YOUR_ACCESS_TOKEN'
+
+# Defining host is optional and default to http://localhost:8080/api/v1
+configuration.host = "http://localhost:8080/api/v1"
+# Create an instance of the API class
+api_instance = openapi_client.TrainingApi(openapi_client.ApiClient(configuration))
+project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
+training_version = 56 # int | Training version of the project
+
+try:
+    # Get the entire corpus of the specified training
+    api_response = api_instance.get_corpus_of_training(project_uuid, training_version)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling TrainingApi->get_corpus_of_training: %s\n" % e)
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **project_uuid** | [**str**](.md)| UUID of the project | 
+ **training_version** | **int**| Training version of the project | 
+
+### Return type
+
+**str**
+
+### Authorization
+
+[oauth](../README.md#oauth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: text/plain
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Corpus as plain text |  -  |
+**403** | Forbidden |  -  |
+**404** | Project or training not found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
