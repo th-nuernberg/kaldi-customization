@@ -5,7 +5,13 @@
     <div *ngFor="let training of tileData.trainings">
       <span>Trainingsversion: {{training.version}}:</span>
       <span>Trainingsdatum: {{training.creation_timestamp}}:</span>
-      <span [ngClass]="{'color-orange': training.status === '100', 'color-green': training.status === '300'}">
+      <span [ngClass]="{
+        'color-orange': training.status === '100',
+        'color-blue': training.status === '200',
+        'color-grey': training.status === '210',
+        'color-yellow': training.status === '220',
+        'color-green': training.status === '300',
+        'color-red': training.status === '320'}">
         Status: {{training.status}}
       </span>
     </div>
