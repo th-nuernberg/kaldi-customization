@@ -8,6 +8,8 @@ from openapi_server.models.language import Language
 from openapi_server.models.resource import Resource
 from openapi_server.models.resource_type import ResourceType
 from openapi_server.models.resource_status import ResourceStatus
+from openapi_server.models.audio import Audio
+from openapi_server.models.audio_status import AudioStatus
 
 from models import db, Project as DB_Project, TrainingStateEnum as DB_TrainingStateEnum, User as DB_User, AcousticModel as DB_AcousticModel
 from models.training_resource import TrainingResource as DB_TrainingResource
@@ -82,6 +84,14 @@ def db_training_to_front(db_training):
         resources=resource_list
     )
 
+def db_audio_to_front(db_audio):
+    return Audio(
+        uuid=db_audio.uuid,
+        name=db_audio.name,
+        creation_timestamp=db_audio.upload_date,
+        status=AudioStateEnum_to_AudioStatus(db_audio.status)
+    )
+
 def db_training_resource_to_front(db_training_resource):
     return db_resource_to_front(db_training_resource.origin)
 
@@ -131,3 +141,12 @@ def TrainingStateEnum_to_TrainingStatus(trainingState):
         300: TrainingStatus.Training_Success,
         320: TrainingStatus.Training_Failure
         }[trainingState]
+
+def AudioStateEnum_to_AudioStatus(audioState):
+    return {
+        100: AudioStatus.Init,
+        150: AudioStatus.AudioPrep_Pending,
+        200: AudioStatus.AudioPrep_In_Progress,
+        300: AudioStatus.AudioPrep_Success,
+        320: AudioStatus.AudioPrep_Success
+        }[audioState]

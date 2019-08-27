@@ -39,6 +39,7 @@ if __name__ == "__main__":
             acoustic_model_id = str(task["acoustic_model_id"])
             decode_file = task["decode_file"]
             training_id = str(task["training_id"])
+            decode_uuid = task["decode_uuid"]
 
             if not os.path.exists(acoustic_model_folder):
                         os.makedirs(workspace_path)
@@ -102,7 +103,7 @@ if __name__ == "__main__":
             shutil.rmtree(workspace_path)
             shutil.rmtree(decode_path)
 
-            status.submit(DecodeStatus(id=DecodeStatusCode.SUCCESS, decode_uuid=decode_file, transcripts=[result]))
+            status.submit(DecodeStatus(id=DecodeStatusCode.SUCCESS, decode_uuid=decode_uuid, transcripts=[result]))
 
     except KeyboardInterrupt:
         #cleanup

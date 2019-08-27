@@ -121,6 +121,10 @@ class UserApi(object):
         body_params = None
         if 'user' in local_var_params:
             body_params = local_var_params['user']
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
         # Authentication setting
         auth_settings = []  # noqa: E501
 

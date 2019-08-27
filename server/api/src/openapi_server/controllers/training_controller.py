@@ -1,5 +1,6 @@
 import connexion
 import six
+import tempfile
 
 from openapi_server.models.resource import Resource  # noqa: E501
 from openapi_server.models.resource_reference_object import ResourceReferenceObject  # noqa: E501
@@ -20,8 +21,7 @@ from config import minio_client
 
 import os
 from mapper import mapper
-
-TEMP_CORPUS_FOLDER = '/tmp/corpus'
+from flask import stream_with_context, Response
 
 
 def assign_resource_to_training(project_uuid, training_version, resource_reference_object=None):  # noqa: E501
@@ -143,7 +143,8 @@ def delete_assigned_resource_from_training(project_uuid, training_version, resou
     """
     current_user = connexion.context['token_info']['user']
 
-    db_res = DB_Resource.query.filter_by(uuid=resource_uuid, owner_id=current_user.id)
+    db_res = DB_Resource.query.filter_by(
+        uuid=resource_uuid, owner_id=current_user.id)
     if db_res is None:
         return ("Resource not found", 404)
 
@@ -169,6 +170,75 @@ def delete_assigned_resource_from_training(project_uuid, training_version, resou
 
     return ("Resource assignment successfully removed", 200)
 
+def download_model_for_training(project_uuid, training_version):  # noqa: E501
+    """Returns the model
+
+    Returns the model of the specified training # noqa: E501
+
+    :param project_uuid: UUID of project
+    :type project_uuid: str
+    :param training_version: Version of training
+    :type training_version: str
+
+    :rtype: file
+    """
+    current_user = connexion.context['token_info']['user']
+
+    db_project = DB_Project.query.filter_by(uuid=project_uuid).first()
+
+    if not db_project:
+        return ("Project not found", 404)
+
+    db_training = DB_Training.query.filter_by(version=training_version,project_id=db_project.id).first()
+
+    if not db_training:
+        return ("Training not found", 404)
+
+    status, stream = download_from_bucket(minio_client,
+        bucket=minio_buckets["TRAINING_BUCKET"],
+        filename='{}/graph.zip'.format(db_training.id)
+    )
+
+    if not status:  # means no success
+        return ("File not found", 404)
+
+    response = Response(response=stream, content_type="application/zip", direct_passthrough=True)
+    response.headers['Content-Disposition'] = 'attachment; filename=graph.zip'
+    return response
+
+def get_corpus_of_training(project_uuid, training_version):  # noqa: E501
+    """Get the entire corpus of the specified training
+
+    Returns the entire corpus of the specified training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+
+    :rtype: str
+    """
+    current_user = connexion.context['token_info']['user']
+
+    db_project = DB_Project.query.filter_by(uuid=project_uuid).first()
+
+    if not db_project:
+        return ("Project not found", 404)
+
+    db_training = DB_Training.query.filter_by(version=training_version,project_id=db_project.id).first()
+
+    if not db_training:
+        return ("Training not found", 404)
+
+    status, stream = download_from_bucket(minio_client,
+        bucket=minio_buckets["TRAINING_BUCKET"], 
+        filename="{}/corpus.txt".format(db_training.id)
+    )
+
+    if not status:  # means no success
+        return ("File not found", 404)
+
+    return stream.read().decode('utf-8')
 
 def get_corpus_of_training_resource(project_uuid, training_version, resource_uuid):  # noqa: E501
     """Get the corpus of the resource
@@ -185,9 +255,6 @@ def get_corpus_of_training_resource(project_uuid, training_version, resource_uui
     :rtype: str
     """
     current_user = connexion.context['token_info']['user']
-
-    if not os.path.exists(TEMP_CORPUS_FOLDER):
-        os.makedirs(TEMP_CORPUS_FOLDER)
 
     db_project = DB_Project.query.filter_by(
         uuid=project_uuid, owner_id=current_user.id).first()
@@ -210,22 +277,13 @@ def get_corpus_of_training_resource(project_uuid, training_version, resource_uui
     db_training_resource = DB_TrainingResource.query.filter_by(origin_id=db_resource.id) \
         .filter_by(training_id=db_training.id).first()
 
-    if db_resource is None:
+    if db_training_resource is None:
         return ("Resource not assigned to this Training", 404)
 
-    if db_resource.status != DB_ResourceStateEnum.TextPreparation_Success:
-        return ("TextPreparation not finished (status {})".format(db_resource.status), 404)
+    status, stream = download_from_bucket(
+        minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "{}/corpus.txt".format(db_training_resource.id))
 
-    target_path = os.path.join(TEMP_CORPUS_FOLDER, "{}".format("tmp.txt"))
-    download_from_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], str(
-        db_training_resource.id) + "/corpus.txt", target_path)
-
-    ret_val = "Error!"
-    with open(target_path) as f:
-        ret_val = f.read()
-
-    os.remove(target_path)
-    return ret_val
+    return stream.read().decode('utf-8') if status else ""
 
 
 def get_training_by_version(project_uuid, training_version):  # noqa: E501
@@ -275,9 +333,6 @@ def set_corpus_of_training_resource(project_uuid, training_version, resource_uui
     """
     current_user = connexion.context['token_info']['user']
 
-    if not os.path.exists(TEMP_CORPUS_FOLDER):
-        os.makedirs(TEMP_CORPUS_FOLDER)
-
     db_project = DB_Project.query.filter_by(
         uuid=project_uuid, owner_id=current_user.id).first()
 
@@ -305,7 +360,7 @@ def set_corpus_of_training_resource(project_uuid, training_version, resource_uui
     if db_resource is None:
         return ("Resource not assigned to this Training", 404)
 
-    target_path = os.path.join(TEMP_CORPUS_FOLDER, "{}".format("tmp.txt"))
+    # target_path = os.path.join(TEMP_CORPUS_FOLDER, "{}".format("tmp.txt"))
 
     with open(target_path, "wb") as f:
         f.write(body)

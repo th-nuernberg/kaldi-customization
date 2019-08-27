@@ -58,8 +58,7 @@ class Resource(object):
 
         self.uuid = uuid
         self.name = name
-        if status is not None:
-            self.status = status
+        self.status = status
         self.resource_type = resource_type
         if creation_timestamp is not None:
             self.creation_timestamp = creation_timestamp
@@ -128,6 +127,8 @@ class Resource(object):
         :param status: The status of this Resource.  # noqa: E501
         :type: ResourceStatus
         """
+        if status is None:
+            raise ValueError("Invalid value for `status`, must not be `None`")  # noqa: E501
 
         self._status = status
 

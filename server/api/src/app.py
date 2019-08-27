@@ -14,6 +14,7 @@ from openapi_server import encoder
 from models import *
 from oauth2 import config_oauth
 from routes.auth import bp as auth_bp
+from socket_server import socketio
 
 connex_app = connexion.FlaskApp(__name__, specification_dir='openapi_server/openapi',  options={
     'swagger_ui': True
@@ -22,6 +23,7 @@ connex_app.add_api('openapi.yaml', pythonic_params=True, resolver=connexion.reso
 
 app = connex_app.app
 app.json_encoder = encoder.JSONEncoder
+
 
 if __name__ == "__main__":
     conf, _, status_queue, minio_client = connector.parse_args(
@@ -62,6 +64,7 @@ if __name__ == "__main__":
 
     db.init_app(app)
     config_oauth(app)
+    socketio.init_app(app)
     app.register_blueprint(auth_bp, url_prefix='/api')
 
     start_status_queue_handler(app, db)

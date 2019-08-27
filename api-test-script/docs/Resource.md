@@ -5,7 +5,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **uuid** | **str** |  | 
 **name** | **str** |  | 
-**status** | [**ResourceStatus**](ResourceStatus.md) |  | [optional] 
+**status** | [**ResourceStatus**](ResourceStatus.md) |  | 
 **resource_type** | [**ResourceType**](ResourceType.md) |  | 
 **creation_timestamp** | **datetime** |  | [optional] 
 
