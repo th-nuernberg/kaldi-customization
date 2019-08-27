@@ -13,7 +13,7 @@ minio_buckets = dict(
 
     # projects
     TRAINING_BUCKET='trainings'
-    )
+)
 
 
 def does_bucket_exist(minio_client, bucket_name):
@@ -26,9 +26,12 @@ def does_bucket_exist(minio_client, bucket_name):
     return (True, "")
 
 
-def download_from_bucket(minio_client, bucket, filename, target_path):
+def download_from_bucket(minio_client, bucket, filename, target_path=None):
     try:
-        minio_client.fget_object(bucket, filename, target_path)
+        if target_path:
+            minio_client.fget_object(bucket, filename, target_path)
+        else:
+            return (True, minio_client.get_object(bucket, filename, target_path))
 
     except ResponseError as err:
         print(err)
@@ -48,12 +51,14 @@ def upload_to_bucket(minio_client, bucket, filename, file_path):
     print("Upload of /" + bucket + "/" + filename + " was successfull.")
     return (True, "")
 
+
 def copy_object_in_bucket(minio_client, old_bucket, old_file, new_bucket, new_file):
     try:
-        minio_client.copy_object(new_bucket,new_file,"/{}/{}".format(old_bucket,old_file))
+        minio_client.copy_object(new_bucket, new_file,
+                                 "/{}/{}".format(old_bucket, old_file))
     except ResponseError as err:
         print(err)
-        return (False,err)
+        return (False, err)
 
     print("Copy of {} was successfull.".format(new_file))
-    return (True,"")
+    return (True, "")

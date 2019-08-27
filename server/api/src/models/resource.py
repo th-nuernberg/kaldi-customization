@@ -62,3 +62,13 @@ class Resource(db.Model):
     def has_error(self):
         return self.status == ResourceStateEnum.Upload_Failure \
             or self.status == ResourceStateEnum.TextPreparation_Failure
+
+    def mimetype(self):
+        return (
+            'application/octet-stream',
+            'text/html',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'text/plain',
+            'application/pdf',
+            'image/png',
+            'image/jpeg')[self.resource_type]

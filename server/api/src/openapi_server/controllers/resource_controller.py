@@ -26,7 +26,7 @@ from models import TrainingStateEnum as DB_TrainingStateEnum
 from sqlalchemy import and_
 
 from werkzeug.utils import secure_filename
-from flask import send_file
+from flask import stream_with_context, Response
 
 from minio_communication import download_from_bucket, upload_to_bucket, minio_buckets
 from redis_communication import create_textprep_job
@@ -114,16 +114,16 @@ def create_resource(upfile):  # noqa: E501
 
     minio_file_path = str(db_resource.uuid) + '/source'
 
-    upload_result = upload_to_bucket(
+    status, message = upload_to_bucket(
         minio_client=minio_client,
         bucket=minio_buckets["RESOURCE_BUCKET"],
         filename=minio_file_path,
         file_path=local_file_path
     )
 
-    # TODO: delete local file local_file_path
+    os.remove(local_file_path)
 
-    if upload_result[0]:
+    if status:
         db_resource.status = DB_ResourceState.TextPreparation_Ready
     else:
         db_resource.status = DB_ResourceState.Upload_Failure
@@ -196,29 +196,19 @@ def get_resource_data(resource_uuid):  # noqa: E501
     db_resource = DB_Resource.query.filter_by(
         uuid=resource_uuid, owner_id=current_user.id).first()
 
-    if (db_resource is None):
+    if not db_resource:
         print('Resource {} in DB not found'.format(resource_uuid))
         return ("File not found", 404)
 
-    minio_file_path = str(db_resource.uuid) + '/' + str(db_resource.uuid)
+    status, stream = download_from_bucket(minio_client,
+        bucket=minio_buckets["RESOURCE_BUCKET"],
+        filename='{}/source'.format(db_resource.uuid)
+    )
 
-    if not os.path.exists(TEMP_UPLOAD_FOLDER):
-        os.makedirs(TEMP_UPLOAD_FOLDER)
+    if not status:  # means no success
+        print('Resource {} in MinIO not found'.format(resource_uuid))
+        return ("File not found", 404)
 
-    # use local file system as file cache?
-    local_file_path = os.path.join(TEMP_UPLOAD_FOLDER, str(db_resource.uuid))
-
-    if not os.path.exists(local_file_path):
-        download_result = download_from_bucket(
-            minio_client=minio_client,
-            bucket=minio_buckets["RESOURCE_BUCKET"],
-            filename=minio_file_path,
-            target_path=local_file_path
-        )
-
-        if not download_result[0]:  # means no success
-            print('Resource {} in MinIO not found'.format(resource_uuid))
-            return ("File not found", 404)
-
-    # TODO delete file
-    return send_file(local_file_path, as_attachment=True, attachment_filename=db_resource.name)
+    response = Response(response=stream, content_type=db_resource.mimetype(), direct_passthrough=True)
+    response.headers['Content-Disposition'] = 'attachment; filename={}'.format(db_resource.name)
+    return response

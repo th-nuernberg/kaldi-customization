@@ -11,9 +11,9 @@ class TrainingStateEnum(enum.IntEnum):
     Init = 100
 
     # waiting for test prep processing assigned resources
-    TextPrep_Pending = 150,
+    TextPrep_Pending = 150
     # text prep reported failure for already assigned resource
-    TextPrep_Failure = 151,
+    TextPrep_Failure = 151
 
     # resources assigned and resource state is TextPreparation_Success
     Trainable = 200
@@ -48,6 +48,9 @@ class TrainingStateEnum(enum.IntEnum):
     def status_to_string(status):
         return {
             100: "Init",
+
+            150: "TextPrep_Pending",
+            151: "TextPrep_Failure",
 
             200: "Trainable",
             205: "Training_DataPrep_Pending",
