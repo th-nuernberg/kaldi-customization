@@ -2,11 +2,14 @@
 
 import argparse
 import json
+import os
 import requests
 import time
 
 from openapi_client.rest import ApiException
 from openapi_client import *
+
+script_dir = os.path.dirname(os.path.realpath(__file__))
 
 
 if __name__ == "__main__":
@@ -74,7 +77,7 @@ if __name__ == "__main__":
     print(training)
 
     print('Upload resource:')
-    resource = resource_instance.create_resource('../worker/text-preparation-worker/test/src/test-files/pdf/text_generator.pdf')
+    resource = resource_instance.create_resource(os.path.join(script_dir, '../../worker/text-preparation-worker/test/src/test-files/pdf/text_generator.pdf'))
     print(resource)
 
     print('Assign resource to training:')
@@ -111,7 +114,7 @@ if __name__ == "__main__":
     if last_status != TrainingStatus.Training_Success:
         exit(1)
     print("Upload audio:")
-    audio_file = decode_api_instance.upload_audio('../initialization/example/test.wav')
+    audio_file = decode_api_instance.upload_audio(os.path.join(script_dir, '../../initialization/example/test.wav'))
     print(audio_file)
     a_ref = AudioReferenceObject(audio_uuid = audio_file.uuid)
     print('Start decoding:')

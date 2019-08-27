@@ -1,0 +1,1580 @@
+openapi: 3.0.1
+info:
+  description: Kaldi Customization Server.
+  title: Kaldi Customization Server
+  version: 1.0.2
+servers:
+- url: http://localhost:8080/api/v1
+- url: https://localhost:8080/api/v1
+tags:
+- description: Operations about projects
+  name: project
+- description: Operations about ASR training
+  name: training
+- description: Operations about user
+  name: user
+- description: Operations about decoding
+  name: decode
+- description: Global operations
+  name: global
+- description: Operations about resources
+  name: resource
+paths:
+  /audio:
+    get:
+      operationId: get_all_audio
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Audio'
+                type: array
+          description: List of resources
+        403:
+          content: {}
+          description: Forbidden
+      security:
+      - oauth:
+        - read:audio
+      summary: Returns a list of available audio
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+    post:
+      operationId: upload_audio
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BinaryResourceObject'
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Audio'
+          description: List of resources
+        403:
+          content: {}
+          description: Forbidden
+        405:
+          content: {}
+          description: Invalid Input
+      security:
+      - oauth:
+        - write:audio
+      summary: Uploads audio
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+  /audio/{audio_uuid}:
+    delete:
+      description: Delete a single audio resource
+      operationId: delete_audio_by_uuid
+      parameters:
+      - description: UUID of audio to delete
+        explode: false
+        in: path
+        name: audio_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content: {}
+          description: Success
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Audio not found
+      security:
+      - oauth:
+        - write:audio
+      summary: Delete audio by UUID
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+    get:
+      description: Returns a single audio resource
+      operationId: get_audio_by_uuid
+      parameters:
+      - description: UUID of audio to return
+        explode: false
+        in: path
+        name: audio_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Audio'
+          description: Audio object
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Audio not found
+      security:
+      - oauth:
+        - read:audio
+      summary: Find audio by UUID
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+  /audio/{audio_uuid}/data:
+    get:
+      description: Returns the audio content
+      operationId: get_audio_data
+      parameters:
+      - description: UUID of resource to return
+        explode: false
+        in: path
+        name: audio_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            audio/wav:
+              schema:
+                format: binary
+                type: string
+          description: Uploaded audio content
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Audio not found
+      security:
+      - oauth:
+        - read:audio
+      summary: Returns the audio content
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+  /global/acousticmodels:
+    get:
+      operationId: get_acoustic_models
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AcousticModel'
+                type: array
+          description: List of acoustic models
+      summary: Returns a list of available acoustic models
+      tags:
+      - global
+      x-openapi-router-controller: openapi_server.controllers.global_controller
+  /global/acousticmodels/{acoustic_model_uuid}/model:
+    get:
+      description: Returns the model of the specified acoustic model
+      operationId: download_acoustic_model
+      parameters:
+      - description: UUID of the acoustic model
+        explode: false
+        in: path
+        name: acoustic_model_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/zip:
+              schema:
+                format: binary
+                type: string
+          description: Acoustic Model
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Page not found
+      summary: Returns the acoustic model
+      tags:
+      - global
+      x-openapi-router-controller: openapi_server.controllers.global_controller
+  /global/languages:
+    get:
+      operationId: get_languages
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Language'
+                type: array
+          description: List of acoustic models
+      summary: Returns a list of available languages
+      tags:
+      - global
+      x-openapi-router-controller: openapi_server.controllers.global_controller
+  /project:
+    get:
+      operationId: get_projects
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Project'
+                type: array
+          description: List of projects
+        403:
+          content: {}
+          description: Forbidden
+      security:
+      - oauth:
+        - read:projects
+      summary: Returns a list of available projects
+      tags:
+      - project
+      x-openapi-router-controller: openapi_server.controllers.project_controller
+    post:
+      operationId: create_project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectObject'
+        description: Project object that needs to be created
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+          description: successful operation
+        400:
+          content: {}
+          description: bad request
+        403:
+          description: Forbidden
+      security:
+      - oauth:
+        - write:projects
+        - read:projects
+      summary: Create a new project
+      tags:
+      - project
+      x-openapi-router-controller: openapi_server.controllers.project_controller
+  /project/{project_uuid}:
+    get:
+      description: Returns a single project
+      operationId: get_project_by_uuid
+      parameters:
+      - description: UUID of project to return
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+          description: successful operation
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Find project by UUID
+      tags:
+      - project
+      x-openapi-router-controller: openapi_server.controllers.project_controller
+  /project/{project_uuid}/training:
+    post:
+      operationId: create_training
+      parameters:
+      - description: Project object that needs to be trained
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Training'
+          description: Successful operation
+        403:
+          description: Forbidden
+        404:
+          content: {}
+          description: Project not found
+      security:
+      - oauth:
+        - write:projects
+        - read:projects
+        - train:projects
+      summary: Create a new training
+      tags:
+      - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+  /project/{project_uuid}/training/{training_version}:
+    get:
+      description: Returns the training object
+      operationId: get_training_by_version
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Training'
+          description: Got the specified training
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Find project training results by UUID
+      tags:
+      - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+    post:
+      description: Start the training process for the specified training
+      operationId: start_training_by_version
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        202:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Training'
+          description: Training successfully queued
+        400:
+          content: {}
+          description: training already done or pending
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - read:projects
+        - train:projects
+      summary: Start the specified training
+      tags:
+      - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+  /project/{project_uuid}/training/{training_version}/corpus:
+    get:
+      description: Returns the entire corpus of the specified training
+      operationId: get_corpus_of_training
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                description: Corpus of the resource
+                example: er horte leise schritte hinter sich das bedeutete nichts
+                  gutes wer wurde ihm schon folgen spat in der nacht und dazu noch
+                  in dieser engen gasse mitten im ubel beleumundeten hafenviertel
+                  gerade jetzt wo er das ding seines lebens gedreht hatte und mit
+                  der beute verschwinden wollte hatte einer seiner zahllosen kollegen
+                  dieselbe idee gehabt ihn beobachtet und abgewartet um ihn nun um
+                  die fruchte seiner arbeit zu erleichtern oder gehorten die schritte
+                  hinter ihm zu einem der unzahligen gesetzeshuter dieser stadt und
+                  die stahlerne acht um seine handgelenke wurde gleich zuschnappen
+                  er konnte die aufforderung stehen zu bleiben schon horen gehetzt
+                  sah er sich um plotzlich erblickte er den schmalen durchgang blitzartig
+                  drehte er sich nach rechts und verschwand zwischen den beiden gebauden
+                  beinahe ware er dabei uber den umgesturzten mulleimer gefallen der
+                  mitten im weg lag
+                type: string
+          description: Corpus as plain text
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Get the entire corpus of the specified training
+      tags:
+      - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+  /project/{project_uuid}/training/{training_version}/decode:
+    get:
+      description: Returns a list of all decodings for this training version
+      operationId: get_decodings
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/DecodeMessage'
+                type: array
+          description: List of decoding messages
+        400:
+          content: {}
+          description: Training not finished
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - decode:projects
+      summary: List of all decodings
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+    post:
+      description: Decode audio data to text using the trained project and the given
+        audio
+      operationId: start_decode
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AudioReferenceObject'
+        description: Audio that needs to be decoded
+        required: true
+      responses:
+        202:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecodeTaskReference'
+          description: Decoding successfully queued
+        400:
+          content: {}
+          description: Training not finished
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - decode:projects
+      summary: Decode audio to text
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+  /project/{project_uuid}/training/{training_version}/decode/{decode_uuid}:
+    get:
+      description: Returns the result of a decoding task
+      operationId: get_decode_result
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: UUID of the decoding task
+        explode: false
+        in: path
+        name: decode_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecodeMessage'
+          description: Result of the decoding task
+        204:
+          content: {}
+          description: Decoding not yet completed
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+        415:
+          content: {}
+          description: Unsupported media type
+      security:
+      - oauth:
+        - decode:projects
+      summary: Get the result of a decoding task
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+  /project/{project_uuid}/training/{training_version}/model:
+    get:
+      description: Returns the model of the specified training
+      operationId: download_model_for_training
+      parameters:
+      - description: UUID of project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Version of training
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/zip:
+              schema:
+                format: binary
+                type: string
+          description: Trained model content
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Page not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Returns the model
+      tags:
+      - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+  /project/{project_uuid}/training/{training_version}/resource:
+    post:
+      description: Assign the specified resource to the training
+      operationId: assign_resource_to_training
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceReferenceObject'
+        description: Resource that needs to be added
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+          description: Resource successfully assigned
+        400:
+          content: {}
+          description: Resource already in training
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project, training or resource not found
+      security:
+      - oauth:
+        - read:projects
+        - write:projects
+        - read:resources
+        - write:resources
+      summary: Assign a resource to the training
+      tags:
+      - training
+      - resource
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+  /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}:
+    delete:
+      description: Removes the assigned resource from the training
+      operationId: delete_assigned_resource_from_training
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: UUID of the resource
+        explode: false
+        in: path
+        name: resource_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        200:
+          content: {}
+          description: Resource assignment successfully removed
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project, training or resource not found
+        409:
+          description: 'Conflict: already in training'
+      security:
+      - oauth:
+        - read:projects
+        - write:projects
+        - read:resources
+        - write:resources
+      summary: Remove a resource from the training
+      tags:
+      - training
+      - resource
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+  /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/corpus:
+    get:
+      description: Returns the corpus of the specified resource for this training
+      operationId: get_corpus_of_training_resource
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: UUID of the resource
+        explode: false
+        in: path
+        name: resource_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                description: Corpus of the resource
+                example: er horte leise schritte hinter sich das bedeutete nichts
+                  gutes wer wurde ihm schon folgen spat in der nacht und dazu noch
+                  in dieser engen gasse mitten im ubel beleumundeten hafenviertel
+                  gerade jetzt wo er das ding seines lebens gedreht hatte und mit
+                  der beute verschwinden wollte hatte einer seiner zahllosen kollegen
+                  dieselbe idee gehabt ihn beobachtet und abgewartet um ihn nun um
+                  die fruchte seiner arbeit zu erleichtern oder gehorten die schritte
+                  hinter ihm zu einem der unzahligen gesetzeshuter dieser stadt und
+                  die stahlerne acht um seine handgelenke wurde gleich zuschnappen
+                  er konnte die aufforderung stehen zu bleiben schon horen gehetzt
+                  sah er sich um plotzlich erblickte er den schmalen durchgang blitzartig
+                  drehte er sich nach rechts und verschwand zwischen den beiden gebauden
+                  beinahe ware er dabei uber den umgesturzten mulleimer gefallen der
+                  mitten im weg lag
+                type: string
+          description: Corpus as plain text
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - read:projects
+        - read:resources
+      summary: Get the corpus of the resource
+      tags:
+      - training
+      - resource
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+    put:
+      description: Updates the corpus of the specified resource for this training
+      operationId: set_corpus_of_training_resource
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: UUID of the resource
+        explode: false
+        in: path
+        name: resource_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              description: Corpus as plain text
+              example: er horte leise schritte hinter sich das bedeutete nichts gutes
+                wer wurde ihm schon folgen spat in der nacht und dazu noch in dieser
+                engen gasse mitten im ubel beleumundeten hafenviertel gerade jetzt
+                wo er das ding seines lebens gedreht hatte und mit der beute verschwinden
+                wollte hatte einer seiner zahllosen kollegen dieselbe idee gehabt
+                ihn beobachtet und abgewartet um ihn nun um die fruchte seiner arbeit
+                zu erleichtern oder gehorten die schritte hinter ihm zu einem der
+                unzahligen gesetzeshuter dieser stadt und die stahlerne acht um seine
+                handgelenke wurde gleich zuschnappen er konnte die aufforderung stehen
+                zu bleiben schon horen gehetzt sah er sich um plotzlich erblickte
+                er den schmalen durchgang blitzartig drehte er sich nach rechts und
+                verschwand zwischen den beiden gebauden beinahe ware er dabei uber
+                den umgesturzten mulleimer gefallen der mitten im weg lag
+              type: string
+        description: New or updated corpus as plain text
+        required: true
+      responses:
+        200:
+          description: Success
+        403:
+          description: Forbidden
+        404:
+          description: Project or training not found
+        409:
+          description: Training already started
+      security:
+      - oauth:
+        - read:projects
+        - write:projects
+        - read:resources
+        - write:resources
+      summary: Set the corpus of the resource
+      tags:
+      - training
+      - resource
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+  /resource:
+    get:
+      operationId: get_resource
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Resource'
+                type: array
+          description: List of resources
+        403:
+          content: {}
+          description: Forbidden
+      security:
+      - oauth:
+        - read:resources
+      summary: Returns a list of available resources
+      tags:
+      - resource
+      x-openapi-router-controller: openapi_server.controllers.resource_controller
+    post:
+      operationId: create_resource
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BinaryResourceObject'
+        required: true
+      responses:
+        202:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+          description: Upload successful
+        403:
+          content: {}
+          description: Forbidden
+        405:
+          content: {}
+          description: Invalid input
+      security:
+      - oauth:
+        - write:resources
+        - read:resources
+      summary: Create/Upload a new resource
+      tags:
+      - resource
+      x-openapi-router-controller: openapi_server.controllers.resource_controller
+  /resource/{resource_uuid}:
+    get:
+      description: Returns a single resource
+      operationId: get_resource_by_uuid
+      parameters:
+      - description: UUID of resource to return
+        explode: false
+        in: path
+        name: resource_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+          description: Resource object
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Page not found
+      security:
+      - oauth:
+        - read:resources
+      summary: Find resource by UUID
+      tags:
+      - resource
+      x-openapi-router-controller: openapi_server.controllers.resource_controller
+  /resource/{resource_uuid}/data:
+    get:
+      description: Returns the resource content
+      operationId: get_resource_data
+      parameters:
+      - description: UUID of resource to return
+        explode: false
+        in: path
+        name: resource_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/pdf:
+              schema:
+                format: binary
+                type: string
+            image/png:
+              schema:
+                format: binary
+                type: string
+            text/html:
+              schema:
+                format: binary
+                type: string
+            text/plain:
+              schema:
+                format: binary
+                type: string
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+              schema:
+                format: binary
+                type: string
+            image/jpeg:
+              schema:
+                format: binary
+                type: string
+          description: Uploaded resource content
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Page not found
+      security:
+      - oauth:
+        - read:resources
+      summary: Returns the resource content
+      tags:
+      - resource
+      x-openapi-router-controller: openapi_server.controllers.resource_controller
+  /user:
+    get:
+      description: Provides info about the logged in user.
+      operationId: get_user
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: OK
+        403:
+          content: {}
+          description: No user is logged in.
+      security:
+      - oauth:
+        - read:user
+      summary: Get current user
+      tags:
+      - user
+      x-openapi-router-controller: openapi_server.controllers.user_controller
+    post:
+      description: This can only be done by the logged in user.
+      operationId: create_user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        description: Created user object
+        required: true
+      responses:
+        200:
+          content: {}
+          description: Successful operation
+        400:
+          content: {}
+          description: Error at operation
+      summary: Create user
+      tags:
+      - user
+      x-openapi-router-controller: openapi_server.controllers.user_controller
+  /user/login:
+    post:
+      operationId: login_user
+      parameters:
+      - description: The user name for login
+        explode: true
+        in: query
+        name: email
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: The password for login in clear text
+        explode: true
+        in: query
+        name: password
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        200:
+          content: {}
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              explode: false
+              schema:
+                format: int32
+                type: integer
+              style: simple
+            X-Expires-After:
+              description: date in UTC when token expires
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        400:
+          content: {}
+          description: Invalid username/password supplied
+      summary: Logs user into the system
+      tags:
+      - user
+      x-openapi-router-controller: openapi_server.controllers.user_controller
+  /user/logout:
+    post:
+      operationId: logout_user
+      responses:
+        200:
+          content: {}
+          description: successful operation
+      summary: Logs out current logged in user session
+      tags:
+      - user
+      x-openapi-router-controller: openapi_server.controllers.user_controller
+components:
+  schemas:
+    AcousticModel:
+      example:
+        name: name
+        language:
+          name: name
+          id: 0
+        uuid: 550e8400-e29b-11d4-a716-446655440000
+      properties:
+        name:
+          type: string
+        language:
+          $ref: '#/components/schemas/Language'
+        model_type:
+          $ref: '#/components/schemas/AcousticModelType'
+        uuid:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+      required:
+      - language
+      - model_type
+      - name
+      - uuid
+      type: object
+    AcousticModelType:
+      enum:
+      - 100
+      - 200
+      - 300
+      type: integer
+      x-enum-varnames:
+      - HMM_GMM
+      - HMM_DNN
+      - HMM_RNN
+    DecodeMessage:
+      example:
+        transcripts:
+        - '{}'
+        - '{}'
+        uuid: 550e8400-e29b-11d4-a716-446655440000
+      properties:
+        uuid:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        transcripts:
+          items:
+            properties:
+              text:
+                type: string
+              confidence:
+                type: number
+          type: array
+      type: object
+    Language:
+      example:
+        name: name
+        id: 0
+      properties:
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+      required:
+      - name
+      type: object
+    Project:
+      example:
+        owner:
+          user-email: user-email
+          password: password
+          username: username
+        parent: 550e8400-e29b-11d4-a716-446655440000
+        creation_timestamp: 2000-01-23T04:56:07.000+00:00
+        name: name
+        trainings:
+        - creation_timestamp: 2000-01-23T04:56:07.000+00:00
+          resources:
+          - creation_timestamp: 2000-01-23T04:56:07.000+00:00
+            name: myFile.pdf
+            uuid: 550e8400-e29b-11d4-a716-446655440000
+          - creation_timestamp: 2000-01-23T04:56:07.000+00:00
+            name: myFile.pdf
+            uuid: 550e8400-e29b-11d4-a716-446655440000
+          version: 0
+        - creation_timestamp: 2000-01-23T04:56:07.000+00:00
+          resources:
+          - creation_timestamp: 2000-01-23T04:56:07.000+00:00
+            name: myFile.pdf
+            uuid: 550e8400-e29b-11d4-a716-446655440000
+          - creation_timestamp: 2000-01-23T04:56:07.000+00:00
+            name: myFile.pdf
+            uuid: 550e8400-e29b-11d4-a716-446655440000
+          version: 0
+        acoustic_model:
+          name: name
+          language:
+            name: name
+            id: 0
+          uuid: 550e8400-e29b-11d4-a716-446655440000
+        uuid: 550e8400-e29b-11d4-a716-446655440000
+      properties:
+        name:
+          type: string
+        uuid:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        acoustic_model:
+          $ref: '#/components/schemas/AcousticModel'
+        parent:
+          description: UUID of the parent project
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        trainings:
+          items:
+            $ref: '#/components/schemas/Training'
+          type: array
+        creation_timestamp:
+          format: date-time
+          type: string
+        owner:
+          $ref: '#/components/schemas/User'
+      required:
+      - acoustic_model
+      - name
+      - owner
+      - uuid
+      type: object
+    Resource:
+      example:
+        creation_timestamp: 2000-01-23T04:56:07.000+00:00
+        name: myFile.pdf
+        uuid: 550e8400-e29b-11d4-a716-446655440000
+      properties:
+        uuid:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        name:
+          example: myFile.pdf
+          type: string
+        status:
+          $ref: '#/components/schemas/ResourceStatus'
+        resource_type:
+          $ref: '#/components/schemas/ResourceType'
+        creation_timestamp:
+          format: date-time
+          type: string
+      required:
+      - name
+      - resource_type
+      - status
+      - uuid
+      type: object
+    Audio:
+      example:
+        creation_timestamp: 2000-01-23T04:56:07.000+00:00
+        name: myAudio.wav
+        uuid: 550e8400-e29b-11d4-a716-446655440000
+      properties:
+        uuid:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        name:
+          example: myAudio.wav
+          type: string
+        creation_timestamp:
+          format: date-time
+          type: string
+        status:
+          $ref: '#/components/schemas/AudioStatus'
+      required:
+      - name
+      - status
+      - uuid
+      type: object
+    ResourceStatus:
+      enum:
+      - 0
+      - 1
+      - 9
+      - 10
+      - 11
+      - 12
+      - 13
+      type: integer
+      x-enum-varnames:
+      - Upload_InProgress
+      - Upload_Failure
+      - TextPreparation_Ready
+      - TextPreparation_Pending
+      - TextPreparation_InProcess
+      - TextPreparation_Failure
+      - TextPreparation_Success
+    ResourceType:
+      enum:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      type: integer
+      x-enum-varnames:
+      - html
+      - docx
+      - txt
+      - pdf
+      - png
+      - jpg
+    TrainingStatus:
+      enum:
+      - 100
+      - 200
+      - 210
+      - 220
+      - 300
+      - 320
+      type: integer
+      x-enum-varnames:
+      - Init
+      - Trainable
+      - Training_Pending
+      - Training_In_Progress
+      - Training_Success
+      - Training_Failure
+    AudioStatus:
+      enum:
+      - 100
+      - 150
+      - 200
+      - 300
+      - 320
+      type: integer
+      x-enum-varnames:
+      - Init
+      - AudioPrep_Pending
+      - AudioPrep_In_Progress
+      - AudioPrep_Success
+      - AudioPrep_Failure
+    Training:
+      example:
+        creation_timestamp: 2000-01-23T04:56:07.000+00:00
+        resources:
+        - creation_timestamp: 2000-01-23T04:56:07.000+00:00
+          name: myFile.pdf
+          uuid: 550e8400-e29b-11d4-a716-446655440000
+        - creation_timestamp: 2000-01-23T04:56:07.000+00:00
+          name: myFile.pdf
+          uuid: 550e8400-e29b-11d4-a716-446655440000
+        version: 0
+      properties:
+        version:
+          example: 0
+          type: integer
+        creation_timestamp:
+          format: date-time
+          type: string
+        status:
+          $ref: '#/components/schemas/TrainingStatus'
+        resources:
+          items:
+            $ref: '#/components/schemas/Resource'
+          type: array
+      type: object
+    User:
+      example:
+        user-email: user-email
+        password: password
+        username: username
+      properties:
+        username:
+          type: string
+        user-email:
+          format: email
+          type: string
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - username
+      type: object
+    CreateProjectObject:
+      example:
+        parent: 550e8400-e29b-11d4-a716-446655440000
+        name: MyProject
+        acoustic_model: 550e8400-e29b-11d4-a716-446655440000
+      properties:
+        name:
+          description: Name of the new project
+          example: MyProject
+          type: string
+        acoustic_model:
+          description: UUID of the acoustic model
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        parent:
+          description: UUID of the optional parent project
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+      required:
+      - acoustic_model
+      - name
+      type: object
+    BinaryDecodeObject:
+      properties:
+        audio_file:
+          description: Audio file for decoding
+          format: binary
+          type: string
+      required:
+      - audio_file
+      type: object
+    DecodeTaskReference:
+      example:
+        decode_uuid: 550e8400-e29b-11d4-a716-446655440000
+      properties:
+        decode_uuid:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+      type: object
+    ResourceReferenceObject:
+      example:
+        resource_uuid: 550e8400-e29b-11d4-a716-446655440000
+      properties:
+        resource_uuid:
+          description: UUID of the resource
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+      required:
+      - resource_uuid
+      type: object
+    AudioReferenceObject:
+      example:
+        audio_uuid: 550e8400-e29b-11d4-a716-446655440000
+      properties:
+        audio_uuid:
+          description: UUID of the audio file
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+      required:
+      - audio_uuid
+      type: object
+    BinaryResourceObject:
+      properties:
+        upfile:
+          description: File object that needs to be uploaded
+          format: binary
+          type: string
+      required:
+      - upfile
+      type: object
+  securitySchemes:
+    api_key:
+      in: header
+      name: api_key
+      type: apiKey
+      x-apikeyInfoFunc: openapi_server.controllers.security_controller_.info_from_api_key
+    oauth:
+      flows:
+        password:
+          scopes:
+            write:user: modify the user account
+            read:user: read the user account
+            write:projects: modify projects in your account
+            read:projects: read your projects
+            train:projects: train projects in your account
+            decode:projects: decode audio data using projects in your account
+            write:resources: modify resources in your account
+            read:resources: read your resources
+            write:audio: modify your audio
+            read:audio: read your audio
+          tokenUrl: http://localhost:8080/api/oauth/token
+      type: oauth2
+      x-tokenInfoFunc: openapi_server.controllers.security_controller_.info_from_oauth
+      x-scopeValidateFunc: openapi_server.controllers.security_controller_.validate_scope_oauth
