@@ -36,6 +36,9 @@ class Decoding(db.Model):
     status = db.Column(db.Enum(DecodingStateEnum))
     transcripts = db.Column(db.Text, default='[]')
 
+    audioresource_id = db.Column(db.Integer, db.ForeignKey("audioresources.id"), nullable=True)
+    audioresource = db.relationship('AudioResource', uselist=False)
+
     upload_date = db.Column(db.DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     def __repr__(self):

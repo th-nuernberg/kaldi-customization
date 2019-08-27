@@ -10,6 +10,19 @@ from models.language import Language as DB_Language
 
 from mapper import mapper
 
+def download_acoustic_model(acoustic_model_uuid):  # noqa: E501
+    """Returns the acoustic model
+
+    Returns the model of the specified acoustic model # noqa: E501
+
+    :param acoustic_model_uuid: UUID of the acoustic model
+    :type acoustic_model_uuid: str
+
+    :rtype: file
+    """
+    return 'do some magic!'
+
+
 def get_acoustic_models():  # noqa: E501
     """Returns a list of available acoustic models
 

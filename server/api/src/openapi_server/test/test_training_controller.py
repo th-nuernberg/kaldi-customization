@@ -68,6 +68,22 @@ class TestTrainingController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    def test_get_corpus_of_training(self):
+        """Test case for get_corpus_of_training
+
+        Get the entire corpus of the specified training
+        """
+        headers = { 
+            'Accept': 'text/plain',
+            'Authorization': 'Bearer special-key',
+        }
+        response = self.client.open(
+            '/api/v1/project/{project_uuid}/training/{training_version}/corpus'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
+            method='GET',
+            headers=headers)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     def test_get_corpus_of_training_resource(self):
         """Test case for get_corpus_of_training_resource
 
