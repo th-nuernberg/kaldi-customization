@@ -21,6 +21,7 @@ from config import minio_client
 
 import os
 from mapper import mapper
+from flask import stream_with_context, Response
 
 
 def assign_resource_to_training(project_uuid, training_version, resource_reference_object=None):  # noqa: E501
@@ -181,7 +182,29 @@ def download_model_for_training(project_uuid, training_version):  # noqa: E501
 
     :rtype: file
     """
-    return 'do some magic!'
+    current_user = connexion.context['token_info']['user']
+
+    db_project = DB_Project.query.filter_by(uuid=project_uuid).first()
+
+    if not db_project:
+        return ("Project not found", 404)
+
+    db_training = DB_Training.query.filter_by(version=training_version,project_id=db_project.id).first()
+
+    if not db_training:
+        return ("Training not found", 404)
+
+    status, stream = download_from_bucket(minio_client,
+        bucket=minio_buckets["TRAINING_BUCKET"],
+        filename='{}/graph.zip'.format(db_training.id)
+    )
+
+    if not status:  # means no success
+        return ("File not found", 404)
+
+    response = Response(response=stream, content_type="application/zip", direct_passthrough=True)
+    response.headers['Content-Disposition'] = 'attachment; filename=graph.zip'
+    return response
 
 def get_corpus_of_training(project_uuid, training_version):  # noqa: E501
     """Get the entire corpus of the specified training
@@ -195,7 +218,27 @@ def get_corpus_of_training(project_uuid, training_version):  # noqa: E501
 
     :rtype: str
     """
-    return 'do some magic!'
+    current_user = connexion.context['token_info']['user']
+
+    db_project = DB_Project.query.filter_by(uuid=project_uuid).first()
+
+    if not db_project:
+        return ("Project not found", 404)
+
+    db_training = DB_Training.query.filter_by(version=training_version,project_id=db_project.id).first()
+
+    if not db_training:
+        return ("Training not found", 404)
+
+    status, stream = download_from_bucket(minio_client,
+        bucket=minio_buckets["TRAINING_BUCKET"], 
+        filename="{}/corpus.txt".format(db_training.id)
+    )
+
+    if not status:  # means no success
+        return ("File not found", 404)
+
+    return stream.read().decode('utf-8')
 
 def get_corpus_of_training_resource(project_uuid, training_version, resource_uuid):  # noqa: E501
     """Get the corpus of the resource
