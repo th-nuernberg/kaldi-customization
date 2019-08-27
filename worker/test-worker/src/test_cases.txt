@@ -1,0 +1,36 @@
+# Test cases for Text-Preparation-Worker:
+    1. Korrekten Task für Text-Preparation-Worker anlegen
+    2. Fehlerhaften Task für Text-Preparation-Worker anlegen
+    3. Tasks für folgende Dateitypen anlegen:
+        3.1 PDF
+        3.2 TXT
+        3.3 PNG
+        3.4 JPG
+        3.5 HTML
+        3.6 DOCX
+    4. Tasks für nicht unterstützte Dateitypen anlegen:
+        4.1 JPEG
+        4.2 *.bin
+    
+# Test cases for Data-Preparation-Worker:
+    1. Korrekten Task für Data-Preparation-Worker anlegen
+    2. Fehlerhaften Task für Data-Preparation-Worker anlegen
+    3. Task mit fehlerhaftem Acoustic-Model anlegen
+    4. Task anlegen wo Dateien da sind
+    5. Task anlegen wo Dateien nicht vorhanden sind
+
+# Test cases for Kaldi-Worker:
+    1. Korrekten Task für Kaldi-Worker erstellen
+    2. Fehlerhaften Task für Kaldi-Worker erstellen
+    3. Task anlegen wo Dateien da sind
+    4. Task anlegen wo Dateien nicht da sind
+    5. Testen, ob hochgeladene Dateien korrekt sind
+
+# Test cases for Decode-Worker:
+    1. Korrekten Task für Data-Preparation-Worker anlegen
+    2. Fehlerhaften Task für Data-Preparation-Worker anlegen
+    3. Audio Datei mit 16KHz verwenden
+    4. Audio Datei mit <16KHz bzw. >16KHz verwenden
+    5. Testen, ob hochgeladene Dateien korrekt sind
+
+
