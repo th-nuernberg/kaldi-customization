@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSnackBar } from '@angular/material';
@@ -33,6 +33,7 @@ export class TrainingUploadComponent implements OnInit {
   currentTrainingResourcesWithCorupus: [Resource, string][];
   allResources:MatTableDataSource<Resource>;
 
+  getCorpusInterval:any;
   displayedColumns: string[] = ['select', 'name', 'type'];
   show:boolean = true;
   showContentPreview:boolean;
@@ -42,6 +43,7 @@ export class TrainingUploadComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private trainingService: TrainingService,
     private resourceService: ResourceService,
     private projectService: ProjectService,
@@ -76,9 +78,16 @@ export class TrainingUploadComponent implements OnInit {
     this.fileContent = "";
     this.showContentPreview = false;
 
-    setInterval(
+    this.getCorpusInterval = setInterval(
       () => this.getResourceCorpusResult(),
       10000);
+  }
+
+  ngOnDestroy() {
+    this.currentTrainingResources = [];
+    this.currentTrainingResourcesWithCorupus = [];
+
+    clearInterval(this.getCorpusInterval);
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -124,28 +133,20 @@ export class TrainingUploadComponent implements OnInit {
       this.showContentPreview = false;
       this.fileContent = "";
     } else {
-      selectedResources.forEach(element => {
-        //console.log("Selected: " + element.selected);
-        const resource:Resource = element.value;
-        this.resourceService.getResourceData(resource.uuid)
-          .subscribe(data => {
-            //console.log("Show preview of resource data: " + data);
-            this.showPreview(data);
-        });
+      selectedResources.forEach(selectedElement => {
+        const selectedResource:Resource = selectedElement.value;
+        //console.log("Selected: " + selectedElement.selected);
+        for(let item of this.currentTrainingResourcesWithCorupus) {
+          const resourceWithCorpus = item[0];
+          const corpusContent = item[1];
+
+          if(resourceWithCorpus.uuid == selectedResource.uuid) {
+            this.fileContent = corpusContent;
+            this.showContentPreview = true;
+          }
+        }
       });
     }
-  }
-
-  showPreview(data:Blob) {
-    // TODO: SHOW CONTENT OF CORPUS OF THE RESOURCE AND NOT OF THE RESOURCE ITSSELF
-    var reader = new FileReader();
-    var me = this;
-
-    reader.readAsText(data);
-    reader.onload = function () {
-      me.fileContent = reader.result;
-    }
-    this.showContentPreview = true;
   }
 
   // removes selected training resources
@@ -156,7 +157,6 @@ export class TrainingUploadComponent implements OnInit {
       let index:number = this.currentTrainingResources.findIndex(d => d === resource);
 
       if(index > -1) {
-        // TODO: EXTEND API TO REMOVE ADDED RESOURCES FROM THE TRAINING!!
         this.trainingService.deleteAssignedResourceFromTraining(
           this.projectUuid,
           this.trainingVersion,
@@ -211,7 +211,7 @@ export class TrainingUploadComponent implements OnInit {
   getResourceCorpusResult() {
     this.currentTrainingResources.forEach(resource => {
       console.log("Use resource to find corpus: " + resource.name);
-      this.resourceService.getCorpusOfTrainingResource(
+      this.trainingService.getCorpusOfTrainingResource(
         this.projectUuid,
         this.trainingVersion,
         resource.uuid).subscribe(corpus => {
@@ -223,6 +223,10 @@ export class TrainingUploadComponent implements OnInit {
 
   startTraining() {
     console.log("Start Training: " + this.trainingVersion + " of Project: " + this.projectUuid);
-    this.trainingService.startTrainingByVersion(this.projectUuid, this.trainingVersion);
+    this.trainingService.startTrainingByVersion(this.projectUuid, this.trainingVersion)
+    .subscribe(training => {
+      this.snackBar.open("Started training...", "", { duration: 3000 });
+      this.router.navigate(["/project/" + this.projectUuid]);
+    });
   }
 }
