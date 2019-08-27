@@ -36,6 +36,37 @@ paths:
       tags:
       - global
       x-openapi-router-controller: openapi_server.controllers.global_controller
+  /global/acousticmodels/{acoustic_model_uuid}/model:
+    get:
+      description: Returns the model of the specified acoustic model
+      operationId: download_acoustic_model
+      parameters:
+      - description: UUID of the acoustic model
+        explode: false
+        in: path
+        name: acoustic_model_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/zip:
+              schema:
+                format: binary
+                type: string
+          description: Acoustic Model
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Page not found
+      summary: Returns the acoustic model
+      tags:
+      - global
+      x-openapi-router-controller: openapi_server.controllers.global_controller
   /global/languages:
     get:
       operationId: get_languages
@@ -170,6 +201,48 @@ paths:
         - read:projects
         - train:projects
       summary: Create a new training
+      tags:
+      - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+  /project/{project_uuid}/training/{training_version}/model:
+    get:
+      description: Returns the model of the specified training
+      operationId: download_model_for_training
+      parameters:
+      - description: UUID of project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Version of training
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/zip:
+              schema:
+                format: binary
+                type: string
+          description: Trained model content
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Page not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Returns the model
       tags:
       - training
       x-openapi-router-controller: openapi_server.controllers.training_controller
