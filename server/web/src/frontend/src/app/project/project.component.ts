@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material';
 import {
   TrainingService,
   Training,
@@ -40,7 +41,8 @@ export class ProjectComponent implements OnInit {
     public dialog: MatDialog,
     public trainingService: TrainingService,
     public decodeService: DecodeService,
-    public projectService: ProjectService
+    public projectService: ProjectService,
+    private snackBar: MatSnackBar
     ) { }
 
   ngOnInit() {
@@ -54,7 +56,7 @@ export class ProjectComponent implements OnInit {
             this.projectUuid,
             training.version)
             .subscribe(decodings => {
-              console.log("Decodings: " + decodings);
+              //console.log("Decodings: " + decodings);
               this.decodings.concat(decodings);
             });
         });
@@ -69,11 +71,13 @@ export class ProjectComponent implements OnInit {
         console.log("Created Training: " + training.version);
         this.training = training;
         // opens training dialog
+        this.snackBar.open("Created training...", "", { duration: 2000 });
         this.router.navigate(['/upload/training/' + this.projectUuid + "/" + this.training.version]);
       });
   }
 
   openTraining(trainingVersion:number) {
+    this.snackBar.open("Opened training...", "", { duration: 2000 });
     this.router.navigate(['/upload/training/' + this.projectUuid + "/" + trainingVersion]);
   }
 
@@ -86,6 +90,16 @@ export class ProjectComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
     });
+  }
+
+  downloadTraining(trainingVersion:number) {
+    this.snackBar.open("Download training...", "", { duration: 2000 });
+    this.trainingService.getTrainingByVersion(
+      this.projectUuid,
+      trainingVersion);
+    // TODO this.trainingService.downloadTraining(
+    //  this.projectUuid,
+    //  trainingVersion);
   }
 }
 
@@ -101,6 +115,7 @@ export class ModelOverviewDialog {
   constructor(
     public router: Router,
     public dialogRef: MatDialogRef<ModelOverviewDialog>,
+    public snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: [Observable<Project>, number]) {
       this.trainingVersion = this.data[1];
       this.data[0].subscribe(project => {
@@ -113,6 +128,7 @@ export class ModelOverviewDialog {
   }
 
   onDecodeClick(): void {
+    this.snackBar.open("Open decoding...", "", { duration: 2000 });
     this.router.navigate(['/upload/decoding/' + this.projectUuid + "/" + this.trainingVersion]);
     this.dialogRef.close();
   }
