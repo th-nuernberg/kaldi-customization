@@ -9,11 +9,13 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { AudioStatus } from './audioStatus';
 
 
-export interface InlineObject { 
-    username?: string;
-    email?: string;
-    password?: string;
+export interface Audio { 
+    uuid: string;
+    name: string;
+    creation_timestamp?: Date;
+    status: AudioStatus;
 }
 

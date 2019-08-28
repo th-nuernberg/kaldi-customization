@@ -16,7 +16,7 @@ import { ResourceType } from './resourceType';
 export interface Resource { 
     uuid: string;
     name: string;
-    status?: ResourceStatus;
+    status: ResourceStatus;
     resource_type: ResourceType;
     creation_timestamp?: Date;
 }

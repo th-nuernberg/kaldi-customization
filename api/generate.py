@@ -8,6 +8,7 @@ from generator.typescript_angular import generate as generate_typescript_client
 
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
+kaldi_customization_dir = os.path.join(script_dir, '..')
 tools_dir = os.path.join(script_dir, 'tools')
 out_dir = os.path.join(script_dir, 'out')
 
@@ -41,7 +42,9 @@ if __name__ == "__main__":
         os.path.join(out_dir, 'server'))
     generate_python_client(
         generator_executable, api_definition,
-        os.path.join(out_dir, 'python_client'))
+        os.path.join(out_dir, 'python_client'),
+        destination=os.path.join(script_dir, 'demo', 'api'))
     generate_typescript_client(
         generator_executable, api_definition,
-        os.path.join(out_dir, 'typescript_client'))
+        output=os.path.join(out_dir, 'typescript_client'),
+        destination=os.path.join(kaldi_customization_dir, 'server', 'web', 'src', 'frontend', 'projects', 'swagger-client', 'src'))

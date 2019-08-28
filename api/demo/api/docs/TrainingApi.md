@@ -7,6 +7,7 @@ Method | HTTP request | Description
 [**assign_resource_to_training**](TrainingApi.md#assign_resource_to_training) | **POST** /project/{project_uuid}/training/{training_version}/resource | Assign a resource to the training
 [**create_training**](TrainingApi.md#create_training) | **POST** /project/{project_uuid}/training | Create a new training
 [**delete_assigned_resource_from_training**](TrainingApi.md#delete_assigned_resource_from_training) | **DELETE** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid} | Remove a resource from the training
+[**download_model_for_training**](TrainingApi.md#download_model_for_training) | **GET** /project/{project_uuid}/training/{training_version}/model | Returns the model
 [**get_corpus_of_training**](TrainingApi.md#get_corpus_of_training) | **GET** /project/{project_uuid}/training/{training_version}/corpus | Get the entire corpus of the specified training
 [**get_corpus_of_training_resource**](TrainingApi.md#get_corpus_of_training_resource) | **GET** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/corpus | Get the corpus of the resource
 [**get_training_by_version**](TrainingApi.md#get_training_by_version) | **GET** /project/{project_uuid}/training/{training_version} | Find project training results by UUID
@@ -204,6 +205,70 @@ void (empty response body)
 **403** | Forbidden |  -  |
 **404** | Project, training or resource not found |  -  |
 **409** | Conflict: already in training |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **download_model_for_training**
+> file download_model_for_training(project_uuid, training_version)
+
+Returns the model
+
+Returns the model of the specified training
+
+### Example
+
+* OAuth Authentication (oauth):
+```python
+from __future__ import print_function
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+configuration = openapi_client.Configuration()
+# Configure OAuth2 access token for authorization: oauth
+configuration.access_token = 'YOUR_ACCESS_TOKEN'
+
+# Defining host is optional and default to http://localhost:8080/api/v1
+configuration.host = "http://localhost:8080/api/v1"
+# Create an instance of the API class
+api_instance = openapi_client.TrainingApi(openapi_client.ApiClient(configuration))
+project_uuid = 'project_uuid_example' # str | UUID of project
+training_version = 'training_version_example' # str | Version of training
+
+try:
+    # Returns the model
+    api_response = api_instance.download_model_for_training(project_uuid, training_version)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling TrainingApi->download_model_for_training: %s\n" % e)
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **project_uuid** | **str**| UUID of project | 
+ **training_version** | **str**| Version of training | 
+
+### Return type
+
+**file**
+
+### Authorization
+
+[oauth](../README.md#oauth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/zip
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Trained model content |  -  |
+**403** | Forbidden |  -  |
+**404** | Page not found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

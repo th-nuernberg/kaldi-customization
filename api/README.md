@@ -15,12 +15,17 @@ Execute the `generate.py` script to generate the Python API Server and a Python 
 
 ```python3 generate.py``` *or* ```python generate.py``` (assuming `python(.exe)` is Python 3)
 
-Enter the `out` directory, then:
+### Clients
 
- * Copy `python_client/*` into `kaldi-customization/api/demo`
- * Copy `typescript_client/*` into `kaldi-customization/server/web/src/frontend/projects/swagger-client/src`
-    * **Fix `test/plain` responses** (see Known Issues below)
- * Merge `server/openapi_server` into `kaldi-customization/server/api/src/openapi_server`
+The clients are moved to the destinations in `kaldi-customization/api/demo/api` and `kaldi-customization/server/web/src/frontend/projects/swagger-client/src`.
+
+### Server
+
+As previous mentioned, it is not possible to override the API server. A manual merge of the newly generated code from `out/server/opernapi_server` into the existing code in `kaldi-customization/server/api/src/openapi_server` is required.
+
+To have a look what changed the `python3 generator/diff.py` script can be executed to display the operation changes (diff of the `openapi.yaml` files) and the generated function call (diff of the `<tag>_controller.py` files).
+
+*Nevertheless, it is highly recommended to use a merge tool to perform the API server update.*
 
 
 ## API Workflow Demo (`demo/`)
@@ -36,17 +41,31 @@ Contains a sample workflow using the generated Python API client (on `http://loc
 
 ## Known Issues
 
-### Type `File` (Generator Bug)
+### Type `File` (OpenAPI Generator Bug)
 A defined type named `File` is generated to `java.io.File` in Python imports.
 
-**Solution:** Do not define a type named `File`
+**Solution:**  
+Do not define a type named `File`
 
-### Responses of Content Type `text/plain` (Generator Bug)
+### Required Positional Argument (OpenAPI Generator Bug)
+A positional argument has no default value, but will be set in the function body, if no value is passed by the caller.
+
+```
+if connexion.request.is_json:
+    <argument> = <Object>.from_dict(connexion.request.get_json())  # noqa: E501
+```
+
+**Solution:**  
+Add a default value `<argument>=None` manually
+
+### Responses of Content Type `text/plain` (OpenAPI Generator Bug)
 A generated TypeScript client tries to parse responses of content type `text/plain` as JSON.
 
 **Solution:**
 
-Modify the methods with a `text/plain` response ...
+*The solution is implemented in the generator script (`generator/typescript_angular.py`) and does not require any manual handling.*
+
+The script modifies the methods in `out/typescript_client/api/*.service.ts` with a `text/plain` response ...
 
 ```
 // to determine the Accept header
@@ -58,7 +77,7 @@ const httpHeaderAccepts: string[] = [
 ..., to expect a plain string, and not a JSON string:
 
 ```
-// Generated Example:
+// OpenAPI Generated Example:
 return this.httpClient.get<string>(`<uri>`,
     {
         withCredentials: this.configuration.withCredentials,

@@ -83,6 +83,7 @@ Class | Method | HTTP request | Description
 *DecodeApi* | [**get_decodings**](docs/DecodeApi.md#get_decodings) | **GET** /project/{project_uuid}/training/{training_version}/decode | List of all decodings
 *DecodeApi* | [**start_decode**](docs/DecodeApi.md#start_decode) | **POST** /project/{project_uuid}/training/{training_version}/decode | Decode audio to text
 *DecodeApi* | [**upload_audio**](docs/DecodeApi.md#upload_audio) | **POST** /audio | Uploads audio
+*GlobalApi* | [**download_acoustic_model**](docs/GlobalApi.md#download_acoustic_model) | **GET** /global/acousticmodels/{acoustic_model_uuid}/model | Returns the acoustic model
 *GlobalApi* | [**get_acoustic_models**](docs/GlobalApi.md#get_acoustic_models) | **GET** /global/acousticmodels | Returns a list of available acoustic models
 *GlobalApi* | [**get_languages**](docs/GlobalApi.md#get_languages) | **GET** /global/languages | Returns a list of available languages
 *ProjectApi* | [**create_project**](docs/ProjectApi.md#create_project) | **POST** /project | Create a new project
@@ -99,6 +100,7 @@ Class | Method | HTTP request | Description
 *TrainingApi* | [**assign_resource_to_training**](docs/TrainingApi.md#assign_resource_to_training) | **POST** /project/{project_uuid}/training/{training_version}/resource | Assign a resource to the training
 *TrainingApi* | [**create_training**](docs/TrainingApi.md#create_training) | **POST** /project/{project_uuid}/training | Create a new training
 *TrainingApi* | [**delete_assigned_resource_from_training**](docs/TrainingApi.md#delete_assigned_resource_from_training) | **DELETE** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid} | Remove a resource from the training
+*TrainingApi* | [**download_model_for_training**](docs/TrainingApi.md#download_model_for_training) | **GET** /project/{project_uuid}/training/{training_version}/model | Returns the model
 *TrainingApi* | [**get_corpus_of_training**](docs/TrainingApi.md#get_corpus_of_training) | **GET** /project/{project_uuid}/training/{training_version}/corpus | Get the entire corpus of the specified training
 *TrainingApi* | [**get_corpus_of_training_resource**](docs/TrainingApi.md#get_corpus_of_training_resource) | **GET** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/corpus | Get the corpus of the resource
 *TrainingApi* | [**get_training_by_version**](docs/TrainingApi.md#get_training_by_version) | **GET** /project/{project_uuid}/training/{training_version} | Find project training results by UUID

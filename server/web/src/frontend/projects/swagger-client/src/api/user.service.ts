@@ -18,8 +18,6 @@ import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 
 import { Observable }                                        from 'rxjs';
 
-import { InlineObject } from '../model/inlineObject';
-import { OAuth2Client } from '../model/oAuth2Client';
 import { User } from '../model/user';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -62,72 +60,18 @@ export class UserService {
 
 
     /**
-     * Create a client
-     * 
-     * @param o_auth2_client Client object that needs to be created
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public createClient(o_auth2_client: OAuth2Client, observe?: 'body', reportProgress?: boolean): Observable<OAuth2Client>;
-    public createClient(o_auth2_client: OAuth2Client, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<OAuth2Client>>;
-    public createClient(o_auth2_client: OAuth2Client, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<OAuth2Client>>;
-    public createClient(o_auth2_client: OAuth2Client, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (o_auth2_client === null || o_auth2_client === undefined) {
-            throw new Error('Required parameter o_auth2_client was null or undefined when calling createClient.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        const httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected !== undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected !== undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.post<OAuth2Client>(`${this.configuration.basePath}/user/client`,
-            o_auth2_client,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
      * Create user
      * This can only be done by the logged in user.
-     * @param inline_object 
+     * @param user Created user object
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createUser(inline_object: InlineObject, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public createUser(inline_object: InlineObject, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public createUser(inline_object: InlineObject, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public createUser(inline_object: InlineObject, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (inline_object === null || inline_object === undefined) {
-            throw new Error('Required parameter inline_object was null or undefined when calling createUser.');
+    public createUser(user: User, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public createUser(user: User, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public createUser(user: User, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public createUser(user: User, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (user === null || user === undefined) {
+            throw new Error('Required parameter user was null or undefined when calling createUser.');
         }
 
         let headers = this.defaultHeaders;
@@ -150,146 +94,7 @@ export class UserService {
         }
 
         return this.httpClient.post<any>(`${this.configuration.basePath}/user`,
-            inline_object,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * Delete a client
-     * 
-     * @param client_id Id of OAuth2Client to delete
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public deleteClient(client_id: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public deleteClient(client_id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public deleteClient(client_id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public deleteClient(client_id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (client_id === null || client_id === undefined) {
-            throw new Error('Required parameter client_id was null or undefined when calling deleteClient.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        const httpHeaderAccepts: string[] = [
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected !== undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.delete<any>(`${this.configuration.basePath}/user/client/${encodeURIComponent(String(client_id))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * Get a client
-     * 
-     * @param client_id Id of OAuth2Client to return
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public getClient(client_id: string, observe?: 'body', reportProgress?: boolean): Observable<OAuth2Client>;
-    public getClient(client_id: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<OAuth2Client>>;
-    public getClient(client_id: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<OAuth2Client>>;
-    public getClient(client_id: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (client_id === null || client_id === undefined) {
-            throw new Error('Required parameter client_id was null or undefined when calling getClient.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        const httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected !== undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<OAuth2Client>(`${this.configuration.basePath}/user/client/${encodeURIComponent(String(client_id))}`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * Get clients
-     * 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public getClientList(observe?: 'body', reportProgress?: boolean): Observable<Array<OAuth2Client>>;
-    public getClientList(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<OAuth2Client>>>;
-    public getClientList(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<OAuth2Client>>>;
-    public getClientList(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        const httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected !== undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<Array<OAuth2Client>>(`${this.configuration.basePath}/user/client`,
+            user,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,

@@ -61,6 +61,47 @@ export class GlobalService {
 
 
     /**
+     * Returns the acoustic model
+     * Returns the model of the specified acoustic model
+     * @param acoustic_model_uuid UUID of the acoustic model
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public downloadAcousticModel(acoustic_model_uuid: string, observe?: 'body', reportProgress?: boolean): Observable<Blob>;
+    public downloadAcousticModel(acoustic_model_uuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Blob>>;
+    public downloadAcousticModel(acoustic_model_uuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Blob>>;
+    public downloadAcousticModel(acoustic_model_uuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (acoustic_model_uuid === null || acoustic_model_uuid === undefined) {
+            throw new Error('Required parameter acoustic_model_uuid was null or undefined when calling downloadAcousticModel.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        const httpHeaderAccepts: string[] = [
+            'application/zip'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected !== undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get(`${this.configuration.basePath}/global/acousticmodels/${encodeURIComponent(String(acoustic_model_uuid))}/model`,
+            {
+                responseType: "blob",
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
      * Returns a list of available acoustic models
      * 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.

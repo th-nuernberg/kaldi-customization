@@ -28,6 +28,13 @@ class TestGlobalApi(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_download_acoustic_model(self):
+        """Test case for download_acoustic_model
+
+        Returns the acoustic model  # noqa: E501
+        """
+        pass
+
     def test_get_acoustic_models(self):
         """Test case for get_acoustic_models
 

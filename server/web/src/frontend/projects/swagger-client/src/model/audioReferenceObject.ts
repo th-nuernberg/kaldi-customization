@@ -11,9 +11,10 @@
  */
 
 
-export interface User { 
-    username: string;
-    user_email?: string;
-    password?: string;
+export interface AudioReferenceObject { 
+    /**
+     * UUID of the audio file
+     */
+    audio_uuid: string;
 }
 

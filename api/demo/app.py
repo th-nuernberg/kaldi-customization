@@ -4,12 +4,14 @@ import argparse
 import json
 import os
 import requests
+import sys
 import time
+
+script_dir = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, os.path.join(script_dir, 'api'))
 
 from openapi_client.rest import ApiException
 from openapi_client import *
-
-script_dir = os.path.dirname(os.path.realpath(__file__))
 
 
 if __name__ == "__main__":

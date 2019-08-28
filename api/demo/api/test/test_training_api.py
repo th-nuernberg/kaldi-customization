@@ -49,6 +49,13 @@ class TestTrainingApi(unittest.TestCase):
         """
         pass
 
+    def test_download_model_for_training(self):
+        """Test case for download_model_for_training
+
+        Returns the model  # noqa: E501
+        """
+        pass
+
     def test_get_corpus_of_training(self):
         """Test case for get_corpus_of_training
 

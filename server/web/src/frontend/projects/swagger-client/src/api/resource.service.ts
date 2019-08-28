@@ -244,54 +244,6 @@ export class ResourceService {
 
     /**
      * Get the corpus of the resource
-     * Returns the corpus of the specified resource
-     * @param resource_uuid UUID of the resource
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public getCorpusOfResource(resource_uuid: string, observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public getCorpusOfResource(resource_uuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public getCorpusOfResource(resource_uuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public getCorpusOfResource(resource_uuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (resource_uuid === null || resource_uuid === undefined) {
-            throw new Error('Required parameter resource_uuid was null or undefined when calling getCorpusOfResource.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        const httpHeaderAccepts: string[] = [
-            'text/plain'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected !== undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<string>(`${this.configuration.basePath}/resource/${encodeURIComponent(String(resource_uuid))}/corpus`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * Get the corpus of the resource
      * Returns the corpus of the specified resource for this training
      * @param project_uuid UUID of the project
      * @param training_version Training version of the project
@@ -342,7 +294,7 @@ export class ResourceService {
                 headers: headers,
                 observe: observe,
                 reportProgress: reportProgress,
-                responseType: "text"
+                responseType: 'text'
             }
         );
     }
@@ -485,63 +437,6 @@ export class ResourceService {
         return this.httpClient.get(`${this.configuration.basePath}/resource/${encodeURIComponent(String(resource_uuid))}/data`,
             {
                 responseType: "blob",
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * Set the corpus of the resource
-     * Updates the corpus of the specified resource
-     * @param resource_uuid UUID of the resource
-     * @param body New or updated corpus as plain text
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public setCorpusOfResource(resource_uuid: string, body: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public setCorpusOfResource(resource_uuid: string, body: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public setCorpusOfResource(resource_uuid: string, body: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public setCorpusOfResource(resource_uuid: string, body: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-        if (resource_uuid === null || resource_uuid === undefined) {
-            throw new Error('Required parameter resource_uuid was null or undefined when calling setCorpusOfResource.');
-        }
-        if (body === null || body === undefined) {
-            throw new Error('Required parameter body was null or undefined when calling setCorpusOfResource.');
-        }
-
-        let headers = this.defaultHeaders;
-
-        // authentication (oauth) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // to determine the Accept header
-        const httpHeaderAccepts: string[] = [
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected !== undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'text/plain'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected !== undefined) {
-            headers = headers.set('Content-Type', httpContentTypeSelected);
-        }
-
-        return this.httpClient.put<any>(`${this.configuration.basePath}/resource/${encodeURIComponent(String(resource_uuid))}/corpus`,
-            body,
-            {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,

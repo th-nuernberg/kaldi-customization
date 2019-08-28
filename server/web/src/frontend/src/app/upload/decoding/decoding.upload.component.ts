@@ -78,13 +78,15 @@ export class DecodingUploadComponent implements OnInit {
     console.log("Uploaded audio: " + file.files[0].name);
     const audioFile:Blob = file.files[0] as Blob;
 
-    this.decodeService.startDecode(
-      this.projectUuid,
-      this.trainingVersion,
-      audioFile);
+    // FIXME: causes compile error
+    // this.decodeService.startDecode(
+    //   this.projectUuid,
+    //   this.trainingVersion,
+    //   audioFile);
 
-    this.currentDecodingResources.push(audioFile);
-    this.snackBar.open("Start audio decoding...", "", { duration: 3000 });
+    // this.currentDecodingResources.push(audioFile);
+    // this.snackBar.open("Start audio decoding...", "", { duration: 3000 });
+    this.snackBar.open("TODO: Implement/Fix start audio decoding...", "", { duration: 3000 });
   }
 
   reloadProject() {

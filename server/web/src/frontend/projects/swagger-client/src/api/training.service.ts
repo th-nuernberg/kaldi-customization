@@ -225,6 +225,112 @@ export class TrainingService {
     }
 
     /**
+     * Returns the model
+     * Returns the model of the specified training
+     * @param project_uuid UUID of project
+     * @param training_version Version of training
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public downloadModelForTraining(project_uuid: string, training_version: string, observe?: 'body', reportProgress?: boolean): Observable<Blob>;
+    public downloadModelForTraining(project_uuid: string, training_version: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Blob>>;
+    public downloadModelForTraining(project_uuid: string, training_version: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Blob>>;
+    public downloadModelForTraining(project_uuid: string, training_version: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling downloadModelForTraining.');
+        }
+        if (training_version === null || training_version === undefined) {
+            throw new Error('Required parameter training_version was null or undefined when calling downloadModelForTraining.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // authentication (oauth) required
+        if (this.configuration.accessToken) {
+            const accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // to determine the Accept header
+        const httpHeaderAccepts: string[] = [
+            'application/zip'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected !== undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/model`,
+            {
+                responseType: "blob",
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Get the entire corpus of the specified training
+     * Returns the entire corpus of the specified training
+     * @param project_uuid UUID of the project
+     * @param training_version Training version of the project
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getCorpusOfTraining(project_uuid: string, training_version: number, observe?: 'body', reportProgress?: boolean): Observable<string>;
+    public getCorpusOfTraining(project_uuid: string, training_version: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
+    public getCorpusOfTraining(project_uuid: string, training_version: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
+    public getCorpusOfTraining(project_uuid: string, training_version: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling getCorpusOfTraining.');
+        }
+        if (training_version === null || training_version === undefined) {
+            throw new Error('Required parameter training_version was null or undefined when calling getCorpusOfTraining.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // authentication (oauth) required
+        if (this.configuration.accessToken) {
+            const accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // to determine the Accept header
+        const httpHeaderAccepts: string[] = [
+            'text/plain'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected !== undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/corpus`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress,
+                responseType: 'text'
+            }
+        );
+    }
+
+    /**
      * Get the corpus of the resource
      * Returns the corpus of the specified resource for this training
      * @param project_uuid UUID of the project
@@ -276,7 +382,7 @@ export class TrainingService {
                 headers: headers,
                 observe: observe,
                 reportProgress: reportProgress,
-                responseType: "text"
+                responseType: 'text'
             }
         );
     }
