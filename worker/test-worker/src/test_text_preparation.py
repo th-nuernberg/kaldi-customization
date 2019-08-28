@@ -42,7 +42,7 @@ def test_text_prep(redis_client, minio_client):
     # Step 2: Subscribe to the status-queue channel
     pubsub = redis_client.pubsub(ignore_subscribe_messages=True)
     pubsub.subscribe('Status-Queue')
-    
+
     # Step 3: Send all tasks for text-prep-worker into the queue
     redis_client.rpush('Text-Prep-Queue', json.dumps(text_file_task))
     redis_client.rpush('Text-Prep-Queue', json.dumps(pdf_file_task))

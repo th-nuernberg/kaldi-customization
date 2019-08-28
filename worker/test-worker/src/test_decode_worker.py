@@ -21,6 +21,7 @@ def test_decode_worker(redis_client, minio_client):
     '''
     task2 = {
         'decode_file': 'test2.wav',
+        'decode_uuid': 'ICH BIN EINE UUID',
         'acoustic_model_id': '1',
         'training_id': 'test'
     }
