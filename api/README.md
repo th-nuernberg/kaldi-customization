@@ -17,13 +17,13 @@ Execute the `generate.py` script to generate the Python API Server and a Python 
 
 ### Clients
 
-The clients are moved to the destinations in `kaldi-customization/api/demo/api` and `kaldi-customization/server/web/src/frontend/projects/swagger-client/src`.
+The clients are moved to the destinations in `kaldi-customization/api/demo/api` and `kaldi-customization/server/web/src/frontend/projects/swagger-client/src` automatically.
 
 ### Server
 
 As previous mentioned, it is not possible to override the API server. A manual merge of the newly generated code from `out/server/opernapi_server` into the existing code in `kaldi-customization/server/api/src/openapi_server` is required.
 
-To have a look what changed the `python3 generator/diff.py` script can be executed to display the operation changes (diff of the `openapi.yaml` files) and the generated function call (diff of the `<tag>_controller.py` files).
+To have a look what changed, the `python3 generator/diff.py` script can be executed. It displays the operation changes (diff of the `openapi.yaml` files) and the generated function call changes (diff of the `<tag>_controller.py` files).
 
 *Nevertheless, it is highly recommended to use a merge tool to perform the API server update.*
 
@@ -56,7 +56,7 @@ if connexion.request.is_json:
 ```
 
 **Solution:**  
-Add a default value `<argument>=None` manually
+Add a default value `<argument>=None` to the concerned positional argument in the argument list manually.
 
 ### Responses of Content Type `text/plain` (OpenAPI Generator Bug)
 A generated TypeScript client tries to parse responses of content type `text/plain` as JSON.
