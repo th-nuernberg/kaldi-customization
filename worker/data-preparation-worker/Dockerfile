@@ -20,7 +20,7 @@ RUN wget http://www.openfst.org/twiki/pub/FST/FstDownload/openfst-1.6.2.tar.gz &
     tar -xvzf openfst-1.6.2.tar.gz && \
     cd openfst-1.6.2/ && \
     ./configure --enable-static --enable-shared --enable-far --enable-ngram-fsts && \
-    make -j 4 && \
+    make -j $(nproc) && \
     make install && \
     cd
 
@@ -33,7 +33,7 @@ ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/lib/fst
 RUN git clone https://github.com/AdolfVonKleist/Phonetisaurus.git && \
     cd Phonetisaurus && \
     ./configure && \
-    make && \
+    make -j $(nproc) && \
     make install && \
     cd
 
@@ -41,7 +41,7 @@ RUN git clone https://github.com/AdolfVonKleist/Phonetisaurus.git && \
 RUN git clone https://github.com/mitlm/mitlm.git && \
     cd mitlm/ && \
     ./autogen.sh && \
-    make && \
+    make -j $(nproc) && \
     make install && \
     cd
 
