@@ -19,12 +19,37 @@ echo "----------------------------------------------------------------------"
 echo "----------------------------------------------------------------------"
 echo "Starting to create all needed buckets and upload all needed files."
 python3 -u buckets_and_uploads.py $1 $2 $3 $4 $5
-echo "Creation of all needed buckets and uploading finished successfully."
-echo "----------------------------------------------------------------------"
+
+bucket_and_upload_result=$?
+if [ $bucket_and_upload_result -eq 200 ]
+then
+    echo "All needed buckets were created successfully."
+    echo "All needed files were uploaded successfully."
+    echo "----------------------------------------------------------------------"
+elif [ $bucket_and_upload_result -eq 400 ]
+then
+    echo "No bucket was created and no file was uploaded, because it was not possible to establish a connection with the MinIO-server."    
+else
+    echo "During the setup of all buckets and their uploads, at least one file upload failed."
+    echo "######################################################################"
+
+    category=$((bucket_and_upload_result / 100))
+    upload=$((bucket_and_upload_result % 100))
+
+    if [ $category -eq 0 ]
+    then
+        echo "The error occured within the following function: upload_all_text_prep_files"
+        echo "The following upload failed: $upload"
+    elif [ $category -eq 1 ]
+    then
+        echo "The error occured within the following function: upload_all_remaining_files"
+        echo "The following upload failed: $upload"
+    fi
+fi
 
 # Step 2.1: Setup all test cases for the text-preparation-worker and execute these test cases
 echo ""
-python3 -u test_text_preparation.py $1 $2 $3 $4 $5
+python3 -u text-preparation-tests/test_text_preparation.py $1 $2 $3 $4 $5
 echo "----------------------------------------------------------------------"
 
 # Step 2.2: Copying all files from the RESOURCE-bucket to the TRAINING_RESOURCE-bucket
@@ -40,7 +65,7 @@ echo "----------------------------------------------------------------------"
 
 # Step 4: Setup all test cases for the data-preparation-worker and execute these test cases
 echo ""
-python3 -u test_data_preparation.py $1 $2 $3 $4 $5
+python3 -u data-preparation-tests/test_data_preparation.py $1 $2 $3 $4 $5
 echo ""
 echo "----------------------------------------------------------------------"
 
@@ -52,7 +77,7 @@ echo "----------------------------------------------------------------------"
 
 # Step 6: Setup all test cases for the kaldi-worker and execute these test cases
 echo ""
-python3 -u test_kaldi_worker.py $1 $2 $3 $4 $5
+python3 -u kaldi-tests/test_kaldi_worker.py $1 $2 $3 $4 $5
 echo ""
 echo "----------------------------------------------------------------------"
 
@@ -64,7 +89,7 @@ echo "----------------------------------------------------------------------"
 
 # Step 8: Setup all test cases for the decode-worker and execute these test cases
 echo ""
-python3 -u test_decode_worker.py $1 $2 $3 $4 $5
+python3 -u decode-tests/test_decode_worker.py $1 $2 $3 $4 $5
 echo ""
 echo "----------------------------------------------------------------------"
 
