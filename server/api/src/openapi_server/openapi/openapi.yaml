@@ -1555,14 +1555,10 @@ components:
       - upfile
       type: object
   securitySchemes:
-    api_key:
-      in: header
-      name: api_key
-      type: apiKey
-      x-apikeyInfoFunc: openapi_server.controllers.security_controller_.info_from_api_key
     oauth:
       flows:
         password:
+          tokenUrl: http://localhost:8080/api/oauth/token
           scopes:
             write:user: modify the user account
             read:user: read the user account
@@ -1574,7 +1570,6 @@ components:
             read:resources: read your resources
             write:audio: modify your audio
             read:audio: read your audio
-          tokenUrl: http://localhost:8080/api/oauth/token
       type: oauth2
       x-tokenInfoFunc: openapi_server.controllers.security_controller_.info_from_oauth
       x-scopeValidateFunc: openapi_server.controllers.security_controller_.validate_scope_oauth

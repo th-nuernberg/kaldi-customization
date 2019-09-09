@@ -149,7 +149,7 @@ Class | Method | HTTP request | Description
 
 - **Type**: OAuth
 - **Flow**: password
-- **Authorization URL**: 
+- **Authorization URL**: http://localhost:8080/api/oauth/authorize
 - **Scopes**: 
  - **write:user**: modify the user account
  - **read:user**: read the user account

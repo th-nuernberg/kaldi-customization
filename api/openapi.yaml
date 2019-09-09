@@ -1574,6 +1574,7 @@ components:
             read:resources: read your resources
             write:audio: modify your audio
             read:audio: read your audio
+          authorizationUrl: http://localhost:8080/api/oauth/authorize
           tokenUrl: http://localhost:8080/api/oauth/token
       type: oauth2
       x-tokenInfoFunc: openapi_server.controllers.security_controller_.info_from_oauth

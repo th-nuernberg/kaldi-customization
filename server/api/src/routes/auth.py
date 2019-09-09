@@ -1,9 +1,8 @@
-from flask import Blueprint, request, session
-from flask import render_template, redirect, jsonify
+from flask import Blueprint, redirect, render_template, request, session
 from werkzeug.security import gen_salt
 from authlib.flask.oauth2 import current_token
 from authlib.oauth2 import OAuth2Error
-from models import db, User, OAuth2Client
+from models import db, User as DB_User, OAuth2Client
 from oauth2 import authorization, require_oauth
 
 
@@ -13,7 +12,7 @@ bp = Blueprint(__name__, 'home')
 def current_user():
     if 'id' in session:
         uid = session['id']
-        return User.query.get(uid)
+        return DB_User.query.get(uid)
     return None
 
 
@@ -21,9 +20,9 @@ def current_user():
 def home():
     if request.method == 'POST':
         username = request.form.get('username')
-        user = User.query.filter_by(username=username).first()
+        user = DB_User.query.filter_by(username=username).first()
         if not user:
-            user = User(username=username)
+            user = DB_User(username=username)
             db.session.add(user)
             db.session.commit()
         session['id'] = user.id
@@ -61,7 +60,7 @@ def create_client():
     return redirect('/api/')
 
 
-@bp.route('/oauth/authorize', methods=['GET', 'POST'])
+@bp.route('/oauth/authorize', methods=('GET', 'POST'))
 def authorize():
     user = current_user()
     if request.method == 'GET':
@@ -72,7 +71,7 @@ def authorize():
         return render_template('authorize.html', user=user, grant=grant)
     if not user and 'username' in request.form:
         username = request.form.get('username')
-        user = User.query.filter_by(username=username).first()
+        user = DB_User.query.filter_by(username=username).first()
     if request.form['confirm']:
         grant_user = user
     else:
@@ -80,11 +79,11 @@ def authorize():
     return authorization.create_authorization_response(grant_user=grant_user)
 
 
-@bp.route('/oauth/token', methods=['POST'])
+@bp.route('/oauth/token', methods=('POST',))
 def issue_token():
     return authorization.create_token_response()
 
 
-@bp.route('/oauth/revoke', methods=['POST'])
+@bp.route('/oauth/revoke', methods=('POST',))
 def revoke_token():
     return authorization.create_endpoint_response('revocation')

@@ -52,7 +52,12 @@ def get_user():  # noqa: E501
 
     :rtype: User
     """
-    return 'do some magic!'
+    current_user = connexion.context['token_info']['user']
+
+    if not current_user:
+        return ("User not authorized", 403)
+
+    return User(username=current_user.username, user_email=current_user.user_email)
 
 
 def login_user(email, password):  # noqa: E501
@@ -66,8 +71,16 @@ def login_user(email, password):  # noqa: E501
     :type password: str
 
     :rtype: None
-    """
-    return 'do some magic!'
+    """    
+    db_user = DB_User.query.filter_by(user_email=email).first()
+
+    if not db_user:
+        return ("Invalid email/password", 400)
+
+    if not db_user.check_password(password):
+        return ("Invalid email/password", 400)
+
+    return User(username=db_user.username, user_email=db_user.user_email)
 
 
 def logout_user():  # noqa: E501
