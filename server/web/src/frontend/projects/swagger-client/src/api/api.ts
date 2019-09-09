@@ -1,5 +1,13 @@
+export * from './decode.service';
+import { DecodeService } from './decode.service';
+export * from './global.service';
+import { GlobalService } from './global.service';
 export * from './project.service';
 import { ProjectService } from './project.service';
+export * from './resource.service';
+import { ResourceService } from './resource.service';
+export * from './training.service';
+import { TrainingService } from './training.service';
 export * from './user.service';
 import { UserService } from './user.service';
-export const APIS = [ProjectService, UserService];
+export const APIS = [DecodeService, GlobalService, ProjectService, ResourceService, TrainingService, UserService];

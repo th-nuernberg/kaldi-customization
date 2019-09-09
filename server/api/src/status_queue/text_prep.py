@@ -31,7 +31,6 @@ def handle_text_prep_status(msg_data, db_session):
     print('[Status] ' + status.message)
 
     db_session.add(db_resource)
-    db_session.commit()
 
     if db_resource.status == ResourceStateEnum.TextPreparation_Success:
         db_trainings = db_session.query(Training) \

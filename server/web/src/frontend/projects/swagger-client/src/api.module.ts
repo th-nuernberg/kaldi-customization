@@ -3,7 +3,11 @@ import { Configuration } from './configuration';
 import { HttpClient } from '@angular/common/http';
 
 
+import { DecodeService } from './api/decode.service';
+import { GlobalService } from './api/global.service';
 import { ProjectService } from './api/project.service';
+import { ResourceService } from './api/resource.service';
+import { TrainingService } from './api/training.service';
 import { UserService } from './api/user.service';
 
 @NgModule({
@@ -11,7 +15,11 @@ import { UserService } from './api/user.service';
   declarations: [],
   exports:      [],
   providers: [
+    DecodeService,
+    GlobalService,
     ProjectService,
+    ResourceService,
+    TrainingService,
     UserService ]
 })
 export class ApiModule {

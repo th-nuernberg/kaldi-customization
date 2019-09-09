@@ -11,9 +11,9 @@ class TrainingStateEnum(enum.IntEnum):
     Init = 100
 
     # waiting for test prep processing assigned resources
-    TextPrep_Pending = 150,
+    TextPrep_Pending = 150
     # text prep reported failure for already assigned resource
-    TextPrep_Failure = 151,
+    TextPrep_Failure = 151
 
     # resources assigned and resource state is TextPreparation_Success
     Trainable = 200
@@ -49,6 +49,9 @@ class TrainingStateEnum(enum.IntEnum):
         return {
             100: "Init",
 
+            150: "TextPrep_Pending",
+            151: "TextPrep_Failure",
+
             200: "Trainable",
             205: "Training_DataPrep_Pending",
             206: "Training_DataPrep_InProgress",
@@ -58,7 +61,7 @@ class TrainingStateEnum(enum.IntEnum):
             220: "Training_In_Progress",
 
             300: "Training_Success",
-            320: "Training_Failure"
+            320: "Training_Failure",
         }[status]
 
 
@@ -76,8 +79,10 @@ class Training(db.Model):
     status = db.Column(db.Enum(TrainingStateEnum), default=TrainingStateEnum.Init)
 
     def can_assign_resource(self):
-        return self.status == TrainingStateEnum.Init \
-            or self.status == TrainingStateEnum.Trainable
+        return self.status in (TrainingStateEnum.Init,
+                               TrainingStateEnum.TextPrep_Pending,
+                               TrainingStateEnum.TextPrep_Failure,
+                               TrainingStateEnum.Trainable)
 
     def __repr__(self):
         return json.dumps(self, cls=AlchemyEncoder)

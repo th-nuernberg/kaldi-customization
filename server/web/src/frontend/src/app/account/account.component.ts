@@ -12,4 +12,6 @@ export class AccountComponent implements OnInit {
   ngOnInit() {
   }
 
+  // TODO: get user information: id, name, email, passwort, registration date, last login, projects and models
+
 }

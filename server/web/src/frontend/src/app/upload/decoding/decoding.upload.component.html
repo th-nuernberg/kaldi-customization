@@ -1,0 +1,151 @@
+<div>
+  <mat-horizontal-stepper labelPosition="bottom" #stepper>
+      <mat-step class="decodingPage">
+        <form>
+          <ng-template matStepLabel>Überblick</ng-template>
+          <ng-container
+            *ngIf="{
+            project: project$ | async,
+            training: training$ | async } as overview;">
+            <div fxLayout="center center">
+              <mat-card class="example-card">
+                <mat-card-content>
+                  <h2>Modell</h2>
+                  <mat-list>
+                    <mat-list-item>
+                      <p>Projekt: {{overview?.project?.name}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Modell: {{overview?.project?.acoustic_model.name}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Training: {{overview?.training?.version}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Status: {{overview?.training?.status}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Datum: {{overview?.training?.creation_timestamp}}</p>
+                    </mat-list-item>
+                  </mat-list>
+                </mat-card-content>
+              </mat-card>
+            </div>         
+          </ng-container>
+          <div>
+            <button
+              mat-flat-button
+              matStepperNext
+              class="uploadFile_Button"
+              color="primary">Next</button>
+          </div>
+        </form>
+      </mat-step>
+
+
+      <mat-step class="decodingPage">
+        <form>
+          <ng-template matStepLabel>Füge Dateien hinzu</ng-template>
+          <div fxLayout="center center">
+            <mat-card class="example-card">
+              <mat-card-content>
+                <h2>Audio Dateien</h2>
+                <!-- Current File panel -->
+                <div>
+                  <mat-selection-list
+                    #resources>
+                    <mat-list-option
+                      *ngFor='let resource of currentDecodingResources'
+                      [value]="resource">
+                      <p mat-line>{{resource.name}}</p>
+                    </mat-list-option>
+                  </mat-selection-list>
+                  <input #file id="fileInput" type="file" style="display:none" (change)="loadFile(file)" />
+                  <button 
+                    mat-flat-button 
+                    color="primary" 
+                    class="uploadFile_Button" 
+                    onclick="document.getElementById('fileInput').click()">
+                    <mat-icon aria-hidden="false">Add</mat-icon>
+                  </button>
+                  <button
+                    mat-flat-button
+                    class="uploadFile_Button" 
+                    color="warn"        
+                    (click)="remove(resources.selectedOptions.selected)">
+                    <mat-icon aria-hidden="false">delete</mat-icon>
+                  </button>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+          <div>
+            <button
+              mat-flat-button
+              matStepperPrevious
+              class="uploadFile_Button"
+              color="primary">Back</button>
+            <button
+              mat-flat-button
+              matStepperNext
+              class="uploadFile_Button"
+              color="primary">Next</button>
+          </div>
+        </form>
+      </mat-step>
+
+      
+      <mat-step>
+          <ng-template matStepLabel>Starte das Decoding</ng-template>
+          <ng-container
+            *ngIf="{
+              decodings: decodings$ | async,
+              project: project$ | async,
+              training: training$ | async } as overview;">
+            <div fxLayout="center center">
+              <mat-card class="example-card">
+                <mat-card-content>
+                  <h2>Decode</h2>
+                  <mat-list>
+                    <mat-list-item>
+                      <p>Projekt: {{overview?.project?.name}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Modell: {{overview?.project?.acoustic_model.name}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Training: {{overview?.training?.version}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Status: {{overview?.training?.status}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item>
+                      <p>Anzahl Audio Dateien: {{currentDecodingResources.length}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list-item *ngFor="let decoding of overview?.decodings">
+                      <p>Audio Dateien: {{decoding}}</p>
+                    </mat-list-item>
+                  </mat-list>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </ng-container>
+          <div>
+              <button
+                mat-flat-button
+                matStepperPrevious
+                class="uploadFile_Button"
+                color="primary">Back</button>
+          </div>
+      </mat-step>
+  </mat-horizontal-stepper>
+</div>

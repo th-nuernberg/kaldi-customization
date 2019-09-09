@@ -1,3 +1,52 @@
-<mat-list>
-  <a routerLink="/workspace/_" mat-list-item>Default Workspace</a>
-</mat-list>
+<div style="height:calc(100vh - 56px);">
+
+  <div
+    class="tilesWrapper"
+    fxLayout="center center">
+
+    <mat-card class="tile">
+      <form [formGroup]="createProjectForm" (ngSubmit)="createProject()">
+        <mat-form-field>
+          <input
+            matInput
+            formControlName="projectName"
+            placeholder="Projektname"
+            required>
+          <mat-error *ngIf="createProjectSubmitted && f.projectName.errors">
+            <div *ngIf="f.projectName.errors.required">Projektname wird benötigt</div>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-select
+            formControlName="modelValue"
+            placeholder="Akustisches Modell"
+            name="model"
+            required>
+            <mat-option
+              *ngFor="let model of acousticModels"
+              [value]="model">
+              {{model.name}}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="createProjectSubmitted && f.modelValue.errors">
+            <div *ngIf="f.modelValue.errors.required">Akustischs Modell wird benötigt</div>
+          </mat-error>
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="primary"
+          class="newProjectButton">
+            <mat-icon aria-hidden="false">add</mat-icon>
+             Projekt
+        </button>
+      </form>
+    </mat-card>
+
+    <app-tile
+      *ngFor="let tile of gridProjectTiles"
+      [tileData]="tile"></app-tile>
+  </div>
+
+</div>

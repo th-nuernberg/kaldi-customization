@@ -1,0 +1,22 @@
+<mat-card class="tile">
+    <mat-card-title>Projekt {{tileData.name}}</mat-card-title>
+    <p>Akustisches Modell: {{tileData.acoustic_model.name}}</p>
+    <p>Basis-Projekt: {{tileData.parent}}</p>
+    <div *ngFor="let training of tileData.trainings">
+      <span>Trainingsversion: {{training.version}}:</span>
+      <span>Trainingsdatum: {{training.creation_timestamp}}:</span>
+      <span [ngClass]="{
+        'color-orange': training.status === '100',
+        'color-blue': training.status === '200',
+        'color-grey': training.status === '210',
+        'color-yellow': training.status === '220',
+        'color-green': training.status === '300',
+        'color-red': training.status === '320'}">
+        Status: {{training.status}}
+      </span>
+    </div>
+    <p>Erstellungsdatum: {{tileData.creation_timestamp}}</p>
+    <button mat-stroked-button routerLink="/project/{{tileData.uuid}}" class="tileButton">
+      <mat-icon aria-hidden="false">open_in_new</mat-icon>
+    </button>
+</mat-card>

@@ -27,7 +27,7 @@ def db_project_to_front(db_project):
     if trainings:
         training_list = [ db_training_to_front(t) for t in trainings ]
     else:
-        training_list = None
+        training_list = []
 
     return Project(
         name=db_project.name,
