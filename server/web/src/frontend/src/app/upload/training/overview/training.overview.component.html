@@ -25,11 +25,24 @@
           <button
             mat-flat-button
             class="uploadFile_Button"
-            color="primary">Zurück zum Training</button>
-          <button
-            mat-flat-button
-            class="uploadFile_Button"
-            color="primary">Zurück zur Projektübersicht</button>
+            color="primary"
+            (click)="backToProjectOverview()">Zurück zur Projektübersicht</button>
+        </div>
+      </ng-container>
+    </mat-card-content>
+  </mat-card>
+</div>
+<div>
+  <mat-card class="example-card">
+    <mat-card-content>
+      <ng-container>
+        <h2>Eindeutige Wordliste</h2>
+        <div>
+          <textarea
+            matInput
+            placeholder="Hier stehen die eindeutigen Wörter des Trainings"
+            readonly=true>
+          </textarea>
         </div>
       </ng-container>
     </mat-card-content>
