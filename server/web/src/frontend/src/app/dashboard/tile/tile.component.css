@@ -5,6 +5,16 @@
     font-size: 12px;
 }
 
+.card-header{
+  display: flex;
+  justify-content: space-between;
+}
+
+.card-content{
+  display: flex;
+  justify-content: space-between;
+}
+
 .tileButton {
     position: absolute;
     bottom: 15px;
@@ -12,25 +22,25 @@
 }
 
 .color-orange {
-    color: orange;
-  }
+  color: orange;
+}
   
-  .color-green {
-    color: green;
-  }
+.color-green {
+  color: green;
+}
 
-  .color-red {
-    color: red;
-  }
+.color-red {
+  color: red;
+}
 
-  .color-yellow {
-    color: yellow;
-  }
+.color-yellow {
+  color: yellow;
+}
 
-  .color-grey {
-    color: grey;
-  }
+.color-grey {
+  color: grey;
+}
 
-  .color-blue {
-    color: blue;
-  }
+.color-blue {
+  color: blue;
+}
