@@ -30,6 +30,7 @@
                 mat-flat-button
                 color="primary"
                 class="tabButton"
+                [disabled]="isDownloadTrainingDisabled(training.status)"
                 (click)="downloadTraining(training.version)">
                 <mat-icon aria-hidden="false">font_download</mat-icon>
               </button>
