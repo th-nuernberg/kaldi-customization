@@ -37,7 +37,7 @@ services:
                 --redis-host=redis --redis-password=${REDIS_PASSWORD} \
                 --minio-host=minio --minio-access-key=${MINIO_ACCESS_KEY} --minio-secret-key=${MINIO_SECRET_KEY}"
 
-  text-prep-worker:
+  text-preparation-worker:
     build:
       context: .
       dockerfile: ./worker/text-preparation-worker/Dockerfile
