@@ -17,7 +17,7 @@ services:
     networks:
       - backend
 
-  text-prep-worker:
+  text-preparation-worker:
     build:
       context: ../../
       dockerfile: ./worker/text-preparation-worker/Dockerfile
