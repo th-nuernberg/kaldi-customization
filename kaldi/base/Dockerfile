@@ -50,13 +50,12 @@ RUN apk del -y \
             automake \
             autoconf \
             libtool \
-			python2 && \
+            python2 && \
     rm -rf /var/cache/apk/* && \
     rm -rf /kaldi/.git /kaldi/egs /kaldi/misc /kaldi/scripts /kaldi/windows .git* .travis.yml && \
-    rm -rf /kaldi/tools/ATLAS_headers /kaldi/tools/CLAPACK /kaldi/tools/cub* /kaldi/tools/extras /kaldi/tools/liblbfgs* /kaldi/tools/sctk* /kaldi/tools/sph2pipe* /kaldi/tools/install_* && \
     find /kaldi/src/ -type f \( -not -name '*.so' -and -not -name '*.so*' -and -not -name '*.sh' -and -not -perm /u=x,g=x,o=x \) -delete && \
     find /kaldi/tools/ -type f \( -not -name '*.so' -and -not -name '*.so*' -and -not -name '*.sh' -and -not -perm /u=x,g=x,o=x \) -delete && \
-	ln -s /usr/bin/python3 /usr/bin/python
+    ln -s /usr/bin/python3 /usr/bin/python
 
 
 CMD ["/bin/bash"]
