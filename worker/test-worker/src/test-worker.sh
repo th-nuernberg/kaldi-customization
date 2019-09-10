@@ -49,7 +49,7 @@ fi
 
 # Step 2.1: Setup all test cases for the text-preparation-worker and execute these test cases
 echo ""
-python3 -u text-preparation-tests/test_text_preparation.py $1 $2 $3 $4 $5
+python3 -u text-preparation-tests/test_supported_file_types.py $1 $2 $3 $4 $5
 echo "----------------------------------------------------------------------"
 
 # Step 2.2: Copying all files from the RESOURCE-bucket to the TRAINING_RESOURCE-bucket

@@ -28,37 +28,37 @@ def create_all_buckets(minio_client):
 
 def upload_all_text_prep_files(minio_client):
     try:
-        upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "1/source", "test-files/text_prep_files/txt/kafkatxt")
+        upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "1/source", "test-files/test_worker_files/legal_files/kafkatxt")
     except:
         print("It was not possible to upload 1/source to the RESOURCE_BUCKET. Either the bucket does not exist or the file is not available!")
         return 1
 
     try:
-        upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "2/source", "test-files/text_prep_files/pdf/kafkapdf")
+        upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "2/source", "test-files/test_worker_files/legal_files/kafkapdf")
     except:
         print("It was not possible to upload 2/source to the RESOURCE_BUCKET. Either the bucket does not exist or the file is not available!")
         return 2
 
     try:
-        upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "3/source", "test-files/text_prep_files/word/kafkadocx")
+        upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "3/source", "test-files/test_worker_files/legal_files/kafkadocx")
     except:
         print("It was not possible to upload 3/source to the RESOURCE_BUCKET. Either the bucket does not exist or the file is not available!")
         return 3
 
     try:
-        upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "4/source", "test-files/text_prep_files/html/gamestarhtml")
+        upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "4/source", "test-files/test_worker_files/legal_files/gamestarhtml")
     except:
         print("It was not possible to upload 4/source to the RESOURCE_BUCKET. Either the bucket does not exist or the file is not available!")
         return 4
 
     try:
-        upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "5/source", "test-files/text_prep_files/jpg/dokumentjpg")
+        upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "5/source", "test-files/test_worker_files/legal_files/dokumentjpg")
     except:
         print("It was not possible to upload 5/source to the RESOURCE_BUCKET. Either the bucket does not exist or the file is not available!")
         return 5
 
     try:
-        upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "6/source", "test-files/text_prep_files/png/dokumentpng")
+        upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "6/source", "test-files/test_worker_files/legal_files/dokumentpng")
     except:
         print("It was not possible to upload 6/source to the RESOURCE_BUCKET. Either the bucket does not exist or the file is not available!")
         return 6
