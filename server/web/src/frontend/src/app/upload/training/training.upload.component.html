@@ -1,13 +1,14 @@
 <!-- Upload overview-->
 <div style="height: calc(100vh - 56px);">
-  <div flex fxLayout="column"
-      fxLayoutAlgin="center center">
-
+  <div
+    flex
+    fxLayout="column"
+    fxLayoutAlgin="center center">
     <mat-horizontal-stepper
       labelPosition="bottom"
       #stepper>
         <mat-step
-          class="decodingPage">
+          class="step-content">
           <form>
             <ng-template matStepLabel>Füge Dateien hinzu</ng-template>
             <div fxLayout="center center">
@@ -57,9 +58,7 @@
                         color="accent"
                         class="uploadFile_Button"
                         (click)="copyResource()">
-                        <!-- TODO: update to new file format / resource format -->
-                        <mat-icon aria-hidden="false" aria-label="Example add icon">library_add</mat-icon>
-                        <!-- TODO: ADD small dialog for added files and uploaded files-->
+                        Hinzufügen
                       </button>
 
                       <input #file id="fileInput" type="file" style="display:none" (change)="loadFile(file)" />
@@ -68,8 +67,7 @@
                         color="primary"
                         class="uploadFile_Button"
                         onclick="document.getElementById('fileInput').click()">
-                        <!-- TODO update to new file format / resource format -->
-                        <mat-icon aria-hidden="false" aria-label="Example upload icon">cloud_upload</mat-icon>
+                        Hochladen
                       </button>
                     </div>
                   </div>
@@ -82,12 +80,13 @@
                 matStepperNext
                 class="uploadFile_Button"
                 color="primary"
-                (click)="reloadProject()">Next</button>
+                (click)="reloadProject()">Weiter</button>
             </div>
           </form>
         </mat-step>
 
-        <mat-step>
+        <mat-step
+          class="step-content">
           <form>
             <ng-template matStepLabel>Überprüfe den Inhalt</ng-template>
             <div fxLayout="center center">
@@ -109,12 +108,10 @@
                       class="uploadFile_Button"
                       color="warn"
                       (click)="remove(resources.selectedOptions.selected)">
-                      <mat-icon
-                        aria-hidden="false">delete</mat-icon>
+                      Löschen
                     </button>
-
                     <div>
-                      <h4>Corpus:</h4>
+                      <h4>Korpus:</h4>
                       <form
                         class="text-content-form"
                         *ngIf="showContentPreview">
@@ -138,53 +135,75 @@
                 mat-flat-button
                 matStepperPrevious
                 class="uploadFile_Button"
-                color="primary">Back</button>
+                color="primary">Zurück</button>
               <button
                 mat-flat-button
                 matStepperNext
                 class="uploadFile_Button"
-                color="primary">Next</button>
+                color="primary">Weiter</button>
             </div>
           </form>
         </mat-step>
 
-        <mat-step>
+        <mat-step
+          class="step-content">
           <ng-template matStepLabel>Starte das Training</ng-template>
           <div>
             <mat-card class="example-card">
+              <mat-card-header>
+                <mat-card-title>
+                  Details
+                </mat-card-title>
+              </mat-card-header>
               <mat-card-content>
                 <ng-container *ngIf="{
                   project: project$ | async,
                   training: training$ | async } as detail;">
-                  <h2>Details</h2>
-                  <div>
+                  <mat-list>
+                    <mat-list-item>
                       <p>Projekt: {{detail.project?.name}}</p>
+                    </mat-list-item>
                       <p>Modell: {{detail.project?.acoustic_model.name}}</p>
-                      <p>Modell: {{detail.project?.acoustic_model.model_type}}</p>
-                  </div>
-                  <div>
-                    <p>Training: {{detail.training?.version}}</p>
-                    <p>Erstellungszeit: {{detail.training?.creation_timestamp}}</p>
-                    <p>Trainingsstatus: {{detail.training?.status}}</p>
-                  </div>
-                  <div *ngFor="let resource of detail.training?.resources">
-                    <p>Resource Name: {{resource.name}} Typ: {{resource.resource_type}} Status: {{resource.status}}</p>
-                  </div>
+                    <mat-list-item>
+                      <p>Modelltyp: {{detail.project?.acoustic_model.model_type}}</p>
+                    </mat-list-item>
+                    <mat-list-item>
+                      <p>Training: {{detail.training?.version}}</p>
+                    </mat-list-item>
+                    <mat-list-item>
+                      <p>Erstellungszeit: {{detail.training?.creation_timestamp | date: "dd.MM.yyyy"}}</p>
+                    </mat-list-item>
+                    <mat-list-item>
+                      <p>Trainingsstatus: {{detail.training?.status}}</p>
+                    </mat-list-item>
+                    <mat-divider></mat-divider>
+                    <mat-list *ngFor="let resource of detail.training?.resources">
+                      <mat-list-item>
+                        <p>Resource Name: {{resource.name}}</p>
+                      </mat-list-item>
+                      <mat-list-item>
+                        <p>Typ: {{resource.resource_type}}</p>
+                      </mat-list-item>
+                      <mat-list-item>
+                        <p>Status: {{resource.status}}</p>
+                      </mat-list-item>
+                    </mat-list>
+                  </mat-list>
                 </ng-container>
               </mat-card-content>
             </mat-card>
           </div>
           <div>
+            <button
+              mat-flat-button
+              matStepperPrevious
+              class="uploadFile_Button"
+              color="primary">Zurück</button>
               <button
-                mat-flat-button
-                matStepperPrevious
-                class="uploadFile_Button"
-                color="primary">Back</button>
-                <button
-                mat-flat-button
-                class="uploadFile_Button"
-                color="primary"
-                (click)="startTraining()">Start Training</button>
+              mat-flat-button
+              class="uploadFile_Button"
+              color="primary"
+              (click)="startTraining()">Starte Training</button>
           </div>
         </mat-step>
     </mat-horizontal-stepper>
