@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material';
 import {
+  TrainingStatus,
   TrainingService,
   Training,
   DecodeService,
@@ -34,6 +35,8 @@ export class ProjectComponent implements OnInit {
 
   project$: Observable<Project>;
   decodings$: Observable<DecodeMessage[]>;
+
+  graphUrl;
 
   constructor(
     private route: ActivatedRoute,
@@ -76,9 +79,16 @@ export class ProjectComponent implements OnInit {
       });
   }
 
-  openTraining(trainingVersion:number) {
+  openTraining(trainingVersion:number, trainingStatus:TrainingStatus) {
     this.snackBar.open("Opened training...", "", { duration: 2000 });
-    this.router.navigate(['/upload/training/' + this.projectUuid + "/" + trainingVersion]);
+    const success = 300;
+    console.log(trainingStatus);
+    if(trainingStatus == success)
+    {
+      this.router.navigate(['/upload/training/overview/' + this.projectUuid + "/" + trainingVersion]);
+    }else {
+      this.router.navigate(['/upload/training/' + this.projectUuid + "/" + trainingVersion]);
+    }
   }
 
   openModelOverviewDialog(trainingVersion:number): void {
@@ -92,14 +102,32 @@ export class ProjectComponent implements OnInit {
     });
   }
 
+  isDownloadTrainingDisabled(trainingStatus:TrainingStatus) {
+    let success = 300;
+    
+    return trainingStatus != success;
+  }
+
   downloadTraining(trainingVersion:number) {
     this.snackBar.open("Download training...", "", { duration: 2000 });
-    this.trainingService.getTrainingByVersion(
+    this.trainingService.downloadModelForTraining(
       this.projectUuid,
-      trainingVersion);
-    // TODO this.trainingService.downloadTraining(
-    //  this.projectUuid,
-    //  trainingVersion);
+      trainingVersion.toString(),
+    ).subscribe(blob => {
+      this.graphUrl = URL.createObjectURL(blob);
+
+      // calls download dialog
+      let a = document.createElement('a');
+      a.href = this.graphUrl;
+      a.download = 'graphs.zip';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        // cleans up download dialog
+        URL.revokeObjectURL(this.graphUrl);
+        a.parentNode.removeChild(a);
+      }, 5000);      
+    });
   }
 }
 
