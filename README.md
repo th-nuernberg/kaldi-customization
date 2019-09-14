@@ -6,12 +6,16 @@ The [report](https://git.informatik.fh-nuernberg.de/kaldi/documentation/blob/mas
 ### Requirements
  * [Docker](https://www.docker.com/)
  * [Docker Compose](https://docs.docker.com/compose/)
- * [Python3](https://www.python.org/)
+ * [Git](https://git-scm.com/) to download this repository
+ * [Python3](https://www.python.org/) for the initialization
 
 ### Start the compose
  * Open a shell
+ * Clone this repository to your local system: `git clone https://git.informatik.fh-nuernberg.de/kaldi/kaldi-customization.git` and switch into the repository folder (first time only)
  * Use the [env.cmd](env.cmd) or [env.sh](env.sh) script in your shell to setup the environment variables for docker-compose
- * TODO: import/load missing docker images (first time only)
+ * TODO: import/load prebuild and missing docker images (first time only)
+    * kaldi-base
+    * data-prep-worker?
  * Start the customization service:
     * Load the compose with `docker-compose up` and have a cup of tea or coffee
     * Wait until the service is online (website is reachable: [localhost:8080](http://localhost:8080))
@@ -25,6 +29,11 @@ The [report](https://git.informatik.fh-nuernberg.de/kaldi/documentation/blob/mas
 ### The customization service is now available
  * Web Interface: [localhost:8080](http://localhost:8080)
  * Web API: [localhost:8080/api](http://localhost:8080/api)
+
+### Stop the service
+ * Make sure that there are no running jobs like a training
+ * Use `docker-compose down` in the repository folder or press `Ctrl + c` in the shell where you startet the compose
+ * All data (database, files) are stored persistantly on the local disk
 
 ## Structure of the repository
 ### [/docker-compose.yml](docker-compose.yml)
@@ -67,6 +76,8 @@ A SQL Server for the persistent data.
 An in memory Redis Server for the task queue.
 
 ### API Functions
+Work in progress...  
+See [localhost:8080/api/v1/ui](http://localhost:8080/api/v1/ui).
 
 | Category | Type | Function Name | Implemented |
 | -------- | ---- | ------------- | ----------- |
