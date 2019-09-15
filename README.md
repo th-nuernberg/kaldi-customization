@@ -13,9 +13,9 @@ The [report](https://git.informatik.fh-nuernberg.de/kaldi/documentation/blob/mas
  * Open a shell
  * Clone this repository to your local system: `git clone https://git.informatik.fh-nuernberg.de/kaldi/kaldi-customization.git` and switch into the repository folder (first time only)
  * Use the [env.cmd](env.cmd) or [env.sh](env.sh) script in your shell to setup the environment variables for docker-compose
- * TODO: import/load prebuild and missing docker images (first time only)
-    * kaldi-base
-    * data-prep-worker?
+ * Build or import missing docker images (first time only)
+    * kaldi-base: See [kaldi/base/README.md](kaldi/base/README.md)
+    * Create all other images by starting the docker-compose or by executing `docker-compose build`
  * Start the customization service:
     * Load the compose with `docker-compose up` and have a cup of tea or coffee
     * Wait until the service is online (website is reachable: [localhost:8080](http://localhost:8080))
