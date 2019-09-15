@@ -33,6 +33,23 @@ def get_filetype(filename):
     return None
 
 
+def assign_audio_to_training(project_uuid, training_version, audio_reference_object):  # noqa: E501
+    """Assign Audio to training
+
+    Assign audio to to be decoded in a specific training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+    :param audio_reference_object: Audio that needs to be decoded
+    :type audio_reference_object: dict | bytes
+
+    :rtype: DecodeTaskReference
+    """
+    if connexion.request.is_json:
+        audio_reference_object = AudioReferenceObject.from_dict(connexion.request.get_json())  # noqa: E501
+    return 'do some magic!'
 
 def delete_audio_by_uuid(audio_uuid):  # noqa: E501
     """Delete audio by UUID
@@ -143,21 +160,27 @@ def get_decodings(project_uuid, training_version):  # noqa: E501
     return decoding_list
 
 
-def start_decode(project_uuid, training_version, audio_reference_object=None):  # noqa: E501
+def start_decode(project_uuid, training_version, decode_uuid):  # noqa: E501
     """Decode audio to text
 
-    Decode audio data to text using the trained project # noqa: E501
+    Decode audio data to text using the trained project and the given audio # noqa: E501
 
     :param project_uuid: UUID of the project
     :type project_uuid: 
     :param training_version: Training version of the project
     :type training_version: int
-    :param audio_file: Audio file for decoding
-    :type audio_file: str
+    :param decode_uuid: UUID of the decoding task
+    :type decode_uuid: 
+    :param callback_object: Callback to be executed after the operation ended
+    :type callback_object: dict | bytes
 
     :rtype: DecodeTaskReference
     """
-    current_user = connexion.context['token_info']['user']
+    try:
+        if connexion.request.is_json:
+            callback_object = CallbackObject.from_dict(connexion.request.get_json())
+    except:
+        callback_object=None
 
     if connexion.request.is_json:
         audio_reference_object = AudioReferenceObject.from_dict(connexion.request.get_json())  # noqa: E501

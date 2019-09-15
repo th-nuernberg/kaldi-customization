@@ -68,6 +68,22 @@ class TestTrainingController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    def test_download_model_for_training(self):
+        """Test case for download_model_for_training
+
+        Returns the model
+        """
+        headers = { 
+            'Accept': 'application/zip',
+            'Authorization': 'Bearer special-key',
+        }
+        response = self.client.open(
+            '/api/v1/project/{project_uuid}/training/{training_version}/model'.format(project_uuid='project_uuid_example', training_version=56),
+            method='GET',
+            headers=headers)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     def test_get_corpus_of_training(self):
         """Test case for get_corpus_of_training
 
@@ -112,6 +128,22 @@ class TestTrainingController(BaseTestCase):
         response = self.client.open(
             '/api/v1/project/{project_uuid}/training/{training_version}'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
             method='GET',
+            headers=headers)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_prepare_training_by_version(self):
+        """Test case for prepare_training_by_version
+
+        Start the specified training
+        """
+        headers = { 
+            'Accept': 'application/json',
+            'Authorization': 'Bearer special-key',
+        }
+        response = self.client.open(
+            '/api/v1/project/{project_uuid}/training/{training_version}/prepare'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
+            method='POST',
             headers=headers)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))

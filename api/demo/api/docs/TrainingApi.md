@@ -11,8 +11,10 @@ Method | HTTP request | Description
 [**get_corpus_of_training**](TrainingApi.md#get_corpus_of_training) | **GET** /project/{project_uuid}/training/{training_version}/corpus | Get the entire corpus of the specified training
 [**get_corpus_of_training_resource**](TrainingApi.md#get_corpus_of_training_resource) | **GET** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/corpus | Get the corpus of the resource
 [**get_training_by_version**](TrainingApi.md#get_training_by_version) | **GET** /project/{project_uuid}/training/{training_version} | Find project training results by UUID
+[**get_trainings_for_project**](TrainingApi.md#get_trainings_for_project) | **GET** /project/{project_uuid}/training | Lists all Trainings of a Project
+[**prepare_training_by_version**](TrainingApi.md#prepare_training_by_version) | **PUT** /project/{project_uuid}/training/{training_version}/prepare | Start the specified training
 [**set_corpus_of_training_resource**](TrainingApi.md#set_corpus_of_training_resource) | **PUT** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/corpus | Set the corpus of the resource
-[**start_training_by_version**](TrainingApi.md#start_training_by_version) | **POST** /project/{project_uuid}/training/{training_version} | Start the specified training
+[**start_training_by_version**](TrainingApi.md#start_training_by_version) | **PUT** /project/{project_uuid}/training/{training_version}/train | Start the specified training
 
 
 # **assign_resource_to_training**
@@ -136,7 +138,7 @@ Name | Type | Description  | Notes
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-**200** | Successful operation |  -  |
+**201** | created successfully |  -  |
 **403** | Forbidden |  -  |
 **404** | Project not found |  -  |
 
@@ -233,7 +235,7 @@ configuration.host = "http://localhost:8080/api/v1"
 # Create an instance of the API class
 api_instance = openapi_client.TrainingApi(openapi_client.ApiClient(configuration))
 project_uuid = 'project_uuid_example' # str | UUID of project
-training_version = 'training_version_example' # str | Version of training
+training_version = 56 # int | Version of training
 
 try:
     # Returns the model
@@ -248,7 +250,7 @@ except ApiException as e:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **project_uuid** | **str**| UUID of project | 
- **training_version** | **str**| Version of training | 
+ **training_version** | **int**| Version of training | 
 
 ### Return type
 
@@ -466,6 +468,133 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **get_trainings_for_project**
+> list[Training] get_trainings_for_project(project_uuid)
+
+Lists all Trainings of a Project
+
+### Example
+
+* OAuth Authentication (oauth):
+```python
+from __future__ import print_function
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+configuration = openapi_client.Configuration()
+# Configure OAuth2 access token for authorization: oauth
+configuration.access_token = 'YOUR_ACCESS_TOKEN'
+
+# Defining host is optional and default to http://localhost:8080/api/v1
+configuration.host = "http://localhost:8080/api/v1"
+# Create an instance of the API class
+api_instance = openapi_client.TrainingApi(openapi_client.ApiClient(configuration))
+project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | Gets all trainings for a specific project
+
+try:
+    # Lists all Trainings of a Project
+    api_response = api_instance.get_trainings_for_project(project_uuid)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling TrainingApi->get_trainings_for_project: %s\n" % e)
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **project_uuid** | [**str**](.md)| Gets all trainings for a specific project | 
+
+### Return type
+
+[**list[Training]**](Training.md)
+
+### Authorization
+
+[oauth](../README.md#oauth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | created successfully |  -  |
+**403** | Forbidden |  -  |
+**404** | Project not found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **prepare_training_by_version**
+> Training prepare_training_by_version(project_uuid, training_version, callback_object=callback_object)
+
+Start the specified training
+
+Start the preparation process for the specified training
+
+### Example
+
+* OAuth Authentication (oauth):
+```python
+from __future__ import print_function
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+configuration = openapi_client.Configuration()
+# Configure OAuth2 access token for authorization: oauth
+configuration.access_token = 'YOUR_ACCESS_TOKEN'
+
+# Defining host is optional and default to http://localhost:8080/api/v1
+configuration.host = "http://localhost:8080/api/v1"
+# Create an instance of the API class
+api_instance = openapi_client.TrainingApi(openapi_client.ApiClient(configuration))
+project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
+training_version = 56 # int | Training version of the project
+callback_object = openapi_client.CallbackObject() # CallbackObject | Callback to be executed after the operation ended (optional)
+
+try:
+    # Start the specified training
+    api_response = api_instance.prepare_training_by_version(project_uuid, training_version, callback_object=callback_object)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling TrainingApi->prepare_training_by_version: %s\n" % e)
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **project_uuid** | [**str**](.md)| UUID of the project | 
+ **training_version** | **int**| Training version of the project | 
+ **callback_object** | [**CallbackObject**](CallbackObject.md)| Callback to be executed after the operation ended | [optional] 
+
+### Return type
+
+[**Training**](Training.md)
+
+### Authorization
+
+[oauth](../README.md#oauth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**202** | Preparation successfully queued |  -  |
+**400** | training already done or pending |  -  |
+**403** | Forbidden |  -  |
+**404** | Project or training not found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **set_corpus_of_training_resource**
 > set_corpus_of_training_resource(project_uuid, training_version, resource_uuid, body)
 
@@ -535,7 +664,7 @@ void (empty response body)
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **start_training_by_version**
-> Training start_training_by_version(project_uuid, training_version)
+> Training start_training_by_version(project_uuid, training_version, callback_object=callback_object)
 
 Start the specified training
 
@@ -560,10 +689,11 @@ configuration.host = "http://localhost:8080/api/v1"
 api_instance = openapi_client.TrainingApi(openapi_client.ApiClient(configuration))
 project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
 training_version = 56 # int | Training version of the project
+callback_object = openapi_client.CallbackObject() # CallbackObject | Callback to be executed after the operation ended (optional)
 
 try:
     # Start the specified training
-    api_response = api_instance.start_training_by_version(project_uuid, training_version)
+    api_response = api_instance.start_training_by_version(project_uuid, training_version, callback_object=callback_object)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling TrainingApi->start_training_by_version: %s\n" % e)
@@ -575,6 +705,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **project_uuid** | [**str**](.md)| UUID of the project | 
  **training_version** | **int**| Training version of the project | 
+ **callback_object** | [**CallbackObject**](CallbackObject.md)| Callback to be executed after the operation ended | [optional] 
 
 ### Return type
 
@@ -586,7 +717,7 @@ Name | Type | Description  | Notes
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 ### HTTP response details

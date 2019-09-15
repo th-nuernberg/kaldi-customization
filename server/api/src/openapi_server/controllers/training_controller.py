@@ -178,7 +178,7 @@ def download_model_for_training(project_uuid, training_version):  # noqa: E501
     :param project_uuid: UUID of project
     :type project_uuid: str
     :param training_version: Version of training
-    :type training_version: str
+    :type training_version: int
 
     :rtype: file
     """
@@ -314,6 +314,38 @@ def get_training_by_version(project_uuid, training_version):  # noqa: E501
 
     return mapper.db_training_to_front(db_training)
 
+def get_trainings_for_project(project_uuid):  # noqa: E501
+    """Lists all Trainings of a Project
+
+     # noqa: E501
+
+    :param project_uuid: Gets all trainings for a specific project
+    :type project_uuid: 
+
+    :rtype: List[Training]
+    """
+    return 'do some magic!'
+
+def prepare_training_by_version(project_uuid, training_version, callback_object=None):  # noqa: E501
+    """Start the specified training
+
+    Start the preparation process for the specified training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+    :param callback_object: Callback to be executed after the operation ended
+    :type callback_object: dict | bytes
+
+    :rtype: Training
+    """
+    try:
+        if connexion.request.is_json:
+            callback_object = CallbackObject.from_dict(connexion.request.get_json())  # noqa: E501
+    except:
+        callback_object = None
+    return 'do some magic!'
 
 def set_corpus_of_training_resource(project_uuid, training_version, resource_uuid, body):  # noqa: E501
     """Set the corpus of the resource
@@ -372,7 +404,7 @@ def set_corpus_of_training_resource(project_uuid, training_version, resource_uui
     return ("Success", 200)
 
 
-def start_training_by_version(project_uuid, training_version):  # noqa: E501
+def start_training_by_version(project_uuid, training_version, callback_object=None):  # noqa: E501
     """Start the specified training
 
     Start the training process for the specified training # noqa: E501
@@ -381,9 +413,17 @@ def start_training_by_version(project_uuid, training_version):  # noqa: E501
     :type project_uuid: 
     :param training_version: Training version of the project
     :type training_version: int
+    :param callback_object: Callback to be executed after the operation ended
+    :type callback_object: dict | bytes
 
     :rtype: Training
     """
+    try:
+        if connexion.request.is_json:
+            callback_object = CallbackObject.from_dict(connexion.request.get_json())  # noqa: E501
+    except:
+        callback_object = None
+    
     current_user = connexion.context['token_info']['user']
 
     db_project = DB_Project.query.filter_by(
