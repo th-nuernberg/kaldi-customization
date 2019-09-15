@@ -20,7 +20,7 @@ The [report](https://git.informatik.fh-nuernberg.de/kaldi/documentation/blob/mas
     * Load the compose with `docker-compose up` and have a cup of tea or coffee
     * Wait until the service is online (website is reachable: [localhost:8080](http://localhost:8080))
  * Use the initialization script [initialization/init.py](initialization/init.py) (first time only):
-    * Use [pip](https://pip.pypa.io/) and [pipenv](https://docs.pipenv.org/en/latest/basics/#example-pipenv-workflow):
+    * A few [modules](initialization/requirements.txt) are required to execute the script: For example use [pip](https://pip.pypa.io/) and [pipenv](https://docs.pipenv.org/en/latest/basics/#example-pipenv-workflow):
         * Open another shell in the initialization directory of this repository
         * `pipenv install` to install the [requirements](initialization/requirements.txt)
         * `pipenv shell` to activate the pipenv shell
@@ -57,7 +57,7 @@ The server components to run the kaldi customization web service.
 This is the API backend. It provides access to the features of the kaldi customization web service and handles authentication.  
 See the [README](server/api/README.md).
 #### /server/web
-This is the web frontend for business users. It offers a user interface to train and test user defined ASR.
+This is the web frontend for users. It offers a user interface to train and test user defined ASR.
 ### /shared
 Scripts and resources which are used by several components.
 ### /worker
