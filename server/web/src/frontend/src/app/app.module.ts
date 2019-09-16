@@ -29,7 +29,7 @@ import {
 
 import { MatDialogModule } from '@angular/material/dialog';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ProjectComponent, ModelOverviewDialog } from './project/project.component';
+import { ProjectComponent } from './project/project.component';
 import { CoverComponent } from './cover/cover.component';
 import { DecodingUploadComponent } from './upload/decoding/decoding.upload.component';
 import { TrainingUploadComponent } from './upload/training/training.upload.component';
@@ -52,7 +52,6 @@ import { LoginComponent } from './login/login.component';
     TrainingOverviewComponent,
     AccountComponent,
     TileComponent,
-    ModelOverviewDialog,
     LoginComponent
   ],
   imports: [
@@ -84,9 +83,7 @@ import { LoginComponent } from './login/login.component';
     MatSnackBarModule,
   ],
   providers: [],
-  entryComponents: [
-    ModelOverviewDialog
-  ],
+  entryComponents: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

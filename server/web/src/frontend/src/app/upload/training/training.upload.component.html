@@ -61,7 +61,13 @@
                         Hinzufügen
                       </button>
 
-                      <input #file id="fileInput" type="file" style="display:none" (change)="loadFile(file)" />
+                      <input
+                        #file
+                        accept=".html,.docx,.txt,.pdf,.png,.jpg"
+                        id="fileInput"
+                        style="display:none"
+                        type="file"
+                        (change)="loadFile(file)" />
                       <button
                         mat-flat-button
                         color="primary"

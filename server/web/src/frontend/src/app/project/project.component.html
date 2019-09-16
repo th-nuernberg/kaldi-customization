@@ -1,11 +1,13 @@
 <div class="page-header" fxLayout="row">
-  <h1>Projekt {{projectUuid}}</h1>
-  <mat-tab-group>
+  <ng-container
+    *ngIf="{
+      project: project$ | async } as overview;">
+  <h1>Projekt {{overview?.project?.name}}</h1>
+    <mat-tab-group>
       <mat-tab>
         <ng-template mat-tab-label>
           Trainings
         </ng-template>
-        <ng-container *ngIf="{project: project$ | async } as overview;">
           <mat-list class="list-content">
             <mat-list-item *ngFor='let training of overview?.project?.trainings'>
               <h4 matLine>Version: {{training.version}}</h4>
@@ -21,8 +23,8 @@
                 mat-flat-button
                 color="accent"
                 class="tabButton"
-                (click)="openModelOverviewDialog(training.version)">
-                  Info
+                (click)="createDecode(training.version)">
+                  Neuer Decode
               </button>
               <button
                 mat-flat-button
@@ -35,7 +37,6 @@
               <mat-divider></mat-divider>
             </mat-list-item>
           </mat-list>
-        </ng-container>
       </mat-tab>
       <mat-tab>
         <ng-template mat-tab-label>
@@ -69,6 +70,7 @@
     (click)="createTraining()">
       Neues Training
     </button>
+  </ng-container>
 </div>
 
 <mat-sidenav-container fxFlexFill>
