@@ -101,7 +101,7 @@ export class DecodingUploadComponent implements OnInit {
       .subscribe(this.currentTrainingResources.push);*/
     });
 
-    this.snackBar.open("Kopiere Audio Datein ins aktuelle Decoding...", "", { duration: 3000 });
+    this.snackBar.open("Kopiere Audio Datein in aktuelle Spracherkennung...", "", { duration: 3000 });
   }
 
   // removes selected training resources
@@ -122,7 +122,7 @@ export class DecodingUploadComponent implements OnInit {
       }
     });
 
-    this.snackBar.open("Lösche Audio Datei vom aktuelle Decoding...", "", { duration: 3000 });
+    this.snackBar.open("Lösche Audio Datei von aktueller Spracherkennung...", "", { duration: 3000 });
   }
 
   // uploads file and show preview

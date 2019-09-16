@@ -92,7 +92,7 @@ export class ProjectComponent implements OnInit {
   }
 
   createDecode(trainingVersion:number): void {
-    this.snackBar.open("Erstelle neues Decoding...", "", { duration: 2000 });
+    this.snackBar.open("Erstelle neue Spracherkennung...", "", { duration: 2000 });
     this.router.navigate(['/upload/decoding/' + this.projectUuid + "/" + trainingVersion]);
   }
 

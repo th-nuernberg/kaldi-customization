@@ -47,13 +47,17 @@
                       <mat-icon aria-hidden="false" aria-label="Example add icon">library_add</mat-icon>
                     </button>
 
-                    <input #file id="fileInput" type="file" style="display:none" (change)="loadFile(file)" />
+                    <input
+                      #file
+                      id="fileInput"
+                      style="display:none"
+                      type="file"
+                      (change)="loadFile(file)" />
                     <button
                       mat-flat-button
                       color="primary"
                       class="uploadFile_Button"
                       onclick="document.getElementById('fileInput').click()">
-                      <!-- TODO update to new file format / resource format -->
                       <mat-icon aria-hidden="false" aria-label="Example upload icon">cloud_upload</mat-icon>
                     </button>
                   </div>
@@ -93,8 +97,8 @@
                 <input #file id="fileInput" type="file" style="display:none" (change)="loadFile(file)" />
                 <button
                   mat-flat-button
-                  class="uploadFile_Button" 
-                  color="warn"        
+                  class="uploadFile_Button"
+                  color="warn"
                   (click)="remove(resources.selectedOptions.selected)">
                   <mat-icon aria-hidden="false">delete</mat-icon>
                 </button>
@@ -117,9 +121,9 @@
       </form>
     </mat-step>
 
-      
+
     <mat-step>
-      <ng-template matStepLabel>Starte das Decoding</ng-template>
+      <ng-template matStepLabel>Starte Spracherkennung</ng-template>
       <ng-container
         *ngIf="{
           audios: audios$ | async,
@@ -128,7 +132,7 @@
         <div fxLayout="center center">
           <mat-card class="example-card">
             <mat-card-content>
-              <h2>Decode</h2>
+              <h2>Spracherkennung</h2>
               <mat-list>
                 <mat-list-item>
                   <p>Projekt: {{overview?.project?.name}}</p>
@@ -168,7 +172,7 @@
           mat-flat-button
           class="uploadFile_Button"
           color="primary"
-          (click)="startDecode()">Starte Decode</button>
+          (click)="startDecode()">Starte Spracherkennung</button>
       </div>
     </mat-step>
   </mat-horizontal-stepper>
