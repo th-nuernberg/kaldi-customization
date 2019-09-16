@@ -55,7 +55,7 @@ class TestLoggingController(BaseTestCase):
             'Authorization': 'Bearer special-key',
         }
         response = self.client.open(
-            '/api/v1/project/{project_uuid}/training/{training_version}/log'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
+            '/api/v1/project/{project_uuid}/training/{training_version}/train/log'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
             method='GET',
             headers=headers)
         self.assert200(response,

@@ -7,6 +7,7 @@ from openapi_server.models.acoustic_model import AcousticModel
 from openapi_server.models.acoustic_model_type import AcousticModelType
 from openapi_server.models.audio import Audio
 from openapi_server.models.audio_reference_object import AudioReferenceObject
+from openapi_server.models.audio_reference_with_callback_object import AudioReferenceWithCallbackObject
 from openapi_server.models.audio_status import AudioStatus
 from openapi_server.models.binary_decode_object import BinaryDecodeObject
 from openapi_server.models.binary_resource_object import BinaryResourceObject

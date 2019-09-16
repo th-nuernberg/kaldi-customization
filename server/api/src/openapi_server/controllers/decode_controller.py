@@ -7,6 +7,7 @@ import datetime
 
 from openapi_server.models.audio import Audio  # noqa: E501
 from openapi_server.models.audio_reference_object import AudioReferenceObject  # noqa: E501
+from openapi_server.models.audio_reference_with_callback_object import AudioReferenceWithCallbackObject  # noqa: E501
 from openapi_server.models.binary_resource_object import BinaryResourceObject  # noqa: E501
 from openapi_server.models.decode_message import DecodeMessage  # noqa: E501
 from openapi_server.models.decode_task_reference import DecodeTaskReference  # noqa: E501
@@ -160,7 +161,7 @@ def get_decodings(project_uuid, training_version):  # noqa: E501
     return decoding_list
 
 
-def start_decode(project_uuid, training_version, decode_uuid):  # noqa: E501
+def start_decode(project_uuid, training_version, decode_uuid, audio_reference_with_callback_object=None):  # noqa: E501
     """Decode audio to text
 
     Decode audio data to text using the trained project and the given audio # noqa: E501
@@ -171,26 +172,22 @@ def start_decode(project_uuid, training_version, decode_uuid):  # noqa: E501
     :type training_version: int
     :param decode_uuid: UUID of the decoding task
     :type decode_uuid: 
-    :param callback_object: Callback to be executed after the operation ended
-    :type callback_object: dict | bytes
+    :param audio_reference_with_callback_object: Audio that needs to be decoded
+    :type audio_reference_with_callback_object: dict | bytes
 
     :rtype: DecodeTaskReference
     """
-    try:
-        if connexion.request.is_json:
-            callback_object = CallbackObject.from_dict(connexion.request.get_json())
-    except:
-        callback_object=None
+    current_user = connexion.context['token_info']['user']
 
     if connexion.request.is_json:
-        audio_reference_object = AudioReferenceObject.from_dict(connexion.request.get_json())  # noqa: E501
-    
+        audio_reference_with_callback_object = AudioReferenceWithCallbackObject.from_dict(connexion.request.get_json())  # noqa: E501
+
     # if user does not select file, browser also
     # submit an empty part without filename
-    if audio_reference_object is None:
+    if audio_reference_with_callback_object is None:
         return ('Invalid input', 405)
 
-    print('Received new file for decode: ' + str(audio_reference_object))
+    print('Received new file for decode: ' + str(audio_reference_with_callback_object))
     
     db_project = DB_Project.query.filter_by(uuid=project_uuid, owner_id=current_user.id).first()
 
@@ -203,7 +200,7 @@ def start_decode(project_uuid, training_version, decode_uuid):  # noqa: E501
     if not db_training:
         return ('Training not found', 404)
 
-    db_audioresource = DB_AudioResource.query.filter_by(uuid=audio_reference_object.audio_uuid).first()
+    db_audioresource = DB_AudioResource.query.filter_by(uuid=audio_reference_with_callback_object.audio_uuid).first()
     # TODO check if file is ready for decoding
 
     db_decode = DB_Decoding(

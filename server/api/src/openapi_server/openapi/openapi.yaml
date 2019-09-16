@@ -677,6 +677,13 @@ paths:
           format: uuid
           type: string
         style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AudioReferenceWithCallbackObject'
+        description: Audio that needs to be decoded
+        required: true
       responses:
         202:
           content:
@@ -1577,7 +1584,7 @@ components:
     Project:
       example:
         owner:
-          user-email: user-email
+          email: email
           password: password
           username: username
         parent: 550e8400-e29b-11d4-a716-446655440000
@@ -1786,13 +1793,13 @@ components:
       type: object
     User:
       example:
-        user-email: user-email
+        email: email
         password: password
         username: username
       properties:
         username:
           type: string
-        user-email:
+        email:
           format: email
           type: string
         password:
@@ -1886,6 +1893,22 @@ components:
           description: UUID of the audio file
           example: 550e8400-e29b-11d4-a716-446655440000
           format: uuid
+          type: string
+      required:
+      - audio_uuid
+      type: object
+    AudioReferenceWithCallbackObject:
+      example:
+        audio_uuid: 550e8400-e29b-11d4-a716-446655440000
+        callback: https://my-ci.example.org/callback
+      properties:
+        audio_uuid:
+          description: UUID of the audio file
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        callback:
+          description: Callback URL when decoding finished
           type: string
       required:
       - audio_uuid

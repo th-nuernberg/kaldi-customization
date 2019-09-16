@@ -455,7 +455,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **start_decode**
-> DecodeTaskReference start_decode(project_uuid, training_version, decode_uuid)
+> DecodeTaskReference start_decode(project_uuid, training_version, decode_uuid, audio_reference_with_callback_object)
 
 Decode audio to text
 
@@ -481,10 +481,11 @@ api_instance = openapi_client.DecodeApi(openapi_client.ApiClient(configuration))
 project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
 training_version = 56 # int | Training version of the project
 decode_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the decoding task
+audio_reference_with_callback_object = openapi_client.AudioReferenceWithCallbackObject() # AudioReferenceWithCallbackObject | Audio that needs to be decoded
 
 try:
     # Decode audio to text
-    api_response = api_instance.start_decode(project_uuid, training_version, decode_uuid)
+    api_response = api_instance.start_decode(project_uuid, training_version, decode_uuid, audio_reference_with_callback_object)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling DecodeApi->start_decode: %s\n" % e)
@@ -497,6 +498,7 @@ Name | Type | Description  | Notes
  **project_uuid** | [**str**](.md)| UUID of the project | 
  **training_version** | **int**| Training version of the project | 
  **decode_uuid** | [**str**](.md)| UUID of the decoding task | 
+ **audio_reference_with_callback_object** | [**AudioReferenceWithCallbackObject**](AudioReferenceWithCallbackObject.md)| Audio that needs to be decoded | 
 
 ### Return type
 
@@ -508,7 +510,7 @@ Name | Type | Description  | Notes
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 ### HTTP response details

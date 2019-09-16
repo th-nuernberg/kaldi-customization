@@ -822,19 +822,20 @@ class DecodeApi(object):
             _request_timeout=local_var_params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def start_decode(self, project_uuid, training_version, decode_uuid, **kwargs):  # noqa: E501
+    def start_decode(self, project_uuid, training_version, decode_uuid, audio_reference_with_callback_object, **kwargs):  # noqa: E501
         """Decode audio to text  # noqa: E501
 
         Decode audio data to text using the trained project and the given audio  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.start_decode(project_uuid, training_version, decode_uuid, async_req=True)
+        >>> thread = api.start_decode(project_uuid, training_version, decode_uuid, audio_reference_with_callback_object, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool: execute request asynchronously
         :param str project_uuid: UUID of the project (required)
         :param int training_version: Training version of the project (required)
         :param str decode_uuid: UUID of the decoding task (required)
+        :param AudioReferenceWithCallbackObject audio_reference_with_callback_object: Audio that needs to be decoded (required)
         :param _preload_content: if False, the urllib3.HTTPResponse object will
                                  be returned without reading/decoding response
                                  data. Default is True.
@@ -847,21 +848,22 @@ class DecodeApi(object):
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
-        return self.start_decode_with_http_info(project_uuid, training_version, decode_uuid, **kwargs)  # noqa: E501
+        return self.start_decode_with_http_info(project_uuid, training_version, decode_uuid, audio_reference_with_callback_object, **kwargs)  # noqa: E501
 
-    def start_decode_with_http_info(self, project_uuid, training_version, decode_uuid, **kwargs):  # noqa: E501
+    def start_decode_with_http_info(self, project_uuid, training_version, decode_uuid, audio_reference_with_callback_object, **kwargs):  # noqa: E501
         """Decode audio to text  # noqa: E501
 
         Decode audio data to text using the trained project and the given audio  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.start_decode_with_http_info(project_uuid, training_version, decode_uuid, async_req=True)
+        >>> thread = api.start_decode_with_http_info(project_uuid, training_version, decode_uuid, audio_reference_with_callback_object, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool: execute request asynchronously
         :param str project_uuid: UUID of the project (required)
         :param int training_version: Training version of the project (required)
         :param str decode_uuid: UUID of the decoding task (required)
+        :param AudioReferenceWithCallbackObject audio_reference_with_callback_object: Audio that needs to be decoded (required)
         :param _return_http_data_only: response data without head status code
                                        and headers
         :param _preload_content: if False, the urllib3.HTTPResponse object will
@@ -878,7 +880,7 @@ class DecodeApi(object):
 
         local_var_params = locals()
 
-        all_params = ['project_uuid', 'training_version', 'decode_uuid']  # noqa: E501
+        all_params = ['project_uuid', 'training_version', 'decode_uuid', 'audio_reference_with_callback_object']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -904,6 +906,10 @@ class DecodeApi(object):
         if ('decode_uuid' not in local_var_params or
                 local_var_params['decode_uuid'] is None):
             raise ApiValueError("Missing the required parameter `decode_uuid` when calling `start_decode`")  # noqa: E501
+        # verify the required parameter 'audio_reference_with_callback_object' is set
+        if ('audio_reference_with_callback_object' not in local_var_params or
+                local_var_params['audio_reference_with_callback_object'] is None):
+            raise ApiValueError("Missing the required parameter `audio_reference_with_callback_object` when calling `start_decode`")  # noqa: E501
 
         collection_formats = {}
 
@@ -923,8 +929,14 @@ class DecodeApi(object):
         local_var_files = {}
 
         body_params = None
+        if 'audio_reference_with_callback_object' in local_var_params:
+            body_params = local_var_params['audio_reference_with_callback_object']
         # HTTP header `Accept`
         header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
             ['application/json'])  # noqa: E501
 
         # Authentication setting

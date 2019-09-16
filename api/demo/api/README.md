@@ -124,6 +124,7 @@ Class | Method | HTTP request | Description
  - [AcousticModelType](docs/AcousticModelType.md)
  - [Audio](docs/Audio.md)
  - [AudioReferenceObject](docs/AudioReferenceObject.md)
+ - [AudioReferenceWithCallbackObject](docs/AudioReferenceWithCallbackObject.md)
  - [AudioStatus](docs/AudioStatus.md)
  - [BinaryDecodeObject](docs/BinaryDecodeObject.md)
  - [BinaryResourceObject](docs/BinaryResourceObject.md)
@@ -145,13 +146,6 @@ Class | Method | HTTP request | Description
 
 
 ## Documentation For Authorization
-
-
-## api_key
-
-- **Type**: API key
-- **API key parameter name**: api_key
-- **Location**: HTTP header
 
 
 ## oauth

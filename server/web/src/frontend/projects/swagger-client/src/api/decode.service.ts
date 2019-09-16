@@ -20,6 +20,7 @@ import { Observable }                                        from 'rxjs';
 
 import { Audio } from '../model/audio';
 import { AudioReferenceObject } from '../model/audioReferenceObject';
+import { AudioReferenceWithCallbackObject } from '../model/audioReferenceWithCallbackObject';
 import { DecodeMessage } from '../model/decodeMessage';
 import { DecodeTaskReference } from '../model/decodeTaskReference';
 
@@ -426,13 +427,14 @@ export class DecodeService {
      * @param project_uuid UUID of the project
      * @param training_version Training version of the project
      * @param decode_uuid UUID of the decoding task
+     * @param audio_reference_with_callback_object Audio that needs to be decoded
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public startDecode(project_uuid: string, training_version: number, decode_uuid: string, observe?: 'body', reportProgress?: boolean): Observable<DecodeTaskReference>;
-    public startDecode(project_uuid: string, training_version: number, decode_uuid: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DecodeTaskReference>>;
-    public startDecode(project_uuid: string, training_version: number, decode_uuid: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DecodeTaskReference>>;
-    public startDecode(project_uuid: string, training_version: number, decode_uuid: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public startDecode(project_uuid: string, training_version: number, decode_uuid: string, audio_reference_with_callback_object: AudioReferenceWithCallbackObject, observe?: 'body', reportProgress?: boolean): Observable<DecodeTaskReference>;
+    public startDecode(project_uuid: string, training_version: number, decode_uuid: string, audio_reference_with_callback_object: AudioReferenceWithCallbackObject, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DecodeTaskReference>>;
+    public startDecode(project_uuid: string, training_version: number, decode_uuid: string, audio_reference_with_callback_object: AudioReferenceWithCallbackObject, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DecodeTaskReference>>;
+    public startDecode(project_uuid: string, training_version: number, decode_uuid: string, audio_reference_with_callback_object: AudioReferenceWithCallbackObject, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (project_uuid === null || project_uuid === undefined) {
             throw new Error('Required parameter project_uuid was null or undefined when calling startDecode.');
         }
@@ -441,6 +443,9 @@ export class DecodeService {
         }
         if (decode_uuid === null || decode_uuid === undefined) {
             throw new Error('Required parameter decode_uuid was null or undefined when calling startDecode.');
+        }
+        if (audio_reference_with_callback_object === null || audio_reference_with_callback_object === undefined) {
+            throw new Error('Required parameter audio_reference_with_callback_object was null or undefined when calling startDecode.');
         }
 
         let headers = this.defaultHeaders;
@@ -464,10 +469,15 @@ export class DecodeService {
 
         // to determine the Content-Type header
         const consumes: string[] = [
+            'application/json'
         ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
 
         return this.httpClient.put<DecodeTaskReference>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/decode/${encodeURIComponent(String(decode_uuid))}/enqueue`,
-            null,
+            audio_reference_with_callback_object,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
