@@ -33,9 +33,9 @@ export class DecodingUploadComponent implements OnInit {
   allAudios:MatTableDataSource<Audio>;
 
   displayedColumns:string[] = ['select', 'name'];
-  
+
   public historySelection = new SelectionModel<Audio>(true, []);
-  
+
   constructor(
     private route: ActivatedRoute,
     private decodeService: DecodeService,
@@ -101,7 +101,7 @@ export class DecodingUploadComponent implements OnInit {
       .subscribe(this.currentTrainingResources.push);*/
     });
 
-    this.snackBar.open("Copied audio to decode...", "", { duration: 3000 });
+    this.snackBar.open("Kopiere Audio Datein ins aktuelle Decoding...", "", { duration: 3000 });
   }
 
   // removes selected training resources
@@ -122,7 +122,7 @@ export class DecodingUploadComponent implements OnInit {
       }
     });
 
-    this.snackBar.open("Removed audio from decode...", "", { duration: 3000 });
+    this.snackBar.open("Lösche Audio Datei vom aktuelle Decoding...", "", { duration: 3000 });
   }
 
   // uploads file and show preview
@@ -151,7 +151,7 @@ export class DecodingUploadComponent implements OnInit {
         .subscribe(this.currentTrainingResources.push);
     });*/
 
-    this.snackBar.open("Added resource to training...", "", { duration: 3000 });
+    this.snackBar.open("Lade Audio Datei hoch...", "", { duration: 3000 });
   }
 
   reloadProject() {

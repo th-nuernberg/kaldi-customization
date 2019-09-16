@@ -1,8 +1,7 @@
 import { Observable } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material';
-import {  
+import {
   Project,
   Resource,
   Training,
@@ -32,13 +31,13 @@ export class TrainingOverviewComponent implements OnInit {
 	    private resourceService: ResourceService,
 	    private projectService: ProjectService,
 	) { }
-	ngOnInit() { 
+	ngOnInit() {
     	this.projectUuid = this.route.snapshot.paramMap.get('uuid');
     	this.trainingVersion =  +this.route.snapshot.paramMap.get('id');
 
     	this.project$ = this.projectService.getProjectByUuid(this.projectUuid)
     	this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
-		
+
 	}
 
 	ngOnDestroy() {	}

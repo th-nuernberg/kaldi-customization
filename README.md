@@ -44,3 +44,40 @@ A SQL Server for the persistent data.
 #### Redis Server
 
 An in memory Redis Server for the task queue.
+
+
+### API Functions
+
+| Category | Type | Function Name | Implemented |
+| -------- | ---- | ------------- | ----------- |
+| Project | GET | getProjects | True |
+| Project | POST | createProject | True |
+| Project | GET | getProjectByUuid | True |
+| Training | POST | createTraining | True |
+| Training | GET | getTrainingByVersion | True |
+| Training | POST | startTrainingByVersion | True |
+| Training | GET | getCorpusOfTraining | True  |
+| Training | GET | downloadModelForTraining | True |
+| Training | POST | assignResourceToTraining | True |
+| Training | DELETE| deleteAssignedResourceFromTraining | True |
+| Training | GET | getCorpusofTrainingResource | True  |
+| Training | PUT | setCorpusOfTraining | True  |
+| User | GET | getUser | **False** |
+| User | POST | createUser | True |
+| User | POST | loginUser | **False** |
+| User | POST | logoutUser | **False** |
+| Decode | GET | getAllAudio| **False** |
+| Decode | POST | uploadAudio| True |
+| Decode | DELETE | deleteAudioByUuid | **False** |
+| Decode | GET | getAudioByUuid | **False** |
+| Decode | GET | getAudioData | **False** |
+| Decode | GET | getDecodings | True |
+| Decode | POST | startDecode | True |
+| Decode | GET | getDecodingResult | True |
+| Global | GET | getAcousticModels | True |
+| Global | GET | downloadAcousticModel | True |
+| Global | GET | getDecodingResult | True |
+| Resource | GET | getResource | True | //Typo in Function Name//
+| Resource | POST | createResource | True |
+| Resource | GET | getResourceByUuid | True |
+| Resource | GET | getResourceData | True |

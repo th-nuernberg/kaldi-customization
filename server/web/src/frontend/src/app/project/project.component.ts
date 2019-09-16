@@ -1,7 +1,6 @@
 import { Observable } from 'rxjs';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material';
 import {
   TrainingStatus,
@@ -12,14 +11,6 @@ import {
   Project,
   ProjectService }
 from 'swagger-client';
-
-export interface TrainingsModel {
-  name: string;
-  fileResultName: string;
-  date: string;
-  link: string;
-  texte: string;
-}
 
 @Component({
   selector: 'app-project',
@@ -41,7 +32,6 @@ export class ProjectComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    public dialog: MatDialog,
     public trainingService: TrainingService,
     public decodeService: DecodeService,
     public projectService: ProjectService,
@@ -74,42 +64,46 @@ export class ProjectComponent implements OnInit {
         console.log("Created Training: " + training.version);
         this.training = training;
         // opens training dialog
-        this.snackBar.open("Created training...", "", { duration: 2000 });
+        this.snackBar.open("Erstelle neues Training...", "", { duration: 2000 });
         this.router.navigate(['/upload/training/' + this.projectUuid + "/" + this.training.version]);
       });
   }
 
   openTraining(trainingVersion:number, trainingStatus:TrainingStatus) {
-    this.snackBar.open("Opened training...", "", { duration: 2000 });
     const success = 300;
+    const failure = 320;
     console.log(trainingStatus);
     if(trainingStatus == success)
     {
+      this.snackBar.open("Öffne Trainingsübersicht...", "", { duration: 2000 });
       this.router.navigate(['/upload/training/overview/' + this.projectUuid + "/" + trainingVersion]);
+    }else if (trainingStatus == failure) {
+      this.trainingService.createTraining(this.projectUuid)
+      .subscribe(training => {
+        this.training = training;
+        // opens training dialog
+        this.snackBar.open("Erstelle neues Training...", "", { duration: 2000 });
+        this.router.navigate(['/upload/training/' + this.projectUuid + "/" + this.training.version]);
+      });
     }else {
+      this.snackBar.open("Öffne Training...", "", { duration: 2000 });
       this.router.navigate(['/upload/training/' + this.projectUuid + "/" + trainingVersion]);
     }
   }
 
-  openModelOverviewDialog(trainingVersion:number): void {
-    const dialogRef = this.dialog.open(ModelOverviewDialog, {
-      width: '400px',
-      data: [this.project$, trainingVersion]
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-    });
+  createDecode(trainingVersion:number): void {
+    this.snackBar.open("Erstelle neues Decoding...", "", { duration: 2000 });
+    this.router.navigate(['/upload/decoding/' + this.projectUuid + "/" + trainingVersion]);
   }
 
   isDownloadTrainingDisabled(trainingStatus:TrainingStatus) {
     let success = 300;
-    
+
     return trainingStatus != success;
   }
 
   downloadTraining(trainingVersion:number) {
-    this.snackBar.open("Download training...", "", { duration: 2000 });
+    this.snackBar.open("Lade Training herunter...", "", { duration: 2000 });
     this.trainingService.downloadModelForTraining(
       this.projectUuid,
       trainingVersion.toString(),
@@ -126,38 +120,7 @@ export class ProjectComponent implements OnInit {
         // cleans up download dialog
         URL.revokeObjectURL(this.graphUrl);
         a.parentNode.removeChild(a);
-      }, 5000);      
+      }, 5000);
     });
-  }
-}
-
-@Component({
-  selector: 'model.overview.dialog',
-  templateUrl: 'model.overview.dialog.html',
-})
-export class ModelOverviewDialog {
-
-  projectUuid: string;
-  trainingVersion: number;
-
-  constructor(
-    public router: Router,
-    public dialogRef: MatDialogRef<ModelOverviewDialog>,
-    public snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: [Observable<Project>, number]) {
-      this.trainingVersion = this.data[1];
-      this.data[0].subscribe(project => {
-        this.projectUuid = project.uuid;
-    }); 
-  }
-
-  onOkClick(): void {
-    this.dialogRef.close();
-  }
-
-  onDecodeClick(): void {
-    this.snackBar.open("Open decoding...", "", { duration: 2000 });
-    this.router.navigate(['/upload/decoding/' + this.projectUuid + "/" + this.trainingVersion]);
-    this.dialogRef.close();
   }
 }
