@@ -32,27 +32,27 @@ class User(object):
     """
     openapi_types = {
         'username': 'str',
-        'user_email': 'str',
+        'email': 'str',
         'password': 'str'
     }
 
     attribute_map = {
         'username': 'username',
-        'user_email': 'user-email',
+        'email': 'email',
         'password': 'password'
     }
 
-    def __init__(self, username=None, user_email=None, password=None):  # noqa: E501
+    def __init__(self, username=None, email=None, password=None):  # noqa: E501
         """User - a model defined in OpenAPI"""  # noqa: E501
 
         self._username = None
-        self._user_email = None
+        self._email = None
         self._password = None
         self.discriminator = None
 
         self.username = username
-        if user_email is not None:
-            self.user_email = user_email
+        if email is not None:
+            self.email = email
         if password is not None:
             self.password = password
 
@@ -80,25 +80,25 @@ class User(object):
         self._username = username
 
     @property
-    def user_email(self):
-        """Gets the user_email of this User.  # noqa: E501
+    def email(self):
+        """Gets the email of this User.  # noqa: E501
 
 
-        :return: The user_email of this User.  # noqa: E501
+        :return: The email of this User.  # noqa: E501
         :rtype: str
         """
-        return self._user_email
+        return self._email
 
-    @user_email.setter
-    def user_email(self, user_email):
-        """Sets the user_email of this User.
+    @email.setter
+    def email(self, email):
+        """Sets the email of this User.
 
 
-        :param user_email: The user_email of this User.  # noqa: E501
+        :param email: The email of this User.  # noqa: E501
         :type: str
         """
 
-        self._user_email = user_email
+        self._email = email
 
     @property
     def password(self):

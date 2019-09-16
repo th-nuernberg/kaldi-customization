@@ -33,7 +33,7 @@ def get_filetype(filename):
     return None
 
 
-def assign_audio_to_training(project_uuid, training_version, audio_reference_object):  # noqa: E501
+def assign_audio_to_training(project_uuid, training_version, audio_reference_object=None):  # noqa: E501
     """Assign Audio to training
 
     Assign audio to to be decoded in a specific training # noqa: E501
@@ -216,10 +216,6 @@ def start_decode(project_uuid, training_version, decode_uuid):  # noqa: E501
 
     print('Added database entry: ' + str(db_decode))
 
-    # cache file in local file system, then upload to MinIO
-    if not os.path.exists(TEMP_UPLOAD_FOLDER):
-        os.makedirs(TEMP_UPLOAD_FOLDER)
-
     minio_file_path = str(db_audioresource.uuid)
 
     create_decode_job(decode_file=minio_file_path,
@@ -255,6 +251,10 @@ def upload_audio(upfile):  # noqa: E501
     )
     db.session.add(db_audioresource)
     db.session.commit()
+
+    # cache file in local file system, then upload to MinIO
+    if not os.path.exists(TEMP_UPLOAD_FOLDER):
+        os.makedirs(TEMP_UPLOAD_FOLDER)
 
     local_file_path = os.path.join(TEMP_UPLOAD_FOLDER, str(db_audioresource.uuid))
     upfile.save(local_file_path)

@@ -1577,7 +1577,7 @@ components:
     Project:
       example:
         owner:
-          user-email: user-email
+          email: email
           password: password
           username: username
         parent: 550e8400-e29b-11d4-a716-446655440000
@@ -1786,13 +1786,13 @@ components:
       type: object
     User:
       example:
-        user-email: user-email
+        email: email
         password: password
         username: username
       properties:
         username:
           type: string
-        user-email:
+        email:
           format: email
           type: string
         password:
@@ -1910,11 +1910,6 @@ components:
       - url
       - method
   securitySchemes:
-    api_key:
-      in: header
-      name: api_key
-      type: apiKey
-      x-apikeyInfoFunc: openapi_server.controllers.security_controller_.info_from_api_key
     oauth:
       flows:
         password:

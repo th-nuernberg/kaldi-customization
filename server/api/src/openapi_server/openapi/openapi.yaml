@@ -1912,11 +1912,6 @@ components:
       - method
       - url
   securitySchemes:
-    api_key:
-      in: header
-      name: api_key
-      type: apiKey
-      x-apikeyInfoFunc: openapi_server.controllers.security_controller_.info_from_api_key
     oauth:
       flows:
         password:
