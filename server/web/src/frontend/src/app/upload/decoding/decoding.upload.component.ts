@@ -1,18 +1,16 @@
 import { Observable } from 'rxjs';
 import {Component, OnInit} from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSnackBar } from '@angular/material';
 import {
   Audio,
-  DecodeMessage,
   Project,
   Resource,
   Training,
   DecodeService,
   ProjectService,
-  ResourceService,
   TrainingService,
 } from 'swagger-client'
 
@@ -38,9 +36,9 @@ export class DecodingUploadComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private decodeService: DecodeService,
     private trainingService: TrainingService,
-    private resourceService: ResourceService,
     private projectService: ProjectService,
     private snackBar: MatSnackBar) {}
 
@@ -53,8 +51,7 @@ export class DecodingUploadComponent implements OnInit {
     // init obeservables
     this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
-    //this.resources$ = this.resourceService.getResource();
-    this.audios$ = new Observable<Array<Audio>>();//this.decodeService.getAllAudio();
+    this.audios$ = new Observable<Array<Audio>>(); //this.decodeService.getAllAudio();
 
     // TODO: get audio files that are added to a decode
     this.audios$.subscribe(audios => {
@@ -92,16 +89,13 @@ export class DecodingUploadComponent implements OnInit {
   copyAudio() {
     this.historySelection.selected.forEach(audio => {
       this.currentAudios.push(audio);
-      console.log("Assgin resource: " + audio.uuid + "Name: " + audio.name + " to Decode");
-      // TODO: change to assignAudioToDecode()
-      /*this.trainingService.assignResourceToTraining(
+      this.snackBar.open("Kopiere Audio Datein in aktuelle Spracherkennung...", "", { duration: 3000 });
+      /*this.decodeService.assign_audio_to_training(
         this.projectUuid,
         this.trainingVersion,
-        { resource_uuid: resource.uuid })
-      .subscribe(this.currentTrainingResources.push);*/
+        { audio_uuid: audio.uuid }
+      ).subscribe(this.currentAudios.push);*/
     });
-
-    this.snackBar.open("Kopiere Audio Datein in aktuelle Spracherkennung...", "", { duration: 3000 });
   }
 
   // removes selected training resources
@@ -112,17 +106,24 @@ export class DecodingUploadComponent implements OnInit {
       let index:number = this.currentAudios.findIndex(d => d === audio);
 
       if(index > -1) {
-        // TODO deleteAssignedResourceFromTraining
         this.decodeService.deleteAudioByUuid(
           audio.uuid
         ).subscribe(r => {
-          console.log("Removed audio: " + r.name + " from decode");
+
           this.currentAudios.splice(index, 1);
         });
       }
     });
 
     this.snackBar.open("Lösche Audio Datei von aktueller Spracherkennung...", "", { duration: 3000 });
+  }
+
+  playAudioData(audio) {
+    let audioData:Blob;
+    this.decodeService.getAudioData(audio.uuid)
+      .subscribe(data => audioData = data);
+
+    return audioData;
   }
 
   // uploads file and show preview
@@ -136,26 +137,29 @@ export class DecodingUploadComponent implements OnInit {
 
     this.decodeService.uploadAudio(blobFile)
       .subscribe(audio => {
-        // TODO assign audio to decode!!!
+        /*
+        this.currentAudios.push(audio);
+        this.decodeService.assignAudioToTraining(
+        this.projectUuid,
+        this.trainingVersion,
+        { audio_uuid: audio.uuid }
+      ).subscribe(this.currentAudios.push);*/
     });
-    // creates resource and starts the TextPrepWorker to create the corupus
-    /*this.resourceService.createResource(blobFile)
-      .subscribe(resource => {
-        console.log("Created Resource: " + resource.uuid);
-        this.currentTrainingResources.push(resource);
-        //console.log("Assgin resource: " + resource.uuid + "Name: " + resource.name + " to training: " + this.trainingVersion);
-        this.trainingService.assignResourceToTraining(
-          this.projectUuid,
-          this.trainingVersion,
-          { resource_uuid: resource.uuid })
-        .subscribe(this.currentTrainingResources.push);
-    });*/
 
     this.snackBar.open("Lade Audio Datei hoch...", "", { duration: 3000 });
   }
 
-  reloadProject() {
-    //console.log("Reload values on next..");
+  startDecode() {
+    this.decodeService.startDecode(
+      this.projectUuid,
+      this.trainingVersion,
+      { audio_uuid: "" }
+    ).subscribe(decode =>
+      this.snackBar.open("Starte Spracherkennung", "", { duration: 3000 }));
+      this.router.navigate(["/upload/training/overview/" + this.projectUuid + "/" + this.trainingVersion]);
+  }
+
+  reloadDecoding() {
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
     this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
   }

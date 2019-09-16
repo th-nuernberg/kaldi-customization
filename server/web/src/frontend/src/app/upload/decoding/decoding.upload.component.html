@@ -35,8 +35,7 @@
 
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                     <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                        (click)="historySelection.toggle(row)">
-                    </tr>
+                        (click)="historySelection.toggle(row)"></tr>
                   </table>
                   <div>
                     <button
@@ -44,11 +43,12 @@
                       color="accent"
                       class="uploadFile_Button"
                       (click)="copyAudio()">
-                      <mat-icon aria-hidden="false" aria-label="Example add icon">library_add</mat-icon>
+                      Hinzufügen
                     </button>
 
                     <input
                       #file
+                      accept=".wav"
                       id="fileInput"
                       style="display:none"
                       type="file"
@@ -58,7 +58,7 @@
                       color="primary"
                       class="uploadFile_Button"
                       onclick="document.getElementById('fileInput').click()">
-                      <mat-icon aria-hidden="false" aria-label="Example upload icon">cloud_upload</mat-icon>
+                      Hochladen
                     </button>
                   </div>
                 </div>
@@ -71,7 +71,7 @@
               matStepperNext
               class="uploadFile_Button"
               color="primary"
-              (click)="reloadProject()">Weiter</button>
+              (click)="reloadDecoding()">Weiter</button>
           </div>
       </form>
     </mat-step>
@@ -92,15 +92,19 @@
                     *ngFor='let audio of currentAudios'
                     [value]="audio">
                     <p mat-line>{{audio.name}}</p>
+                    <audio controls>
+                      <source
+                        src="playAudioData(audio)"
+                        type="audio/wav">
+                    </audio>
                   </mat-list-option>
                 </mat-selection-list>
-                <input #file id="fileInput" type="file" style="display:none" (change)="loadFile(file)" />
                 <button
                   mat-flat-button
                   class="uploadFile_Button"
                   color="warn"
                   (click)="remove(resources.selectedOptions.selected)">
-                  <mat-icon aria-hidden="false">delete</mat-icon>
+                  Löschen
                 </button>
               </div>
             </mat-card-content>
