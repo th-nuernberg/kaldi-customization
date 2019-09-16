@@ -4,13 +4,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
 import { AlertService, AuthenticationService } from '../_services';
+import { User, UserService } from 'swagger-client';
 
 @Component({
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.less']
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.less']
 })
-export class LoginComponent implements OnInit {
-    loginForm: FormGroup;
+export class RegisterComponent implements OnInit {
+    registerForm: FormGroup;
     loading = false;
     submitted = false;
     returnUrl: string;
@@ -21,7 +22,7 @@ export class LoginComponent implements OnInit {
         private route: ActivatedRoute,
         private router: Router,
         private authenticationService: AuthenticationService,
-        private alertService: AlertService
+        private userService: UserService
     ) {
         // redirect to home if already logged in
         if (this.authenticationService.currentUserValue) { 
@@ -30,39 +31,40 @@ export class LoginComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.loginForm = this.formBuilder.group({
+        this.registerForm = this.formBuilder.group({
             username: ['', Validators.required],
+            email: ['', [Validators.required, Validators.email]],
             password: ['', Validators.required]
         });
 
         // get return url from route parameters or default to '/'
-        this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+        this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/login';
     }
 
     // convenience getter for easy access to form fields
-    get f() { return this.loginForm.controls; }
+    get f() { return this.registerForm.controls; }
 
     onSubmit() {
         this.submitted = true;
 
         // stop here if form is invalid
-        if (this.loginForm.invalid) {
+        if (this.registerForm.invalid) {
             return;
         }
 
         this.loading = true;
-        this.authenticationService.login(this.f.username.value, this.f.password.value)
+        this.userService.createUser({
+            username: this.f.username.value,
+            user_email: this.f.email.value,
+            password: this.f.password.value,
+        })
             .pipe(first())
             .subscribe(
                 data => {
                     this.router.navigate([this.returnUrl]);
                 },
                 error => {
-                    this.f.username.reset();
-                    this.f.password.reset();
-                    this.errorMessage = 'Benutzername/Passwort falsch';
-
-                    this.alertService.error(error);
+                    this.errorMessage = 'Benutzername oder Email schon vergeben';
                     this.loading = false;
                 });
     }
