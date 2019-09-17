@@ -91,7 +91,7 @@ if __name__ == "__main__":
     print('Wait for training status become trainable')
 
     while training_instance.get_training_by_version(project.uuid, training.version).status != TrainingStatus.Trainable:
-        time.sleep(5)
+        time.sleep(3)
 
     print("Start preparation:")
     prepared_training = training_instance.prepare_training_by_version(
@@ -102,12 +102,14 @@ if __name__ == "__main__":
         project.uuid, training.version)
 
     last_status = preparation_session.status
-    print('Training status: ', last_status)
+    print('Preparation status: ', last_status)
 
+
+    print('Wait for preparation status become success or failure')
     while last_status != TrainingStatus.Training_DataPrep_Success and last_status != TrainingStatus.Training_DataPrep_Failure:
         if preparation_session.status != last_status:
             last_status = preparation_session.status
-            print('Training status: ', last_status)
+            print('Preparation status: ', last_status)
     
         time.sleep(5)
         preparation_session = training_instance.get_training_by_version(
@@ -124,6 +126,7 @@ if __name__ == "__main__":
     last_status = training_session.status
     print('Training status: ', last_status)
 
+    print('Wait for training status become success or failure')
     while last_status != TrainingStatus.Training_Success and last_status != TrainingStatus.Training_Failure:
         if training_session.status != last_status:
             last_status = training_session.status

@@ -124,7 +124,7 @@ def create_training(project_uuid):  # noqa: E501
     db.session.add(db_training)
     db.session.commit()
 
-    return mapper.db_training_to_front(db_training)
+    return (mapper.db_training_to_front(db_training),201)
 
 
 def delete_assigned_resource_from_training(project_uuid, training_version, resource_uuid):  # noqa: E501
@@ -324,7 +324,18 @@ def get_trainings_for_project(project_uuid):  # noqa: E501
 
     :rtype: List[Training]
     """
-    return 'do some magic!'
+    db_project = DB_Project.query.filter_by(uuid=project_uuid).first()
+
+    if not db_project:
+        return ("Project not found",404)
+
+    db_trainings = DB_Training.query.filter_by(project_id=db_project.id).all()
+
+    traininglist = list()
+
+    for t in db_trainings:
+        traininglist.append(mapper.db_training_to_front(t))
+    return traininglist
 
 def prepare_training_by_version(project_uuid, training_version, callback_object=None):  # noqa: E501
     """Start the specified training
@@ -363,7 +374,7 @@ def prepare_training_by_version(project_uuid, training_version, callback_object=
     if db_training.status != DB_TrainingStateEnum.Trainable:
         return ("training already done or pending", 400)
 
-    db_training.status = DB_TrainingStateEnum.Training_Pending
+    db_training.status = DB_TrainingStateEnum.Training_DataPrep_Pending
     db_training_resources = DB_TrainingResource.query.filter(
     DB_TrainingResource.training_id == db_training.id).all()
 
