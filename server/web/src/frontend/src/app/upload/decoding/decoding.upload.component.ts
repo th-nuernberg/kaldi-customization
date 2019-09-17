@@ -13,6 +13,7 @@ import {
   ProjectService,
   TrainingService,
 } from 'swagger-client'
+import { DecodeTaskReference } from 'projects/swagger-client/src';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,6 +21,7 @@ import {
   styleUrls: ['./decoding.upload.component.less'],
 })
 export class DecodingUploadComponent implements OnInit {
+  private readonly _snackBarDuration = 3000;
   projectUuid: string;
   trainingVersion: number;
 
@@ -27,10 +29,11 @@ export class DecodingUploadComponent implements OnInit {
   training$:Observable<Training>;
   audios$:Observable<Array<Audio>>;
 
-  currentAudios:Audio[];
+  currentAudios:Array<Audio>;
   allAudios:MatTableDataSource<Audio>;
+  currentDecodeTasks: Array<DecodeTaskReference>;
 
-  displayedColumns:string[] = ['select', 'name'];
+  displayedColumns:Array<string> = ['select', 'name'];
 
   public historySelection = new SelectionModel<Audio>(true, []);
 
@@ -44,6 +47,7 @@ export class DecodingUploadComponent implements OnInit {
 
   ngOnInit() {
     this.currentAudios = [];
+    this.currentDecodeTasks = [];
 
     this.projectUuid = this.route.snapshot.paramMap.get('uuid');
     this.trainingVersion =  +this.route.snapshot.paramMap.get('id');
@@ -51,12 +55,11 @@ export class DecodingUploadComponent implements OnInit {
     // init obeservables
     this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
-    this.audios$ = new Observable<Array<Audio>>(); //this.decodeService.getAllAudio();
+    this.audios$ = this.decodeService.getAllAudio();
 
-    // TODO: get audio files that are added to a decode
     this.audios$.subscribe(audios => {
-       this.currentAudios = [];
-       this.allAudios = new MatTableDataSource<Audio>();
+      console.log(audios);
+      this.allAudios = new MatTableDataSource<Audio>(audios);
     })
 
   }
@@ -88,12 +91,15 @@ export class DecodingUploadComponent implements OnInit {
   copyAudio() {
     this.historySelection.selected.forEach(audio => {
       this.currentAudios.push(audio);
-      this.snackBar.open("Kopiere Audio Datein in aktuelle Spracherkennung...", "", { duration: 3000 });
-      /*this.decodeService.assign_audio_to_training(
+      this.snackBar.open("Kopiere Audio Datein in aktuelle Spracherkennung...", "", { duration: this._snackBarDuration });
+      this.decodeService.assignAudioToTraining(
         this.projectUuid,
         this.trainingVersion,
         { audio_uuid: audio.uuid }
-      ).subscribe(this.currentAudios.push);*/
+      ).subscribe(decodeTask => {
+        this.currentDecodeTasks.push(decodeTask);
+        this.currentAudios.push(audio)
+      });
     });
   }
 
@@ -114,7 +120,7 @@ export class DecodingUploadComponent implements OnInit {
       }
     });
 
-    this.snackBar.open("Lösche Audio Datei von aktueller Spracherkennung...", "", { duration: 3000 });
+    this.snackBar.open("Lösche Audio Datei von aktueller Spracherkennung...", "", { duration: this._snackBarDuration });
   }
 
   playAudioData(audio) {
@@ -135,26 +141,39 @@ export class DecodingUploadComponent implements OnInit {
 
     this.decodeService.uploadAudio(blobFile)
       .subscribe(audio => {
-        /*
+
         this.currentAudios.push(audio);
         this.decodeService.assignAudioToTraining(
         this.projectUuid,
         this.trainingVersion,
         { audio_uuid: audio.uuid }
-      ).subscribe(this.currentAudios.push);*/
+      ).subscribe(decodeTask => {
+        this.currentDecodeTasks.push(decodeTask);
+        this.currentAudios.push(audio)
+      });
     });
 
-    this.snackBar.open("Lade Audio Datei hoch...", "", { duration: 3000 });
+    this.snackBar.open("Lade Audio Datei hoch...", "", { duration: this._snackBarDuration });
   }
 
   startDecode() {
-    /*this.decodeService.startDecode(
-      this.projectUuid,
-      this.trainingVersion,
-      { audio_uuid: "" }
-    ).subscribe(decode =>
-      this.snackBar.open("Starte Spracherkennung", "", { duration: 3000 }));
-      this.router.navigate(["/upload/training/overview/" + this.projectUuid + "/" + this.trainingVersion]);*/
+
+    if(this.currentDecodeTasks.length) {
+
+      /*this.currentDecodeTasks.forEach(decodeTask => {
+        this.decodeService.startDecode(
+          this.projectUuid,
+          this.trainingVersion,
+          decodeTask.decode_uuid,
+          { audio_uuid: }
+        ).subscribe(decode => {
+          this.snackBar.open("Starte Spracherkennung", "", { duration: this._snackBarDuration });
+          this.router.navigate(["/upload/training/overview/" + this.projectUuid + "/" + this.trainingVersion]);
+        });
+      })*/
+    } else {
+      this.snackBar.open("Es wurden keine Spracherkennungstask angelegt...", "", { duration: this._snackBarDuration });
+    }
   }
 
   reloadDecoding() {
