@@ -99,7 +99,7 @@ export class ProjectComponent implements OnInit {
     this.snackBar.open("Lade Training herunter...", "", { duration: 2000 });
     this.trainingService.downloadModelForTraining(
       this.projectUuid,
-      trainingVersion.toString(),
+      trainingVersion,
     ).subscribe(blob => {
       this.graphUrl = URL.createObjectURL(blob);
 

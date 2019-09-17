@@ -148,13 +148,13 @@ export class DecodingUploadComponent implements OnInit {
   }
 
   startDecode() {
-    this.decodeService.startDecode(
+    /*this.decodeService.startDecode(
       this.projectUuid,
       this.trainingVersion,
       { audio_uuid: "" }
     ).subscribe(decode =>
       this.snackBar.open("Starte Spracherkennung", "", { duration: 3000 }));
-      this.router.navigate(["/upload/training/overview/" + this.projectUuid + "/" + this.trainingVersion]);
+      this.router.navigate(["/upload/training/overview/" + this.projectUuid + "/" + this.trainingVersion]);*/
   }
 
   reloadDecoding() {
