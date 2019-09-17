@@ -50,7 +50,7 @@ def db_acousticModel_to_front(db_acousticModel):
 def db_user_to_front(db_user):
     return User(
         username=db_user.username,
-        user_email=db_user.user_email
+        email=db_user.user_email
     )
 
 def db_language_to_front(db_language):

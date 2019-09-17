@@ -7,10 +7,14 @@ from openapi_server.models.acoustic_model import AcousticModel
 from openapi_server.models.acoustic_model_type import AcousticModelType
 from openapi_server.models.audio import Audio
 from openapi_server.models.audio_reference_object import AudioReferenceObject
+from openapi_server.models.audio_reference_with_callback_object import AudioReferenceWithCallbackObject
 from openapi_server.models.audio_status import AudioStatus
 from openapi_server.models.binary_decode_object import BinaryDecodeObject
 from openapi_server.models.binary_resource_object import BinaryResourceObject
+from openapi_server.models.callback_method import CallbackMethod
+from openapi_server.models.callback_object import CallbackObject
 from openapi_server.models.create_project_object import CreateProjectObject
+from openapi_server.models.data_prep_stats import DataPrepStats
 from openapi_server.models.decode_message import DecodeMessage
 from openapi_server.models.decode_task_reference import DecodeTaskReference
 from openapi_server.models.language import Language

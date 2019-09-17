@@ -8,7 +8,6 @@ from six import BytesIO
 
 from openapi_server.models.audio import Audio  # noqa: E501
 from openapi_server.models.audio_reference_object import AudioReferenceObject  # noqa: E501
-from openapi_server.models.binary_resource_object import BinaryResourceObject  # noqa: E501
 from openapi_server.models.decode_message import DecodeMessage  # noqa: E501
 from openapi_server.models.decode_task_reference import DecodeTaskReference  # noqa: E501
 from openapi_server.test import BaseTestCase
@@ -134,6 +133,7 @@ class TestDecodeController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    @unittest.skip("multipart/form-data not supported by Connexion")
     def test_upload_audio(self):
         """Test case for upload_audio
 
@@ -141,12 +141,16 @@ class TestDecodeController(BaseTestCase):
         """
         headers = { 
             'Accept': 'application/json',
+            'Content-Type': 'multipart/form-data',
             'Authorization': 'Bearer special-key',
         }
+        data = dict(upfile=(BytesIO(b'some file data'), 'file.txt'))
         response = self.client.open(
             '/api/v1/audio',
             method='POST',
-            headers=headers)
+            headers=headers,
+            data=data,
+            content_type='multipart/form-data')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 

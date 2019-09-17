@@ -15,30 +15,30 @@ class User(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, username=None, user_email=None, password=None):  # noqa: E501
+    def __init__(self, username=None, email=None, password=None):  # noqa: E501
         """User - a model defined in OpenAPI
 
         :param username: The username of this User.  # noqa: E501
         :type username: str
-        :param user_email: The user_email of this User.  # noqa: E501
-        :type user_email: str
+        :param email: The email of this User.  # noqa: E501
+        :type email: str
         :param password: The password of this User.  # noqa: E501
         :type password: str
         """
         self.openapi_types = {
             'username': str,
-            'user_email': str,
+            'email': str,
             'password': str
         }
 
         self.attribute_map = {
             'username': 'username',
-            'user_email': 'user-email',
+            'email': 'email',
             'password': 'password'
         }
 
         self._username = username
-        self._user_email = user_email
+        self._email = email
         self._password = password
 
     @classmethod
@@ -76,25 +76,25 @@ class User(Model):
         self._username = username
 
     @property
-    def user_email(self):
-        """Gets the user_email of this User.
+    def email(self):
+        """Gets the email of this User.
 
 
-        :return: The user_email of this User.
+        :return: The email of this User.
         :rtype: str
         """
-        return self._user_email
+        return self._email
 
-    @user_email.setter
-    def user_email(self, user_email):
-        """Sets the user_email of this User.
+    @email.setter
+    def email(self, email):
+        """Sets the email of this User.
 
 
-        :param user_email: The user_email of this User.
-        :type user_email: str
+        :param email: The email of this User.
+        :type email: str
         """
 
-        self._user_email = user_email
+        self._email = email
 
     @property
     def password(self):
