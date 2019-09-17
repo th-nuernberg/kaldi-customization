@@ -48,9 +48,45 @@ def assign_audio_to_training(project_uuid, training_version, audio_reference_obj
 
     :rtype: DecodeTaskReference
     """
+    current_user = connexion.context['token_info']['user']
+
     if connexion.request.is_json:
         audio_reference_object = AudioReferenceObject.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+
+    # if user does not select file, browser also
+    # submit an empty part without filename
+    if audio_reference_object is None:
+        return ('Invalid input', 405)
+    
+    db_project = DB_Project.query.filter_by(uuid=project_uuid, owner_id=current_user.id).first()
+
+    if not db_project:
+        return ('Project not found', 404)
+
+    db_training = DB_Training.query.filter_by(
+        version=training_version, project=db_project).first()
+
+    if not db_training:
+        return ('Training not found', 404)
+
+    db_audioresource = DB_AudioResource.query.filter_by(uuid=audio_reference_object.audio_uuid).first()
+
+    db_decode = DB_Decoding(
+        training=db_training,
+        status=DB_DecodingStateEnum.Init,
+        audioresource_id=db_audioresource.id
+    )
+    db.session.add(db_decode)
+    db.session.commit()
+
+    print('Added database entry: ' + str(db_decode))
+
+    minio_file_path = str(db_audioresource.uuid)
+
+    db.session.add(db_decode)
+    db.session.commit()
+
+    return DecodeTaskReference(decode_uuid=db_decode.uuid)
 
 def delete_audio_by_uuid(audio_uuid):  # noqa: E501
     """Delete audio by UUID
@@ -203,15 +239,11 @@ def start_decode(project_uuid, training_version, decode_uuid, audio_reference_wi
     db_audioresource = DB_AudioResource.query.filter_by(uuid=audio_reference_with_callback_object.audio_uuid).first()
     # TODO check if file is ready for decoding
 
-    db_decode = DB_Decoding(
-        training=db_training,
-        status=DB_DecodingStateEnum.Init,
-        audioresource_id=db_audioresource.id
-    )
-    db.session.add(db_decode)
-    db.session.commit()
+    db_decode = DB_Decoding.query.filter_by(training_id=db_training.id,audioresource_id=db_audioresource.id).first()
+    
+    if(db_decode.status != DB_DecodingStateEnum.Init):
+        return ('Decoding already in progress or finishd',400)
 
-    print('Added database entry: ' + str(db_decode))
 
     minio_file_path = str(db_audioresource.uuid)
 

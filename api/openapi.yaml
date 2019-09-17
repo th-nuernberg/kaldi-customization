@@ -932,7 +932,7 @@ paths:
           description: Decoding successfully queued
         400:
           content: {}
-          description: Training not finished
+          description: Training not finished or decode in progress
         403:
           content: {}
           description: Forbidden

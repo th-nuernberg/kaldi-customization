@@ -120,7 +120,7 @@ if __name__ == "__main__":
     print(audio_file)
     a_ref = AudioReferenceObject(audio_uuid = audio_file.uuid)
     print('Start decoding:')
-
+    decode_api_instance.assign_audio_to_training(project.uuid,training.version, a_ref)
     decode_session = decode_api_instance.start_decode(project.uuid, training.version, audio_file.uuid, a_ref)
     print(decode_session)
 
