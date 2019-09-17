@@ -8,6 +8,7 @@ from six import BytesIO
 
 from openapi_server.models.audio import Audio  # noqa: E501
 from openapi_server.models.audio_reference_object import AudioReferenceObject  # noqa: E501
+from openapi_server.models.audio_reference_with_callback_object import AudioReferenceWithCallbackObject  # noqa: E501
 from openapi_server.models.decode_message import DecodeMessage  # noqa: E501
 from openapi_server.models.decode_task_reference import DecodeTaskReference  # noqa: E501
 from openapi_server.test import BaseTestCase
@@ -15,6 +16,28 @@ from openapi_server.test import BaseTestCase
 
 class TestDecodeController(BaseTestCase):
     """DecodeController integration test stubs"""
+
+    def test_assign_audio_to_training(self):
+        """Test case for assign_audio_to_training
+
+        Assign Audio to training
+        """
+        audio_reference_object = {
+  "audio_uuid" : "550e8400-e29b-11d4-a716-446655440000"
+}
+        headers = { 
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer special-key',
+        }
+        response = self.client.open(
+            '/api/v1/project/{project_uuid}/training/{training_version}/decode'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
+            method='POST',
+            headers=headers,
+            data=json.dumps(audio_reference_object),
+            content_type='application/json')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
 
     def test_delete_audio_by_uuid(self):
         """Test case for delete_audio_by_uuid
@@ -116,8 +139,9 @@ class TestDecodeController(BaseTestCase):
 
         Decode audio to text
         """
-        audio_reference_object = {
-  "audio_uuid" : "550e8400-e29b-11d4-a716-446655440000"
+        audio_reference_with_callback_object = {
+  "audio_uuid" : "550e8400-e29b-11d4-a716-446655440000",
+  "callback" : "https://my-ci.example.org/callback"
 }
         headers = { 
             'Accept': 'application/json',
@@ -125,10 +149,10 @@ class TestDecodeController(BaseTestCase):
             'Authorization': 'Bearer special-key',
         }
         response = self.client.open(
-            '/api/v1/project/{project_uuid}/training/{training_version}/decode'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
-            method='POST',
+            '/api/v1/project/{project_uuid}/training/{training_version}/decode/{decode_uuid}/enqueue'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56, decode_uuid=550e8400-e29b-11d4-a716-446655440000),
+            method='PUT',
             headers=headers,
-            data=json.dumps(audio_reference_object),
+            data=json.dumps(audio_reference_with_callback_object),
             content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))

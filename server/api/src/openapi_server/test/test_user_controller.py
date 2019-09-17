@@ -19,7 +19,7 @@ class TestUserController(BaseTestCase):
         Create user
         """
         user = {
-  "user-email" : "user-email",
+  "email" : "email",
   "password" : "password",
   "username" : "username"
 }
@@ -62,7 +62,7 @@ class TestUserController(BaseTestCase):
         }
         response = self.client.open(
             '/api/v1/user/login',
-            method='POST',
+            method='PUT',
             headers=headers,
             query_string=query_string)
         self.assert200(response,

@@ -93,6 +93,26 @@ if __name__ == "__main__":
     while training_instance.get_training_by_version(project.uuid, training.version).status != TrainingStatus.Trainable:
         time.sleep(5)
 
+    print("Start preparation:")
+    prepared_training = training_instance.prepare_training_by_version(
+        project.uuid, training.version)
+    print(prepared_training)
+
+    preparation_session = training_instance.get_training_by_version(
+        project.uuid, training.version)
+
+    last_status = preparation_session.status
+    print('Training status: ', last_status)
+
+    while last_status != TrainingStatus.Training_DataPrep_Success and last_status != TrainingStatus.Training_DataPrep_Failure:
+        if preparation_session.status != last_status:
+            last_status = preparation_session.status
+            print('Training status: ', last_status)
+    
+        time.sleep(5)
+        preparation_session = training_instance.get_training_by_version(
+            project.uuid, training.version)
+
     print('Start training:')
     started_training = training_instance.start_training_by_version(
         project.uuid, training.version)
