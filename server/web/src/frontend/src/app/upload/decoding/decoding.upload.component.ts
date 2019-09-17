@@ -163,8 +163,4 @@ export class DecodingUploadComponent implements OnInit {
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
     this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
   }
-
-  startDecode() {
-    // TODO
-  }
 }
