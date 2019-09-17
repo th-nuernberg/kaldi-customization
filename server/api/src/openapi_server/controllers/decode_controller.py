@@ -21,6 +21,7 @@ from werkzeug.utils import secure_filename
 
 from minio_communication import download_from_bucket, upload_to_bucket, minio_buckets
 from config import minio_client
+from flask import stream_with_context, Response
 
 TEMP_UPLOAD_FOLDER = '/tmp/fileupload'
 
@@ -98,7 +99,17 @@ def delete_audio_by_uuid(audio_uuid):  # noqa: E501
 
     :rtype: None
     """
-    return 'do some magic!'
+    audioresource = DB_AudioResource.query.filter_by(uuid=audio_uuid).first()
+
+    if audioresource is None:
+        return("Audio not found",404)
+    
+    #delete all referenced decodings
+    DB_Decoding.query.filter_by(audioresource_id=audioresource.id).delete()
+    DB_AudioResource.query.filter_by(uuid=audio_uuid).delete()
+    db.session.commit()
+
+    return ('Success',200)
 
 def get_all_audio():  # noqa: E501
     """Returns a list of available audio
@@ -108,7 +119,11 @@ def get_all_audio():  # noqa: E501
 
     :rtype: List[Audio]
     """
-    return 'do some magic!'
+    audioresources = DB_AudioResource.query.all()
+    audiolist = list()
+    for ar in audioresources:
+        audiolist.append(mapper.db_audio_to_front(ar))
+    return audiolist
 
 
 def get_audio_by_uuid(audio_uuid):  # noqa: E501
@@ -121,7 +136,12 @@ def get_audio_by_uuid(audio_uuid):  # noqa: E501
 
     :rtype: Audio
     """
-    return 'do some magic!'
+    audioresource = DB_AudioResource.query.filter_by(uuid=audio_uuid).first()
+
+    if audioresource is None:
+        return("Audio not found",404)
+
+    return (mapper.db_audio_to_front(audioresource),200)
 
 
 def get_audio_data(audio_uuid):  # noqa: E501
@@ -134,7 +154,25 @@ def get_audio_data(audio_uuid):  # noqa: E501
 
     :rtype: file
     """
-    return 'do some magic!'
+    current_user = connexion.context['token_info']['user']
+
+    db_audio = DB_AudioResource.query.filter_by(uuid=audio_uuid).first()
+
+    if not db_audio:
+        return ("Audio not found", 404)
+
+    status, stream = download_from_bucket(minio_client,
+        bucket=minio_buckets["DECODING_BUCKET"],
+        filename=db_audio.uuid
+    )
+
+    if not status:  # means no success
+        print('audio {} in MinIO not found'.format(db_audio.uuid))
+        return ("File not found", 404)
+
+    response = Response(response=stream, content_type="audio/wav", direct_passthrough=True)
+    response.headers['Content-Disposition'] = 'attachment; filename={}'.format(db_audio.name)
+    return response
 
 
 def get_decode_result(project_uuid, training_version, decode_uuid):  # noqa: E501
@@ -256,7 +294,7 @@ def start_decode(project_uuid, training_version, decode_uuid, audio_reference_wi
 
     print('Created Decoding job: ' + str(db_decode))
 
-    return DecodeTaskReference(decode_uuid=db_decode.uuid)
+    return (DecodeTaskReference(decode_uuid=db_decode.uuid),202)
 
 def upload_audio(upfile):  # noqa: E501
     """Uploads audio
