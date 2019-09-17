@@ -41,7 +41,7 @@ def create_user(user=None):  # noqa: E501
         print("Failed to insert user into database: ", e)
         return ("Cannot create user", 400)
 
-    return User(username=db_user.username, email=db_user.user_email)
+    return (User(username=db_user.username, email=db_user.user_email),201)
 
 
 def get_user():  # noqa: E501

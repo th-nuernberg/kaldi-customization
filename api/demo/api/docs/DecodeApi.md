@@ -517,7 +517,7 @@ Name | Type | Description  | Notes
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **202** | Decoding successfully queued |  -  |
-**400** | Training not finished |  -  |
+**400** | Training not finished or decode in progress |  -  |
 **403** | Forbidden |  -  |
 **404** | Project or training not found |  -  |
 

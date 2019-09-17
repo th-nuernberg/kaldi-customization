@@ -1739,7 +1739,13 @@ components:
     TrainingStatus:
       enum:
       - 100
+      - 150
+      - 151
       - 200
+      - 205
+      - 206
+      - 207
+      - 208
       - 210
       - 220
       - 300
@@ -1747,7 +1753,13 @@ components:
       type: integer
       x-enum-varnames:
       - Init
+      - TextPrep_Pending
+      - TextPrep_Failure
       - Trainable
+      - Training_DataPrep_Pending
+      - Training_DataPrep_InProgress
+      - Training_DataPrep_Success
+      - Training_DataPrep_Failure
       - Training_Pending
       - Training_In_Progress
       - Training_Success

@@ -348,4 +348,4 @@ def upload_audio(upfile):  # noqa: E501
 
     print('Uploaded audio file to MinIO: ' + str(db_audioresource))
     print(mapper.db_audio_to_front(db_audioresource))
-    return mapper.db_audio_to_front(db_audioresource)
+    return (mapper.db_audio_to_front(db_audioresource),201)
