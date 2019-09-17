@@ -19,10 +19,9 @@ from 'swagger-client';
 })
 export class ProjectComponent implements OnInit {
   projectUuid: string;
-  training_version: number;
 
   training: Training;
-  decodings: DecodeMessage[];
+  currentDecodings: DecodeMessage[];
 
   project$: Observable<Project>;
   decodings$: Observable<DecodeMessage[]>;
@@ -39,18 +38,19 @@ export class ProjectComponent implements OnInit {
     ) { }
 
   ngOnInit() {
-    this.decodings = [];
+    this.currentDecodings = [];
     this.projectUuid = this.route.snapshot.paramMap.get('uuid');
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
     this.project$.subscribe(project => {
       if (project.trainings.length) {
         project.trainings.forEach(training => {
+          // TODO what about decodings$ observable solution
           this.decodeService.getDecodings(
             this.projectUuid,
             training.version)
             .subscribe(decodings => {
               //console.log("Decodings: " + decodings);
-              this.decodings.concat(decodings);
+              this.currentDecodings.concat(decodings);
             });
         });
       }
@@ -92,7 +92,7 @@ export class ProjectComponent implements OnInit {
   }
 
   createDecode(trainingVersion:number): void {
-    this.snackBar.open("Erstelle neues Decoding...", "", { duration: 2000 });
+    this.snackBar.open("Erstelle neue Spracherkennung...", "", { duration: 2000 });
     this.router.navigate(['/upload/decoding/' + this.projectUuid + "/" + trainingVersion]);
   }
 
