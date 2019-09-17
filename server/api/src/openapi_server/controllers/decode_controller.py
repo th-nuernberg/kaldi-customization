@@ -7,6 +7,7 @@ import datetime
 
 from openapi_server.models.audio import Audio  # noqa: E501
 from openapi_server.models.audio_reference_object import AudioReferenceObject  # noqa: E501
+from openapi_server.models.audio_reference_with_callback_object import AudioReferenceWithCallbackObject  # noqa: E501
 from openapi_server.models.binary_resource_object import BinaryResourceObject  # noqa: E501
 from openapi_server.models.decode_message import DecodeMessage  # noqa: E501
 from openapi_server.models.decode_task_reference import DecodeTaskReference  # noqa: E501
@@ -33,6 +34,23 @@ def get_filetype(filename):
     return None
 
 
+def assign_audio_to_training(project_uuid, training_version, audio_reference_object=None):  # noqa: E501
+    """Assign Audio to training
+
+    Assign audio to to be decoded in a specific training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+    :param audio_reference_object: Audio that needs to be decoded
+    :type audio_reference_object: dict | bytes
+
+    :rtype: DecodeTaskReference
+    """
+    if connexion.request.is_json:
+        audio_reference_object = AudioReferenceObject.from_dict(connexion.request.get_json())  # noqa: E501
+    return 'do some magic!'
 
 def delete_audio_by_uuid(audio_uuid):  # noqa: E501
     """Delete audio by UUID
@@ -143,31 +161,33 @@ def get_decodings(project_uuid, training_version):  # noqa: E501
     return decoding_list
 
 
-def start_decode(project_uuid, training_version, audio_reference_object=None):  # noqa: E501
+def start_decode(project_uuid, training_version, decode_uuid, audio_reference_with_callback_object=None):  # noqa: E501
     """Decode audio to text
 
-    Decode audio data to text using the trained project # noqa: E501
+    Decode audio data to text using the trained project and the given audio # noqa: E501
 
     :param project_uuid: UUID of the project
     :type project_uuid: 
     :param training_version: Training version of the project
     :type training_version: int
-    :param audio_file: Audio file for decoding
-    :type audio_file: str
+    :param decode_uuid: UUID of the decoding task
+    :type decode_uuid: 
+    :param audio_reference_with_callback_object: Audio that needs to be decoded
+    :type audio_reference_with_callback_object: dict | bytes
 
     :rtype: DecodeTaskReference
     """
     current_user = connexion.context['token_info']['user']
 
     if connexion.request.is_json:
-        audio_reference_object = AudioReferenceObject.from_dict(connexion.request.get_json())  # noqa: E501
-    
+        audio_reference_with_callback_object = AudioReferenceWithCallbackObject.from_dict(connexion.request.get_json())  # noqa: E501
+
     # if user does not select file, browser also
     # submit an empty part without filename
-    if audio_reference_object is None:
+    if audio_reference_with_callback_object is None:
         return ('Invalid input', 405)
 
-    print('Received new file for decode: ' + str(audio_reference_object))
+    print('Received new file for decode: ' + str(audio_reference_with_callback_object))
     
     db_project = DB_Project.query.filter_by(uuid=project_uuid, owner_id=current_user.id).first()
 
@@ -180,7 +200,7 @@ def start_decode(project_uuid, training_version, audio_reference_object=None):  
     if not db_training:
         return ('Training not found', 404)
 
-    db_audioresource = DB_AudioResource.query.filter_by(uuid=audio_reference_object.audio_uuid).first()
+    db_audioresource = DB_AudioResource.query.filter_by(uuid=audio_reference_with_callback_object.audio_uuid).first()
     # TODO check if file is ready for decoding
 
     db_decode = DB_Decoding(
@@ -192,10 +212,6 @@ def start_decode(project_uuid, training_version, audio_reference_object=None):  
     db.session.commit()
 
     print('Added database entry: ' + str(db_decode))
-
-    # cache file in local file system, then upload to MinIO
-    if not os.path.exists(TEMP_UPLOAD_FOLDER):
-        os.makedirs(TEMP_UPLOAD_FOLDER)
 
     minio_file_path = str(db_audioresource.uuid)
 
@@ -232,6 +248,10 @@ def upload_audio(upfile):  # noqa: E501
     )
     db.session.add(db_audioresource)
     db.session.commit()
+
+    # cache file in local file system, then upload to MinIO
+    if not os.path.exists(TEMP_UPLOAD_FOLDER):
+        os.makedirs(TEMP_UPLOAD_FOLDER)
 
     local_file_path = os.path.join(TEMP_UPLOAD_FOLDER, str(db_audioresource.uuid))
     upfile.save(local_file_path)

@@ -26,11 +26,11 @@ def create_user(user=None):  # noqa: E501
 
     # TODO: implement more intelligent checks for valid email addresses
     #       and secure passwords
-    if not user.username or not user.password or not user.user_email:
+    if not user.username or not user.password or not user.email:
         return ("Invalid username/password/email", 400)
 
     db_user = DB_User(username=user.username,
-                      user_email=user.user_email,
+                      user_email=user.email,
                       pw_hash=sha256_crypt.encrypt(user.password))
 
     db.session.add(db_user)
@@ -41,7 +41,7 @@ def create_user(user=None):  # noqa: E501
         print("Failed to insert user into database: ", e)
         return ("Cannot create user", 400)
 
-    return User(username=db_user.username, user_email=db_user.user_email)
+    return User(username=db_user.username, email=db_user.user_email)
 
 
 def get_user():  # noqa: E501
