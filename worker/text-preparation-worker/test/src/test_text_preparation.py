@@ -11,11 +11,11 @@ def test_text_prep(redis_client, minio_client):
     # Step 1: Create texts-in and texts-out bucket
     try:
         minio_client.make_bucket(minio_buckets["RESOURCE_BUCKET"])
+        minio_client.make_bucket(minio_buckets["LOG_BUCKET"])
     except (minio.error.BucketAlreadyOwnedByYou, minio.error.BucketAlreadyExists):
         pass
     except minio.ResponseError as e:
         raise e
-
 
     # Step 2: Upload needed files into the texts-in bucket
     upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], "1/source", "test-files/txt/kafkatxt")
