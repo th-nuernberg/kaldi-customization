@@ -68,13 +68,11 @@ export class ProjectComponent implements OnInit {
   }
 
   openTraining(trainingVersion:number, trainingStatus:TrainingStatus) {
-    const success = 300;
-    const failure = 320;
-    if(trainingStatus == success)
+    if(trainingStatus == TrainingStatus.Training_Success)
     {
       this.snackBar.open("Öffne Trainingsübersicht...", "", { duration: 2000 });
       this.router.navigate(['/upload/training/overview/' + this.projectUuid + "/" + trainingVersion]);
-    }else if (trainingStatus == failure) {
+    }else if (trainingStatus == TrainingStatus.Training_Failure) {
       this.trainingService.createTraining(this.projectUuid)
       .subscribe(training => {
         this.training = training;
@@ -94,9 +92,7 @@ export class ProjectComponent implements OnInit {
   }
 
   isDownloadTrainingDisabled(trainingStatus:TrainingStatus) {
-    let success = 300;
-
-    return trainingStatus != success;
+    return trainingStatus != TrainingStatus.Training_Success;
   }
 
   downloadTraining(trainingVersion:number) {
