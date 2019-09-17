@@ -86,7 +86,7 @@ See [localhost:8080/api/v1/ui](http://localhost:8080/api/v1/ui).
 | Project | GET | getProjectByUuid | True |
 | Training | POST | createTraining | True |
 | Training | GET | getTrainingByVersion | True |
-| Training | POST | startTrainingByVersion | True |
+| Training | PUT | startTrainingByVersion | True |
 | Training | GET | getCorpusOfTraining | True  |
 | Training | GET | downloadModelForTraining | True |
 | Training | POST | assignResourceToTraining | True |
@@ -97,13 +97,14 @@ See [localhost:8080/api/v1/ui](http://localhost:8080/api/v1/ui).
 | User | POST | createUser | True |
 | User | POST | loginUser | **False** |
 | User | POST | logoutUser | **False** |
-| Decode | GET | getAllAudio| **False** |
+| Decode | GET | getAllAudio| True |
 | Decode | POST | uploadAudio| True |
-| Decode | DELETE | deleteAudioByUuid | **False** |
-| Decode | GET | getAudioByUuid | **False** |
-| Decode | GET | getAudioData | **False** |
+| Decode | DELETE | deleteAudioByUuid | True |
+| Decode | GET | getAudioByUuid | True |
+| Decode | GET | getAudioData | True |
 | Decode | GET | getDecodings | True |
-| Decode | POST | startDecode | True |
+| Decode | POST | assignAudioToDecode | True |
+| Decode | PUT | startDecode | True |
 | Decode | GET | getDecodingResult | True |
 | Global | GET | getAcousticModels | True |
 | Global | GET | downloadAcousticModel | True |
