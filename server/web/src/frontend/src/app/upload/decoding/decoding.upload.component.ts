@@ -55,7 +55,6 @@ export class DecodingUploadComponent implements OnInit {
 
     // TODO: get audio files that are added to a decode
     this.audios$.subscribe(audios => {
-      console.log(audios);
        this.currentAudios = [];
        this.allAudios = new MatTableDataSource<Audio>();
     })
@@ -132,7 +131,6 @@ export class DecodingUploadComponent implements OnInit {
   }
 
   uploadAudio(file) {
-    console.log("Uploaded audio: " + file.files[0].name);
     const blobFile:Blob = file.files[0] as Blob;
 
     this.decodeService.uploadAudio(blobFile)

@@ -49,7 +49,6 @@ export class ProjectComponent implements OnInit {
             this.projectUuid,
             training.version)
             .subscribe(decodings => {
-              //console.log("Decodings: " + decodings);
               this.currentDecodings.concat(decodings);
             });
         });
@@ -61,7 +60,6 @@ export class ProjectComponent implements OnInit {
   createTraining() {
     this.trainingService.createTraining(this.projectUuid)
       .subscribe(training => {
-        console.log("Created Training: " + training.version);
         this.training = training;
         // opens training dialog
         this.snackBar.open("Erstelle neues Training...", "", { duration: 2000 });
@@ -72,7 +70,6 @@ export class ProjectComponent implements OnInit {
   openTraining(trainingVersion:number, trainingStatus:TrainingStatus) {
     const success = 300;
     const failure = 320;
-    console.log(trainingStatus);
     if(trainingStatus == success)
     {
       this.snackBar.open("Öffne Trainingsübersicht...", "", { duration: 2000 });

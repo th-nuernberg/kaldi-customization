@@ -15,7 +15,6 @@ export class TileComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    // console.log("Project: " + this.tileData.name + " TileData-Uuid: " + this.tileData.uuid);
     this.lastTraining = this.tileData.trainings[this.tileData.trainings.length-1];
   }
 

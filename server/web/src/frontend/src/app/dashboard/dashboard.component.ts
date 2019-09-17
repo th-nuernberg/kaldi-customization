@@ -62,7 +62,6 @@ export class DashboardComponent implements OnInit {
 
     const projectName = this.f.projectName.value;
     const acousticModelUuid = this.f.modelValue.value.uuid;
-    // console.log("Creates new project: " + projectName + " with uuid: " + acousticModelUuid);
     this.projectService.createProject(
       {
         name: projectName,
