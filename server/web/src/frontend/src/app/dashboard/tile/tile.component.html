@@ -1,22 +1,40 @@
 <mat-card class="tile">
-    <mat-card-title>Projekt {{tileData.name}}</mat-card-title>
-    <p>Akustisches Modell: {{tileData.acoustic_model.name}}</p>
-    <p>Basis-Projekt: {{tileData.parent}}</p>
-    <div *ngFor="let training of tileData.trainings">
-      <span>Trainingsversion: {{training.version}}:</span>
-      <span>Trainingsdatum: {{training.creation_timestamp}}:</span>
-      <span [ngClass]="{
-        'color-orange': training.status === '100',
-        'color-blue': training.status === '200',
-        'color-grey': training.status === '210',
-        'color-yellow': training.status === '220',
-        'color-green': training.status === '300',
-        'color-red': training.status === '320'}">
-        Status: {{training.status}}
-      </span>
-    </div>
-    <p>Erstellungsdatum: {{tileData.creation_timestamp}}</p>
+  <mat-card-header class="card-header">
+    <mat-card-title>Projekt: {{tileData.name}}</mat-card-title>
+  </mat-card-header>
+  <mat-card-content class="card-content">
+    <mat-list>
+      <mat-list-item>
+        <p>Akustisches Modell: {{tileData.acoustic_model.name}}</p>
+      </mat-list-item>
+      <mat-list-item>
+        <p>Basis-Projekt: {{tileData.parent}}</p>
+      </mat-list-item>
+      <mat-list-item>
+        <p>Trainingsversion: {{lastTraining?.version}}</p>
+      </mat-list-item>
+      <mat-list-item>
+        <p>Trainingsdatum: {{lastTraining?.creation_timestamp | date:"dd.MM.yyyy"}}</p>
+      </mat-list-item>
+      <mat-list-item>
+        <p [ngClass]="{
+          'color-orange': lastTraining?.status === '100',
+          'color-blue': lastTraining?.status === '200',
+          'color-grey': lastTraining?.status === '210',
+          'color-yellow': lastTraining?.status === '220',
+          'color-green': lastTraining?.status === '300',
+          'color-red': lastTraining?.status === '320'}">
+          Status: {{lastTrainingStatus}}
+        </p>
+      </mat-list-item>
+      <mat-list-item>
+        <p>Erstellungsdatum: {{ tileData.creation_timestamp | date:"dd.MM.yyyy" }}</p>
+      </mat-list-item>
+    </mat-list>
+  </mat-card-content>
+  <mat-card-actions>
     <button mat-stroked-button routerLink="/project/{{tileData.uuid}}" class="tileButton">
       <mat-icon aria-hidden="false">open_in_new</mat-icon>
     </button>
+  </mat-card-actions>
 </mat-card>

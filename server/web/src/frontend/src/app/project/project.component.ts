@@ -1,9 +1,9 @@
 import { Observable } from 'rxjs';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material';
 import {
+  TrainingStatus,
   TrainingService,
   Training,
   DecodeService,
@@ -12,14 +12,6 @@ import {
   ProjectService }
 from 'swagger-client';
 
-export interface TrainingsModel {
-  name: string;
-  fileResultName: string;
-  date: string;
-  link: string;
-  texte: string;
-}
-
 @Component({
   selector: 'app-project',
   templateUrl: './project.component.html',
@@ -27,18 +19,18 @@ export interface TrainingsModel {
 })
 export class ProjectComponent implements OnInit {
   projectUuid: string;
-  training_version: number;
 
   training: Training;
-  decodings: DecodeMessage[];
+  currentDecodings: DecodeMessage[];
 
   project$: Observable<Project>;
   decodings$: Observable<DecodeMessage[]>;
 
+  graphUrl;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    public dialog: MatDialog,
     public trainingService: TrainingService,
     public decodeService: DecodeService,
     public projectService: ProjectService,
@@ -46,18 +38,18 @@ export class ProjectComponent implements OnInit {
     ) { }
 
   ngOnInit() {
-    this.decodings = [];
+    this.currentDecodings = [];
     this.projectUuid = this.route.snapshot.paramMap.get('uuid');
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
     this.project$.subscribe(project => {
       if (project.trainings.length) {
         project.trainings.forEach(training => {
+          // TODO what about decodings$ observable solution
           this.decodeService.getDecodings(
             this.projectUuid,
             training.version)
             .subscribe(decodings => {
-              //console.log("Decodings: " + decodings);
-              this.decodings.concat(decodings);
+              this.currentDecodings.concat(decodings);
             });
         });
       }
@@ -68,68 +60,60 @@ export class ProjectComponent implements OnInit {
   createTraining() {
     this.trainingService.createTraining(this.projectUuid)
       .subscribe(training => {
-        console.log("Created Training: " + training.version);
         this.training = training;
         // opens training dialog
-        this.snackBar.open("Created training...", "", { duration: 2000 });
+        this.snackBar.open("Erstelle neues Training...", "", { duration: 2000 });
         this.router.navigate(['/upload/training/' + this.projectUuid + "/" + this.training.version]);
       });
   }
 
-  openTraining(trainingVersion:number) {
-    this.snackBar.open("Opened training...", "", { duration: 2000 });
-    this.router.navigate(['/upload/training/' + this.projectUuid + "/" + trainingVersion]);
+  openTraining(trainingVersion:number, trainingStatus:TrainingStatus) {
+    if(trainingStatus == TrainingStatus.Training_Success)
+    {
+      this.snackBar.open("Öffne Trainingsübersicht...", "", { duration: 2000 });
+      this.router.navigate(['/upload/training/overview/' + this.projectUuid + "/" + trainingVersion]);
+    }else if (trainingStatus == TrainingStatus.Training_Failure) {
+      this.trainingService.createTraining(this.projectUuid)
+      .subscribe(training => {
+        this.training = training;
+        // opens training dialog
+        this.snackBar.open("Erstelle neues Training...", "", { duration: 2000 });
+        this.router.navigate(['/upload/training/' + this.projectUuid + "/" + this.training.version]);
+      });
+    }else {
+      this.snackBar.open("Öffne Training...", "", { duration: 2000 });
+      this.router.navigate(['/upload/training/' + this.projectUuid + "/" + trainingVersion]);
+    }
   }
 
-  openModelOverviewDialog(trainingVersion:number): void {
-    const dialogRef = this.dialog.open(ModelOverviewDialog, {
-      width: '400px',
-      data: [this.project$, trainingVersion]
-    });
+  createDecode(trainingVersion:number): void {
+    this.snackBar.open("Erstelle neue Spracherkennung...", "", { duration: 2000 });
+    this.router.navigate(['/upload/decoding/' + this.projectUuid + "/" + trainingVersion]);
+  }
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-    });
+  isDownloadTrainingDisabled(trainingStatus:TrainingStatus) {
+    return trainingStatus != TrainingStatus.Training_Success;
   }
 
   downloadTraining(trainingVersion:number) {
-    this.snackBar.open("Download training...", "", { duration: 2000 });
-    this.trainingService.getTrainingByVersion(
+    this.snackBar.open("Lade Training herunter...", "", { duration: 2000 });
+    this.trainingService.downloadModelForTraining(
       this.projectUuid,
-      trainingVersion);
-    // TODO this.trainingService.downloadTraining(
-    //  this.projectUuid,
-    //  trainingVersion);
-  }
-}
+      trainingVersion,
+    ).subscribe(blob => {
+      this.graphUrl = URL.createObjectURL(blob);
 
-@Component({
-  selector: 'model.overview.dialog',
-  templateUrl: 'model.overview.dialog.html',
-})
-export class ModelOverviewDialog {
-
-  projectUuid: string;
-  trainingVersion: number;
-
-  constructor(
-    public router: Router,
-    public dialogRef: MatDialogRef<ModelOverviewDialog>,
-    public snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: [Observable<Project>, number]) {
-      this.trainingVersion = this.data[1];
-      this.data[0].subscribe(project => {
-        this.projectUuid = project.uuid;
-    }); 
-  }
-
-  onOkClick(): void {
-    this.dialogRef.close();
-  }
-
-  onDecodeClick(): void {
-    this.snackBar.open("Open decoding...", "", { duration: 2000 });
-    this.router.navigate(['/upload/decoding/' + this.projectUuid + "/" + this.trainingVersion]);
-    this.dialogRef.close();
+      // calls download dialog
+      let a = document.createElement('a');
+      a.href = this.graphUrl;
+      a.download = 'graphs.zip';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        // cleans up download dialog
+        URL.revokeObjectURL(this.graphUrl);
+        a.parentNode.removeChild(a);
+      }, 5000);
+    });
   }
 }

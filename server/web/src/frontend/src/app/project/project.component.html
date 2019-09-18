@@ -1,63 +1,63 @@
 <div class="page-header" fxLayout="row">
-  <h1>Projekt {{projectUuid}}</h1>
-  <mat-tab-group>
+  <ng-container
+    *ngIf="{
+      project: project$ | async } as overview;">
+  <h1>Projekt {{overview?.project?.name}}</h1>
+    <mat-tab-group>
       <mat-tab>
         <ng-template mat-tab-label>
           Trainings
         </ng-template>
-        <ng-container *ngIf="{
-                  project: project$ | async } as overview;">
-          <mat-list>
+          <mat-list class="list-content">
             <mat-list-item *ngFor='let training of overview?.project?.trainings'>
-              <mat-icon mat-list-icon>folder</mat-icon>
-              <h4 mat-line>Version:{{training.version}}</h4>
-              <p mat-line>Status: {{training.status}}</p>
+              <h4 matLine>Version: {{training.version}}</h4>
+              <p matLine>Status: {{training.status}}</p>
               <button
                 mat-flat-button
                 color="warn"
                 class="tabButton"
-                (click)="openTraining(training.version)">
-                  <mat-icon aria-hidden="false">open_in_new</mat-icon>
+                (click)="openTraining(training.version, training.status)">
+                  Öffnen
               </button>
               <button
                 mat-flat-button
                 color="accent"
                 class="tabButton"
-                (click)="openModelOverviewDialog(training.version)">
-                  <mat-icon aria-hidden="false">info</mat-icon>
+                (click)="createDecode(training.version)">
+                  Neue Spracherkennung
               </button>
               <button
                 mat-flat-button
                 color="primary"
                 class="tabButton"
+                [disabled]="isDownloadTrainingDisabled(training.status)"
                 (click)="downloadTraining(training.version)">
-                <mat-icon aria-hidden="false">font_download</mat-icon>
+                  Herunterladen
               </button>
               <mat-divider></mat-divider>
             </mat-list-item>
           </mat-list>
-        </ng-container>
       </mat-tab>
       <mat-tab>
         <ng-template mat-tab-label>
-          Decodings
+          Spracherkennungen
         </ng-template>
         <mat-list>
           <mat-list-item *ngFor='let decoding of decodings'>
-            <h4 mat-line>{{decoding.uuid}}</h4>
-            <p mat-line>{{decoding.transcripts}}</p>
+            <h4 matLine>{{decoding.uuid}}</h4>
+            <p matLine>{{decoding.transcripts}}</p>
             <button
               mat-flat-button
               color="warn"
               class="tabButton">
-              <mat-icon aria-hidden="false">info</mat-icon>
+                Info
             </button>
             <button
-                mat-flat-button
-                color="primary"
-                class="tabButton">
-                <mat-icon aria-hidden="false">font_download</mat-icon>
-              </button>
+              mat-flat-button
+              color="primary"
+              class="tabButton">
+                Herunterladen
+            </button>
             <mat-divider></mat-divider>
           </mat-list-item>
         </mat-list>
@@ -68,15 +68,16 @@
     class="tabGroupHeaderButton"
     color="primary"
     (click)="createTraining()">
-      <mat-icon aria-hidden="false">add</mat-icon>
+      Neues Training
     </button>
+  </ng-container>
 </div>
 
 <mat-sidenav-container fxFlexFill>
   <mat-sidenav color="primary" #sidenav fxLayout="row" mode="side" opened="true" position="start">
     <div fxLayout="column">
       <a mat-button routerLink="/">Home</a>
-      <a mat-button routerLink="/dashboard">Dashboard</a>
+      <a mat-button routerLink="/dashboard">Übersicht</a>
       <a mat-button routerLink="/account">Account</a>
     </div>
   </mat-sidenav>
