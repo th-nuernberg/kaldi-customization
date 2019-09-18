@@ -26,6 +26,12 @@ def test_data_prep_worker(redis_client, minio_client):
         pass
     except minio.ResponseError as e:
         raise e
+    try:
+        minio_client.make_bucket(minio_buckets["LOG_BUCKET"])
+    except (minio.error.BucketAlreadyOwnedByYou, minio.error.BucketAlreadyExists):
+        pass
+    except minio.ResponseError as e:
+        raise e
 
     # Step 2: Upload all needed files for the data-prep-worker
     # upload_to_bucket(minio_client, bucket, filename, file_path):

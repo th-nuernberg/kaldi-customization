@@ -23,6 +23,10 @@ def infinite_loop():
             print("Starting to process received data")
             task = DataPrepTask(**data)
 
+            log_file_handler = open("/log.txt", "w")
+            log_file_handler.write("Starting to process the received task \n")
+            log_file_handler.write("{}\n".format(task))
+
             status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.IN_PROGRESS,
                                             training_id=task.training_id, message="Task in progress"))
 
@@ -31,6 +35,7 @@ def infinite_loop():
 
             download_results = []
 
+            log_file_handler.write("Starting to download all needed files. \n")
             # Step 1: Download all files which were created by the Text-Preparation-Worker for this task.
             #         In addition to that, download the G2P-graph from the acoustic-bucket:
             # Download of the graph
@@ -49,32 +54,57 @@ def infinite_loop():
             # If any download did not finish --> Set task status to: Failure
             for download in download_results:
                 if not download[0]:
+                    log_file_handler.write("While the task was processed, the following error has occurred: \n")
+                    log_file_handler.write("############################################################### \n")
+                    log_file_handler.write("At least one download failed. Task failed!\n")
                     status_queue.submit(DataPrepStatus(
                         id=DataPrepStatusCode.FAILURE, training_id=task.training_id, message="Download failed"))
+            log_file_handler.write("All needed files were successfully downloaded. Processing continues \n")
 
+            log_file_handler.write("Starting to merge all downloaded corpus-files. \n")
             # Step 2: Merge all corpus-files into one final corpus and save the file locally
             corpus = merge_corpus_list(corpus_list)
+            log_file_handler.write("Successfully merged all corpus-files. Continuing by saving the merged corpus locally \n")
+
             save_txt_file("/data_prep_worker/out/corpus.txt", corpus)
+            log_file_handler.write("Successfully saved the merged corpus file \n")
 
             # Step 3: Create the lexicon file by using the combined corpus
+            log_file_handler.write("Processing continues. Next step is to create a unique word list \n")
             lexicon = create_unique_word_list(
                 "/data_prep_worker/out/corpus.txt")
+            log_file_handler.write("Successfully created the unique word list.\n")
+
+            log_file_handler.write("Saving the word list locally, before the processing continues. \n")
             save_txt_file("/data_prep_worker/out/final_word_list", lexicon)
+            log_file_handler.write("Successfully saved the word list. \n")
 
             # Step 4: Execute Phonetisaurus and create phones for the unique word
+            log_file_handler.write("Processing continues by executing the Phonetisaurus which will create the lexicon-file for the Kaldi-Framework. \n")
             execute_phonetisaurus()
-            print("Finished creating lexicon.txt")
+            log_file_handler.write("Successfully created the lexicon-file. \n")
+            print("Successfully created the lexicon-file")
 
             # Step 5: Upload lexicon which was retrieved by phonetisaurus-apply and its graph
-            # TODO: Check whether the upload is successfull
+            log_file_handler.write("Processing continues by uploading the created lexicon-file and merged corpus to their corresponding MinIO-bucket \n")
             upload_to_bucket(
                 minio_client, minio_buckets["TRAINING_BUCKET"], "{}/lexicon.txt".format(task.training_id), "/data_prep_worker/out/lexicon.txt")
             upload_to_bucket(
                 minio_client, minio_buckets["TRAINING_BUCKET"], "{}/corpus.txt".format(task.training_id), "/data_prep_worker/out/corpus.txt")
+            log_file_handler.write("Successfully uploaded lexicon.txt and corpus.txt \n")
 
             # Step 6: Delete all files which were downloaded or created for this task
             remove_local_files("/data_prep_worker/in/")
             remove_local_files("/data_prep_worker/out/")
+
+            #TODO: Create log results for failing tasks
+            log_file_handler.close()
+            upload_result = upload_to_bucket(minio_client, minio_buckets["LOG_BUCKET"], "data_preparation_worker/{}/{}".format(task.training_id, "log.txt"), "/log.txt")
+            if not upload_result[0]:
+                print("An error occurred during the upload of the logfile.")
+            print("Logfile was successfully uploaded")
+
+            #TODO: Create stats-files for the frontend
 
             # Step 7: Update status queue to: Successfull if this point is reached
             status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.SUCCESS,
