@@ -52,7 +52,7 @@ def process_file(file_type, resource_uuid, minio_client, log_file_handler):
         log_file_handler.write(existance_result_in[1] + "\n")
         return existance_result_in
 
-    log_file_handler.write("Requested bucket exists. Processing continues. \n")
+    log_file_handler.write("A request was send towards the MinIO-server to check whether the {} bucket exist. Response was positive. Processing continues. \n".format(minio_buckets["RESOURCE_BUCKET"]))
 
     # Step 2: Downloads the needed file which is located within the texts-in bucket
     download_result = download_from_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], resource_uuid + "/source", file_path)
@@ -79,10 +79,10 @@ def process_file(file_type, resource_uuid, minio_client, log_file_handler):
         elif file_type == "png" or file_type == "jpg":
             full_text = ocr_parser(file_path, log_file_handler)
         else:
-            log_file_handler.write("While processing the received task, the following error has occurred: \n")
+            log_file_handler.write("While trying to parse the downloaded file, the following error has occurred: \n")
             log_file_handler.write("###################################################################### \n")
             log_file_handler.write("The given file type is not supported. Task failed. \n")
-            return (False, "Given file type is not supported. Finishing processing")
+            return (False, "Given file type is not supported. Task failed")
 
         log_file_handler.write("Parsing of the file finished successfully. \n")
         log_file_handler.write("Starting to create the corpus file. \n")
@@ -121,13 +121,13 @@ def process_file(file_type, resource_uuid, minio_client, log_file_handler):
         log_file_handler.write(corpus_upload_result[1] + "\n")
         return corpus_upload_result
 
-    log_file_handler.write("Successfully uploaded the corpus file \n")
+    log_file_handler.write("Successfully uploaded the corpus file. Corpus is located within {} in the {} MinIO-bucket.\n".format(resource_uuid + "/corpus.txt", minio_buckets["RESOURCE_BUCKET"]))
 
     # Step 6: Remove local files
     remove_local_files(text_prep_input)
     remove_local_files(text_prep_output)
 
-    return (True, "Processing of data has finished successfully")
+    return (True, "The task was successfully processed.")
 
 
 def infinite_loop():
@@ -144,8 +144,9 @@ def infinite_loop():
             log_file_handler = open("/log.txt", "w")
 
 
-            print("Starting to process received data")
-            log_file_handler.write("Starting to process received data \n")
+            print("Starting to process the received task")
+            log_file_handler.write("Starting to process the received task. \n")
+            log_file_handler.write("{}\n".format(task))
 
             status_queue.submit(TextPrepStatus(
                 id=TextPrepStatusCode.IN_PROGRESS,
