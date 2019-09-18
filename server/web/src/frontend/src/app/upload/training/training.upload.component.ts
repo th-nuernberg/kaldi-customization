@@ -57,8 +57,6 @@ export class TrainingUploadComponent implements OnInit {
     this.projectUuid = this.route.snapshot.paramMap.get('uuid');
     this.trainingVersion =  +this.route.snapshot.paramMap.get('id');
 
-    //console.log("Project: " + this.projectUuid + " Trainingsversion: " + this.trainingVersion);
-
     // init obeservables
     this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
@@ -117,7 +115,6 @@ export class TrainingUploadComponent implements OnInit {
   copyResource() {
     this.historySelection.selected.forEach(resource => {
       this.currentTrainingResources.push(resource);
-      //console.log("Assgin resource: " + resource.uuid + "Name: " + resource.name + " to training: " + this.trainingVersion);
       this.trainingService.assignResourceToTraining(
         this.projectUuid,
         this.trainingVersion,
@@ -162,7 +159,6 @@ export class TrainingUploadComponent implements OnInit {
           this.trainingVersion,
           resource.uuid
         ).subscribe(r => {
-          //console.log("Removed resource: " + r.name + " from training: " + this.projectUuid);
           this.currentTrainingResources.splice(index, 1);
         });
       }
@@ -177,15 +173,12 @@ export class TrainingUploadComponent implements OnInit {
   }
 
   uploadResource(file) {
-    //console.log("Uploaded resource: " + file.files[0].name);
     const blobFile:Blob = file.files[0] as Blob;
 
     // creates resource and starts the TextPrepWorker to create the corupus
     this.resourceService.createResource(blobFile)
       .subscribe(resource => {
-        //console.log("Created Resource: " + resource.uuid);
         this.currentTrainingResources.push(resource);
-        //console.log("Assgin resource: " + resource.uuid + "Name: " + resource.name + " to training: " + this.trainingVersion);
         this.trainingService.assignResourceToTraining(
           this.projectUuid,
           this.trainingVersion,
@@ -197,8 +190,6 @@ export class TrainingUploadComponent implements OnInit {
   }
 
   reloadProject() {
-
-    //console.log("Reload values on next..");
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
     this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
 
@@ -210,19 +201,16 @@ export class TrainingUploadComponent implements OnInit {
 
   getResourceCorpusResult() {
     this.currentTrainingResources.forEach(resource => {
-      //console.log("Use resource to find corpus: " + resource.name);
       this.trainingService.getCorpusOfTrainingResource(
         this.projectUuid,
         this.trainingVersion,
         resource.uuid).subscribe(corpus => {
-          //console.log("Found corpus of: " + resource.name)
           this.currentTrainingResourcesWithCorupus.push([resource, corpus])
       });
     });
   }
 
   startTraining() {
-    //console.log("Start Training: " + this.trainingVersion + " of Project: " + this.projectUuid);
     this.trainingService.startTrainingByVersion(this.projectUuid, this.trainingVersion)
     .subscribe(training => {
       this.snackBar.open("Starte Training...", "", { duration: 3000 });

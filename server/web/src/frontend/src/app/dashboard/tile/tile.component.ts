@@ -1,22 +1,23 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnChanges } from '@angular/core';
 import { Project, Training } from 'swagger-client';
+import { StatusMapperService } from '../../_services';
 
 @Component({
   selector: 'app-tile',
   templateUrl: './tile.component.html',
   styleUrls: ['./tile.component.css']
 })
-export class TileComponent implements OnInit {
-  // TODO check for future details/data that is necessary for the dashboard tiles
+export class TileComponent implements OnInit, OnChanges {
   @Input() tileData: Project;
-
- lastTraining: Training;
+  lastTraining: Training;
+  lastTrainingStatus:string;
 
   constructor() { }
 
+  ngOnChanges() {
+    this.lastTrainingStatus = this.lastTraining ? StatusMapperService.convertTrainingStatus(this.lastTraining.status): "";
+  }
   ngOnInit() {
-    // console.log("Project: " + this.tileData.name + " TileData-Uuid: " + this.tileData.uuid);
     this.lastTraining = this.tileData.trainings[this.tileData.trainings.length-1];
   }
-
 }

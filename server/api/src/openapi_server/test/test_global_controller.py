@@ -14,6 +14,21 @@ from openapi_server.test import BaseTestCase
 class TestGlobalController(BaseTestCase):
     """GlobalController integration test stubs"""
 
+    def test_download_acoustic_model(self):
+        """Test case for download_acoustic_model
+
+        Returns the acoustic model
+        """
+        headers = { 
+            'Accept': 'application/zip',
+        }
+        response = self.client.open(
+            '/api/v1/global/acousticmodels/{acoustic_model_uuid}/model'.format(acoustic_model_uuid='acoustic_model_uuid_example'),
+            method='GET',
+            headers=headers)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     def test_get_acoustic_models(self):
         """Test case for get_acoustic_models
 

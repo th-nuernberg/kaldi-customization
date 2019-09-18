@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { DecodeService } from './api/decode.service';
 import { GlobalService } from './api/global.service';
+import { LoggingService } from './api/logging.service';
 import { ProjectService } from './api/project.service';
 import { ResourceService } from './api/resource.service';
 import { TrainingService } from './api/training.service';
@@ -17,6 +18,7 @@ import { UserService } from './api/user.service';
   providers: [
     DecodeService,
     GlobalService,
+    LoggingService,
     ProjectService,
     ResourceService,
     TrainingService,
