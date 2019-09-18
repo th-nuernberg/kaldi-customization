@@ -8,67 +8,70 @@
         <ng-template mat-tab-label>
           Trainings
         </ng-template>
-          <mat-list class="list-content">
-            <mat-list-item *ngFor='let training of overview?.project?.trainings'>
-              <h4 matLine>Version: {{training.version}}</h4>
-              <p matLine>Status: {{training.status}}</p>
+        <ng-container class="tabBody">
+          <mat-nav-list>
+            <a mat-list-item
+              class="listItemContainer"
+              *ngFor='let training of overview?.project?.trainings'
+              (click)="openTraining(training.version, training.status)">
+              <div class="matListTextContainer">
+                <p matLine class="textContainer">Version: {{training.version}}</p>
+                <p matLine class="textContainer">Status: {{training.status}}</p>
+              </div>
               <button
-                mat-flat-button
-                color="warn"
-                class="tabButton"
-                (click)="openTraining(training.version, training.status)">
-                  Öffnen
-              </button>
-              <button
-                mat-flat-button
-                color="accent"
-                class="tabButton"
+                mat-stroked-button
+                class="actionButton rightAlign"
                 (click)="createDecode(training.version)">
-                  Neue Spracherkennung
+                  <mat-icon>mic</mat-icon>
               </button>
               <button
-                mat-flat-button
-                color="primary"
-                class="tabButton"
+                mat-stroked-button
+                class="actionButton"
                 [disabled]="isDownloadTrainingDisabled(training.status)"
                 (click)="downloadTraining(training.version)">
-                  Herunterladen
+                  <mat-icon>get_app</mat-icon>
               </button>
               <mat-divider></mat-divider>
-            </mat-list-item>
-          </mat-list>
+            </a>
+          </mat-nav-list>
+        </ng-container>
       </mat-tab>
       <mat-tab>
         <ng-template mat-tab-label>
           Spracherkennungen
         </ng-template>
-        <mat-list>
-          <mat-list-item *ngFor='let decoding of decodings'>
-            <h4 matLine>{{decoding.uuid}}</h4>
-            <p matLine>{{decoding.transcripts}}</p>
-            <button
-              mat-flat-button
-              color="warn"
-              class="tabButton">
-                Info
-            </button>
-            <button
-              mat-flat-button
-              color="primary"
-              class="tabButton">
-                Herunterladen
-            </button>
-            <mat-divider></mat-divider>
-          </mat-list-item>
-        </mat-list>
+        <ng-container class="tabBody">
+          <mat-list>
+            <mat-list-item
+              class="listItemContainer"
+              *ngFor='let decoding of decodings'>
+              <div class="matListTextContainer">
+                <p matLine class="textContainer">{{decoding.uuid}}</p>
+                <p matLine class="textContainer">{{decoding.transcripts}}</p>
+              </div>
+              <button
+                mat-stroked-button
+                class="actionButton rightAlign">
+                  Info
+              </button>
+              <button
+                mat-stroked-button
+                class="actionButton">
+                  <mat-icon>get_app</mat-icon>
+              </button>
+              <mat-divider></mat-divider>
+            </mat-list-item>
+          </mat-list>
+        </ng-container>
       </mat-tab>
     </mat-tab-group>
     <button
-    mat-flat-button
-    class="tabGroupHeaderButton"
+    mat-raised-button
     color="primary"
+    class="tabGroupHeaderButton"
     (click)="createTraining()">
-      Neues Training
+      <mat-icon>add</mat-icon>
+      Training
     </button>
   </ng-container>
 </div>

@@ -1,14 +1,10 @@
-<!-- Upload overview-->
 <div style="height: calc(100vh - 56px);">
-  <div
-    flex
-    fxLayout="column"
-    fxLayoutAlgin="center center">
+  <div>
     <mat-horizontal-stepper
       labelPosition="bottom"
       #stepper>
         <mat-step
-          class="step-content">
+          class="trainingPage">
           <form>
             <ng-template matStepLabel>Füge Dateien hinzu</ng-template>
             <div fxLayout="center center">
@@ -16,7 +12,7 @@
                 <mat-card-content>
                   <div>
                     <h2>Dateien</h2>
-                    <table mat-table [dataSource]=allResources>
+                    <table mat-table [dataSource]=allResources class="mat-elevation-z8">
                       <!-- Checkbox Column -->
                       <ng-container matColumnDef="select">
                         <th mat-header-cell *matHeaderCellDef>
@@ -52,15 +48,7 @@
                           (click)="historySelection.toggle(row)">
                       </tr>
                     </table>
-                    <div>
-                      <button
-                        mat-flat-button
-                        color="accent"
-                        class="uploadFile_Button"
-                        (click)="copyResource()">
-                        Hinzufügen
-                      </button>
-
+                    <div class="uploadContainer">
                       <input
                         #file
                         accept=".html,.docx,.txt,.pdf,.png,.jpg"
@@ -69,9 +57,8 @@
                         type="file"
                         (change)="loadFile(file)" />
                       <button
-                        mat-flat-button
-                        color="primary"
-                        class="uploadFile_Button"
+                        mat-stroked-button
+                        class="uploadButton"
                         onclick="document.getElementById('fileInput').click()">
                         Hochladen
                       </button>
@@ -82,17 +69,17 @@
             </div>
             <div>
               <button
-                mat-flat-button
+                mat-raised-button
                 matStepperNext
-                class="uploadFile_Button"
                 color="primary"
+                class="uploadButton"
                 (click)="reloadProject()">Weiter</button>
             </div>
           </form>
         </mat-step>
 
         <mat-step
-          class="step-content">
+          class="trainingPage">
           <form>
             <ng-template matStepLabel>Überprüfe den Inhalt</ng-template>
             <div fxLayout="center center">
@@ -111,8 +98,8 @@
                     </mat-selection-list>
                     <button
                       mat-flat-button
-                      class="uploadFile_Button"
                       color="warn"
+                      class="uploadButton removeButtonColor"
                       (click)="remove(resources.selectedOptions.selected)">
                       Löschen
                     </button>
@@ -138,22 +125,21 @@
             </div>
             <div>
               <button
-                mat-flat-button
+                mat-stroked-button
                 matStepperPrevious
-                class="uploadFile_Button"
-                color="primary">Zurück</button>
+                class="uploadButton">Zurück</button>
               <button
-                mat-flat-button
+                mat-raised-button
+                color="primary"
                 matStepperNext
-                class="uploadFile_Button"
-                color="primary">Weiter</button>
+                class="uploadButton">Weiter</button>
             </div>
           </form>
         </mat-step>
 
         <mat-step
-          class="step-content">
-          <ng-template matStepLabel>Starte das Training</ng-template>
+          class="trainingPage">
+          <ng-template matStepLabel>Bereite das Training vor</ng-template>
           <div>
             <mat-card class="example-card">
               <mat-card-header>
@@ -169,7 +155,9 @@
                     <mat-list-item>
                       <p>Projekt: {{detail.project?.name}}</p>
                     </mat-list-item>
+                    <mat-list-item>
                       <p>Modell: {{detail.project?.acoustic_model.name}}</p>
+                    </mat-list-item>
                     <mat-list-item>
                       <p>Modelltyp: {{detail.project?.acoustic_model.model_type}}</p>
                     </mat-list-item>
@@ -201,15 +189,14 @@
           </div>
           <div>
             <button
-              mat-flat-button
+              mat-stroked-button
               matStepperPrevious
-              class="uploadFile_Button"
-              color="primary">Zurück</button>
+              class="uploadButton">Zurück</button>
               <button
-              mat-flat-button
-              class="uploadFile_Button"
+              mat-raised-button
               color="primary"
-              (click)="startTraining()">Starte Training</button>
+              class="uploadButton"
+              (click)="prepareTraining()">Training vorbereiten</button>
           </div>
         </mat-step>
     </mat-horizontal-stepper>

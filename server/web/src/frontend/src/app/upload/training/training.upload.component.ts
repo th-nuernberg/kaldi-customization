@@ -189,7 +189,9 @@ export class TrainingUploadComponent implements OnInit {
     this.snackBar.open("Lade neue Ressource hoch...", "", { duration: 3000 });
   }
 
-  reloadProject() {
+  async reloadProject() {
+    await this.copyResource();
+
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
     this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
 
@@ -210,7 +212,8 @@ export class TrainingUploadComponent implements OnInit {
     });
   }
 
-  startTraining() {
+  prepareTraining() {
+    // TODO: call prepareTraining api method => startTraining moves to Training Overview Page
     this.trainingService.startTrainingByVersion(this.projectUuid, this.trainingVersion)
     .subscribe(training => {
       this.snackBar.open("Starte Training...", "", { duration: 3000 });
