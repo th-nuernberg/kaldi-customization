@@ -63,7 +63,7 @@ Name | Type | Description  | Notes
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-**200** | successful operation |  -  |
+**201** | created successfully |  -  |
 **400** | bad request |  -  |
 **403** | Forbidden |  -  |
 

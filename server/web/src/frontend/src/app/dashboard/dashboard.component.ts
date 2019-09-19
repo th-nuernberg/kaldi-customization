@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material';
 import {
   ProjectService,
   Project,
@@ -24,7 +25,8 @@ export class DashboardComponent implements OnInit {
   constructor(
     private projectService: ProjectService,
      private globalService: GlobalService,
-     private formBuilder: FormBuilder,){
+     private formBuilder: FormBuilder,
+     private snackBar: MatSnackBar){
   }
 
   ngOnInit() {
@@ -51,16 +53,15 @@ export class DashboardComponent implements OnInit {
 
   // creates a new project with the passed project name and acoustic model uuid
   createProject() {
-
     this.createProjectSubmitted = true;
 
     // stop here if form is invalid
     if (this.createProjectForm.invalid) {
         return;
     }
+
     const projectName = this.f.projectName.value;
     const acousticModelUuid = this.f.modelValue.value.uuid;
-    console.log("Creates new project: " + projectName + " with uuid: " + acousticModelUuid);
     this.projectService.createProject(
       {
         name: projectName,
@@ -68,6 +69,7 @@ export class DashboardComponent implements OnInit {
       }
     )
     .subscribe(project => {
+      this.snackBar.open("Erstelle neues Projekt...", "", { duration: 3000 });
       this.gridProjectTiles.push(project);
       this.createProjectSubmitted = false;
       this.createProjectForm.reset();

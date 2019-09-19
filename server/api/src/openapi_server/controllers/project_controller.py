@@ -60,7 +60,7 @@ def create_project(create_project_object=None):  # noqa: E501
     db.session.add(db_proj)
     db.session.commit()
 
-    return mapper.db_project_to_front(db_proj)
+    return (mapper.db_project_to_front(db_proj),201)
 
 
 def get_project_by_uuid(project_uuid):  # noqa: E501

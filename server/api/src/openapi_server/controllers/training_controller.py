@@ -15,7 +15,7 @@ from models.resource import Resource as DB_Resource, ResourceStateEnum as DB_Res
 from models.training import Training as DB_Training, TrainingStateEnum as DB_TrainingStateEnum
 from models.training_resource import TrainingResource as DB_TrainingResource
 
-from redis_communication import create_dataprep_job
+from redis_communication import create_dataprep_job, create_kaldi_job
 from minio_communication import upload_to_bucket, download_from_bucket, minio_buckets, copy_object_in_bucket
 from config import minio_client
 
@@ -124,7 +124,7 @@ def create_training(project_uuid):  # noqa: E501
     db.session.add(db_training)
     db.session.commit()
 
-    return mapper.db_training_to_front(db_training)
+    return (mapper.db_training_to_front(db_training),201)
 
 
 def delete_assigned_resource_from_training(project_uuid, training_version, resource_uuid):  # noqa: E501
@@ -178,7 +178,7 @@ def download_model_for_training(project_uuid, training_version):  # noqa: E501
     :param project_uuid: UUID of project
     :type project_uuid: str
     :param training_version: Version of training
-    :type training_version: str
+    :type training_version: int
 
     :rtype: file
     """
@@ -314,6 +314,81 @@ def get_training_by_version(project_uuid, training_version):  # noqa: E501
 
     return mapper.db_training_to_front(db_training)
 
+def get_trainings_for_project(project_uuid):  # noqa: E501
+    """Lists all Trainings of a Project
+
+     # noqa: E501
+
+    :param project_uuid: Gets all trainings for a specific project
+    :type project_uuid: 
+
+    :rtype: List[Training]
+    """
+    db_project = DB_Project.query.filter_by(uuid=project_uuid).first()
+
+    if not db_project:
+        return ("Project not found",404)
+
+    db_trainings = DB_Training.query.filter_by(project_id=db_project.id).all()
+
+    traininglist = list()
+
+    for t in db_trainings:
+        traininglist.append(mapper.db_training_to_front(t))
+    return traininglist
+
+def prepare_training_by_version(project_uuid, training_version, callback_object=None):  # noqa: E501
+    """Start the specified training
+
+    Start the preparation process for the specified training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+    :param callback_object: Callback to be executed after the operation ended
+    :type callback_object: dict | bytes
+
+    :rtype: Training
+    """
+    try:
+        if connexion.request.is_json:
+            callback_object = CallbackObject.from_dict(connexion.request.get_json())  # noqa: E501
+    except:
+        callback_object = None
+    
+    current_user = connexion.context['token_info']['user']
+
+    db_project = DB_Project.query.filter_by(
+        uuid=project_uuid, owner_id=current_user.id).first()
+
+    if not db_project:
+        return ("Project not found",404)
+
+    db_training = DB_Training.query.filter_by(
+        version=training_version, project=db_project).first()
+
+    if not db_training:
+        return ("Training not found",404)
+
+    if db_training.status != DB_TrainingStateEnum.Trainable:
+        return ("training already done or pending", 400)
+
+    db_training.status = DB_TrainingStateEnum.Training_DataPrep_Pending
+    db_training_resources = DB_TrainingResource.query.filter(
+    DB_TrainingResource.training_id == db_training.id).all()
+
+    db.session.add(db_training)
+    db.session.commit()
+
+    create_dataprep_job(
+        acoustic_model_id=db_project.acoustic_model_id,
+        corpi=[r.id for r in db_training_resources],
+        training_id=db_training.id
+    )
+
+    return mapper.db_training_to_front(db_training)
+
 
 def set_corpus_of_training_resource(project_uuid, training_version, resource_uuid, body):  # noqa: E501
     """Set the corpus of the resource
@@ -372,7 +447,7 @@ def set_corpus_of_training_resource(project_uuid, training_version, resource_uui
     return ("Success", 200)
 
 
-def start_training_by_version(project_uuid, training_version):  # noqa: E501
+def start_training_by_version(project_uuid, training_version, callback_object=None):  # noqa: E501
     """Start the specified training
 
     Start the training process for the specified training # noqa: E501
@@ -381,30 +456,39 @@ def start_training_by_version(project_uuid, training_version):  # noqa: E501
     :type project_uuid: 
     :param training_version: Training version of the project
     :type training_version: int
+    :param callback_object: Callback to be executed after the operation ended
+    :type callback_object: dict | bytes
 
     :rtype: Training
     """
+    try:
+        if connexion.request.is_json:
+            callback_object = CallbackObject.from_dict(connexion.request.get_json())  # noqa: E501
+    except:
+        callback_object = None
+        
     current_user = connexion.context['token_info']['user']
 
     db_project = DB_Project.query.filter_by(
         uuid=project_uuid, owner_id=current_user.id).first()
+
+    if not db_project:
+        return ("Project not found",404)
+
     db_training = DB_Training.query.filter_by(
         version=training_version, project=db_project).first()
 
-    if db_training.status != DB_TrainingStateEnum.Trainable:
-        return ("training already done or pending", 400)
+    if not db_training:
+        return ("Training not found",404)
 
-    db_training.status = DB_TrainingStateEnum.Training_Pending
-    db_training_resources = DB_TrainingResource.query.filter(
-        DB_TrainingResource.training_id == db_training.id).all()
+    if db_training.status == DB_TrainingStateEnum.Training_DataPrep_Success:
+        db_training.status = DB_TrainingStateEnum.Training_Pending
+        db.session.add(db_training)
+        db.session.commit()
 
-    db.session.add(db_training)
-    db.session.commit()
-
-    create_dataprep_job(
-        acoustic_model_id=db_project.acoustic_model_id,
-        corpi=[r.id for r in db_training_resources],
-        training_id=db_training.id
-    )
-
-    return mapper.db_training_to_front(db_training)
+        create_kaldi_job(
+            training_id=db_training.id,
+            acoustic_model_id=db_training.project.acoustic_model_id)
+        return mapper.db_training_to_front(db_training)
+    else:
+        return (mapper.db_training_resource_to_front,400)    

@@ -6,7 +6,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**create_user**](UserApi.md#create_user) | **POST** /user | Create user
 [**get_user**](UserApi.md#get_user) | **GET** /user | Get current user
-[**login_user**](UserApi.md#login_user) | **POST** /user/login | Logs user into the system
+[**login_user**](UserApi.md#login_user) | **PUT** /user/login | Logs user into the system
 [**logout_user**](UserApi.md#logout_user) | **POST** /user/logout | Logs out current logged in user session
 
 
@@ -59,7 +59,7 @@ No authorization required
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-**200** | Successful operation |  -  |
+**201** | successfully created |  -  |
 **400** | Error at operation |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

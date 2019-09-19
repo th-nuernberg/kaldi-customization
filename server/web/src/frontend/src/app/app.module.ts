@@ -29,10 +29,11 @@ import {
 
 import { MatDialogModule } from '@angular/material/dialog';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ProjectComponent, ModelOverviewDialog } from './project/project.component';
+import { ProjectComponent } from './project/project.component';
 import { CoverComponent } from './cover/cover.component';
 import { DecodingUploadComponent } from './upload/decoding/decoding.upload.component';
 import { TrainingUploadComponent } from './upload/training/training.upload.component';
+import { TrainingOverviewComponent } from './upload/training/overview/training.overview.component';
 import { AccountComponent } from './account/account.component';
 import { ApiModule } from 'swagger-client';
 import { IdentityService } from '../identity.service';
@@ -48,9 +49,9 @@ import { LoginComponent } from './login/login.component';
     CoverComponent,
     DecodingUploadComponent,
     TrainingUploadComponent,
+    TrainingOverviewComponent,
     AccountComponent,
     TileComponent,
-    ModelOverviewDialog,
     LoginComponent
   ],
   imports: [
@@ -82,9 +83,7 @@ import { LoginComponent } from './login/login.component';
     MatSnackBarModule,
   ],
   providers: [],
-  entryComponents: [
-    ModelOverviewDialog
-  ],
+  entryComponents: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

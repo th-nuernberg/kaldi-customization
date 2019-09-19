@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   description: Kaldi Customization Server.
   title: Kaldi Customization Server
-  version: 1.0.2
+  version: 1.0.3
 servers:
 - url: http://localhost:8080/api/v1
 - url: https://localhost:8080/api/v1
@@ -19,6 +19,8 @@ tags:
   name: global
 - description: Operations about resources
   name: resource
+- description: Operations about logging and log-files
+  name: logging
 paths:
   /audio:
     get:
@@ -51,12 +53,12 @@ paths:
               $ref: '#/components/schemas/BinaryResourceObject'
         required: true
       responses:
-        200:
+        201:
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Audio'
-          description: List of resources
+          description: Created Resource
         403:
           content: {}
           description: Forbidden
@@ -261,12 +263,12 @@ paths:
         description: Project object that needs to be created
         required: true
       responses:
-        200:
+        201:
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Project'
-          description: successful operation
+          description: created successfully
         400:
           content: {}
           description: bad request
@@ -316,10 +318,10 @@ paths:
       - project
       x-openapi-router-controller: openapi_server.controllers.project_controller
   /project/{project_uuid}/training:
-    post:
-      operationId: create_training
+    get:
+      operationId: get_trainings_for_project
       parameters:
-      - description: Project object that needs to be trained
+      - description: Gets all trainings for a specific project
         explode: false
         in: path
         name: project_uuid
@@ -334,8 +336,42 @@ paths:
           content:
             application/json:
               schema:
+                items:
+                  $ref: '#/components/schemas/Training'
+                type: array
+          description: created successfully
+        403:
+          description: Forbidden
+        404:
+          content: {}
+          description: Project not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Lists all Trainings of a Project
+      tags:
+      - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+    post:
+      operationId: create_training
+      parameters:
+      - description: Project object that needs to be trained
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
                 $ref: '#/components/schemas/Training'
-          description: Successful operation
+          description: created successfully
         403:
           description: Forbidden
         404:
@@ -393,7 +429,8 @@ paths:
       tags:
       - training
       x-openapi-router-controller: openapi_server.controllers.training_controller
-    post:
+  /project/{project_uuid}/training/{training_version}/train:
+    put:
       description: Start the training process for the specified training
       operationId: start_training_by_version
       parameters:
@@ -415,6 +452,13 @@ paths:
         schema:
           type: integer
         style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackObject'
+        description: Callback to be executed after the operation ended
+        required: false
       responses:
         202:
           content:
@@ -439,6 +483,191 @@ paths:
       tags:
       - training
       x-openapi-router-controller: openapi_server.controllers.training_controller
+  /project/{project_uuid}/training/{training_version}/prepare:
+    put:
+      description: Start the preparation process for the specified training
+      operationId: prepare_training_by_version
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackObject'
+        description: Callback to be executed after the operation ended
+        required: false
+      responses:
+        202:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Training'
+          description: Preparation successfully queued
+        400:
+          content: {}
+          description: training already done or pending
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - read:projects
+        - train:projects
+      summary: Start the specified training
+      tags:
+      - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+  /project/{project_uuid}/training/{training_version}/prepare/log:
+    get:
+      description: Returns the log of a preparation
+      operationId: get_perparation_log
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                description: Log of the preparation
+                type: string
+          description: log as plain text
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Get Training Log
+      tags:
+      - logging
+      x-openapi-router-controller: openapi_server.controllers.logging_controller
+  /project/{project_uuid}/training/{training_version}/train/log:
+    get:
+      description: Returns the log of a training
+      operationId: get_training_log
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                description: Log of the training
+                type: string
+          description: log as plain text
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Get Training Log
+      tags:
+      - logging
+      x-openapi-router-controller: openapi_server.controllers.logging_controller
+  /project/{project_uuid}/training/{training_version}/stats:
+    get:
+      description: Returns the stats to be reviewed before training
+      operationId: get_training_stats
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataPrepStats'
+          description: Stats for this training
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Get Training Stats
+      tags:
+      - logging
+      x-openapi-router-controller: openapi_server.controllers.logging_controller
   /project/{project_uuid}/training/{training_version}/corpus:
     get:
       description: Returns the entire corpus of the specified training
@@ -546,9 +775,8 @@ paths:
       - decode
       x-openapi-router-controller: openapi_server.controllers.decode_controller
     post:
-      description: Decode audio data to text using the trained project and the given
-        audio
-      operationId: start_decode
+      description: Assign audio to to be decoded in a specific training
+      operationId: assign_audio_to_training
       parameters:
       - description: UUID of the project
         explode: false
@@ -576,15 +804,12 @@ paths:
         description: Audio that needs to be decoded
         required: true
       responses:
-        202:
+        201:
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DecodeTaskReference'
-          description: Decoding successfully queued
-        400:
-          content: {}
-          description: Training not finished
+          description: Audio successfully added to training
         403:
           content: {}
           description: Forbidden
@@ -594,7 +819,7 @@ paths:
       security:
       - oauth:
         - decode:projects
-      summary: Decode audio to text
+      summary: Assign Audio to training
       tags:
       - decode
       x-openapi-router-controller: openapi_server.controllers.decode_controller
@@ -657,6 +882,70 @@ paths:
       tags:
       - decode
       x-openapi-router-controller: openapi_server.controllers.decode_controller
+  /project/{project_uuid}/training/{training_version}/decode/{decode_uuid}/enqueue:
+    put:
+      description: Decode audio data to text using the trained project and the given
+        audio
+      operationId: start_decode
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: UUID of the decoding task
+        explode: false
+        in: path
+        name: decode_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AudioReferenceWithCallbackObject'
+        description: Audio that needs to be decoded
+        required: true
+      responses:
+        202:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecodeTaskReference'
+          description: Decoding successfully queued
+        400:
+          content: {}
+          description: Training not finished or decode in progress
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - decode:projects
+      summary: Decode audio to text
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
   /project/{project_uuid}/training/{training_version}/model:
     get:
       description: Returns the model of the specified training
@@ -676,7 +965,7 @@ paths:
         name: training_version
         required: true
         schema:
-          type: string
+          type: integer
         style: simple
       responses:
         200:
@@ -753,7 +1042,6 @@ paths:
       summary: Assign a resource to the training
       tags:
       - training
-      - resource
       x-openapi-router-controller: openapi_server.controllers.training_controller
   /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}:
     delete:
@@ -809,7 +1097,6 @@ paths:
       summary: Remove a resource from the training
       tags:
       - training
-      - resource
       x-openapi-router-controller: openapi_server.controllers.training_controller
   /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/corpus:
     get:
@@ -879,7 +1166,6 @@ paths:
       summary: Get the corpus of the resource
       tags:
       - training
-      - resource
       x-openapi-router-controller: openapi_server.controllers.training_controller
     put:
       description: Updates the corpus of the specified resource for this training
@@ -952,7 +1238,6 @@ paths:
       summary: Set the corpus of the resource
       tags:
       - training
-      - resource
       x-openapi-router-controller: openapi_server.controllers.training_controller
   /resource:
     get:
@@ -990,7 +1275,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Resource'
-          description: Upload successful
+          description: Upload successful and preparation queued
         403:
           content: {}
           description: Forbidden
@@ -1038,6 +1323,40 @@ paths:
       tags:
       - resource
       x-openapi-router-controller: openapi_server.controllers.resource_controller
+  /resource/{resource_uuid}/log:
+    get:
+      description: Returns the log of a resource
+      operationId: get_resource_log
+      parameters:
+      - description: UUID of resource to return
+        explode: false
+        in: path
+        name: resource_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                description: Log of the training
+                type: string
+          description: log as plain text
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Page not found
+      security:
+      - oauth:
+        - read:resources
+      summary: Find resource by UUID
+      tags:
+      - logging
+      x-openapi-router-controller: openapi_server.controllers.logging_controller
   /resource/{resource_uuid}/data:
     get:
       description: Returns the resource content
@@ -1124,9 +1443,9 @@ paths:
         description: Created user object
         required: true
       responses:
-        200:
+        201:
           content: {}
-          description: Successful operation
+          description: successfully created
         400:
           content: {}
           description: Error at operation
@@ -1135,7 +1454,7 @@ paths:
       - user
       x-openapi-router-controller: openapi_server.controllers.user_controller
   /user/login:
-    post:
+    put:
       operationId: login_user
       parameters:
       - description: The user name for login
@@ -1246,6 +1565,8 @@ components:
               confidence:
                 type: number
           type: array
+        audio:
+          $ref: '#/components/schemas/Audio'
       type: object
     Language:
       example:
@@ -1263,7 +1584,7 @@ components:
     Project:
       example:
         owner:
-          user-email: user-email
+          email: email
           password: password
           username: username
         parent: 550e8400-e29b-11d4-a716-446655440000
@@ -1407,10 +1728,24 @@ components:
       - pdf
       - png
       - jpg
+    CallbackMethod:
+      enum:
+      - 0
+      - 1
+      type: integer
+      x-enum-varnames:
+      - GET
+      - POST
     TrainingStatus:
       enum:
       - 100
+      - 150
+      - 151
       - 200
+      - 205
+      - 206
+      - 207
+      - 208
       - 210
       - 220
       - 300
@@ -1418,7 +1753,13 @@ components:
       type: integer
       x-enum-varnames:
       - Init
+      - TextPrep_Pending
+      - TextPrep_Failure
       - Trainable
+      - Training_DataPrep_Pending
+      - Training_DataPrep_InProgress
+      - Training_DataPrep_Success
+      - Training_DataPrep_Failure
       - Training_Pending
       - Training_In_Progress
       - Training_Success
@@ -1464,13 +1805,13 @@ components:
       type: object
     User:
       example:
-        user-email: user-email
+        email: email
         password: password
         username: username
       properties:
         username:
           type: string
-        user-email:
+        email:
           format: email
           type: string
         password:
@@ -1533,6 +1874,29 @@ components:
       required:
       - resource_uuid
       type: object
+    DataPrepStats:
+      example:
+        unique_words: 510
+        total_words_count: 7265
+        lines_count: 212
+        files_count: 3
+      properties:
+        unique_words_count:
+          description: The number of unique words
+          example: 510
+          type: integer
+        total_words_count:
+          description: The total number words
+          example: 7265
+          type: integer
+        lines_count:
+          description: The number of processed lines
+          example: 212
+          type: integer
+        files_count:
+          description: The number of processed files
+          example: 3
+          type: integer
     AudioReferenceObject:
       example:
         audio_uuid: 550e8400-e29b-11d4-a716-446655440000
@@ -1545,6 +1909,22 @@ components:
       required:
       - audio_uuid
       type: object
+    AudioReferenceWithCallbackObject:
+      example:
+        audio_uuid: 550e8400-e29b-11d4-a716-446655440000
+        callback: 'https://my-ci.example.org/callback'
+      properties:
+        audio_uuid:
+          description: UUID of the audio file
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        callback:
+          type: string
+          description: Callback URL when decoding finished
+      required:
+      - audio_uuid
+      type: object
     BinaryResourceObject:
       properties:
         upfile:
@@ -1554,12 +1934,17 @@ components:
       required:
       - upfile
       type: object
+    CallbackObject:
+      properties:
+        url:
+          description: The URL to be called 
+          type: string
+        method:
+          $ref: '#/components/schemas/CallbackMethod'
+      required:
+      - url
+      - method
   securitySchemes:
-    api_key:
-      in: header
-      name: api_key
-      type: apiKey
-      x-apikeyInfoFunc: openapi_server.controllers.security_controller_.info_from_api_key
     oauth:
       flows:
         password:

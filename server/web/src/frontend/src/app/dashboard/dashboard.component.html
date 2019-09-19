@@ -30,7 +30,7 @@
             </mat-option>
           </mat-select>
           <mat-error *ngIf="createProjectSubmitted && f.modelValue.errors">
-            <div *ngIf="f.modelValue.errors.required">Akustischs Modell wird benötigt</div>
+            <div *ngIf="f.modelValue.errors.required">Akustisches Modell wird benötigt</div>
           </mat-error>
         </mat-form-field>
 
@@ -38,8 +38,7 @@
           mat-raised-button
           color="primary"
           class="newProjectButton">
-            <mat-icon aria-hidden="false">add</mat-icon>
-             Projekt
+             Neues Projekt
         </button>
       </form>
     </mat-card>

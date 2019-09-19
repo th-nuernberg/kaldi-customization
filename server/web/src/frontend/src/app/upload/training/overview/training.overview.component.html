@@ -1,0 +1,50 @@
+<div>
+  <mat-card class="example-card">
+    <mat-card-content>
+      <ng-container *ngIf="{
+        project: project$ | async,
+        training: training$ | async } as detail;">
+        <h2>Status Training</h2>
+        <div>
+            <p>Projekt: {{detail.project?.name}}</p>
+            <p>Modell: {{detail.project?.acoustic_model.name}}</p>
+            <p>Modell: {{detail.project?.acoustic_model.model_type}}</p>
+        </div>
+        <div>
+          <p>Training: {{detail.training?.version}}</p>
+          <p>Erstellungszeit: {{detail.training?.creation_timestamp}}</p>
+          <p>Trainingsstatus: {{detail.training?.status}}</p>
+        </div>
+        <div>
+          <p>Anzahl der Dateien: TODO </p>
+          <p>Anzahl der Textzeilen: TODO </p>
+          <p>Anzahl der Wörter: TODO</p>
+          <p>Anzahl der eindeutigen Wörter: TODO</p>
+        </div>
+        <div>
+          <button
+            mat-flat-button
+            class="uploadFile_Button"
+            color="primary"
+            (click)="backToProjectOverview()">Zurück zur Projektübersicht</button>
+        </div>
+      </ng-container>
+    </mat-card-content>
+  </mat-card>
+</div>
+<div>
+  <mat-card class="example-card">
+    <mat-card-content>
+      <ng-container>
+        <h2>Eindeutige Wordliste</h2>
+        <div>
+          <textarea
+            matInput
+            placeholder="Hier stehen die eindeutigen Wörter des Trainings"
+            readonly=true>
+          </textarea>
+        </div>
+      </ng-container>
+    </mat-card-content>
+  </mat-card>
+</div>

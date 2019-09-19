@@ -19,7 +19,13 @@ class TrainingStatus(Model):
     allowed enum values
     """
     Init = "100"
+    TextPrep_Pending = "150"
+    TextPrep_Failure = "151"
     Trainable = "200"
+    Training_DataPrep_Pending = "205"
+    Training_DataPrep_InProgress = "206"
+    Training_DataPrep_Success = "207"
+    Training_DataPrep_Failure = "208"
     Training_Pending = "210"
     Training_In_Progress = "220"
     Training_Success = "300"

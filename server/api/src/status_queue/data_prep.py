@@ -30,12 +30,3 @@ def handle_data_prep_status(msg_data, db_session):
 
     db_session.add(db_training)
     db_session.commit()
-
-    if db_training.status == TrainingStateEnum.Training_DataPrep_Success:
-        db_training.status = TrainingStateEnum.Training_Pending
-        db_session.add(db_training)
-        db_session.commit()
-
-        create_kaldi_job(
-            training_id=db_training.id,
-            acoustic_model_id=db_training.project.acoustic_model_id)

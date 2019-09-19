@@ -142,7 +142,7 @@ def create_resource(upfile):  # noqa: E501
 
         print('Created TextPreparation job: ' + str(db_resource))
 
-    return mapper.db_resource_to_front(db_resource)
+    return (mapper.db_resource_to_front(db_resource),201)
 
 
 def get_resource():  # noqa: E501

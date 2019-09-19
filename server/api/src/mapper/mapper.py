@@ -50,7 +50,7 @@ def db_acousticModel_to_front(db_acousticModel):
 def db_user_to_front(db_user):
     return User(
         username=db_user.username,
-        user_email=db_user.user_email
+        email=db_user.user_email
     )
 
 def db_language_to_front(db_language):
@@ -128,14 +128,14 @@ def TrainingStateEnum_to_TrainingStatus(trainingState):
     return {
         100: TrainingStatus.Init,
         # text prep status missing
-        150: TrainingStatus.Init,
-        151: TrainingStatus.Init,
+        150: TrainingStatus.TextPrep_Pending,
+        151: TrainingStatus.TextPrep_Failure,
         200: TrainingStatus.Trainable,
         # data prep status missing
-        205: TrainingStatus.Init,
-        206: TrainingStatus.Init,
-        207: TrainingStatus.Init,
-        208: TrainingStatus.Init,
+        205: TrainingStatus.Training_DataPrep_Pending,
+        206: TrainingStatus.Training_DataPrep_InProgress,
+        207: TrainingStatus.Training_DataPrep_Success,
+        208: TrainingStatus.Training_DataPrep_Failure,
         210: TrainingStatus.Training_Pending,
         220: TrainingStatus.Training_In_Progress,
         300: TrainingStatus.Training_Success,
