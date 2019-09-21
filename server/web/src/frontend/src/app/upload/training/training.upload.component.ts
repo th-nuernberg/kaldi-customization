@@ -123,14 +123,6 @@ export class TrainingUploadComponent implements OnInit {
         this.trainingVersion,
         { resource_uuid: resource.uuid })
       .subscribe(this.currentTrainingResources.push);
-      this.trainingService.setCorpusOfTrainingResource(
-        this.projectUuid,
-        this.trainingVersion,
-        resource.uuid,
-        "body TODO"
-      ).subscribe(corpus => {
-        this.snackBar.open("Setze Korpus zur Ressource...", "", AppConstants.snackBarConfig);
-      });
     });
 
     this.snackBar.open("Kopiere Ressource in das aktuelle Training...", "", AppConstants.snackBarConfig);
