@@ -12,8 +12,9 @@ import {
   DecodeService,
   ProjectService,
   TrainingService,
+  DecodeTaskReference
 } from 'swagger-client'
-import { DecodeTaskReference } from 'projects/swagger-client/src';
+import AppConstants from  '../../app.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -90,7 +91,7 @@ export class DecodingUploadComponent implements OnInit {
   copyAudio() {
     this.historySelection.selected.forEach(audio => {
       this.currentAudios.push(audio);
-      this.snackBar.open("Kopiere Audio Datein in aktuelle Spracherkennung...", "", { duration: this._snackBarDuration });
+      this.snackBar.open("Kopiere Audio Datein in aktuelle Spracherkennung...", "", AppConstants.snackBarConfig);
       this.decodeService.assignAudioToTraining(
         this.projectUuid,
         this.trainingVersion,
@@ -119,7 +120,7 @@ export class DecodingUploadComponent implements OnInit {
       }
     });
 
-    this.snackBar.open("Lösche Audio Datei von aktueller Spracherkennung...", "", { duration: this._snackBarDuration });
+    this.snackBar.open("Lösche Audio Datei von aktueller Spracherkennung...", "", AppConstants.snackBarConfig);
   }
 
   playAudioData(audio) {
@@ -152,7 +153,7 @@ export class DecodingUploadComponent implements OnInit {
       });
     });
 
-    this.snackBar.open("Lade Audio Datei hoch...", "", { duration: this._snackBarDuration });
+    this.snackBar.open("Lade Audio Datei hoch...", "", AppConstants.snackBarConfig);
   }
 
   startDecode() {
@@ -166,7 +167,7 @@ export class DecodingUploadComponent implements OnInit {
           decodeTask.decode_uuid,
           { audio_uuid: }
         ).subscribe(decode => {
-          this.snackBar.open("Starte Spracherkennung", "", { duration: this._snackBarDuration });
+          this.snackBar.open("Starte Spracherkennung", "", AppConstants.snackBarConfig);
           this.router.navigate(["/upload/training/overview/" + this.projectUuid + "/" + this.trainingVersion]);
         });
       })*/

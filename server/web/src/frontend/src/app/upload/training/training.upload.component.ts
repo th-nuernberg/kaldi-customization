@@ -13,12 +13,15 @@ import {
   ResourceService,
   TrainingService,
 }
-from 'swagger-client'
+from 'swagger-client';
+import AppConstants from  '../../app.component';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './training.upload.component.html',
-  styleUrls: ['./training.upload.component.less'],
+  styleUrls: [
+    './training.upload.component.less',
+    ]
 })
 
 export class TrainingUploadComponent implements OnInit {
@@ -122,7 +125,7 @@ export class TrainingUploadComponent implements OnInit {
       .subscribe(this.currentTrainingResources.push);
     });
 
-    this.snackBar.open("Kopiere Ressource in das aktuelle Training...", "", { duration: 3000 });
+    this.snackBar.open("Kopiere Ressource in das aktuelle Training...", "", AppConstants.snackBarConfig);
   }
 
   onSelectionChange(ev, selectedResources) {
@@ -164,7 +167,7 @@ export class TrainingUploadComponent implements OnInit {
       }
     });
 
-    this.snackBar.open("Lösche Ressource vom aktuellen Training...", "", { duration: 3000 });
+    this.snackBar.open("Lösche Ressource vom aktuellen Training...", "", AppConstants.snackBarConfig);
   }
 
   // uploads file and show preview
@@ -186,7 +189,7 @@ export class TrainingUploadComponent implements OnInit {
         .subscribe(this.currentTrainingResources.push);
     });
 
-    this.snackBar.open("Lade neue Ressource hoch...", "", { duration: 3000 });
+    this.snackBar.open("Lade neue Ressource hoch...", "", AppConstants.snackBarConfig);
   }
 
   async reloadProject() {
@@ -216,7 +219,7 @@ export class TrainingUploadComponent implements OnInit {
     // TODO: call prepareTraining api method => startTraining moves to Training Overview Page
     this.trainingService.startTrainingByVersion(this.projectUuid, this.trainingVersion)
     .subscribe(training => {
-      this.snackBar.open("Starte Training...", "", { duration: 3000 });
+      this.snackBar.open("Starte Training...", "", AppConstants.snackBarConfig);
       this.router.navigate(["/upload/training/overview/" + this.projectUuid + "/" + this.trainingVersion]);
     });
   }

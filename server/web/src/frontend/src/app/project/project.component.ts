@@ -11,6 +11,7 @@ import {
   Project,
   ProjectService }
 from 'swagger-client';
+import AppConstants from  '../app.component';
 
 @Component({
   selector: 'app-project',
@@ -62,7 +63,7 @@ export class ProjectComponent implements OnInit {
       .subscribe(training => {
         this.training = training;
         // opens training dialog
-        this.snackBar.open("Erstelle neues Training...", "", { duration: 2000 });
+        this.snackBar.open("Erstelle neues Training...", "", AppConstants.snackBarConfig);
         this.router.navigate(['/upload/training/' + this.projectUuid + "/" + this.training.version]);
       });
   }
@@ -70,24 +71,24 @@ export class ProjectComponent implements OnInit {
   openTraining(trainingVersion:number, trainingStatus:TrainingStatus) {
     if(trainingStatus == TrainingStatus.Training_Success)
     {
-      this.snackBar.open("Öffne Trainingsübersicht...", "", { duration: 2000 });
+      this.snackBar.open("Öffne Trainingsübersicht...", "", AppConstants.snackBarConfig);
       this.router.navigate(['/upload/training/overview/' + this.projectUuid + "/" + trainingVersion]);
     }else if (trainingStatus == TrainingStatus.Training_Failure) {
       this.trainingService.createTraining(this.projectUuid)
       .subscribe(training => {
         this.training = training;
         // opens training dialog
-        this.snackBar.open("Erstelle neues Training...", "", { duration: 2000 });
+        this.snackBar.open("Erstelle neues Training...", "", AppConstants.snackBarConfig);
         this.router.navigate(['/upload/training/' + this.projectUuid + "/" + this.training.version]);
       });
     }else {
-      this.snackBar.open("Öffne Training...", "", { duration: 2000 });
+      this.snackBar.open("Öffne Training...", "", AppConstants.snackBarConfig);
       this.router.navigate(['/upload/training/' + this.projectUuid + "/" + trainingVersion]);
     }
   }
 
   createDecode(trainingVersion:number): void {
-    this.snackBar.open("Erstelle neue Spracherkennung...", "", { duration: 2000 });
+    this.snackBar.open("Erstelle neue Spracherkennung...", "", AppConstants.snackBarConfig);
     this.router.navigate(['/upload/decoding/' + this.projectUuid + "/" + trainingVersion]);
   }
 
@@ -96,7 +97,7 @@ export class ProjectComponent implements OnInit {
   }
 
   downloadTraining(trainingVersion:number) {
-    this.snackBar.open("Lade Training herunter...", "", { duration: 2000 });
+    this.snackBar.open("Lade Training herunter...", "", AppConstants.snackBarConfig);
     this.trainingService.downloadModelForTraining(
       this.projectUuid,
       trainingVersion,
