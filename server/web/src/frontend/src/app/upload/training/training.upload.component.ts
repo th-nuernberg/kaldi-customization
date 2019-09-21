@@ -123,11 +123,20 @@ export class TrainingUploadComponent implements OnInit {
         this.trainingVersion,
         { resource_uuid: resource.uuid })
       .subscribe(this.currentTrainingResources.push);
+      this.trainingService.setCorpusOfTrainingResource(
+        this.projectUuid,
+        this.trainingVersion,
+        resource.uuid,
+        "body TODO"
+      ).subscribe(corpus => {
+        this.snackBar.open("Setze Korpus zur Ressource...", "", AppConstants.snackBarConfig);
+      });
     });
 
     this.snackBar.open("Kopiere Ressource in das aktuelle Training...", "", AppConstants.snackBarConfig);
   }
 
+  // show the selected content of a corpus
   onSelectionChange(ev, selectedResources) {
     if(ev.option.selected === false) {
       this.showContentPreview = false;
@@ -175,9 +184,9 @@ export class TrainingUploadComponent implements OnInit {
     this.uploadResource(file);
   }
 
+  // uploads new resource and assigns to training
   uploadResource(file) {
     const blobFile:Blob = file.files[0] as Blob;
-
     // creates resource and starts the TextPrepWorker to create the corupus
     this.resourceService.createResource(blobFile)
       .subscribe(resource => {
@@ -192,8 +201,13 @@ export class TrainingUploadComponent implements OnInit {
     this.snackBar.open("Lade neue Ressource hoch...", "", AppConstants.snackBarConfig);
   }
 
-  async reloadProject() {
-    await this.copyResource();
+  // reloads project, copies existing resources to training or prepares training
+  async reloadProject(newResources:boolean=false) {
+    if(newResources) {
+      await this.copyResource();
+    } else {
+      await this.prepareTraining();
+    }
 
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
     this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
@@ -204,6 +218,7 @@ export class TrainingUploadComponent implements OnInit {
     });
   }
 
+  // gets the content of all assigned corpuses
   getResourceCorpusResult() {
     this.currentTrainingResources.forEach(resource => {
       this.trainingService.getCorpusOfTrainingResource(
@@ -215,8 +230,16 @@ export class TrainingUploadComponent implements OnInit {
     });
   }
 
+  // prepares training and executes the text preparation worker
   prepareTraining() {
-    // TODO: call prepareTraining api method => startTraining moves to Training Overview Page
+    this.trainingService.prepareTrainingByVersion(this.projectUuid, this.trainingVersion)
+      .subscribe(training => {
+        this.snackBar.open("Bereite Training vor...", "", AppConstants.snackBarConfig);
+      })
+  }
+
+  // starts the training
+  startTraining() {
     this.trainingService.startTrainingByVersion(this.projectUuid, this.trainingVersion)
     .subscribe(training => {
       this.snackBar.open("Starte Training...", "", AppConstants.snackBarConfig);
