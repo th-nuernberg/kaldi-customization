@@ -3,7 +3,8 @@
     *ngIf="{
       project: project$ | async } as overview;">
   <h1>Projekt {{overview?.project?.name}}</h1>
-    <mat-tab-group>
+    <mat-tab-group
+      class="projectMatTabGroupContainer">
       <mat-tab>
         <ng-template mat-tab-label>
           Trainings

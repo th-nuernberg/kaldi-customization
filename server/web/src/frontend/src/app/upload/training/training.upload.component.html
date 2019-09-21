@@ -4,11 +4,11 @@
       labelPosition="bottom"
       #stepper>
         <mat-step
-          class="trainingPage">
+          class="stepContainer">
           <form>
             <ng-template matStepLabel>Füge Dateien hinzu</ng-template>
             <div fxLayout="center center">
-              <mat-card class="example-card">
+              <mat-card class="cardContainer">
                 <mat-card-content>
                   <div>
                     <h2>Dateien</h2>
@@ -58,7 +58,7 @@
                         (change)="loadFile(file)" />
                       <button
                         mat-stroked-button
-                        class="uploadButton"
+                        class="uploadComponentButtonContainer"
                         onclick="document.getElementById('fileInput').click()">
                         Hochladen
                       </button>
@@ -72,18 +72,18 @@
                 mat-raised-button
                 matStepperNext
                 color="primary"
-                class="uploadButton"
+                class="uploadComponentButtonContainer"
                 (click)="reloadProject()">Weiter</button>
             </div>
           </form>
         </mat-step>
 
         <mat-step
-          class="trainingPage">
+          class="stepContainer">
           <form>
             <ng-template matStepLabel>Überprüfe den Inhalt</ng-template>
             <div fxLayout="center center">
-              <mat-card class="example-card">
+              <mat-card class="cardContainer">
                 <mat-card-content>
                   <div>
                     <h2>Aktuelles Modell</h2>
@@ -99,16 +99,16 @@
                     <button
                       mat-flat-button
                       color="warn"
-                      class="uploadButton removeButtonColor"
+                      class="uploadComponentButtonContainer removeButtonColor"
                       (click)="remove(resources.selectedOptions.selected)">
                       Löschen
                     </button>
                     <div>
                       <h4>Korpus:</h4>
                       <form
-                        class="text-content-form"
+                        class="formContainer"
                         *ngIf="showContentPreview">
-                        <mat-form-field class="text-content-full">
+                        <mat-form-field class="textAreaContainer">
                           <textarea
                             matInput
                             cdkTextareaAutosize
@@ -127,21 +127,21 @@
               <button
                 mat-stroked-button
                 matStepperPrevious
-                class="uploadButton">Zurück</button>
+                class="uploadComponentButtonContainer">Zurück</button>
               <button
                 mat-raised-button
                 color="primary"
                 matStepperNext
-                class="uploadButton">Weiter</button>
+                class="uploadComponentButtonContainer">Weiter</button>
             </div>
           </form>
         </mat-step>
 
         <mat-step
-          class="trainingPage">
+          class="stepContainer">
           <ng-template matStepLabel>Bereite das Training vor</ng-template>
           <div>
-            <mat-card class="example-card">
+            <mat-card class="cardContainer">
               <mat-card-header>
                 <mat-card-title>
                   Details
@@ -191,11 +191,11 @@
             <button
               mat-stroked-button
               matStepperPrevious
-              class="uploadButton">Zurück</button>
+              class="uploadComponentButtonContainer">Zurück</button>
               <button
               mat-raised-button
               color="primary"
-              class="uploadButton"
+              class="uploadComponentButtonContainer"
               (click)="prepareTraining()">Training vorbereiten</button>
           </div>
         </mat-step>

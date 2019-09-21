@@ -58,7 +58,6 @@ export class DecodingUploadComponent implements OnInit {
     this.audios$ = this.decodeService.getAllAudio();
 
     this.audios$.subscribe(audios => {
-      console.log(audios);
       this.allAudios = new MatTableDataSource<Audio>(audios);
     })
 

@@ -5,7 +5,7 @@ import { StatusMapperService } from '../../_services';
 @Component({
   selector: 'app-tile',
   templateUrl: './tile.component.html',
-  styleUrls: ['./tile.component.css']
+  styleUrls: ['../dashboard.component.less']
 })
 export class TileComponent implements OnInit, OnChanges {
   @Input() tileData: Project;

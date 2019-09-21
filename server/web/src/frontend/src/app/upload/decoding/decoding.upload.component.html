@@ -4,11 +4,11 @@
       labelPosition="bottom"
       #stepper>
       <mat-step
-        class="decodingPage">
+        class="stepContainer">
         <form>
           <ng-template matStepLabel>Füge Audio Dateien hinzu</ng-template>
           <div fxLayout="center center">
-            <mat-card class="example-card">
+            <mat-card class="cardContainer">
               <mat-card-content>
                 <div>
                   <h2>Audio Dateien</h2>
@@ -52,7 +52,7 @@
                         (change)="loadFile(file)" />
                       <button
                         mat-stroked-button
-                        class="uploadButton"
+                        class="uploadComponentButtonContainer"
                         onclick="document.getElementById('fileInput').click()">
                         Hochladen
                       </button>
@@ -65,7 +65,7 @@
               <button
                 mat-raised-button
                 matStepperNext
-                class="uploadButton"
+                class="uploadComponentButtonContainer"
                 color="primary"
                 (click)="reloadDecoding()">Weiter</button>
             </div>
@@ -73,11 +73,11 @@
       </mat-step>
 
 
-      <mat-step class="decodingPage">
+      <mat-step class="stepContainer">
         <form>
           <ng-template matStepLabel>Überprüfe Audio Dateien</ng-template>
           <div fxLayout="center center">
-            <mat-card class="example-card">
+            <mat-card class="cardContainer">
               <mat-card-content>
                 <h2>Audio Dateien</h2>
                 <!-- Current File panel -->
@@ -97,7 +97,7 @@
                   </mat-selection-list>
                   <button
                     mat-flat-button
-                    class="uploadButton"
+                    class="uploadComponentButtonContainer"
                     color="warn"
                     (click)="remove(resources.selectedOptions.selected)">
                     Löschen
@@ -110,11 +110,11 @@
             <button
               mat-stroked-button
               matStepperPrevious
-              class="uploadButton">Zurück</button>
+              class="uploadComponentButtonContainer">Zurück</button>
             <button
               mat-raised-button
               matStepperNext
-              class="uploadButton"
+              class="uploadComponentButtonContainer"
               color="primary">Weiter</button>
           </div>
         </form>
@@ -122,15 +122,15 @@
 
 
       <mat-step
-        class="decodingPage">
-        <ng-template matStepLabel>Starte Spracherkennung</ng-template>
+        class="stepContainer">
+        <ng-template matStepLabel>Start</ng-template>
         <ng-container
           *ngIf="{
             audios: audios$ | async,
             project: project$ | async,
             training: training$ | async } as overview;">
           <div fxLayout="center center">
-            <mat-card class="example-card">
+            <mat-card class="cardContainer">
               <mat-card-content>
                 <h2>Spracherkennung</h2>
                 <mat-list>
@@ -166,10 +166,10 @@
           <button
             mat-stroked-button
             matStepperPrevious
-            class="uploadButton">Zurück</button>
+            class="uploadComponentButtonContainer">Zurück</button>
           <button
             mat-raised-button
-            class="uploadButton"
+            class="uploadComponentButtonContainer"
             color="primary"
             (click)="startDecode()">Starte Spracherkennung</button>
         </div>
