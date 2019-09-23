@@ -24,7 +24,9 @@ import {
   MatTableModule,
   MatStepperModule,
   MatAutocompleteModule,
-  MatSnackBarModule
+  MatSnackBarModule,
+  MatExpansionModule,
+  MatTooltipModule
 } from '@angular/material';
 
 import { MatDialogModule } from '@angular/material/dialog';
@@ -83,6 +85,8 @@ import { SafePipe } from './safe.pipe';
     MatStepperModule,
     MatAutocompleteModule,
     MatSnackBarModule,
+    MatExpansionModule,
+    MatTooltipModule
   ],
   providers: [],
   entryComponents: [],

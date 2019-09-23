@@ -179,7 +179,7 @@ export class DecodingUploadComponent implements OnInit {
     this.decodeService.uploadAudio(blobFile)
       .subscribe(audio => {
 
-        this.currentAudios.push(audio);
+        //this.currentAudios.push(audio);
         this.decodeService.assignAudioToTraining(
         this.projectUuid,
         this.trainingVersion,

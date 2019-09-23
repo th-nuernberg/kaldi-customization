@@ -107,7 +107,7 @@
                     class="uploadComponentButtonContainer"
                     color="warn"
                     (click)="remove(resources.selectedOptions.selected)">
-                    Löschen
+                    <mat-icon>delete</mat-icon>
                   </button>
                 </div>
               </mat-card-content>
@@ -178,7 +178,7 @@
             mat-raised-button
             class="uploadComponentButtonContainer"
             color="primary"
-            (click)="startDecode()">Starte Spracherkennung</button>
+            (click)="startDecode()">Start</button>
         </div>
       </mat-step>
     </mat-horizontal-stepper>
