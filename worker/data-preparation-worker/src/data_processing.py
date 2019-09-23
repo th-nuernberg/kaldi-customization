@@ -39,34 +39,43 @@ def create_unique_word_list(file_path):
 
         all_words = text.split()
         unique_word_list = sorted(list(set(all_words)))
+        if "\xc2\xa0" in unique_word_list:
+            unique_word_list.remove("\xc2\xa0")
 
     return unique_word_list
 
 
-def merge_corpus_list(corpus_list):
+def merge_corpus_list(corpus_list, log_file_handler):
     '''
-    This function merges multiple corpuses into one file. In order to do so, the first corpus of 
+    This function merges multiple corpus-files into one file. In order to do so, the first corpus of 
     the list is extended with the remaining ones. 
 
-    One assumption for this function is, that it does not matter whether a sentence occurs 
-    multiple times. Every sentence is appended.
+    It does not matter whether a sentence occurs multiple times. Every sentence is appended.
 
-    The final corpus is locally saved and afterwards uploaded into the corresponding MinIO-Bucket
+    Input of this function: list of all corpus-files for this task
+    Output of this function: list of all sentences of all corpus-files --> merged corpus list
 
     Loading all files from: /data_prep_worker/in/
     Saving merged corpus into: /data_prep_worker/out/
     '''
     first_corpus = open(corpus_list[0], "r").read()
-    return_corpus_list = re.split("\n", first_corpus)    
+    return_corpus_list = re.split("\n", first_corpus)  
 
-    for corpus in range(1, len(corpus_list), 1):
-        second_corpus = open(corpus_list[corpus], "r").read()
-        second_corpus_list = re.split("\n", second_corpus)
+    if len(corpus_list) > 1:
+        print("Corpus list contains more than one element. Merge process is starting.")
+        log_file_handler.write("Corpus list contains more than one element. Merge process is starting. \n")
 
-        # Appends all sentences of the second corpus to the first one
-        for sentence in second_corpus_list:
-            return_corpus_list.append(sentence)
+        for corpus in range(1, len(corpus_list), 1):
+            second_corpus = open(corpus_list[corpus], "r").read()
+            second_corpus_list = re.split("\n", second_corpus)
 
+            # Appends all sentences of the second corpus to the first one
+            for sentence in second_corpus_list:
+                if sentence != " " or sentence != "":
+                    return_corpus_list.append(sentence)
+        return return_corpus_list
+    print("There is only one element within the given corpus list. Therefore no merge was needed.")
+    log_file_handler.write("There is only one element within the given corpus list. Therefore no merge was needed. \n")
     return return_corpus_list
 
 
