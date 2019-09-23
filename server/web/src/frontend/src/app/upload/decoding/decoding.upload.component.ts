@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatTableDataSource } from '@angular/material/table';
@@ -15,6 +15,7 @@ import {
   DecodeTaskReference
 } from 'swagger-client'
 import AppConstants from  '../../app.component';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-dashboard',
@@ -36,11 +37,18 @@ export class DecodingUploadComponent implements OnInit {
 
   displayedColumns:Array<string> = ['select', 'name'];
 
+  currentlyPlayingAudio? : {
+    audio: Audio,
+    data: string
+  } = null;
+  @ViewChild('audioPlayer') audioPlayer;
+
   public historySelection = new SelectionModel<Audio>(true, []);
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private sanitizer:DomSanitizer,
     private decodeService: DecodeService,
     private trainingService: TrainingService,
     private projectService: ProjectService,
@@ -62,6 +70,13 @@ export class DecodingUploadComponent implements OnInit {
       this.allAudios = new MatTableDataSource<Audio>(audios);
     })
 
+  }
+
+  audioData() {
+    if (!this.currentlyPlayingAudio)
+      return null;
+
+    return this.sanitizer.bypassSecurityTrustResourceUrl(this.currentlyPlayingAudio.data);
   }
 
 /** Whether the number of selected elements matches the total number of rows. */
@@ -90,7 +105,6 @@ export class DecodingUploadComponent implements OnInit {
   // copies selected history elements to current panel
   copyAudio() {
     this.historySelection.selected.forEach(audio => {
-      this.currentAudios.push(audio);
       this.snackBar.open("Kopiere Audio Datein in aktuelle Spracherkennung...", "", AppConstants.snackBarConfig);
       this.decodeService.assignAudioToTraining(
         this.projectUuid,
@@ -123,12 +137,35 @@ export class DecodingUploadComponent implements OnInit {
     this.snackBar.open("Lösche Audio Datei von aktueller Spracherkennung...", "", AppConstants.snackBarConfig);
   }
 
-  playAudioData(audio) {
-    let audioData:Blob;
-    this.decodeService.getAudioData(audio.uuid)
-      .subscribe(data => audioData = data);
+  triggerAudio(event, audio) {
+    event.stopPropagation();
 
-    return audioData;
+    if (this.isPlaying(audio)) {
+      this.currentlyPlayingAudio = null;
+    } else {
+      this.decodeService.getAudioData(audio.uuid)
+        .subscribe(data => {
+          const audioData = URL.createObjectURL(data);
+          if (this.currentlyPlayingAudio) {
+            URL.revokeObjectURL(this.currentlyPlayingAudio.data);
+          }
+
+          this.currentlyPlayingAudio = {
+            audio: audio,
+            data: audioData
+          };
+
+          setTimeout(() => this.audioPlayer.nativeElement.play(), 0);
+        });
+      }
+  }
+
+  stopAudio() {
+    this.currentlyPlayingAudio = null;
+  }
+
+  isPlaying(audio: Audio) {
+    return (this.currentlyPlayingAudio && this.currentlyPlayingAudio.audio.uuid == audio.uuid);
   }
 
   // uploads file and show preview

@@ -87,14 +87,21 @@
                     <mat-list-option
                       *ngFor='let audio of currentAudios'
                       [value]="audio">
-                      <p mat-line>{{audio.name}}</p>
-                      <audio controls>
-                        <source
-                          src="playAudioData(audio)"
-                          type="audio/wav">
-                      </audio>
+                      <p mat-line>
+                        <button
+                          mat-button
+                          color="{{ isPlaying(audio) ? 'accent' : 'primary' }}"
+                          (click)="triggerAudio($event, audio)">
+                          <mat-icon>{{ isPlaying(audio) ? 'pause_circle_outline' : 'play_circle_outline' }}</mat-icon>
+                        </button>
+                      {{audio.name}}</p>
                     </mat-list-option>
                   </mat-selection-list>
+                  <audio #audioPlayer
+                    [src]="currentlyPlayingAudio?.data | safe:'url'"
+                    type="audio/wav"
+                    (ended)="stopAudio()">
+                  </audio>
                   <button
                     mat-flat-button
                     class="uploadComponentButtonContainer"
