@@ -26,12 +26,12 @@ def test_text_prep(redis_client, minio_client):
         print("Received the following message via Status-Queue")
         print(msg)
         data_part = json.loads(msg['data'])
-        if data_part['id'] == 200:
-            count += 1
-        if count == 6:
-            print("All tasks finished successfully")
-            break
-    exit(0)
+        if data_part['id'] == 100:
+            exit(0)
+        elif data_part['id'] == 200:
+            exit(999)
+        else:
+            pass
 
 
 

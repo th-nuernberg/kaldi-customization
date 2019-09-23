@@ -24,6 +24,10 @@ def create_all_buckets(minio_client):
         minio_client.make_bucket("trainings")
     except Exception as e:
         pass
+    try:
+        minio_client.make_bucket("logs")
+    except Exception as e:
+        pass
 
 
 def upload_all_text_prep_files(minio_client):
@@ -193,7 +197,7 @@ if __name__ == "__main__":
     if return_value != 0:
         exit(return_value)
 
-    print("All necessary files were successfully uploaded")
+    print("All text-prep files were successfully uploaded")
     print("")
 
     # Step 4: Uploading all necessary files for kaldi-worker, decode-worker and data-prep-worker

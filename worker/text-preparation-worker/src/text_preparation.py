@@ -133,6 +133,7 @@ def process_file(file_type, resource_uuid, minio_client, log_file_handler):
 def infinite_loop():
     _, task_queue, status_queue, minio_client = parse_args('Text-Preparation-Worker Connector', task_queue='Text-Prep-Queue')
 
+
     for data in task_queue.listen():
         print("Received the following task from Text-Prep-Queue: ")
         print(data)
@@ -142,7 +143,6 @@ def infinite_loop():
             task = TextPrepTask(**data)
 
             log_file_handler = open("/log.txt", "w")
-
 
             print("Starting to process the received task")
             log_file_handler.write("Starting to process the received task. \n")

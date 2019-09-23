@@ -58,10 +58,14 @@ def test_text_prep(redis_client, minio_client):
         data_part = json.loads(msg['data'])
         if data_part['id'] == 200:
             count += 1
+        elif data_part['id'] == 10:
+            pass
+        elif data_part['id'] == 100:
+            print("At least one task failed")
+            exit(100)
         if count == 6:
             print("All tasks finished successfully")
-            break
-    exit(0)
+            exit(0)
 
 
 
