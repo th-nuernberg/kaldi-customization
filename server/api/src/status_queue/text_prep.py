@@ -44,7 +44,7 @@ def handle_text_prep_status(msg_data, db_session):
                 .filter(TrainingResource.training_id == db_training.id) \
                 .all()
             
-            #copy corpus to all affected trainings
+            # copy corpus to all affected trainings
             db_training_resource = db_session.query(TrainingResource) \
                                     .filter_by(training_id=db_training.id) \
                                     .filter_by(origin_id=db_resource.id) \
@@ -56,10 +56,14 @@ def handle_text_prep_status(msg_data, db_session):
                 new_bucket=minio_buckets["TRAINING_RESOURCE_BUCKET"],
                 new_file="{}/corpus.txt".format(db_training_resource.id))
 
+            # Update training status - is it trainable now?
             training_status = TrainingStateEnum.Trainable
             for db_resource in db_resources:
+                # resource preparation failed -> not trainable
                 if db_resource.status == ResourceStateEnum.TextPreparation_Failure:
                     training_status = TrainingStateEnum.Training_DataPrep_Failure
+
+                # resource preparation not finished yet -> not trainable
                 elif db_resource.status != ResourceStateEnum.TextPreparation_Success:
                     training_status = TrainingStateEnum.Training_DataPrep_Pending
 

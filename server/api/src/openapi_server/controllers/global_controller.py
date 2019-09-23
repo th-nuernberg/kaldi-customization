@@ -11,7 +11,7 @@ from models.language import Language as DB_Language
 from mapper import mapper
 from flask import stream_with_context, Response
 
-from minio_communication import upload_to_bucket, download_from_bucket, minio_buckets, copy_object_in_bucket
+from minio_communication import upload_to_bucket, download_from_bucket, minio_buckets
 from config import minio_client
 
 def download_acoustic_model(acoustic_model_uuid):  # noqa: E501

@@ -23,8 +23,6 @@ from models import Training as DB_Training
 from models import TrainingResource as DB_TrainingResource
 from models import TrainingStateEnum as DB_TrainingStateEnum
 
-from sqlalchemy import and_
-
 from werkzeug.utils import secure_filename
 from flask import stream_with_context, Response
 
@@ -34,24 +32,6 @@ from config import minio_client
 from mapper import mapper
 
 TEMP_UPLOAD_FOLDER = '/tmp/fileupload'
-
-
-def get_db_project_training(project_uuid, training_version):
-    """
-    Queries the database and returns the specified project / training.
-    Returns None if not found
-    """
-    current_user = connexion.context['token_info']['user']
-
-    db_proj = DB_Project.query.filter_by(
-        uuid=project_uuid, owner_id=current_user.id).first()
-    if db_proj is None:
-        return None, None
-
-    db_train = DB_Training.query.filter_by(
-        and_(project=db_proj, version=training_version))
-
-    return db_proj, db_train
 
 
 def get_filetype(filename):

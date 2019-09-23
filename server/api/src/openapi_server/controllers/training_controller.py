@@ -24,6 +24,25 @@ from mapper import mapper
 from flask import stream_with_context, Response
 
 
+def get_db_project_training(project_uuid, training_version):
+    """
+    Queries the database and returns the specified project / training.
+    Returns None if not found
+    """
+    current_user = connexion.context['token_info']['user']
+
+    db_proj = DB_Project.query.filter_by(
+        uuid=project_uuid, owner_id=current_user.id).first()
+    if db_proj is None:
+        return None, None
+
+    db_train = DB_Training.query.filter_by(
+        project=db_proj,
+        version=training_version).first()
+
+    return db_proj, db_train
+
+
 def assign_resource_to_training(project_uuid, training_version, resource_reference_object=None):  # noqa: E501
     """Assign a resource to the training
 
@@ -144,7 +163,7 @@ def delete_assigned_resource_from_training(project_uuid, training_version, resou
     current_user = connexion.context['token_info']['user']
 
     db_res = DB_Resource.query.filter_by(
-        uuid=resource_uuid, owner_id=current_user.id)
+        uuid=resource_uuid, owner_id=current_user.id).first()
     if db_res is None:
         return ("Resource not found", 404)
 
@@ -160,7 +179,8 @@ def delete_assigned_resource_from_training(project_uuid, training_version, resou
 
     # check if already assigned
     db_train_res = DB_TrainingResource.query.filter_by(
-        and_(training=db_train, origin=db_res))
+        training=db_train,
+        origin=db_res).first()
 
     if db_train_res is None:
         return ("Resource was not in training", 400)
@@ -283,6 +303,7 @@ def get_corpus_of_training_resource(project_uuid, training_version, resource_uui
     status, stream = download_from_bucket(
         minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "{}/corpus.txt".format(db_training_resource.id))
 
+    print(db_training_resource.id)
     return stream.read().decode('utf-8') if status else ""
 
 
@@ -432,18 +453,17 @@ def set_corpus_of_training_resource(project_uuid, training_version, resource_uui
     db_training_resource = DB_TrainingResource.query.filter_by(origin_id=db_resource.id) \
         .filter_by(training_id=db_training.id).first()
 
-    if db_resource is None:
+    if db_training_resource is None:
         return ("Resource not assigned to this Training", 404)
 
-    # target_path = os.path.join(TEMP_CORPUS_FOLDER, "{}".format("tmp.txt"))
-
-    with open(target_path, "wb") as f:
-        f.write(body)
+    f = tempfile.NamedTemporaryFile()
+    f.write(body)
+    f.flush()
 
     upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], str(
-        db_training_resource.id) + "/corpus.txt", target_path)
+        db_training_resource.id) + "/corpus.txt", f.name)
 
-    os.remove(target_path)
+    f.close()
     return ("Success", 200)
 
 
