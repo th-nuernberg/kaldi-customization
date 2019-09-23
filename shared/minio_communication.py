@@ -8,11 +8,14 @@ minio_buckets = dict(
 
     DECODING_BUCKET='decodings',
 
-    # acoustic models thfilenameat are trained by users
+    # pretrained acoustic models
     ACOUSTIC_MODELS_BUCKET='acoustic-models',
 
-    # projects
-    TRAINING_BUCKET='trainings'
+    # training bucket contains all files which are needed for the trainings
+    TRAINING_BUCKET='trainings',
+
+    # workers will upload all their logs into the log bucket
+    LOG_BUCKET='logs'
 )
 
 
