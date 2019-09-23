@@ -90,7 +90,7 @@ export class DecodingUploadComponent implements OnInit {
   // copies selected history elements to current panel
   copyAudio() {
     this.historySelection.selected.forEach(audio => {
-      this.currentAudios.push(audio);
+      //this.currentAudios.push(audio);
       this.snackBar.open("Kopiere Audio Datein in aktuelle Spracherkennung...", "", AppConstants.snackBarConfig);
       this.decodeService.assignAudioToTraining(
         this.projectUuid,
@@ -142,7 +142,7 @@ export class DecodingUploadComponent implements OnInit {
     this.decodeService.uploadAudio(blobFile)
       .subscribe(audio => {
 
-        this.currentAudios.push(audio);
+        //this.currentAudios.push(audio);
         this.decodeService.assignAudioToTraining(
         this.projectUuid,
         this.trainingVersion,

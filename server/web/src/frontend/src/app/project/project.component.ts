@@ -13,6 +13,44 @@ import {
 from 'swagger-client';
 import AppConstants from  '../app.component';
 
+const DUMMY_DECODES: DecodeMessage[] = [
+  {
+    uuid: "550e8400-e29b-11d4-a716-446655440000",
+    transcripts: [
+      new Object("und die mühsam am auch liegt auf die diesen klicken einem texten zu produzieren"),
+      new Object("und die mühsam am auch liegt auf die diesen klicken einem texten zu produzieren"),
+      new Object("und die mühsam am auch liegt auf die diesen klicken einem texten zu produzieren")
+    ],
+    audio: {
+      uuid: "550e8400-e29b-11d4-a716-446655440000",
+      name: "text.wav",
+      status: 300
+    }
+  },
+  {
+    uuid: "550e8400-e29b-11d4-a716-446655440000",
+    transcripts: [
+      new Object("und die mühsam am auch liegt auf die diesen klicken einem texten zu produzieren")
+    ],
+    audio: {
+      uuid: "550e8400-e29b-11d4-a716-446655440000",
+      name: "text2.wav",
+      status: 300
+    }
+  },
+  {
+    uuid: "550e8400-e29b-11d4-a716-446655440000",
+    transcripts: [
+      new Object("und die mühsam am auch liegt auf die diesen klicken einem texten zu produzieren")
+    ],
+    audio: {
+      uuid: "550e8400-e29b-11d4-a716-446655440000",
+      name: "text3.wav",
+      status: 300
+    }
+  },
+];
+
 @Component({
   selector: 'app-project',
   templateUrl: './project.component.html',
@@ -36,12 +74,14 @@ export class ProjectComponent implements OnInit {
     public decodeService: DecodeService,
     public projectService: ProjectService,
     private snackBar: MatSnackBar
-    ) { }
+    ) {}
 
   ngOnInit() {
-    this.currentDecodings = [];
+    this.currentDecodings = DUMMY_DECODES;
+
     this.projectUuid = this.route.snapshot.paramMap.get('uuid');
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
+
     this.project$.subscribe(project => {
       if (project.trainings.length) {
         project.trainings.forEach(training => {
@@ -50,8 +90,8 @@ export class ProjectComponent implements OnInit {
             this.projectUuid,
             training.version)
             .subscribe(decodings => {
-              this.currentDecodings.concat(decodings);
-            });
+              //this.currentDecodings.concat(decodings);
+          });
         });
       }
     });

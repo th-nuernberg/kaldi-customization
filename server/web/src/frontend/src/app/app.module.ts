@@ -24,7 +24,9 @@ import {
   MatTableModule,
   MatStepperModule,
   MatAutocompleteModule,
-  MatSnackBarModule
+  MatSnackBarModule,
+  MatExpansionModule,
+  MatTooltipModule
 } from '@angular/material';
 
 import { MatDialogModule } from '@angular/material/dialog';
@@ -81,6 +83,8 @@ import { LoginComponent } from './login/login.component';
     MatStepperModule,
     MatAutocompleteModule,
     MatSnackBarModule,
+    MatExpansionModule,
+    MatTooltipModule
   ],
   providers: [],
   entryComponents: [],
