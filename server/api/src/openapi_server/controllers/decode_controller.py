@@ -15,7 +15,7 @@ from openapi_server import util
 
 from mapper import mapper
 
-from models import db, Project as DB_Project, Training as DB_Training, Decoding as DB_Decoding, DecodingStateEnum as DB_DecodingStateEnum, AudioResource as DB_AudioResource, AudioStateEnum as DB_AudioStateEnum
+from models import db, Project as DB_Project, Training as DB_Training, Decoding as DB_Decoding, DecodingStateEnum as DB_DecodingStateEnum, AudioResource as db_audio_resource, AudioStateEnum as DB_AudioStateEnum
 
 from werkzeug.utils import secure_filename
 
@@ -31,7 +31,9 @@ def get_filetype(filename):
     Returns the filetype or None, if it cannot be processed by the text preperation worker.
     '''
     if '.' in filename:
-        return filename.rsplit('.', 1)[1].lower()
+        filetype = filename.rsplit('.', 1)[1].lower()
+        if filetype in ['wav']:
+            return filetype
     return None
 
 
@@ -47,7 +49,7 @@ def assign_audio_to_training(project_uuid, training_version, audio_reference_obj
     :param audio_reference_object: Audio that needs to be decoded
     :type audio_reference_object: dict | bytes
 
-    :rtype: DecodeTaskReference
+    :rtype: Decoding
     """
     current_user = connexion.context['token_info']['user']
 
@@ -70,24 +72,41 @@ def assign_audio_to_training(project_uuid, training_version, audio_reference_obj
     if not db_training:
         return ('Training not found', 404)
 
-    db_audioresource = DB_AudioResource.query.filter_by(uuid=audio_reference_object.audio_uuid).first()
+    db_audio_resource = db_audio_resource.query.filter_by(uuid=audio_reference_object.audio_uuid).first()
 
     db_decode = DB_Decoding(
+        uuid=db_audio_resource.uuid,
         training=db_training,
-        status=DB_DecodingStateEnum.Init,
-        audioresource_id=db_audioresource.id
+        status=DB_DecodingStateEnum.Assigned,
+        audioresource_id=db_audio_resource.id
     )
     db.session.add(db_decode)
     db.session.commit()
 
     print('Added database entry: ' + str(db_decode))
 
-    minio_file_path = str(db_audioresource.uuid)
-
     db.session.add(db_decode)
     db.session.commit()
 
     return DecodeTaskReference(decode_uuid=db_decode.uuid)
+
+
+def delete_assigned_audio_from_training(project_uuid, training_version, decode_uuid):  # noqa: E501
+    """Remove an audio resource from training
+
+    Removes the assigned audio resource from the training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+    :param decode_uuid: UUID of the resource
+    :type decode_uuid: 
+
+    :rtype: None
+    """
+    return 'do some magic!'
+
 
 def delete_audio_by_uuid(audio_uuid):  # noqa: E501
     """Delete audio by UUID
@@ -99,14 +118,14 @@ def delete_audio_by_uuid(audio_uuid):  # noqa: E501
 
     :rtype: None
     """
-    audioresource = DB_AudioResource.query.filter_by(uuid=audio_uuid).first()
+    audioresource = db_audio_resource.query.filter_by(uuid=audio_uuid).first()
 
     if audioresource is None:
         return("Audio not found",404)
     
     #delete all referenced decodings
     DB_Decoding.query.filter_by(audioresource_id=audioresource.id).delete()
-    DB_AudioResource.query.filter_by(uuid=audio_uuid).delete()
+    db_audio_resource.query.filter_by(uuid=audio_uuid).delete()
     db.session.commit()
 
     return ('Success',200)
@@ -119,7 +138,7 @@ def get_all_audio():  # noqa: E501
 
     :rtype: List[Audio]
     """
-    audioresources = DB_AudioResource.query.all()
+    audioresources = db_audio_resource.query.all()
     audiolist = list()
     for ar in audioresources:
         audiolist.append(mapper.db_audio_to_front(ar))
@@ -136,7 +155,7 @@ def get_audio_by_uuid(audio_uuid):  # noqa: E501
 
     :rtype: Audio
     """
-    audioresource = DB_AudioResource.query.filter_by(uuid=audio_uuid).first()
+    audioresource = db_audio_resource.query.filter_by(uuid=audio_uuid).first()
 
     if audioresource is None:
         return("Audio not found",404)
@@ -156,7 +175,7 @@ def get_audio_data(audio_uuid):  # noqa: E501
     """
     current_user = connexion.context['token_info']['user']
 
-    db_audio = DB_AudioResource.query.filter_by(uuid=audio_uuid).first()
+    db_audio = db_audio_resource.query.filter_by(uuid=audio_uuid).first()
 
     if not db_audio:
         return ("Audio not found", 404)
@@ -214,7 +233,7 @@ def get_decodings(project_uuid, training_version):  # noqa: E501
     :param training_version: Training version of the project
     :type training_version: int
 
-    :rtype: List[DecodeMessage]
+    :rtype: List[Decoding]
     """
     current_user = connexion.context['token_info']['user']
 
@@ -235,7 +254,7 @@ def get_decodings(project_uuid, training_version):  # noqa: E501
     return decoding_list
 
 
-def start_decode(project_uuid, training_version, decode_uuid, audio_reference_with_callback_object=None):  # noqa: E501
+def start_decode(project_uuid, training_version, decode_uuid, callback=None):  # noqa: E501
     """Decode audio to text
 
     Decode audio data to text using the trained project and the given audio # noqa: E501
@@ -246,15 +265,15 @@ def start_decode(project_uuid, training_version, decode_uuid, audio_reference_wi
     :type training_version: int
     :param decode_uuid: UUID of the decoding task
     :type decode_uuid: 
-    :param audio_reference_with_callback_object: Audio that needs to be decoded
-    :type audio_reference_with_callback_object: dict | bytes
+    :param callback: Callback to be executed after the operation ended
+    :type callback: dict | bytes
 
-    :rtype: DecodeTaskReference
+    :rtype: Decoding
     """
     current_user = connexion.context['token_info']['user']
 
     if connexion.request.is_json:
-        audio_reference_with_callback_object = AudioReferenceWithCallbackObject.from_dict(connexion.request.get_json())  # noqa: E501
+        callback = Callback.from_dict(connexion.request.get_json())  # noqa: E501
 
     # if user does not select file, browser also
     # submit an empty part without filename
@@ -274,27 +293,47 @@ def start_decode(project_uuid, training_version, decode_uuid, audio_reference_wi
     if not db_training:
         return ('Training not found', 404)
 
-    db_audioresource = DB_AudioResource.query.filter_by(uuid=audio_reference_with_callback_object.audio_uuid).first()
+    db_audio_resource = db_audio_resource.query.filter_by(uuid=decode_uuid).first()
     # TODO check if file is ready for decoding
 
-    db_decode = DB_Decoding.query.filter_by(training_id=db_training.id,audioresource_id=db_audioresource.id).first()
-    
-    if(db_decode.status != DB_DecodingStateEnum.Init):
+    db_decode = DB_Decoding.query.filter_by(training_id=db_training.id, audioresource_id=db_audio_resource.id).first()
+
+    if db_decode.status != DB_DecodingStateEnum.Assigned:
         return ('Decoding already in progress or finishd',400)
 
 
-    minio_file_path = str(db_audioresource.uuid)
+    minio_file_path = str(db_audio_resource.uuid)
 
     create_decode_job(decode_file=minio_file_path,
                         acoustic_model_id=db_project.acoustic_model_id, training_id=db_training.id, decode_uuid=db_decode.uuid)
 
-    db_decode.status = DB_DecodingStateEnum.Decoding_Pending
+    db_decode.status = DB_DecodingStateEnum.Decoding_Enqueued
     db.session.add(db_decode)
     db.session.commit()
 
     print('Created Decoding job: ' + str(db_decode))
 
     return (DecodeTaskReference(decode_uuid=db_decode.uuid),202)
+
+
+def start_decode_all(project_uuid, training_version, callback=None):  # noqa: E501
+    """Decode audio to text
+
+    Decode audio data to text using the trained project and the given audio # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+    :param callback: Callback to be executed after the operation ended
+    :type callback: dict | bytes
+
+    :rtype: None
+    """
+    if connexion.request.is_json:
+        callback = Callback.from_dict(connexion.request.get_json())  # noqa: E501
+    return 'do some magic!'
+
 
 def upload_audio(upfile):  # noqa: E501
     """Uploads audio
@@ -304,7 +343,7 @@ def upload_audio(upfile):  # noqa: E501
     :param upfile: File object that needs to be uploaded
     :type upfile: str
 
-    :rtype: List[Audio]
+    :rtype: Audio
     """
 
     filename = secure_filename(upfile.filename)
@@ -313,20 +352,20 @@ def upload_audio(upfile):  # noqa: E501
     if filetype is None:
         return ('Invalid input', 405)
 
-    db_audioresource = DB_AudioResource(
+    db_audio_resource = db_audio_resource(
         name=filename
     )
-    db.session.add(db_audioresource)
+    db.session.add(db_audio_resource)
     db.session.commit()
 
     # cache file in local file system, then upload to MinIO
     if not os.path.exists(TEMP_UPLOAD_FOLDER):
         os.makedirs(TEMP_UPLOAD_FOLDER)
 
-    local_file_path = os.path.join(TEMP_UPLOAD_FOLDER, str(db_audioresource.uuid))
+    local_file_path = os.path.join(TEMP_UPLOAD_FOLDER, str(db_audio_resource.uuid))
     upfile.save(local_file_path)
 
-    minio_file_path = str(db_audioresource.uuid)
+    minio_file_path = str(db_audio_resource.uuid)
 
     upload_result = upload_to_bucket(
         minio_client=minio_client,
@@ -339,13 +378,13 @@ def upload_audio(upfile):  # noqa: E501
 
     if upload_result[0]:
         # TODO WRONG STATUS UNTIL AUDIO PREP WORKFLOW EXISTS
-        db_audioresource.status = DB_AudioStateEnum.AudioPrep_Success
+        db_audio_resource.status = DB_AudioStateEnum.Decodable
     else:
-        db_audioresource.status = DB_AudioStateEnum.AudioPrep_Failure
+        db_audio_resource.status = DB_AudioStateEnum.AudioPrep_Failure
 
-    db.session.add(db_audioresource)
+    db.session.add(db_audio_resource)
     db.session.commit()
 
-    print('Uploaded audio file to MinIO: ' + str(db_audioresource))
-    print(mapper.db_audio_to_front(db_audioresource))
-    return mapper.db_audio_to_front(db_audioresource)
+    print('Uploaded audio file to MinIO: ' + str(db_audio_resource))
+    print(mapper.db_audio_to_front(db_audio_resource))
+    return mapper.db_audio_to_front(db_audio_resource)

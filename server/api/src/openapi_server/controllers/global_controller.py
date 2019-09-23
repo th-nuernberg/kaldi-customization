@@ -5,7 +5,7 @@ from openapi_server.models.acoustic_model import AcousticModel  # noqa: E501
 from openapi_server.models.language import Language  # noqa: E501
 from openapi_server import util
 
-from models.acousticmodel import AcousticModel as DB_AcousticModel
+from models.acoustic_model import AcousticModel as DB_AcousticModel
 from models.language import Language as DB_Language
 
 from mapper import mapper
@@ -51,8 +51,8 @@ def get_acoustic_models():  # noqa: E501
     :rtype: List[AcousticModel]
     """
 
-    db_acousticmodels = DB_AcousticModel.query.all()
-    return [ mapper.db_acousticModel_to_front(model) for model in db_acousticmodels ]
+    db_acoustic_models = DB_AcousticModel.query.all()
+    return [ mapper.db_acousticModel_to_front(model) for model in db_acoustic_models ]
 
 def get_languages():  # noqa: E501
     """Returns a list of available languages

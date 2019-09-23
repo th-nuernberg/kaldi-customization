@@ -18,11 +18,13 @@ class AudioStatus(Model):
     """
     allowed enum values
     """
-    Init = "100"
-    AudioPrep_Pending = "150"
-    AudioPrep_In_Progress = "200"
-    AudioPrep_Success = "300"
-    AudioPrep_Failure = "320"
+    Upload_InProgress = "100"
+    Upload_Failure = "190"
+    Preparable = "200"
+    AudioPrep_Enqueued = "210"
+    AudioPrep_InProgress = "220"
+    AudioPrep_Failure = "290"
+    Decodable = "300"
 
     def __init__(self):  # noqa: E501
         """AudioStatus - a model defined in OpenAPI

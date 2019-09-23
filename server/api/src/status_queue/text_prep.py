@@ -4,9 +4,9 @@ from minio_communication import copy_object_in_bucket, minio_buckets
 from config import minio_client
 
 text_prep_status_mapping = {
-    TextPrepStatusCode.IN_PROGRESS: ResourceStateEnum.TextPreparation_InProgress,
-    TextPrepStatusCode.SUCCESS: ResourceStateEnum.TextPreparation_Success,
-    TextPrepStatusCode.FAILURE: ResourceStateEnum.TextPreparation_Failure
+    TextPrepStatusCode.IN_PROGRESS: ResourceStateEnum.TextPrep_InProgress,
+    TextPrepStatusCode.FAILURE: ResourceStateEnum.TextPrep_Failure,
+    TextPrepStatusCode.SUCCESS: ResourceStateEnum.Trainable
 }
 
 
@@ -32,7 +32,7 @@ def handle_text_prep_status(msg_data, db_session):
 
     db_session.add(db_resource)
 
-    if db_resource.status == ResourceStateEnum.TextPreparation_Success:
+    if db_resource.status == ResourceStateEnum.Trainable:
         db_trainings = db_session.query(Training) \
             .join(TrainingResource, Training.id == TrainingResource.training_id) \
             .join(Resource, TrainingResource.origin_id == db_resource.id) \
@@ -58,10 +58,10 @@ def handle_text_prep_status(msg_data, db_session):
 
             training_status = TrainingStateEnum.Trainable
             for db_resource in db_resources:
-                if db_resource.status == ResourceStateEnum.TextPreparation_Failure:
-                    training_status = TrainingStateEnum.Training_DataPrep_Failure
-                elif db_resource.status != ResourceStateEnum.TextPreparation_Success:
-                    training_status = TrainingStateEnum.Training_DataPrep_Pending
+                if db_resource.status == ResourceStateEnum.TextPrep_Failure:
+                    training_status = TrainingStateEnum.TextPrep_Failure
+                elif db_resource.status != ResourceStateEnum.Trainable:
+                    training_status = TrainingStateEnum.TextPrep_InProgress
 
             db_training.status = training_status
             db_session.add(db_training)

@@ -28,6 +28,9 @@ class OAuth2AuthorizationCode(db.Model, OAuth2AuthorizationCodeMixin):
         db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'))
     user = db.relationship('User')
 
+    project_id = db.Column(
+        db.Integer, db.ForeignKey('projects.id', ondelete='CASCADE'), nullable=True)
+
 
 class OAuth2Token(db.Model, OAuth2TokenMixin):
     __tablename__ = 'oauth2_tokens'

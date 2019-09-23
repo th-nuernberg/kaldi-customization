@@ -6,8 +6,8 @@ import json
 
 decode_status_mapping = {
     DecodeStatusCode.IN_PROGRESS: DecodingStateEnum.Decoding_InProgress,
-    DecodeStatusCode.SUCCESS: DecodingStateEnum.Decoding_Success,
-    DecodeStatusCode.FAILURE: DecodingStateEnum.Decoding_Failure
+    DecodeStatusCode.FAILURE: DecodingStateEnum.Decoding_Failure,
+    DecodeStatusCode.SUCCESS: DecodingStateEnum.Decoded
 }
 
 
@@ -33,3 +33,5 @@ def handle_decode_status(msg_data, db_session):
 
     db_session.add(db_decoding)
     db_session.commit()
+
+    # TODO: handle callback

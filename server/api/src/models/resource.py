@@ -5,26 +5,28 @@ import json
 
 
 class ResourceStateEnum(enum.IntEnum):
-    Upload_InProgress = 0
-    Upload_Failure = 1
-    TextPreparation_Ready = 9
+    Upload_InProgress = 100
+    Upload_Failure = 190
 
-    TextPreparation_Pending = 10
-    TextPreparation_InProgress = 11
-    TextPreparation_Failure = 12
-    TextPreparation_Success = 13
+    Preparable = 200
+    TextPrep_Enqueued = 210
+    TextPrep_InProgress = 220
+    TextPrep_Failure = 230
+
+    Trainable = 300
 
     @staticmethod
     def status_to_string(status):
         return {
-            0: 'Upload_InProgress',
-            1: 'Upload_Failure',
-            9: 'TextPreparation_Ready',
+            100: 'Upload_InProgress',
+            190: 'Upload_Failure',
 
-            10: 'TextPreparation_Pending',
-            11: 'TextPreparation_InProgress',
-            12: 'TextPreparation_Failure',
-            13: 'TextPreparation_Success'
+            200: 'Preparable',
+            210: 'TextPrep_Enqueued',
+            220: 'TextPrep_InProgress',
+            290: 'TextPrep_Failure',
+
+            300: 'Trainable'
             }[status]
 
 
@@ -50,7 +52,7 @@ class Resource(db.Model):
     uuid = db.Column(db.String(36), name="uuid", primary_key=True, default=generate_uuid)
     upload_date = db.Column(db.DateTime(timezone=False), default=datetime.datetime.utcnow)
 
-    status = db.Column(db.Enum(ResourceStateEnum))
+    status = db.Column(db.Enum(ResourceStateEnum), default=ResourceStateEnum.Upload_InProgress)
     resource_type = db.Column(db.Enum(ResourceTypeEnum), nullable=True)
 
     owner_id = db.Column(db.Integer,db.ForeignKey("users.id"))
@@ -61,7 +63,7 @@ class Resource(db.Model):
 
     def has_error(self):
         return self.status == ResourceStateEnum.Upload_Failure \
-            or self.status == ResourceStateEnum.TextPreparation_Failure
+            or self.status == ResourceStateEnum.TextPrep_Failure
 
     def mimetype(self):
         return (

@@ -1,24 +1,19 @@
-import importlib
 import importlib.machinery
 importlib.machinery.SourceFileLoader('minio_communication','shared/minio_communication.py').load_module()
+
 from minio_communication import *
+
 importlib.machinery.SourceFileLoader('models','server/api/src/models/__init__.py').load_module()
 from models import *
 
 import minio
 import logging
 
-from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
-
-import datetime
-
-REDIS_PASSWORD="kalditproject"
 
 MINIO_ACCESS_KEY="AKIAIOSFODNN7EXAMPLE"
 MINIO_SECRET_KEY="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
 
-MYSQL_ROOT_PASSWORD="kalditproject"
 MYSQL_USER="api"
 MYSQL_PASSWORD="api-server-password"
 MYSQL_DATABASE="api"
@@ -26,7 +21,7 @@ MYSQL_DATABASE="api"
 
 minio_client = minio.Minio("localhost:9001",access_key=MINIO_ACCESS_KEY,secret_key=MINIO_SECRET_KEY,secure=False)
 
-app = Flask('__APP')
+app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://{}:{}@{}:{}/{}'.format(MYSQL_USER, MYSQL_PASSWORD, "127.0.0.1", 3307, MYSQL_DATABASE)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -49,23 +44,8 @@ with app.app_context():
     Voxforge_RNN = AcousticModel(name='Voxforge-RNN', language=german, model_type=ModelType.HMM_RNN)
     db.session.add(Voxforge_RNN)
 
-    user = User(username = "kaldi" , pw_hash="213123123", salt = "Ein Muffin")
-    db.session.add(user)
-
-    test_project = Project(name = "TestProject", uuid = "12345678901234567890123456789012", owner = user,acoustic_model = Voxforge_RNN)
-    db.session.add(test_project)
-
-    test_training = Training(project = test_project, version = 1, create_date = datetime.datetime.now(), status = TrainingStateEnum.Init)
-    db.session.add(test_project)
-    
     db.session.commit()
-
-    #commit generates ids, we need them later so safe them before closing the session
-    test_project_id = test_project.id
-    test_train_id = test_training.id
     db.session.close()
-
-    db.session.commit()
 
 '''Create buckets if they do not exist'''
 for bucket_name in minio_buckets.values():
@@ -94,10 +74,3 @@ upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfo
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/global_cmvn.stats"  , "initialization/acoustic-models/voxforge-rnn/extractor/global_cmvn.stats")
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/online_cmvn.conf"  , "initialization/acoustic-models/voxforge-rnn/extractor/online_cmvn.conf")
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/splice_opts"  , "initialization/acoustic-models/voxforge-rnn/extractor/splice_opts")
-
-# Test Project
-upload_to_bucket(minio_client,minio_buckets["TRAINING_BUCKET"], str(test_train_id) + "/corpus.txt"  , "initialization/example/corpus.txt")
-upload_to_bucket(minio_client,minio_buckets["TRAINING_BUCKET"], str(test_train_id) + "/lexicon.txt"  , "initialization/example/lexicon.txt")
-
-# Test Decode
-upload_to_bucket(minio_client,minio_buckets["DECODING_BUCKET"], "test.wav", "initialization/example/test.wav")

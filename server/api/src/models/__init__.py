@@ -1,12 +1,12 @@
 from ._db import db
 
-from .acousticmodel import *
+from .acoustic_model import *
+from .audio_resource import *
 from .auth import *
-from .training_resource import *
+from .decoding import *
 from .language import *
 from .project import *
 from .resource import *
-from .user import *
-from .decoding import *
 from .training import *
-from .audioresource import *
+from .training_resource import *
+from .user import *

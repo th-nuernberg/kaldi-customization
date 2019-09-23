@@ -1,7 +1,7 @@
 import connexion
 import six
 
-from openapi_server.models.data_prep_stats import DataPrepStats  # noqa: E501
+from openapi_server.models.training_stats import TrainingStats  # noqa: E501
 from openapi_server import util
 
 
@@ -58,6 +58,6 @@ def get_training_stats(project_uuid, training_version):  # noqa: E501
     :param training_version: Training version of the project
     :type training_version: int
 
-    :rtype: DataPrepStats
+    :rtype: TrainingStats
     """
     return 'do some magic!'

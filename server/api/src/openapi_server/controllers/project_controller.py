@@ -8,6 +8,7 @@ from openapi_server.models.acoustic_model import AcousticModel
 from openapi_server.models.acoustic_model_type import AcousticModelType
 from openapi_server.models.create_project_object import CreateProjectObject  # noqa: E501
 from openapi_server.models.project import Project  # noqa: E501
+from openapi_server.models.project_creation import ProjectCreation  # noqa: E501
 from openapi_server.models.training_status import TrainingStatus  # noqa: E501
 from openapi_server import util
 
@@ -16,18 +17,18 @@ from models import db, Project as DB_Project, TrainingStateEnum as DB_TrainingSt
 from mapper import mapper
 
 
-def create_project(create_project_object=None):  # noqa: E501
+def create_project(project=None):  # noqa: E501
     """Create a new project
 
      # noqa: E501
 
-    :param create_project_object: Project object that needs to be created
-    :type create_project_object: dict | bytes
+    :param project: Project object that needs to be created
+    :type project: dict | bytes
 
     :rtype: Project
     """
     if connexion.request.is_json:
-        create_project_object = CreateProjectObject.from_dict(connexion.request.get_json())  # noqa: E501
+        project = ProjectCreation.from_dict(connexion.request.get_json())  # noqa: E501
     else:
         return ('Invalid input', 405)
 
@@ -35,21 +36,21 @@ def create_project(create_project_object=None):  # noqa: E501
 
     # Resolve acoustic model
     db_acousticModel = DB_AcousticModel.query.filter_by(
-        uuid=create_project_object.acoustic_model).first()
+        uuid=project.acoustic_model).first()
 
     if not db_acousticModel:
         return ("Acoustic Model not found", 404)
 
     # Resolve optional parent project
     db_parent_proj = None
-    if create_project_object.parent is not None:
+    if project.parent is not None:
         db_parent_proj = DB_Project.query.filter_by(
-            uuid=create_project_object.parent, owner_id=current_user.id).first()
+            uuid=project.parent, owner_id=current_user.id).first()
         if db_parent_proj is None:
             return ("Parent project not found", 404)
 
     db_proj = DB_Project(
-        name=create_project_object.name,
+        name=project.name,
         owner=current_user,
         acoustic_model=db_acousticModel
     )

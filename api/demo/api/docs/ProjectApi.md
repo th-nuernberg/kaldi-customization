@@ -10,7 +10,7 @@ Method | HTTP request | Description
 
 
 # **create_project**
-> Project create_project(create_project_object)
+> Project create_project(project_creation)
 
 Create a new project
 
@@ -31,11 +31,11 @@ configuration.access_token = 'YOUR_ACCESS_TOKEN'
 configuration.host = "http://localhost:8080/api/v1"
 # Create an instance of the API class
 api_instance = openapi_client.ProjectApi(openapi_client.ApiClient(configuration))
-create_project_object = openapi_client.CreateProjectObject() # CreateProjectObject | Project object that needs to be created
+project_creation = openapi_client.ProjectCreation() # ProjectCreation | Project object that needs to be created
 
 try:
     # Create a new project
-    api_response = api_instance.create_project(create_project_object)
+    api_response = api_instance.create_project(project_creation)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling ProjectApi->create_project: %s\n" % e)
@@ -45,7 +45,7 @@ except ApiException as e:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **create_project_object** | [**CreateProjectObject**](CreateProjectObject.md)| Project object that needs to be created | 
+ **project_creation** | [**ProjectCreation**](ProjectCreation.md)| Project object that needs to be created | 
 
 ### Return type
 

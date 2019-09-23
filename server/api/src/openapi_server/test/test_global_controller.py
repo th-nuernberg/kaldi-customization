@@ -23,7 +23,7 @@ class TestGlobalController(BaseTestCase):
             'Accept': 'application/zip',
         }
         response = self.client.open(
-            '/api/v1/global/acousticmodels/{acoustic_model_uuid}/model'.format(acoustic_model_uuid='acoustic_model_uuid_example'),
+            '/api/v1/global/acoustic_models/{acoustic_model_uuid}/model'.format(acoustic_model_uuid='acoustic_model_uuid_example'),
             method='GET',
             headers=headers)
         self.assert200(response,
@@ -38,7 +38,7 @@ class TestGlobalController(BaseTestCase):
             'Accept': 'application/json',
         }
         response = self.client.open(
-            '/api/v1/global/acousticmodels',
+            '/api/v1/global/acoustic_models',
             method='GET',
             headers=headers)
         self.assert200(response,

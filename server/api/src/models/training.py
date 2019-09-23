@@ -8,38 +8,42 @@ class TrainingStateEnum(enum.IntEnum):
     ###############################################
 
     # empty training
-    Init = 100
+    Empty = 100
 
-    # waiting for test prep processing assigned resources
-    TextPrep_Pending = 150
+    # waiting for text prep processing assigned resources
+    TextPrep_Pending = 110
     # text prep reported failure for already assigned resource
-    TextPrep_Failure = 151
+    TextPrep_Failure = 190
 
-    # resources assigned and resource state is TextPreparation_Success
-    Trainable = 200
+    # resources assigned and resource state is TextPrep_Success
+    Preparable = 200
 
     ###############################################
     # Data Prep
 
     # task in data prep queue, but not processed by data prep worker
-    Training_DataPrep_Pending = 205
+    DataPrep_Enqueue = 210
     # status queue update by data prep worker
-    Training_DataPrep_InProgress = 206
+    DataPrep_InProgress = 220
 
-    Training_DataPrep_Success = 207
-    Training_DataPrep_Failure = 208
+    DataPrep_Failure = 290
+
+    # training can be started
+    Trainable = 300
 
     # Data Prep
     ###############################################
     # Kaldi
 
     # task in kaldi queue, but not processed by kaldi worker
-    Training_Pending = 210
+    Training_Enqueue = 310
     # status queue update by kaldi worker (start processing)
-    Training_In_Progress = 220
+    Training_In_Progress = 320
 
-    Training_Success = 300
-    Training_Failure = 320
+    Training_Failure = 390
+
+    # training finished
+    Decodable = 400
 
     # Kaldi
     ###############################################
@@ -47,21 +51,23 @@ class TrainingStateEnum(enum.IntEnum):
     @staticmethod
     def status_to_string(status):
         return {
-            100: "Init",
+            100: "Empty",
+            110: "TextPrep_Pending",
 
-            150: "TextPrep_Pending",
-            151: "TextPrep_Failure",
+            190: "TextPrep_Failure",
+            200: "Preparable",
 
-            200: "Trainable",
-            205: "Training_DataPrep_Pending",
-            206: "Training_DataPrep_InProgress",
-            207: "Training_DataPrep_Success",
-            208: "Training_DataPrep_Failure",
-            210: "Training_Pending",
-            220: "Training_In_Progress",
+            210: "DataPrep_Enqueued",
+            220: "DataPrep_InProgress",
 
-            300: "Training_Success",
-            320: "Training_Failure",
+            290: "DataPrep_Failure",
+            300: "Trainable",
+
+            310: "Training_Enqueued",
+            320: "Training_InProgress",
+
+            390: "Training_Failure",
+            400: "Decodable",
         }[status]
 
 
@@ -76,13 +82,21 @@ class Training(db.Model):
     version = db.Column(db.Integer, autoincrement=True)
 
     create_date = db.Column(db.DateTime(timezone=False), default=datetime.datetime.utcnow)
-    status = db.Column(db.Enum(TrainingStateEnum), default=TrainingStateEnum.Init)
+    status = db.Column(db.Enum(TrainingStateEnum), default=TrainingStateEnum.Empty)
+
+    callback = db.Column(db.String(1024), nullable=True)
 
     def can_assign_resource(self):
-        return self.status in (TrainingStateEnum.Init,
+        return self.status in (TrainingStateEnum.Empty,
                                TrainingStateEnum.TextPrep_Pending,
                                TrainingStateEnum.TextPrep_Failure,
-                               TrainingStateEnum.Trainable)
+                               TrainingStateEnum.Preparable)
+
+    def can_edit(self):
+        return self.status in (DB_TrainingStateEnum.Empty,
+                               DB_TrainingStateEnum.TextPrep_Pending,
+                               DB_TrainingStateEnum.TextPrep_Failure,
+                               DB_TrainingStateEnum.Preparable)
 
     def __repr__(self):
         return json.dumps(self, cls=AlchemyEncoder)

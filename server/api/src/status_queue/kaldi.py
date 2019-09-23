@@ -6,8 +6,8 @@ import uuid
 
 kaldi_status_mapping = {
     KaldiStatusCode.IN_PROGRESS: TrainingStateEnum.Training_In_Progress,
-    KaldiStatusCode.SUCCESS: TrainingStateEnum.Training_Success,
-    KaldiStatusCode.FAILURE: TrainingStateEnum.Training_Failure
+    KaldiStatusCode.FAILURE: TrainingStateEnum.Training_Failure,
+    KaldiStatusCode.SUCCESS: TrainingStateEnum.Decodable
 }
 
 
@@ -31,3 +31,5 @@ def handle_kaldi_status(msg_data, db_session):
 
     db_session.add(db_training)
     db_session.commit()
+
+    # TODO: handle callback

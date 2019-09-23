@@ -18,13 +18,13 @@ class ResourceStatus(Model):
     """
     allowed enum values
     """
-    Upload_InProgress = "0"
-    Upload_Failure = "1"
-    TextPreparation_Ready = "9"
-    TextPreparation_Pending = "10"
-    TextPreparation_InProcess = "11"
-    TextPreparation_Failure = "12"
-    TextPreparation_Success = "13"
+    Upload_InProgress = "100"
+    Upload_Failure = "190"
+    Preparable = "200"
+    TextPrep_Enqueued = "210"
+    TextPrep_InProcess = "220"
+    TextPrep_Failure = "230"
+    Trainable = "300"
 
     def __init__(self):  # noqa: E501
         """ResourceStatus - a model defined in OpenAPI

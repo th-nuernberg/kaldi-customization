@@ -201,7 +201,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_training_stats**
-> DataPrepStats get_training_stats(project_uuid, training_version)
+> TrainingStats get_training_stats(project_uuid, training_version)
 
 Get Training Stats
 
@@ -244,7 +244,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**DataPrepStats**](DataPrepStats.md)
+[**TrainingStats**](TrainingStats.md)
 
 ### Authorization
 

@@ -13,7 +13,7 @@ class Project(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     owner = db.relationship('User')
 
-    acoustic_model_id = db.Column(db.Integer, db.ForeignKey("acousticmodels.id"))
+    acoustic_model_id = db.Column(db.Integer, db.ForeignKey("acoustic_models.id"))
     acoustic_model = db.relationship('AcousticModel')
 
     parent_id = db.Column(db.Integer, db.ForeignKey("projects.id"), nullable=True)

@@ -44,13 +44,13 @@ def db_acousticModel_to_front(db_acousticModel):
         uuid=db_acousticModel.uuid,
         name=db_acousticModel.name,
         language=db_language_to_front(db_acousticModel.language),
-        model_type=AcousticModelTypeEnum_to_AcousticModelType(db_acousticModel.model_type)
+        model_type=db_acousticModel.model_type
     )
 
 def db_user_to_front(db_user):
     return User(
         username=db_user.username,
-        email=db_user.user_email
+        email=db_user.email
     )
 
 def db_language_to_front(db_language):
@@ -62,8 +62,8 @@ def db_language_to_front(db_language):
 def db_resource_to_front(db_resource):
     return Resource(
         name=db_resource.name,
-        status=ResourceStateEnum_to_ResourceStatus(db_resource.status),
-        resource_type=ResourceTypeEnum_to_ResourceType(db_resource.resource_type),
+        status=db_resource.status,
+        resource_type=db_resource.resource_type,
         uuid=db_resource.uuid,
         creation_timestamp=db_resource.upload_date
     )
@@ -80,7 +80,7 @@ def db_training_to_front(db_training):
     return Training(
         version=db_training.version,
         creation_timestamp=db_training.create_date,
-        status=TrainingStateEnum_to_TrainingStatus(db_training.status),
+        status=db_training.status,
         resources=resource_list
     )
 
@@ -89,64 +89,8 @@ def db_audio_to_front(db_audio):
         uuid=db_audio.uuid,
         name=db_audio.name,
         creation_timestamp=db_audio.upload_date,
-        status=AudioStateEnum_to_AudioStatus(db_audio.status)
+        status=db_audio.status
     )
 
 def db_training_resource_to_front(db_training_resource):
     return db_resource_to_front(db_training_resource.origin)
-
-def ResourceTypeEnum_to_ResourceType(resourceType):
-    return {
-        1: ResourceType.html,
-        2: ResourceType.docx,
-        3: ResourceType.txt,
-        4: ResourceType.pdf,
-        5: ResourceType.png,
-        6: ResourceType.jpg
-        }[resourceType]
-
-def ResourceStateEnum_to_ResourceStatus(resourceState):
-    return {
-        0: ResourceStatus.Upload_InProgress,
-        1: ResourceStatus.Upload_Failure,
-        9: ResourceStatus.TextPreparation_Ready,
-
-        10: ResourceStatus.TextPreparation_Pending,
-        11: ResourceStatus.TextPreparation_InProcess,
-        12: ResourceStatus.TextPreparation_Failure,
-        13: ResourceStatus.TextPreparation_Success
-        }[resourceState]
-
-def AcousticModelTypeEnum_to_AcousticModelType(modelType):
-    return {
-        100: AcousticModelType.HMM_GMM,
-        200: AcousticModelType.HMM_DNN,
-        300: AcousticModelType.HMM_RNN
-        }[modelType]
-
-def TrainingStateEnum_to_TrainingStatus(trainingState):
-    return {
-        100: TrainingStatus.Init,
-        # text prep status missing
-        150: TrainingStatus.Init,
-        151: TrainingStatus.Init,
-        200: TrainingStatus.Trainable,
-        # data prep status missing
-        205: TrainingStatus.Init,
-        206: TrainingStatus.Init,
-        207: TrainingStatus.Init,
-        208: TrainingStatus.Init,
-        210: TrainingStatus.Training_Pending,
-        220: TrainingStatus.Training_In_Progress,
-        300: TrainingStatus.Training_Success,
-        320: TrainingStatus.Training_Failure
-        }[trainingState]
-
-def AudioStateEnum_to_AudioStatus(audioState):
-    return {
-        100: AudioStatus.Init,
-        150: AudioStatus.AudioPrep_Pending,
-        200: AudioStatus.AudioPrep_In_Progress,
-        300: AudioStatus.AudioPrep_Success,
-        320: AudioStatus.AudioPrep_Success
-        }[audioState]

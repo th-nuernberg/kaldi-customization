@@ -2,6 +2,7 @@ import connexion
 import six
 import tempfile
 
+from openapi_server.models.callback import Callback  # noqa: E501
 from openapi_server.models.resource import Resource  # noqa: E501
 from openapi_server.models.resource_reference_object import ResourceReferenceObject  # noqa: E501
 from openapi_server.models.training import Training  # noqa: E501
@@ -10,7 +11,7 @@ from openapi_server import util
 from models import db
 from models.project import Project as DB_Project
 from models.user import User as DB_User
-from models.acousticmodel import AcousticModel as DB_AcousticModel
+from models.acoustic_model import AcousticModel as DB_AcousticModel
 from models.resource import Resource as DB_Resource, ResourceStateEnum as DB_ResourceStateEnum
 from models.training import Training as DB_Training, TrainingStateEnum as DB_TrainingStateEnum
 from models.training_resource import TrainingResource as DB_TrainingResource
@@ -79,13 +80,13 @@ def assign_resource_to_training(project_uuid, training_version, resource_referen
     db.session.commit()
 
     # if text prep is already done, we should copy corpus to the new training_resource
-    if db_resource.status == DB_ResourceStateEnum.TextPreparation_Success:
+    if db_resource.status == DB_ResourceStateEnum.Trainable:
         copy_object_in_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], db_resource.uuid + "/corpus.txt",
                               minio_buckets["TRAINING_RESOURCE_BUCKET"], str(db_training_resource.id) + "/corpus.txt")
 
-    if db_resource.status != DB_ResourceStateEnum.TextPreparation_Success:
+    if db_resource.status != DB_ResourceStateEnum.Trainable:
         db_training.status = DB_TrainingStateEnum.TextPrep_Pending
-    elif db_training.status == DB_TrainingStateEnum.Init:
+    elif db_training.status == DB_TrainingStateEnum.Empty:
         db_training.status = DB_TrainingStateEnum.Trainable
 
     db.session.add(db_training)
@@ -326,7 +327,8 @@ def get_trainings_for_project(project_uuid):  # noqa: E501
     """
     return 'do some magic!'
 
-def prepare_training_by_version(project_uuid, training_version, callback_object=None):  # noqa: E501
+
+def prepare_training_by_version(project_uuid, training_version, callback=None):  # noqa: E501
     """Start the specified training
 
     Start the preparation process for the specified training # noqa: E501
@@ -335,17 +337,49 @@ def prepare_training_by_version(project_uuid, training_version, callback_object=
     :type project_uuid: 
     :param training_version: Training version of the project
     :type training_version: int
-    :param callback_object: Callback to be executed after the operation ended
-    :type callback_object: dict | bytes
+    :param callback: Callback to be executed after the operation ended
+    :type callback: dict | bytes
 
     :rtype: Training
     """
     try:
         if connexion.request.is_json:
-            callback_object = CallbackObject.from_dict(connexion.request.get_json())  # noqa: E501
+            callback = Callback.from_dict(connexion.request.get_json())  # noqa: E501
     except:
-        callback_object = None
-    return 'do some magic!'
+        callback = None
+
+    current_user = connexion.context['token_info']['user']
+
+    db_project = DB_Project.query.filter_by(
+        uuid=project_uuid, owner_id=current_user.id).first()
+
+    if db_project is None:
+        return ("Project not found", 404)
+
+    db_training = DB_Training.query.filter_by(
+        version=training_version, project=db_project).first()
+
+    if not db_training:
+        return ("training not found", 404)
+
+    if db_training.status != DB_TrainingStateEnum.Preparable:
+        return ("preparation already done or pending", 400)
+
+    db_training.status = DB_TrainingStateEnum.DataPrep_Enqueue
+    db_training_resources = DB_TrainingResource.query.filter(
+        DB_TrainingResource.training_id == db_training.id).all()
+
+    db.session.add(db_training)
+    db.session.commit()
+
+    create_dataprep_job(
+        acoustic_model_id=db_project.acoustic_model_id,
+        corpi=[r.id for r in db_training_resources],
+        training_id=db_training.id
+    )
+
+    return mapper.db_training_to_front(db_training)
+
 
 def set_corpus_of_training_resource(project_uuid, training_version, resource_uuid, body):  # noqa: E501
     """Set the corpus of the resource
@@ -377,7 +411,7 @@ def set_corpus_of_training_resource(project_uuid, training_version, resource_uui
     if db_training is None:
         return ("Training not found", 404)
 
-    if db_training.status not in (DB_TrainingStateEnum.Init, DB_TrainingStateEnum.Trainable, DB_TrainingStateEnum.TextPrep_Pending, DB_TrainingStateEnum.TextPrep_Failure):
+    if db_training.can_edit():
         return ("Training already started or done", 409)
 
     db_resource = DB_Resource.query.filter(
@@ -404,7 +438,7 @@ def set_corpus_of_training_resource(project_uuid, training_version, resource_uui
     return ("Success", 200)
 
 
-def start_training_by_version(project_uuid, training_version, callback_object=None):  # noqa: E501
+def start_training_by_version(project_uuid, training_version, callback=None):  # noqa: E501
     """Start the specified training
 
     Start the training process for the specified training # noqa: E501
@@ -413,38 +447,40 @@ def start_training_by_version(project_uuid, training_version, callback_object=No
     :type project_uuid: 
     :param training_version: Training version of the project
     :type training_version: int
-    :param callback_object: Callback to be executed after the operation ended
-    :type callback_object: dict | bytes
+    :param callback: Callback to be executed after the operation ended
+    :type callback: dict | bytes
 
     :rtype: Training
     """
     try:
         if connexion.request.is_json:
-            callback_object = CallbackObject.from_dict(connexion.request.get_json())  # noqa: E501
+            callback = Callback.from_dict(connexion.request.get_json())  # noqa: E501
     except:
-        callback_object = None
-    
+        callback = None
+
     current_user = connexion.context['token_info']['user']
 
     db_project = DB_Project.query.filter_by(
         uuid=project_uuid, owner_id=current_user.id).first()
+
+    if not db_project:
+        return ("project not found", 404)
+
     db_training = DB_Training.query.filter_by(
         version=training_version, project=db_project).first()
+
+    if not db_training:
+        return ("training not found", 404)
 
     if db_training.status != DB_TrainingStateEnum.Trainable:
         return ("training already done or pending", 400)
 
-    db_training.status = DB_TrainingStateEnum.Training_Pending
-    db_training_resources = DB_TrainingResource.query.filter(
-        DB_TrainingResource.training_id == db_training.id).all()
+    db_training.status = DB_TrainingStateEnum.Training_Enqueue
+    db_session.add(db_training)
+    db_session.commit()
 
-    db.session.add(db_training)
-    db.session.commit()
-
-    create_dataprep_job(
-        acoustic_model_id=db_project.acoustic_model_id,
-        corpi=[r.id for r in db_training_resources],
-        training_id=db_training.id
-    )
+    create_kaldi_job(
+        training_id=db_training.id,
+        acoustic_model_id=db_training.project.acoustic_model_id)
 
     return mapper.db_training_to_front(db_training)

@@ -4,8 +4,8 @@ All URIs are relative to *http://localhost:8080/api/v1*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**download_acoustic_model**](GlobalApi.md#download_acoustic_model) | **GET** /global/acousticmodels/{acoustic_model_uuid}/model | Returns the acoustic model
-[**get_acoustic_models**](GlobalApi.md#get_acoustic_models) | **GET** /global/acousticmodels | Returns a list of available acoustic models
+[**download_acoustic_model**](GlobalApi.md#download_acoustic_model) | **GET** /global/acoustic_models/{acoustic_model_uuid}/model | Returns the acoustic model
+[**get_acoustic_models**](GlobalApi.md#get_acoustic_models) | **GET** /global/acoustic_models | Returns a list of available acoustic models
 [**get_languages**](GlobalApi.md#get_languages) | **GET** /global/languages | Returns a list of available languages
 
 

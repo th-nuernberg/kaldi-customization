@@ -18,12 +18,19 @@ class TrainingStatus(Model):
     """
     allowed enum values
     """
-    Init = "100"
-    Trainable = "200"
-    Training_Pending = "210"
-    Training_In_Progress = "220"
-    Training_Success = "300"
-    Training_Failure = "320"
+    Empty = "100"
+    TextPrep_Enqueued = "120"
+    TextPrep_InProgress = "130"
+    TextPrep_Failure = "190"
+    Preparable = "200"
+    DataPrep_Enqueued = "210"
+    DataPrep_InProgress = "220"
+    DataPrep_Failure = "290"
+    Trainable = "300"
+    Training_Enqueued = "310"
+    Training_InProgress = "320"
+    Training_Failure = "390"
+    Decodable = "400"
 
     def __init__(self):  # noqa: E501
         """TrainingStatus - a model defined in OpenAPI

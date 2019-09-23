@@ -7,7 +7,7 @@ import {
   TrainingService,
   Training,
   DecodeService,
-  DecodeMessage,
+  Decoding,
   Project,
   ProjectService }
 from 'swagger-client';
@@ -21,10 +21,10 @@ export class ProjectComponent implements OnInit {
   projectUuid: string;
 
   training: Training;
-  currentDecodings: DecodeMessage[];
+  currentDecodings: Decoding[];
 
   project$: Observable<Project>;
-  decodings$: Observable<DecodeMessage[]>;
+  decodings$: Observable<Decoding[]>;
 
   graphUrl;
 

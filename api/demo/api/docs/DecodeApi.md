@@ -5,6 +5,7 @@ All URIs are relative to *http://localhost:8080/api/v1*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**assign_audio_to_training**](DecodeApi.md#assign_audio_to_training) | **POST** /project/{project_uuid}/training/{training_version}/decode | Assign Audio to training
+[**delete_assigned_audio_from_training**](DecodeApi.md#delete_assigned_audio_from_training) | **DELETE** /project/{project_uuid}/training/{training_version}/decode/{decode_uuid} | Remove an audio resource from training
 [**delete_audio_by_uuid**](DecodeApi.md#delete_audio_by_uuid) | **DELETE** /audio/{audio_uuid} | Delete audio by UUID
 [**get_all_audio**](DecodeApi.md#get_all_audio) | **GET** /audio | Returns a list of available audio
 [**get_audio_by_uuid**](DecodeApi.md#get_audio_by_uuid) | **GET** /audio/{audio_uuid} | Find audio by UUID
@@ -12,11 +13,12 @@ Method | HTTP request | Description
 [**get_decode_result**](DecodeApi.md#get_decode_result) | **GET** /project/{project_uuid}/training/{training_version}/decode/{decode_uuid} | Get the result of a decoding task
 [**get_decodings**](DecodeApi.md#get_decodings) | **GET** /project/{project_uuid}/training/{training_version}/decode | List of all decodings
 [**start_decode**](DecodeApi.md#start_decode) | **PUT** /project/{project_uuid}/training/{training_version}/decode/{decode_uuid}/enqueue | Decode audio to text
+[**start_decode_all**](DecodeApi.md#start_decode_all) | **PUT** /project/{project_uuid}/training/{training_version}/decode/enqueue_all | Decode audio to text
 [**upload_audio**](DecodeApi.md#upload_audio) | **POST** /audio | Uploads audio
 
 
 # **assign_audio_to_training**
-> DecodeTaskReference assign_audio_to_training(project_uuid, training_version, audio_reference_object)
+> Decoding assign_audio_to_training(project_uuid, training_version, audio_reference_object)
 
 Assign Audio to training
 
@@ -61,7 +63,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**DecodeTaskReference**](DecodeTaskReference.md)
+[**Decoding**](Decoding.md)
 
 ### Authorization
 
@@ -78,6 +80,72 @@ Name | Type | Description  | Notes
 **201** | Audio successfully added to training |  -  |
 **403** | Forbidden |  -  |
 **404** | Project or training not found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **delete_assigned_audio_from_training**
+> delete_assigned_audio_from_training(project_uuid, training_version, decode_uuid)
+
+Remove an audio resource from training
+
+Removes the assigned audio resource from the training
+
+### Example
+
+* OAuth Authentication (oauth):
+```python
+from __future__ import print_function
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+configuration = openapi_client.Configuration()
+# Configure OAuth2 access token for authorization: oauth
+configuration.access_token = 'YOUR_ACCESS_TOKEN'
+
+# Defining host is optional and default to http://localhost:8080/api/v1
+configuration.host = "http://localhost:8080/api/v1"
+# Create an instance of the API class
+api_instance = openapi_client.DecodeApi(openapi_client.ApiClient(configuration))
+project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
+training_version = 56 # int | Training version of the project
+decode_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the resource
+
+try:
+    # Remove an audio resource from training
+    api_instance.delete_assigned_audio_from_training(project_uuid, training_version, decode_uuid)
+except ApiException as e:
+    print("Exception when calling DecodeApi->delete_assigned_audio_from_training: %s\n" % e)
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **project_uuid** | [**str**](.md)| UUID of the project | 
+ **training_version** | **int**| Training version of the project | 
+ **decode_uuid** | [**str**](.md)| UUID of the resource | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[oauth](../README.md#oauth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Resource assignment successfully removed |  -  |
+**403** | Forbidden |  -  |
+**404** | Project, training or resource not found |  -  |
+**409** | Conflict: already in training |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -322,7 +390,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_decode_result**
-> DecodeMessage get_decode_result(project_uuid, training_version, decode_uuid)
+> Decoding get_decode_result(project_uuid, training_version, decode_uuid)
 
 Get the result of a decoding task
 
@@ -367,7 +435,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**DecodeMessage**](DecodeMessage.md)
+[**Decoding**](Decoding.md)
 
 ### Authorization
 
@@ -390,7 +458,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_decodings**
-> list[DecodeMessage] get_decodings(project_uuid, training_version)
+> list[Decoding] get_decodings(project_uuid, training_version)
 
 List of all decodings
 
@@ -433,7 +501,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**list[DecodeMessage]**](DecodeMessage.md)
+[**list[Decoding]**](Decoding.md)
 
 ### Authorization
 
@@ -455,7 +523,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **start_decode**
-> DecodeTaskReference start_decode(project_uuid, training_version, decode_uuid, audio_reference_with_callback_object)
+> Decoding start_decode(project_uuid, training_version, decode_uuid, callback=callback)
 
 Decode audio to text
 
@@ -481,11 +549,11 @@ api_instance = openapi_client.DecodeApi(openapi_client.ApiClient(configuration))
 project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
 training_version = 56 # int | Training version of the project
 decode_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the decoding task
-audio_reference_with_callback_object = openapi_client.AudioReferenceWithCallbackObject() # AudioReferenceWithCallbackObject | Audio that needs to be decoded
+callback = openapi_client.Callback() # Callback | Callback to be executed after the operation ended (optional)
 
 try:
     # Decode audio to text
-    api_response = api_instance.start_decode(project_uuid, training_version, decode_uuid, audio_reference_with_callback_object)
+    api_response = api_instance.start_decode(project_uuid, training_version, decode_uuid, callback=callback)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling DecodeApi->start_decode: %s\n" % e)
@@ -498,11 +566,11 @@ Name | Type | Description  | Notes
  **project_uuid** | [**str**](.md)| UUID of the project | 
  **training_version** | **int**| Training version of the project | 
  **decode_uuid** | [**str**](.md)| UUID of the decoding task | 
- **audio_reference_with_callback_object** | [**AudioReferenceWithCallbackObject**](AudioReferenceWithCallbackObject.md)| Audio that needs to be decoded | 
+ **callback** | [**Callback**](Callback.md)| Callback to be executed after the operation ended | [optional] 
 
 ### Return type
 
-[**DecodeTaskReference**](DecodeTaskReference.md)
+[**Decoding**](Decoding.md)
 
 ### Authorization
 
@@ -517,7 +585,74 @@ Name | Type | Description  | Notes
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **202** | Decoding successfully queued |  -  |
-**400** | Training not finished |  -  |
+**400** | Training not finished or decode in progress |  -  |
+**403** | Forbidden |  -  |
+**404** | Project or training not found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **start_decode_all**
+> start_decode_all(project_uuid, training_version, callback=callback)
+
+Decode audio to text
+
+Decode audio data to text using the trained project and the given audio
+
+### Example
+
+* OAuth Authentication (oauth):
+```python
+from __future__ import print_function
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+configuration = openapi_client.Configuration()
+# Configure OAuth2 access token for authorization: oauth
+configuration.access_token = 'YOUR_ACCESS_TOKEN'
+
+# Defining host is optional and default to http://localhost:8080/api/v1
+configuration.host = "http://localhost:8080/api/v1"
+# Create an instance of the API class
+api_instance = openapi_client.DecodeApi(openapi_client.ApiClient(configuration))
+project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
+training_version = 56 # int | Training version of the project
+callback = openapi_client.Callback() # Callback | Callback to be executed after the operation ended (optional)
+
+try:
+    # Decode audio to text
+    api_instance.start_decode_all(project_uuid, training_version, callback=callback)
+except ApiException as e:
+    print("Exception when calling DecodeApi->start_decode_all: %s\n" % e)
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **project_uuid** | [**str**](.md)| UUID of the project | 
+ **training_version** | **int**| Training version of the project | 
+ **callback** | [**Callback**](Callback.md)| Callback to be executed after the operation ended | [optional] 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[oauth](../README.md#oauth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | No decodings to enqueue |  -  |
+**202** | Decoding successfully queued |  -  |
+**400** | Training not finished or decode in progress |  -  |
 **403** | Forbidden |  -  |
 **404** | Project or training not found |  -  |
 

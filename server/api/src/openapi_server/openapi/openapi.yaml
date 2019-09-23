@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   description: Kaldi Customization Server.
   title: Kaldi Customization Server
-  version: 1.0.3
+  version: 1.5.0
 servers:
 - url: http://localhost:8080/api/v1
 - url: https://localhost:8080/api/v1
@@ -50,7 +50,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/BinaryResourceObject'
+              $ref: '#/components/schemas/BinaryUpload'
         required: true
       responses:
         201:
@@ -168,7 +168,7 @@ paths:
       tags:
       - decode
       x-openapi-router-controller: openapi_server.controllers.decode_controller
-  /global/acousticmodels:
+  /global/acoustic_models:
     get:
       operationId: get_acoustic_models
       responses:
@@ -184,7 +184,7 @@ paths:
       tags:
       - global
       x-openapi-router-controller: openapi_server.controllers.global_controller
-  /global/acousticmodels/{acoustic_model_uuid}/model:
+  /global/acoustic_models/{acoustic_model_uuid}/model:
     get:
       description: Returns the model of the specified acoustic model
       operationId: download_acoustic_model
@@ -259,7 +259,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateProjectObject'
+              $ref: '#/components/schemas/ProjectCreation'
         description: Project object that needs to be created
         required: true
       responses:
@@ -516,7 +516,7 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/DecodeMessage'
+                  $ref: '#/components/schemas/Decoding'
                 type: array
           description: List of decoding messages
         400:
@@ -569,7 +569,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DecodeTaskReference'
+                $ref: '#/components/schemas/Decoding'
           description: Audio successfully added to training
         403:
           content: {}
@@ -584,7 +584,117 @@ paths:
       tags:
       - decode
       x-openapi-router-controller: openapi_server.controllers.decode_controller
+  /project/{project_uuid}/training/{training_version}/decode/enqueue_all:
+    put:
+      description: Decode audio data to text using the trained project and the given
+        audio
+      operationId: start_decode_all
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Callback'
+        description: Callback to be executed after the operation ended
+        required: false
+      responses:
+        200:
+          content: {}
+          description: No decodings to enqueue
+        202:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Decoding'
+                type: array
+          description: Decoding successfully queued
+        400:
+          content: {}
+          description: Training not finished or decode in progress
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - decode:projects
+      summary: Decode audio to text
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
   /project/{project_uuid}/training/{training_version}/decode/{decode_uuid}:
+    delete:
+      description: Removes the assigned audio resource from the training
+      operationId: delete_assigned_audio_from_training
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: UUID of the resource
+        explode: false
+        in: path
+        name: decode_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        200:
+          content: {}
+          description: Resource assignment successfully removed
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project, training or resource not found
+        409:
+          description: 'Conflict: already in training'
+      security:
+      - oauth:
+        - decode:projects
+      summary: Remove an audio resource from training
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
     get:
       description: Returns the result of a decoding task
       operationId: get_decode_result
@@ -622,7 +732,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DecodeMessage'
+                $ref: '#/components/schemas/Decoding'
           description: Result of the decoding task
         204:
           content: {}
@@ -681,19 +791,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AudioReferenceWithCallbackObject'
-        description: Audio that needs to be decoded
-        required: true
+              $ref: '#/components/schemas/Callback'
+        description: Callback to be executed after the operation ended
+        required: false
       responses:
         202:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DecodeTaskReference'
+                $ref: '#/components/schemas/Decoding'
           description: Decoding successfully queued
         400:
           content: {}
-          description: Training not finished
+          description: Training not finished or decode in progress
         403:
           content: {}
           description: Forbidden
@@ -707,6 +817,60 @@ paths:
       tags:
       - decode
       x-openapi-router-controller: openapi_server.controllers.decode_controller
+  /project/{project_uuid}/training/{training_version}/enqueue:
+    put:
+      description: Start the training process for the specified training
+      operationId: start_training_by_version
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Callback'
+        description: Callback to be executed after the operation ended
+        required: false
+      responses:
+        202:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Training'
+          description: Training successfully queued
+        400:
+          content: {}
+          description: training already done or pending
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - read:projects
+        - train:projects
+      summary: Start the specified training
+      tags:
+      - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
   /project/{project_uuid}/training/{training_version}/model:
     get:
       description: Returns the model of the specified training
@@ -776,7 +940,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CallbackObject'
+              $ref: '#/components/schemas/Callback'
         description: Callback to be executed after the operation ended
         required: false
       responses:
@@ -1126,7 +1290,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataPrepStats'
+                $ref: '#/components/schemas/TrainingStats'
           description: Stats for this training
         403:
           content: {}
@@ -1141,60 +1305,6 @@ paths:
       tags:
       - logging
       x-openapi-router-controller: openapi_server.controllers.logging_controller
-  /project/{project_uuid}/training/{training_version}/train:
-    put:
-      description: Start the training process for the specified training
-      operationId: start_training_by_version
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CallbackObject'
-        description: Callback to be executed after the operation ended
-        required: false
-      responses:
-        202:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Training'
-          description: Training successfully queued
-        400:
-          content: {}
-          description: training already done or pending
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project or training not found
-      security:
-      - oauth:
-        - read:projects
-        - train:projects
-      summary: Start the specified training
-      tags:
-      - training
-      x-openapi-router-controller: openapi_server.controllers.training_controller
   /project/{project_uuid}/training/{training_version}/train/log:
     get:
       description: Returns the log of a training
@@ -1267,7 +1377,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/BinaryResourceObject'
+              $ref: '#/components/schemas/BinaryUpload'
         required: true
       responses:
         202:
@@ -1546,17 +1656,108 @@ components:
       - HMM_GMM
       - HMM_DNN
       - HMM_RNN
-    DecodeMessage:
+    Audio:
       example:
-        transcripts:
-        - '{}'
-        - '{}'
+        creation_timestamp: 2000-01-23T04:56:07.000+00:00
+        name: myAudio.wav
         uuid: 550e8400-e29b-11d4-a716-446655440000
+        status: 200
       properties:
         uuid:
           example: 550e8400-e29b-11d4-a716-446655440000
           format: uuid
           type: string
+        name:
+          example: myAudio.wav
+          type: string
+        creation_timestamp:
+          format: date-time
+          type: string
+        status:
+          $ref: '#/components/schemas/AudioStatus'
+      required:
+      - name
+      - status
+      - uuid
+      type: object
+    AudioReferenceObject:
+      example:
+        audio_uuid: 550e8400-e29b-11d4-a716-446655440000
+      properties:
+        audio_uuid:
+          description: UUID of the audio file
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+      required:
+      - audio_uuid
+      type: object
+    AudioStatus:
+      enum:
+      - 100
+      - 190
+      - 200
+      - 210
+      - 220
+      - 290
+      - 300
+      type: integer
+      x-enum-varnames:
+      - Upload_InProgress
+      - Upload_Failure
+      - Preparable
+      - AudioPrep_Enqueued
+      - AudioPrep_InProgress
+      - AudioPrep_Failure
+      - Decodable
+    BinaryUpload:
+      properties:
+        upfile:
+          description: File object that needs to be uploaded
+          format: binary
+          type: string
+      required:
+      - upfile
+      type: object
+    Callback:
+      example:
+        url: https://my-ci.example.org/callback
+        method: 0
+      properties:
+        url:
+          description: The URL to be called
+          type: string
+        method:
+          $ref: '#/components/schemas/CallbackMethod'
+      required:
+      - method
+      - url
+    CallbackMethod:
+      enum:
+      - 0
+      - 1
+      type: integer
+      x-enum-varnames:
+      - GET
+      - POST
+    Decoding:
+      example:
+        uuid: 550e8400-e29b-11d4-a716-446655440000
+        status: 100
+        transcripts:
+        - '{ ... }'
+        audio:
+          creation_timestamp: 2000-01-23T04:56:07.000+00:00
+          name: myAudio.wav
+          uuid: 550e8400-e29b-11d4-a716-446655440000
+          status: 200
+      properties:
+        uuid:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        status:
+          $ref: '#/components/schemas/DecodingStatus'
         transcripts:
           items:
             properties:
@@ -1567,7 +1768,26 @@ components:
           type: array
         audio:
           $ref: '#/components/schemas/Audio'
+      required:
+      - audio
+      - status
+      - transcripts
+      - uuid
       type: object
+    DecodingStatus:
+      enum:
+      - 100
+      - 110
+      - 120
+      - 190
+      - 200
+      type: integer
+      x-enum-varnames:
+      - Assigned
+      - Decoding_Enqueued
+      - Decoding_InProgress
+      - Decoding_Failure
+      - Decoded
     Language:
       example:
         name: name
@@ -1579,6 +1799,30 @@ components:
         name:
           type: string
       required:
+      - name
+      type: object
+    ProjectCreation:
+      example:
+        parent: 550e8400-e29b-11d4-a716-446655440000
+        name: MyProject
+        acoustic_model: 550e8400-e29b-11d4-a716-446655440000
+      properties:
+        name:
+          description: Name of the new project
+          example: MyProject
+          type: string
+        acoustic_model:
+          description: UUID of the acoustic model
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        parent:
+          description: UUID of the optional parent project
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+      required:
+      - acoustic_model
       - name
       type: object
     Project:
@@ -1642,8 +1886,6 @@ components:
       required:
       - acoustic_model
       - name
-      - owner
-      - uuid
       type: object
     Resource:
       example:
@@ -1671,47 +1913,36 @@ components:
       - status
       - uuid
       type: object
-    Audio:
+    ResourceReferenceObject:
       example:
-        creation_timestamp: 2000-01-23T04:56:07.000+00:00
-        name: myAudio.wav
-        uuid: 550e8400-e29b-11d4-a716-446655440000
+        resource_uuid: 550e8400-e29b-11d4-a716-446655440000
       properties:
-        uuid:
+        resource_uuid:
+          description: UUID of the resource
           example: 550e8400-e29b-11d4-a716-446655440000
           format: uuid
           type: string
-        name:
-          example: myAudio.wav
-          type: string
-        creation_timestamp:
-          format: date-time
-          type: string
-        status:
-          $ref: '#/components/schemas/AudioStatus'
       required:
-      - name
-      - status
-      - uuid
+      - resource_uuid
       type: object
     ResourceStatus:
       enum:
-      - 0
-      - 1
-      - 9
-      - 10
-      - 11
-      - 12
-      - 13
+      - 100
+      - 190
+      - 200
+      - 210
+      - 220
+      - 230
+      - 300
       type: integer
       x-enum-varnames:
       - Upload_InProgress
       - Upload_Failure
-      - TextPreparation_Ready
-      - TextPreparation_Pending
-      - TextPreparation_InProcess
-      - TextPreparation_Failure
-      - TextPreparation_Success
+      - Preparable
+      - TextPrep_Enqueued
+      - TextPrep_InProcess
+      - TextPrep_Failure
+      - Trainable
     ResourceType:
       enum:
       - 1
@@ -1728,44 +1959,6 @@ components:
       - pdf
       - png
       - jpg
-    CallbackMethod:
-      enum:
-      - 0
-      - 1
-      type: integer
-      x-enum-varnames:
-      - GET
-      - POST
-    TrainingStatus:
-      enum:
-      - 100
-      - 200
-      - 210
-      - 220
-      - 300
-      - 320
-      type: integer
-      x-enum-varnames:
-      - Init
-      - Trainable
-      - Training_Pending
-      - Training_In_Progress
-      - Training_Success
-      - Training_Failure
-    AudioStatus:
-      enum:
-      - 100
-      - 150
-      - 200
-      - 300
-      - 320
-      type: integer
-      x-enum-varnames:
-      - Init
-      - AudioPrep_Pending
-      - AudioPrep_In_Progress
-      - AudioPrep_Success
-      - AudioPrep_Failure
     Training:
       example:
         creation_timestamp: 2000-01-23T04:56:07.000+00:00
@@ -1791,78 +1984,7 @@ components:
             $ref: '#/components/schemas/Resource'
           type: array
       type: object
-    User:
-      example:
-        email: email
-        password: password
-        username: username
-      properties:
-        username:
-          type: string
-        email:
-          format: email
-          type: string
-        password:
-          type: string
-          writeOnly: true
-      required:
-      - username
-      type: object
-    CreateProjectObject:
-      example:
-        parent: 550e8400-e29b-11d4-a716-446655440000
-        name: MyProject
-        acoustic_model: 550e8400-e29b-11d4-a716-446655440000
-      properties:
-        name:
-          description: Name of the new project
-          example: MyProject
-          type: string
-        acoustic_model:
-          description: UUID of the acoustic model
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        parent:
-          description: UUID of the optional parent project
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-      required:
-      - acoustic_model
-      - name
-      type: object
-    BinaryDecodeObject:
-      properties:
-        audio_file:
-          description: Audio file for decoding
-          format: binary
-          type: string
-      required:
-      - audio_file
-      type: object
-    DecodeTaskReference:
-      example:
-        decode_uuid: 550e8400-e29b-11d4-a716-446655440000
-      properties:
-        decode_uuid:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-      type: object
-    ResourceReferenceObject:
-      example:
-        resource_uuid: 550e8400-e29b-11d4-a716-446655440000
-      properties:
-        resource_uuid:
-          description: UUID of the resource
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-      required:
-      - resource_uuid
-      type: object
-    DataPrepStats:
+    TrainingStats:
       example:
         unique_words: 510
         total_words_count: 7265
@@ -1885,60 +2007,57 @@ components:
           description: The number of processed files
           example: 3
           type: integer
-    AudioReferenceObject:
+    TrainingStatus:
+      enum:
+      - 100
+      - 120
+      - 130
+      - 190
+      - 200
+      - 210
+      - 220
+      - 290
+      - 300
+      - 310
+      - 320
+      - 390
+      - 400
+      type: integer
+      x-enum-varnames:
+      - Empty
+      - TextPrep_Enqueued
+      - TextPrep_InProgress
+      - TextPrep_Failure
+      - Preparable
+      - DataPrep_Enqueued
+      - DataPrep_InProgress
+      - DataPrep_Failure
+      - Trainable
+      - Training_Enqueued
+      - Training_InProgress
+      - Training_Failure
+      - Decodable
+    User:
       example:
-        audio_uuid: 550e8400-e29b-11d4-a716-446655440000
+        email: email
+        password: password
+        username: username
       properties:
-        audio_uuid:
-          description: UUID of the audio file
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
+        username:
           type: string
+        email:
+          format: email
+          type: string
+        password:
+          type: string
+          writeOnly: true
       required:
-      - audio_uuid
+      - username
       type: object
-    AudioReferenceWithCallbackObject:
-      example:
-        audio_uuid: 550e8400-e29b-11d4-a716-446655440000
-        callback: https://my-ci.example.org/callback
-      properties:
-        audio_uuid:
-          description: UUID of the audio file
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        callback:
-          description: Callback URL when decoding finished
-          type: string
-      required:
-      - audio_uuid
-      type: object
-    BinaryResourceObject:
-      properties:
-        upfile:
-          description: File object that needs to be uploaded
-          format: binary
-          type: string
-      required:
-      - upfile
-      type: object
-    CallbackObject:
-      example:
-        url: url
-      properties:
-        url:
-          description: The URL to be called
-          type: string
-        method:
-          $ref: '#/components/schemas/CallbackMethod'
-      required:
-      - method
-      - url
   securitySchemes:
     oauth:
       flows:
         password:
-          tokenUrl: http://localhost:8080/api/oauth/token
           scopes:
             write:user: modify the user account
             read:user: read the user account
@@ -1950,6 +2069,7 @@ components:
             read:resources: read your resources
             write:audio: modify your audio
             read:audio: read your audio
+          tokenUrl: http://localhost:8080/api/oauth/token
       type: oauth2
       x-tokenInfoFunc: openapi_server.controllers.security_controller_.info_from_oauth
       x-scopeValidateFunc: openapi_server.controllers.security_controller_.validate_scope_oauth

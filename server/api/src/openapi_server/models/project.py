@@ -119,8 +119,6 @@ class Project(Model):
         :param uuid: The uuid of this Project.
         :type uuid: str
         """
-        if uuid is None:
-            raise ValueError("Invalid value for `uuid`, must not be `None`")  # noqa: E501
 
         self._uuid = uuid
 
@@ -230,7 +228,5 @@ class Project(Model):
         :param owner: The owner of this Project.
         :type owner: User
         """
-        if owner is None:
-            raise ValueError("Invalid value for `owner`, must not be `None`")  # noqa: E501
 
         self._owner = owner

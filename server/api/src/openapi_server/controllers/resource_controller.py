@@ -16,7 +16,7 @@ from openapi_server import util
 from models import db
 from models import Resource as DB_Resource
 from models import ResourceTypeEnum as DB_ResourceType
-from models import ResourceStateEnum as DB_ResourceState
+from models import ResourceStateEnum as DB_ResourceStateEnum
 from models import User as DB_User
 from models import Project as DB_Project
 from models import Training as DB_Training
@@ -96,7 +96,7 @@ def create_resource(upfile):  # noqa: E501
 
     db_resource = DB_Resource(
         name=filename,
-        status=DB_ResourceState.Upload_InProgress,
+        status=DB_ResourceStateEnum.Upload_InProgress,
         resource_type=filetype,
         owner=current_user
     )
@@ -124,19 +124,19 @@ def create_resource(upfile):  # noqa: E501
     os.remove(local_file_path)
 
     if status:
-        db_resource.status = DB_ResourceState.TextPreparation_Ready
+        db_resource.status = DB_ResourceStateEnum.Trainable
     else:
-        db_resource.status = DB_ResourceState.Upload_Failure
+        db_resource.status = DB_ResourceStateEnum.Upload_Failure
 
     db.session.add(db_resource)
     db.session.commit()
 
     print('Uploaded file to MinIO: ' + str(db_resource))
 
-    if db_resource.status == DB_ResourceState.TextPreparation_Ready:
+    if db_resource.status == DB_ResourceStateEnum.Trainable:
         create_textprep_job(str(db_resource.uuid), db_resource.resource_type)
 
-        db_resource.status = DB_ResourceState.TextPreparation_Pending
+        db_resource.status = DB_ResourceStateEnum.TextPrep_Enqueued
         db.session.add(db_resource)
         db.session.commit()
 

@@ -14,7 +14,7 @@ Method | HTTP request | Description
 [**get_trainings_for_project**](TrainingApi.md#get_trainings_for_project) | **GET** /project/{project_uuid}/training | Lists all Trainings of a Project
 [**prepare_training_by_version**](TrainingApi.md#prepare_training_by_version) | **PUT** /project/{project_uuid}/training/{training_version}/prepare | Start the specified training
 [**set_corpus_of_training_resource**](TrainingApi.md#set_corpus_of_training_resource) | **PUT** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/corpus | Set the corpus of the resource
-[**start_training_by_version**](TrainingApi.md#start_training_by_version) | **PUT** /project/{project_uuid}/training/{training_version}/train | Start the specified training
+[**start_training_by_version**](TrainingApi.md#start_training_by_version) | **PUT** /project/{project_uuid}/training/{training_version}/enqueue | Start the specified training
 
 
 # **assign_resource_to_training**
@@ -529,7 +529,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **prepare_training_by_version**
-> Training prepare_training_by_version(project_uuid, training_version, callback_object=callback_object)
+> Training prepare_training_by_version(project_uuid, training_version, callback=callback)
 
 Start the specified training
 
@@ -554,11 +554,11 @@ configuration.host = "http://localhost:8080/api/v1"
 api_instance = openapi_client.TrainingApi(openapi_client.ApiClient(configuration))
 project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
 training_version = 56 # int | Training version of the project
-callback_object = openapi_client.CallbackObject() # CallbackObject | Callback to be executed after the operation ended (optional)
+callback = openapi_client.Callback() # Callback | Callback to be executed after the operation ended (optional)
 
 try:
     # Start the specified training
-    api_response = api_instance.prepare_training_by_version(project_uuid, training_version, callback_object=callback_object)
+    api_response = api_instance.prepare_training_by_version(project_uuid, training_version, callback=callback)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling TrainingApi->prepare_training_by_version: %s\n" % e)
@@ -570,7 +570,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **project_uuid** | [**str**](.md)| UUID of the project | 
  **training_version** | **int**| Training version of the project | 
- **callback_object** | [**CallbackObject**](CallbackObject.md)| Callback to be executed after the operation ended | [optional] 
+ **callback** | [**Callback**](Callback.md)| Callback to be executed after the operation ended | [optional] 
 
 ### Return type
 
@@ -664,7 +664,7 @@ void (empty response body)
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **start_training_by_version**
-> Training start_training_by_version(project_uuid, training_version, callback_object=callback_object)
+> Training start_training_by_version(project_uuid, training_version, callback=callback)
 
 Start the specified training
 
@@ -689,11 +689,11 @@ configuration.host = "http://localhost:8080/api/v1"
 api_instance = openapi_client.TrainingApi(openapi_client.ApiClient(configuration))
 project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
 training_version = 56 # int | Training version of the project
-callback_object = openapi_client.CallbackObject() # CallbackObject | Callback to be executed after the operation ended (optional)
+callback = openapi_client.Callback() # Callback | Callback to be executed after the operation ended (optional)
 
 try:
     # Start the specified training
-    api_response = api_instance.start_training_by_version(project_uuid, training_version, callback_object=callback_object)
+    api_response = api_instance.start_training_by_version(project_uuid, training_version, callback=callback)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling TrainingApi->start_training_by_version: %s\n" % e)
@@ -705,7 +705,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **project_uuid** | [**str**](.md)| UUID of the project | 
  **training_version** | **int**| Training version of the project | 
- **callback_object** | [**CallbackObject**](CallbackObject.md)| Callback to be executed after the operation ended | [optional] 
+ **callback** | [**Callback**](Callback.md)| Callback to be executed after the operation ended | [optional] 
 
 ### Return type
 

@@ -68,7 +68,7 @@ if __name__ == "__main__":
     print(acoustic_models)
 
     print('Create project:')
-    project = project_instance.create_project(CreateProjectObject(
+    project = project_instance.create_project(ProjectCreation(
         name='My first project',
         acoustic_model=acoustic_models[0].uuid
     ))
@@ -118,10 +118,10 @@ if __name__ == "__main__":
     print("Upload audio:")
     audio_file = decode_api_instance.upload_audio(os.path.join(script_dir, '../../initialization/example/test.wav'))
     print(audio_file)
-    a_ref = AudioReferenceObject(audio_uuid = audio_file.uuid)
+    decoding = Decoding(audio_uuid=audio_file.uuid)
     print('Start decoding:')
-    decode_api_instance.assign_audio_to_training(project.uuid,training.version, a_ref)
-    decode_session = decode_api_instance.start_decode(project.uuid, training.version, audio_file.uuid, a_ref)
+    decode_api_instance.assign_audio_to_training(project.uuid, training.version, audio_file.uuid)
+    decode_session = decode_api_instance.start_decode(project.uuid, training.version, decoding.uuid)
     print(decode_session)
 
     decode_uuid = decode_session.decode_uuid
