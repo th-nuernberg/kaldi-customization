@@ -67,6 +67,8 @@ export class ProjectComponent implements OnInit {
 
   graphUrl;
 
+  private isCreateTrainingButtonVisible: boolean;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,

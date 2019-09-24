@@ -5,7 +5,8 @@
     <h1>Projekt {{overview?.project?.name}}</h1>
     <mat-tab-group
       class="projectMatTabGroupContainer">
-      <mat-tab>
+      <mat-tab
+        #trainingTab>
         <ng-template mat-tab-label>
           Trainings
         </ng-template>
@@ -63,7 +64,7 @@
                       matTooltip="{{decoding.transcripts}}"
                       matTooltipClass="toolTipContainer">
                       <button
-                        mat-icon-button
+                        mat-stroked-button
                         class="smallActionButton"
                         (click)="copyToClipboard(decoding.transcripts)">
                         <mat-icon>post_add</mat-icon>
@@ -84,12 +85,13 @@
       </mat-tab>
     </mat-tab-group>
     <button
-    mat-raised-button
-    color="primary"
-    class="tabGroupHeaderButton"
-    (click)="createTraining()">
-      <mat-icon>add</mat-icon>
-      Training
+      mat-raised-button
+      color="primary"
+      class="tabGroupHeaderButton"
+      *ngIf="trainingTab.isActive"
+      (click)="createTraining()">
+        <mat-icon>add</mat-icon>
+        Training
     </button>
   </ng-container>
 </div>
