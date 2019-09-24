@@ -120,13 +120,18 @@ def infinite_loop():
             log_file_handler.write("Successfully created the lexicon-file. \n")
             print("Successfully created the lexicon-file")
 
-            # Step 5: Upload lexicon which was retrieved by phonetisaurus-apply and its graph
+            # Step 5: Upload of lexicon.txt, corpus.txt and unique_word_list files
             log_file_handler.write("Processing continues by uploading the created lexicon-file and merged corpus to their corresponding MinIO-bucket \n")
             lexicon_result = upload_to_bucket(minio_client, minio_buckets["TRAINING_BUCKET"], 
                                               "{}/lexicon.txt".format(task.training_id), "/data_prep_worker/out/lexicon.txt")
+
             corpus_result = upload_to_bucket(minio_client, minio_buckets["TRAINING_BUCKET"], 
                                              "{}/corpus.txt".format(task.training_id), "/data_prep_worker/out/corpus.txt")
-            if not lexicon_result[0] or not corpus_result[0]:
+
+            unique_word_list_result = upload_to_bucket(minio_client, minio_buckets["TRAINING_BUCKET"],
+                                             "{}/unique_word_list.txt".format(task.training_id), "/data_prep_worker/out/final_word_list")
+
+            if not lexicon_result[0] or not corpus_result[0] or unique_word_list_result[0]:
                 print("At least one upload failed. It is not possible to finish this task successfully.")
                 log_file_handler.write("While trying to upload the lexicon.txt and corpus.txt files, the following error occurred: \n")
                 log_file_handler.write("############################################################################# \n")
