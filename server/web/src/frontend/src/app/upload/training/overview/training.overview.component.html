@@ -29,22 +29,33 @@
           <button
             mat-stroked-button
             class="uploadFile_Button"
-            (click)="downloadLog(detail.prepLog, 'PreparationLog')">Preparation Log</button>
+            (click)="downloadLog(detail.prepLog, 'PreparationLog')">
+            <mat-icon>get_app</mat-icon>
+            Preparation Log
+          </button>
 
           <button
             mat-stroked-button
             class="uploadFile_Button"
-            (click)="downloadLog(detail.trainingLog, 'TrainingLog')">Training Log</button>
+            (click)="downloadLog(detail.trainingLog, 'TrainingLog')">
+            <mat-icon>get_app</mat-icon>
+            Training Log
+          </button>
 
           <button
             mat-stroked-button
             class="uploadFile_Button"
-            (click)="downloadLog(detail.resourceLog, 'ResourceLog')">Resource Log</button>
+            (click)="downloadLog(detail.resourceLog, 'ResourceLog')">
+            <mat-icon>get_app</mat-icon>
+            Resource Log
+          </button>
           <button
             mat-flat-button
             class="uploadFile_Button"
             color="primary"
-            (click)="backToProjectOverview()">Zurück</button>
+            (click)="backToProjectOverview()">
+            <mat-icon>home</mat-icon>
+          </button>
         </div>
       </ng-container>
     </mat-card-content>
