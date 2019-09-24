@@ -117,12 +117,17 @@ export class TrainingUploadComponent implements OnInit {
   // copies selected history elements to current panel
   copyResource() {
     this.historySelection.selected.forEach(resource => {
-      this.currentTrainingResources.push(resource);
       this.trainingService.assignResourceToTraining(
         this.projectUuid,
         this.trainingVersion,
         { resource_uuid: resource.uuid })
-      .subscribe(this.currentTrainingResources.push);
+      .subscribe(assignedResource => {
+        if(this.currentTrainingResources.indexOf(assignedResource) !== -1) {
+          return;
+        }
+
+        this.currentTrainingResources.push(assignedResource);
+       });
     });
 
     this.snackBar.open("Kopiere Ressource in das aktuelle Training...", "", AppConstants.snackBarConfig);
@@ -182,12 +187,17 @@ export class TrainingUploadComponent implements OnInit {
     // creates resource and starts the TextPrepWorker to create the corupus
     this.resourceService.createResource(blobFile)
       .subscribe(resource => {
-        this.currentTrainingResources.push(resource);
         this.trainingService.assignResourceToTraining(
           this.projectUuid,
           this.trainingVersion,
           { resource_uuid: resource.uuid })
-        .subscribe(this.currentTrainingResources.push);
+        .subscribe(assignedResource => {
+          if(this.currentTrainingResources.indexOf(assignedResource) !== -1) {
+            return;
+          }
+
+          this.currentTrainingResources.push(assignedResource);
+        });
     });
 
     this.snackBar.open("Lade neue Ressource hoch...", "", AppConstants.snackBarConfig);

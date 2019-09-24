@@ -111,8 +111,13 @@ export class DecodingUploadComponent implements OnInit {
         this.trainingVersion,
         { audio_uuid: audio.uuid }
       ).subscribe(decodeTask => {
+        if(this.currentDecodeTasks.indexOf(decodeTask) !== -1 ||
+           this.currentAudios.indexOf(audio) !== -1) {
+          return;
+        }
+
         this.currentDecodeTasks.push(decodeTask);
-        this.currentAudios.push(audio)
+        this.currentAudios.push(audio);
       });
     });
   }
@@ -178,13 +183,15 @@ export class DecodingUploadComponent implements OnInit {
 
     this.decodeService.uploadAudio(blobFile)
       .subscribe(audio => {
-
-        //this.currentAudios.push(audio);
         this.decodeService.assignAudioToTraining(
         this.projectUuid,
         this.trainingVersion,
         { audio_uuid: audio.uuid }
       ).subscribe(decodeTask => {
+        if(this.currentDecodeTasks.indexOf(decodeTask) !== -1 ||
+        this.currentAudios.indexOf(audio) !== -1) {
+          return;
+        }
         this.currentDecodeTasks.push(decodeTask);
         this.currentAudios.push(audio)
       });
