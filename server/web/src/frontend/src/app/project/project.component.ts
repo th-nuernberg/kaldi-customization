@@ -67,8 +67,6 @@ export class ProjectComponent implements OnInit {
 
   graphUrl;
 
-  private isCreateTrainingButtonVisible: boolean;
-
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -158,6 +156,26 @@ export class ProjectComponent implements OnInit {
         a.parentNode.removeChild(a);
       }, 5000);
     });
+  }
+
+  downloadTranscript(data, name:string) {
+    let fileName = name.split('.').slice(0, -1).join('.');
+    this.snackBar.open("Lade" + fileName + " Transkript herunter...", "", AppConstants.snackBarConfig);
+
+    if(!data) {
+      console.error("No data!");
+      return;
+    }
+
+    let blob = new Blob([data], {type: 'text/plain'});
+    let event = document.createEvent('MouseEvent');
+    let a = document.createElement('a');
+
+    a.href = URL.createObjectURL(blob);
+    a.download = fileName + '.txt';
+    a.dataset.downloadurl = ['text/plain', a.download, a.href].join(':');
+    event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+    a.dispatchEvent(event);
   }
 
   copyToClipboard(text) {

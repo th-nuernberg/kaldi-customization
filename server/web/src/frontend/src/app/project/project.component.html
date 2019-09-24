@@ -73,7 +73,8 @@
                   </div>
                   <button
                     mat-stroked-button
-                    class="actionButton rightAlign">
+                    class="actionButton rightAlign"
+                    (click)="downloadTranscript(decoding.transcripts, decoding.audio.name)">
                       <mat-icon>get_app</mat-icon>
                   </button>
                   <mat-divider></mat-divider>

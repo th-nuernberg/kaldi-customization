@@ -3,7 +3,11 @@
     <mat-card-content>
       <ng-container *ngIf="{
         project: project$ | async,
-        training: training$ | async } as detail;">
+        training: training$ | async,
+        prepLog: preparationLog$ | async,
+        resourceLog: resourceLog$ | async,
+        trainingLog: trainingLog$ | async,
+        trainingStats: trainingStats$ | async } as detail;">
         <h2>Status Training</h2>
         <div>
             <p>Projekt: {{detail.project?.name}}</p>
@@ -16,17 +20,31 @@
           <p>Trainingsstatus: {{detail.training?.status}}</p>
         </div>
         <div>
-          <p>Anzahl der Dateien: TODO </p>
-          <p>Anzahl der Textzeilen: TODO </p>
-          <p>Anzahl der Wörter: TODO</p>
-          <p>Anzahl der eindeutigen Wörter: TODO</p>
+          <p>Anzahl der Dateien: {{detail.trainingStats?.files_count}}</p>
+          <p>Anzahl der Textzeilen: {{detail.trainingStats?.lines_count}}</p>
+          <p>Anzahl der Wörter: {{detail.trainingStats?.words_count}}</p>
+          <p>Anzahl der eindeutigen Wörter: {{detail.trainingStats?.unqiue_words_count}}</p>
         </div>
         <div>
+          <button
+            mat-stroked-button
+            class="uploadFile_Button"
+            (click)="downloadLog(detail.prepLog, 'PreparationLog')">Preparation Log</button>
+
+          <button
+            mat-stroked-button
+            class="uploadFile_Button"
+            (click)="downloadLog(detail.trainingLog, 'TrainingLog')">Training Log</button>
+
+          <button
+            mat-stroked-button
+            class="uploadFile_Button"
+            (click)="downloadLog(detail.resourceLog, 'ResourceLog')">Resource Log</button>
           <button
             mat-flat-button
             class="uploadFile_Button"
             color="primary"
-            (click)="backToProjectOverview()">Zurück zur Projektübersicht</button>
+            (click)="backToProjectOverview()">Zurück</button>
         </div>
       </ng-container>
     </mat-card-content>
