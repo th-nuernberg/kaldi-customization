@@ -35,7 +35,7 @@ def db_project_to_front(db_project):
         acoustic_model=db_acousticModel_to_front(db_project.acoustic_model),
         parent=parent_uuid,
         trainings=training_list,
-        creation_timestamp=db_project.create_date,
+        creation_timestamp=db_project.creation_timestamp,
         owner=db_user_to_front(db_project.owner)
     )
 
@@ -79,7 +79,7 @@ def db_training_to_front(db_training):
 
     return Training(
         version=db_training.version,
-        creation_timestamp=db_training.create_date,
+        creation_timestamp=db_training.creation_timestamp,
         status=TrainingStateEnum_to_TrainingStatus(db_training.status),
         resources=resource_list
     )

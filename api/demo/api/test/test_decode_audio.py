@@ -15,12 +15,12 @@ from __future__ import absolute_import
 import unittest
 
 import openapi_client
-from openapi_client.models.audio import Audio  # noqa: E501
+from openapi_client.models.decode_audio import DecodeAudio  # noqa: E501
 from openapi_client.rest import ApiException
 
 
-class TestAudio(unittest.TestCase):
-    """Audio unit test stubs"""
+class TestDecodeAudio(unittest.TestCase):
+    """DecodeAudio unit test stubs"""
 
     def setUp(self):
         pass
@@ -28,10 +28,10 @@ class TestAudio(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def testAudio(self):
-        """Test Audio"""
+    def testDecodeAudio(self):
+        """Test DecodeAudio"""
         # FIXME: construct object with mandatory attributes with example values
-        # model = openapi_client.models.audio.Audio()  # noqa: E501
+        # model = openapi_client.models.decode_audio.DecodeAudio()  # noqa: E501
         pass
 
 

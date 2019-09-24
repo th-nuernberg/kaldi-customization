@@ -9,12 +9,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { DecodeAudio } from './decodeAudio';
+import { DecodeSessionStatus } from './decodeSessionStatus';
 
 
-export interface ResourceReferenceObject { 
-    /**
-     * UUID of the resource
-     */
-    resource_uuid: string;
+export interface DecodeSession { 
+    session_uuid?: string;
+    creation_timestamp?: Date;
+    status?: DecodeSessionStatus;
+    decodings?: Array<DecodeAudio>;
 }
 
