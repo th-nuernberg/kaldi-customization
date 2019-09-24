@@ -2,7 +2,7 @@
   <ng-container
     *ngIf="{
       project: project$ | async } as overview;">
-    <h1>Projekt {{overview?.project?.name}}</h1>
+    <h1>{{overview?.project?.name}}</h1>
     <mat-tab-group
       class="projectMatTabGroupContainer">
       <mat-tab>
@@ -17,7 +17,7 @@
               (click)="openTraining(training.version, training.status)">
               <div class="matListTextContainer">
                 <p matLine class="textContainer">Version: {{training.version}}</p>
-                <p matLine class="textContainer">Status: {{training.status}}</p>
+                <p matLine class="textContainer">Status: {{training.status | message:'training'}}</p>
               </div>
               <button
                 mat-stroked-button

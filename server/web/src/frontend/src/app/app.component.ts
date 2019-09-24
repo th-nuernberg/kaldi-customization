@@ -27,5 +27,8 @@ export class AppComponent {
 }
 
 export default class AppConstants {
-  public static snackBarConfig: MatSnackBarConfig = { duration: 2000 };
+  public static snackBarConfig: MatSnackBarConfig = {
+    duration: 2000,
+    verticalPosition: 'top'
+  };
 }

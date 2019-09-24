@@ -17,7 +17,7 @@ export default class StatusMapperService {
 
   public static convertAudioStatus(value: any): string {
     const audioPrep = "Audiovorbereitung";
-    switch(value) {
+    switch(+value) {
       case AudioStatus.Init: {
         return audioPrep + this._isInitialized;
       }
@@ -33,6 +33,10 @@ export default class StatusMapperService {
       case AudioStatus.AudioPrep_Failure: {
         return audioPrep + this._hasFailed;
       }
+      default: {
+        console.error('missing status code for audio ' + value);
+        return value;
+      }
     }
   }
 
@@ -40,7 +44,7 @@ export default class StatusMapperService {
     const upload = "Upload";
     const textPrep = "Textvorbereitung";
 
-    switch(value) {
+    switch(+value) {
       case ResourceStatus.Upload_InProgress: {
         return upload + this._isInProgress;
       }
@@ -62,12 +66,16 @@ export default class StatusMapperService {
       case ResourceStatus.TextPreparation_Success: {
         return textPrep + this._wasSuccessful;
       }
+      default: {
+        console.error('missing status code for resource ' + value);
+        return value;
+      }
     }
   }
 
   public static convertTrainingStatus(value: any): string {
     const training = "Training";
-    switch(value) {
+    switch(+value) {
       case TrainingStatus.Init: {
         return training + this._isInitialized;
       }
@@ -85,6 +93,10 @@ export default class StatusMapperService {
       }
       case TrainingStatus.Training_Failure: {
         return training + this._hasFailed;
+      }
+      default: {
+        console.error('missing status code for training ' + value);
+        return value;
       }
     }
   }
