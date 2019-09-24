@@ -61,8 +61,14 @@
                       matLine
                       class="textContainer"
                       matTooltip="{{decoding.transcripts}}"
-                      matTooltipClass="toolTipContainer"
-                      >Text: {{decoding.transcripts}}</p>
+                      matTooltipClass="toolTipContainer">
+                      <button
+                        mat-icon-button
+                        class="smallActionButton"
+                        (click)="copyToClipboard(decoding.transcripts)">
+                        <mat-icon>post_add</mat-icon>
+                      </button>
+                      Text: {{decoding.transcripts}}</p>
                   </div>
                   <button
                     mat-stroked-button

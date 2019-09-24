@@ -157,4 +157,19 @@ export class ProjectComponent implements OnInit {
       }, 5000);
     });
   }
+
+  copyToClipboard(text) {
+    let tempTextArea = document.createElement('textarea');
+    tempTextArea.style.position = 'fixed';
+    tempTextArea.style.left = '0';
+    tempTextArea.style.top = '0';
+    tempTextArea.style.opacity = '0';
+    tempTextArea.value = text;
+
+    document.body.appendChild(tempTextArea);
+    tempTextArea.select();
+    tempTextArea.focus();
+    document.execCommand('copy');
+    document.body.removeChild(tempTextArea);
+  }
 }
