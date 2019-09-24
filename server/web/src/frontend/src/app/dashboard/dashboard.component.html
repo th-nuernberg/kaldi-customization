@@ -38,14 +38,15 @@
           mat-raised-button
           color="primary"
           class="newProjectButton">
-             Neues Projekt
+            <mat-icon>add</mat-icon>
+             Projekt
         </button>
       </form>
     </mat-card>
 
     <app-tile
-      *ngFor="let tile of gridProjectTiles"
-      [tileData]="tile"></app-tile>
+      *ngFor="let tile of gridProjectTiles.reverse()"
+      [project]="tile"></app-tile>
   </div>
 
 </div>

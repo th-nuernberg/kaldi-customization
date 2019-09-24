@@ -14,7 +14,9 @@ from 'swagger-client'
 @Component({
   selector: 'app-dashboard',
   templateUrl: './training.overview.component.html',
-  styleUrls: ['./training.overview.component.less'],
+  styleUrls: [
+    './training.overview.component.less'
+  ]
 })
 
 export class TrainingOverviewComponent implements OnInit {

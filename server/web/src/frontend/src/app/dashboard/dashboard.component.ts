@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material';
 import {
   ProjectService,
   Project,
   GlobalService,
   AcousticModel
 } from 'swagger-client';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';;
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import AppConstants from  '../app.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -69,7 +70,7 @@ export class DashboardComponent implements OnInit {
       }
     )
     .subscribe(project => {
-      this.snackBar.open("Erstelle neues Projekt...", "", { duration: 3000 });
+      this.snackBar.open("Erstelle neues Projekt...", "", AppConstants.snackBarConfig);
       this.gridProjectTiles.push(project);
       this.createProjectSubmitted = false;
       this.createProjectForm.reset();

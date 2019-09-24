@@ -24,7 +24,9 @@ import {
   MatTableModule,
   MatStepperModule,
   MatAutocompleteModule,
-  MatSnackBarModule
+  MatSnackBarModule,
+  MatExpansionModule,
+  MatTooltipModule
 } from '@angular/material';
 
 import { MatDialogModule } from '@angular/material/dialog';
@@ -40,6 +42,8 @@ import { IdentityService } from '../identity.service';
 
 import { TileComponent } from './dashboard/tile/tile.component';
 import { LoginComponent } from './login/login.component';
+import { SafePipe } from './safe.pipe';
+import { StatusMessagePipe } from './status.message.pipe';
 
 @NgModule({
   declarations: [
@@ -52,7 +56,9 @@ import { LoginComponent } from './login/login.component';
     TrainingOverviewComponent,
     AccountComponent,
     TileComponent,
-    LoginComponent
+    LoginComponent,
+    SafePipe,
+    StatusMessagePipe
   ],
   imports: [
     ApiModule.forRoot(IdentityService.getApiConfiguration),
@@ -81,6 +87,8 @@ import { LoginComponent } from './login/login.component';
     MatStepperModule,
     MatAutocompleteModule,
     MatSnackBarModule,
+    MatExpansionModule,
+    MatTooltipModule
   ],
   providers: [],
   entryComponents: [],

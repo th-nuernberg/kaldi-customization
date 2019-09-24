@@ -5,8 +5,25 @@ from openapi_server.models.data_prep_stats import DataPrepStats  # noqa: E501
 from openapi_server import util
 
 
+def get_decode_session_log(project_uuid, training_version, session_uuid):  # noqa: E501
+    """Get decode session
+
+    Returns the log of a decoding session # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+    :param session_uuid: UUID of the session
+    :type session_uuid: 
+
+    :rtype: str
+    """
+    return 'do some magic!'
+
+
 def get_perparation_log(project_uuid, training_version):  # noqa: E501
-    """Get Training Log
+    """Get Preparation Log
 
     Returns the log of a preparation # noqa: E501
 

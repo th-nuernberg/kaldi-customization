@@ -55,7 +55,7 @@ with app.app_context():
     test_project = Project(name = "TestProject", uuid = "12345678901234567890123456789012", owner = user,acoustic_model = Voxforge_RNN)
     db.session.add(test_project)
 
-    test_training = Training(project = test_project, version = 1, create_date = datetime.datetime.now(), status = TrainingStateEnum.Init)
+    test_training = Training(project = test_project, version = 1, creation_timestamp = datetime.datetime.now(), status = TrainingStateEnum.Init)
     db.session.add(test_project)
     
     db.session.commit()

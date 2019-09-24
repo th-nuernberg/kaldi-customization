@@ -75,7 +75,7 @@ class Training(db.Model):
 
     version = db.Column(db.Integer, autoincrement=True)
 
-    create_date = db.Column(db.DateTime(timezone=False), default=datetime.datetime.utcnow)
+    creation_timestamp = db.Column(db.DateTime(timezone=False), default=datetime.datetime.utcnow)
     status = db.Column(db.Enum(TrainingStateEnum), default=TrainingStateEnum.Init)
 
     def can_assign_resource(self):

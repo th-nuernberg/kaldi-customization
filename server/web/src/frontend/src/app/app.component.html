@@ -11,13 +11,13 @@
   <span class="example-spacer"></span>
   <div fxShow="true" fxHide.lt-md="true"
        *ngIf="currentUser != null">
-    <a mat-button routerLink="/dashboard">Übersicht</a>
-    <a mat-button routerLink="/account">Account</a>
-    <a mat-button (click)="logout()">Abmelden</a>
+    <a mat-button routerLink="/dashboard" routerLinkActive="active">Übersicht</a>
+    <a mat-button routerLink="/account" routerLinkActive="active">Account</a>
+    <a mat-button (click)="logout()" routerLinkActive="active">Abmelden</a>
   </div>
   <div fxShow="true" fxHide.lt-md="true"
        *ngIf="currentUser == null">
-    <a mat-button routerLink="/login">Anmelden</a>
+    <a mat-button routerLink="/login" routerLinkActive="active">Anmelden</a>
   </div>
 </mat-toolbar>
 

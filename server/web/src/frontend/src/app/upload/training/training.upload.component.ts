@@ -13,12 +13,15 @@ import {
   ResourceService,
   TrainingService,
 }
-from 'swagger-client'
+from 'swagger-client';
+import AppConstants from  '../../app.component';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './training.upload.component.html',
-  styleUrls: ['./training.upload.component.less'],
+  styleUrls: [
+    './training.upload.component.less',
+    ]
 })
 
 export class TrainingUploadComponent implements OnInit {
@@ -122,9 +125,10 @@ export class TrainingUploadComponent implements OnInit {
       .subscribe(this.currentTrainingResources.push);
     });
 
-    this.snackBar.open("Kopiere Ressource in das aktuelle Training...", "", { duration: 3000 });
+    this.snackBar.open("Kopiere Ressource in das aktuelle Training...", "", AppConstants.snackBarConfig);
   }
 
+  // show the selected content of a corpus
   onSelectionChange(ev, selectedResources) {
     if(ev.option.selected === false) {
       this.showContentPreview = false;
@@ -164,7 +168,7 @@ export class TrainingUploadComponent implements OnInit {
       }
     });
 
-    this.snackBar.open("Lösche Ressource vom aktuellen Training...", "", { duration: 3000 });
+    this.snackBar.open("Lösche Ressource vom aktuellen Training...", "", AppConstants.snackBarConfig);
   }
 
   // uploads file and show preview
@@ -172,9 +176,9 @@ export class TrainingUploadComponent implements OnInit {
     this.uploadResource(file);
   }
 
+  // uploads new resource and assigns to training
   uploadResource(file) {
     const blobFile:Blob = file.files[0] as Blob;
-
     // creates resource and starts the TextPrepWorker to create the corupus
     this.resourceService.createResource(blobFile)
       .subscribe(resource => {
@@ -186,10 +190,17 @@ export class TrainingUploadComponent implements OnInit {
         .subscribe(this.currentTrainingResources.push);
     });
 
-    this.snackBar.open("Lade neue Ressource hoch...", "", { duration: 3000 });
+    this.snackBar.open("Lade neue Ressource hoch...", "", AppConstants.snackBarConfig);
   }
 
-  reloadProject() {
+  // reloads project, copies existing resources to training or prepares training
+  async reloadProject(newResources:boolean=false) {
+    if(newResources) {
+      await this.copyResource();
+    } else {
+      await this.prepareTraining();
+    }
+
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
     this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
 
@@ -199,6 +210,7 @@ export class TrainingUploadComponent implements OnInit {
     });
   }
 
+  // gets the content of all assigned corpuses
   getResourceCorpusResult() {
     this.currentTrainingResources.forEach(resource => {
       this.trainingService.getCorpusOfTrainingResource(
@@ -210,10 +222,19 @@ export class TrainingUploadComponent implements OnInit {
     });
   }
 
+  // prepares training and executes the text preparation worker
+  prepareTraining() {
+    this.trainingService.prepareTrainingByVersion(this.projectUuid, this.trainingVersion)
+      .subscribe(training => {
+        this.snackBar.open("Bereite Training vor...", "", AppConstants.snackBarConfig);
+      })
+  }
+
+  // starts the training
   startTraining() {
     this.trainingService.startTrainingByVersion(this.projectUuid, this.trainingVersion)
     .subscribe(training => {
-      this.snackBar.open("Starte Training...", "", { duration: 3000 });
+      this.snackBar.open("Starte Training...", "", AppConstants.snackBarConfig);
       this.router.navigate(["/upload/training/overview/" + this.projectUuid + "/" + this.trainingVersion]);
     });
   }
