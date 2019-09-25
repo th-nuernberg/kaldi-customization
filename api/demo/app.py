@@ -104,7 +104,6 @@ if __name__ == "__main__":
     last_status = preparation_session.status
     print('Preparation status: ', last_status)
 
-
     print('Wait for preparation status become success or failure')
     while last_status != TrainingStatus.Training_DataPrep_Success and last_status != TrainingStatus.Training_DataPrep_Failure:
         if preparation_session.status != last_status:
@@ -138,24 +137,28 @@ if __name__ == "__main__":
 
     if last_status != TrainingStatus.Training_Success:
         exit(1)
+    
     print("Upload audio:")
     audio_file = decode_api_instance.upload_audio(os.path.join(script_dir, '../../initialization/example/test.wav'))
     print(audio_file)
     a_ref = AudioReferenceObject(audio_uuid = audio_file.uuid)
+    
     print('Start decoding:')
-    decode_api_instance.assign_audio_to_training(project.uuid,training.version, a_ref)
-    decode_session = decode_api_instance.start_decode(project.uuid, training.version, audio_file.uuid, a_ref)
+    decode_session = decode_api_instance.create_decode_session(project.uuid,training.version)
+    decode_api_instance.assign_audio_to_current_session(project.uuid,training.version, a_ref)
+    decode_api_instance.start_decode(project.uuid, training.version, decode_session.session_uuid)
+    
     print(decode_session)
 
-    decode_uuid = decode_session.decode_uuid
+    decode_uuid = decode_session.session_uuid
 
     decode_session = decode_api_instance.get_decode_result(
-        project.uuid, training.version, decode_uuid)
+        project.uuid, training.version, audio_file.uuid)
 
     while not decode_session.transcripts:
         time.sleep(5)
 
         decode_session = decode_api_instance.get_decode_result(
-            project.uuid, training.version, decode_uuid)
+            project.uuid, training.version, audio_file.uuid)
 
     print(decode_session)

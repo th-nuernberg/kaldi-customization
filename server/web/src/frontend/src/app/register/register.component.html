@@ -1,20 +1,28 @@
-<mat-card class="login-card">
-  <mat-card-title>Login</mat-card-title>
+<mat-card class="register-card">
+  <mat-card-title>Registrieren</mat-card-title>
 
   <mat-card-content>
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <div class="login-container">
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="register-container">
         <mat-form-field>
-          <input matInput type="text" placeholder="Email" formControlName="username" />
+          <input matInput type="text" placeholder="Benutzername" formControlName="username" />
           <mat-error *ngIf="submitted && f.username.errors">
-              <div *ngIf="f.username.errors.required">Email wird benötigt</div>
+            <div *ngIf="f.username.errors.required">Benutzername wird benötigt</div>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <input matInput type="text" placeholder="Email" formControlName="email" />
+          <mat-error *ngIf="submitted && f.email.errors">
+            <div *ngIf="f.email.errors.email">Ungültige Email-Adresse</div>
+            <div *ngIf="f.email.errors.required">Email wird benötigt</div>
           </mat-error>
         </mat-form-field>
 
         <mat-form-field>
           <input matInput type="password" placeholder="Passwort" formControlName="password" />
           <mat-error *ngIf="submitted && f.password.errors">
-              <div *ngIf="f.password.errors.required">Passwort wird benötigt</div>
+            <div *ngIf="f.password.errors.required">Passwort wird benötigt</div>
           </mat-error>
         </mat-form-field>
 
@@ -25,7 +33,7 @@
             <br>
           </mat-error>
 
-          <button mat-flat-button [disabled]="loading" color="primary">Login</button>
+          <button mat-flat-button [disabled]="loading" color="primary">Registrieren</button>
           <img *ngIf="loading" class="pl-3" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
         </div>
       </div>

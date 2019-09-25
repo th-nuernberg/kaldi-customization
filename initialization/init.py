@@ -49,22 +49,6 @@ with app.app_context():
     Voxforge_RNN = AcousticModel(name='Voxforge-RNN', language=german, model_type=ModelType.HMM_RNN)
     db.session.add(Voxforge_RNN)
 
-    user = User(username = "kaldi" , pw_hash="213123123", salt = "Ein Muffin")
-    db.session.add(user)
-
-    test_project = Project(name = "TestProject", uuid = "12345678901234567890123456789012", owner = user,acoustic_model = Voxforge_RNN)
-    db.session.add(test_project)
-
-    test_training = Training(project = test_project, version = 1, creation_timestamp = datetime.datetime.now(), status = TrainingStateEnum.Init)
-    db.session.add(test_project)
-    
-    db.session.commit()
-
-    #commit generates ids, we need them later so safe them before closing the session
-    test_project_id = test_project.id
-    test_train_id = test_training.id
-    db.session.close()
-
     db.session.commit()
 
 '''Create buckets if they do not exist'''
@@ -94,10 +78,3 @@ upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfo
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/global_cmvn.stats"  , "initialization/acoustic-models/voxforge-rnn/extractor/global_cmvn.stats")
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/online_cmvn.conf"  , "initialization/acoustic-models/voxforge-rnn/extractor/online_cmvn.conf")
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/extractor/splice_opts"  , "initialization/acoustic-models/voxforge-rnn/extractor/splice_opts")
-
-# Test Project
-upload_to_bucket(minio_client,minio_buckets["TRAINING_BUCKET"], str(test_train_id) + "/corpus.txt"  , "initialization/example/corpus.txt")
-upload_to_bucket(minio_client,minio_buckets["TRAINING_BUCKET"], str(test_train_id) + "/lexicon.txt"  , "initialization/example/lexicon.txt")
-
-# Test Decode
-upload_to_bucket(minio_client,minio_buckets["DECODING_BUCKET"], "test.wav", "initialization/example/test.wav")

@@ -9,6 +9,7 @@ import { TrainingOverviewComponent } from './upload/training/overview/training.o
 import { AccountComponent } from './account/account.component';
 import { LoginComponent } from './login/login.component';
 import { AuthGuard } from './_guards/auth.guard';
+import { RegisterComponent } from './register/register.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -19,6 +20,7 @@ const routes: Routes = [
   { path: 'upload/training/overview/:uuid/:id', component: TrainingOverviewComponent, canActivate: [AuthGuard] },
   { path: 'account',   component: AccountComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
 ];
 
 @NgModule({

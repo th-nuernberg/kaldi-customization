@@ -15,8 +15,6 @@ training_bucket = minio_buckets["TRAINING_BUCKET"]
 script_root_path = os.path.dirname(os.path.realpath(__file__))
 workspace_path = os.path.join(script_root_path, 'workspace')
 
-wav_file_path = os.path.join(workspace_path, 'tmp.wav')
-
 acoustic_model_folder = os.path.join(script_root_path,"acc_models")
 
 downloaded_acoustic_models = set()
@@ -37,7 +35,7 @@ if __name__ == "__main__":
             print(task)
 
             acoustic_model_id = str(task["acoustic_model_id"])
-            decode_file = task["decode_file"]
+            audioresource_uuids = task["audio_uuids"]
             training_id = str(task["training_id"])
             decode_uuid = task["decode_uuid"]
 
@@ -71,17 +69,20 @@ if __name__ == "__main__":
             shutil.unpack_archive(download_graph_path, cur_graph_path)
 
 
-            # Download wav file to decode
-            download_from_bucket(minio_client, decode_bucket, decode_file , wav_file_path)
+            # Download wav files to decode
+            for uuid in audioresource_uuids:
+                download_from_bucket(minio_client, decode_bucket, str(uuid) , os.path.join(workspace_path, str(uuid) + ".wav"))
 
             # create data dir
             data_path = os.path.join(workspace_path,"data")
             os.makedirs(data_path)
             with open(os.path.join(data_path,"utt2spk"),"w") as f:
-                f.write("generic generic_speaker")
+                for i,uuid in enumerate(audioresource_uuids):
+                    f.write("{} generic_speaker{}".format(uuid,i))
             
             with open(os.path.join(data_path,"wav.scp"),"w") as f:
-                f.write("generic " + wav_file_path)
+                for uuid in audioresource_uuids:
+                    f.write("{} {}".format(uuid,os.path.join(workspace_path, str(uuid) + ".wav")))
 
             # decode
             os.chdir("/kaldi/scripts/")
@@ -89,21 +90,21 @@ if __name__ == "__main__":
             os.chdir("/")
             decode_path = os.path.join(cur_acoustic_model_path,"decode")
 
-            result = "ERROR"
+            result = dict()
             # extract from acoustic_model/decode
             with open(os.path.join(decode_path, "log", "decode.1.log")) as f:
                 for line in f:
                     line = line.split()
-                    if line[0] == 'generic':
-                        result = " ".join(line[1:])
+                    if line[0] in audioresource_uuids:
+                        result[line[0]]=[" ".join(line[1:])]
 
-            print("FOUND RESULT:\n"+result)
+            print("FOUND RESULTS:\n"+str(result))
 
             # unload resources
             shutil.rmtree(workspace_path)
             shutil.rmtree(decode_path)
 
-            status.submit(DecodeStatus(id=DecodeStatusCode.SUCCESS, decode_uuid=decode_uuid, transcripts=[result]))
+            status.submit(DecodeStatus(id=DecodeStatusCode.SUCCESS, decode_uuid=decode_uuid, transcripts=result))
 
     except KeyboardInterrupt:
         #cleanup
