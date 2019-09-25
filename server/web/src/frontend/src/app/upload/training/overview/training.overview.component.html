@@ -1,30 +1,56 @@
-<div>
-  <mat-card class="cardContainer">
-    <mat-card-content>
-      <ng-container *ngIf="{
-        project: project$ | async,
-        training: training$ | async,
-        prepLog: preparationLog$ | async,
-        resourceLog: resourceLog$ | async,
-        trainingLog: trainingLog$ | async,
-        trainingStats: trainingStats$ | async } as detail;">
+<div fxLayout="center center">
+  <ng-container *ngIf="{
+    project: project$ | async,
+    training: training$ | async,
+    prepLog: preparationLog$ | async,
+    resourceLog: resourceLog$ | async,
+    trainingLog: trainingLog$ | async,
+    trainingStats: trainingStats$ | async } as detail;">
+    <mat-card class="cardContainer">
+      <mat-card-content>
         <h2>Status Training</h2>
-        <div>
+        <mat-list>
+          <mat-list-item>
             <p>Projekt: {{detail.project?.name}}</p>
+          </mat-list-item>
+          <mat-list-item>
             <p>Modell: {{detail.project?.acoustic_model.name}}</p>
+          </mat-list-item>
+          <mat-list-item>
             <p>Modell: {{detail.project?.acoustic_model.model_type}}</p>
-        </div>
-        <div>
-          <p>Training: {{detail.training?.version}}</p>
-          <p>Erstellungszeit: {{detail.training?.creation_timestamp}}</p>
-          <p>Trainingsstatus: {{detail.training?.status}}</p>
-        </div>
-        <div>
-          <p>Anzahl der Dateien: {{detail.trainingStats?.files_count}}</p>
-          <p>Anzahl der Textzeilen: {{detail.trainingStats?.lines_count}}</p>
-          <p>Anzahl der Wörter: {{detail.trainingStats?.words_count}}</p>
-          <p>Anzahl der eindeutigen Wörter: {{detail.trainingStats?.unqiue_words_count}}</p>
-        </div>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+
+          <mat-list-item>
+            <p>Training: {{detail.training?.version}}</p>
+          </mat-list-item>
+
+          <mat-list-item>
+            <p>Erstellungszeit: {{detail.training?.creation_timestamp}}</p>
+          </mat-list-item>
+
+          <mat-list-item>
+            <p>Trainingsstatus: {{detail.training?.status}}</p>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+
+          <mat-list-item>
+            <p>Anzahl der Dateien: {{detail.trainingStats?.files_count}}</p>
+          </mat-list-item>
+
+          <mat-list-item>
+            <p>Anzahl der Textzeilen: {{detail.trainingStats?.lines_count}}</p>
+          </mat-list-item>
+
+          <mat-list-item>
+            <p>Anzahl der Wörter: {{detail.trainingStats?.words_count}}</p>
+          </mat-list-item>
+
+          <mat-list-item>
+            <p>Anzahl der eindeutigen Wörter: {{detail.trainingStats?.unqiue_words_count}}</p>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+        </mat-list>
         <div>
           <button
             mat-stroked-button
@@ -57,9 +83,9 @@
             <mat-icon>home</mat-icon>
           </button>
         </div>
-      </ng-container>
-    </mat-card-content>
-  </mat-card>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
 </div>
 <div>
   <mat-card class="cardContainer">
