@@ -541,4 +541,4 @@ def start_training_by_version(project_uuid, training_version, callback_object=No
             acoustic_model_id=db_training.project.acoustic_model_id)
         return mapper.db_training_to_front(db_training)
     else:
-        return (mapper.db_training_resource_to_front,400)    
+        return ("Training already done or pending", 400)
