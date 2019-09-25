@@ -15,8 +15,9 @@ from openapi_server.models.callback_method import CallbackMethod
 from openapi_server.models.callback_object import CallbackObject
 from openapi_server.models.create_project_object import CreateProjectObject
 from openapi_server.models.data_prep_stats import DataPrepStats
-from openapi_server.models.decode_message import DecodeMessage
-from openapi_server.models.decode_task_reference import DecodeTaskReference
+from openapi_server.models.decode_audio import DecodeAudio
+from openapi_server.models.decode_session import DecodeSession
+from openapi_server.models.decode_session_status import DecodeSessionStatus
 from openapi_server.models.language import Language
 from openapi_server.models.project import Project
 from openapi_server.models.resource import Resource

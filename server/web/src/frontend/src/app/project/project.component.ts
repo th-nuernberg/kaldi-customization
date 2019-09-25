@@ -8,16 +8,15 @@ import {
   TrainingService,
   Training,
   DecodeService,
-  DecodeMessage,
+  DecodeAudio,
   Project,
   ProjectService }
 from 'swagger-client';
 import AppConstants from  '../app.component';
 import { DomSanitizer } from '@angular/platform-browser';
 
-const DUMMY_DECODES: DecodeMessage[] = [
+const DUMMY_DECODES: DecodeAudio[] = [
   {
-    uuid: "550e8400-e29b-11d4-a716-446655440000",
     transcripts: [
       new Object("und die mühsam am auch liegt auf die diesen klicken einem texten zu produzieren"),
       new Object("und die mühsam am auch liegt auf die diesen klicken einem texten zu produzieren"),
@@ -30,7 +29,6 @@ const DUMMY_DECODES: DecodeMessage[] = [
     }
   },
   {
-    uuid: "550e8400-e29b-11d4-a716-446655440000",
     transcripts: [
       new Object("und die mühsam am auch liegt auf die diesen klicken einem texten zu produzieren")
     ],
@@ -41,7 +39,6 @@ const DUMMY_DECODES: DecodeMessage[] = [
     }
   },
   {
-    uuid: "550e8400-e29b-11d4-a716-446655440000",
     transcripts: [
       new Object("und die mühsam am auch liegt auf die diesen klicken einem texten zu produzieren")
     ],
@@ -62,10 +59,10 @@ export class ProjectComponent implements OnInit {
   projectUuid: string;
 
   training: Training;
-  currentDecodings: DecodeMessage[];
+  currentDecodings: DecodeAudio[];
 
   project$: Observable<Project>;
-  decodings$: Observable<DecodeMessage[]>;
+  decodings$: Observable<DecodeAudio[]>;
 
   graphUrl;
 

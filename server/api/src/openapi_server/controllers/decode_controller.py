@@ -7,10 +7,10 @@ import datetime
 
 from openapi_server.models.audio import Audio  # noqa: E501
 from openapi_server.models.audio_reference_object import AudioReferenceObject  # noqa: E501
-from openapi_server.models.audio_reference_with_callback_object import AudioReferenceWithCallbackObject  # noqa: E501
-from openapi_server.models.binary_resource_object import BinaryResourceObject  # noqa: E501
-from openapi_server.models.decode_message import DecodeMessage  # noqa: E501
-from openapi_server.models.decode_task_reference import DecodeTaskReference  # noqa: E501
+from openapi_server.models.callback_object import CallbackObject  # noqa: E501
+from openapi_server.models.decode_audio import DecodeAudio  # noqa: E501
+from openapi_server.models.decode_session import DecodeSession  # noqa: E501
+from openapi_server.models.resource import Resource  # noqa: E501
 from openapi_server import util
 
 from mapper import mapper
@@ -31,14 +31,16 @@ def get_filetype(filename):
     Returns the filetype or None, if it cannot be processed by the text preperation worker.
     '''
     if '.' in filename:
-        return filename.rsplit('.', 1)[1].lower()
+        filetype = filename.rsplit('.', 1)[1].lower()
+        if filetype in ['wav']:
+            return filetype
     return None
 
 
-def assign_audio_to_training(project_uuid, training_version, audio_reference_object=None):  # noqa: E501
-    """Assign Audio to training
+def assign_audio_to_current_session(project_uuid, training_version, audio_reference_object=None):  # noqa: E501
+    """Assign Audio to decoding session
 
-    Assign audio to to be decoded in a specific training # noqa: E501
+    Assign audio to current decoding session # noqa: E501
 
     :param project_uuid: UUID of the project
     :type project_uuid: 
@@ -89,6 +91,22 @@ def assign_audio_to_training(project_uuid, training_version, audio_reference_obj
 
     return DecodeTaskReference(decode_uuid=db_decode.uuid)
 
+
+def create_decode_session(project_uuid, training_version):  # noqa: E501
+    """Create a new decoding session
+
+    Create a new decoding session # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+
+    :rtype: DecodeSession
+    """
+    return 'do some magic!'
+
+
 def delete_audio_by_uuid(audio_uuid):  # noqa: E501
     """Delete audio by UUID
 
@@ -111,6 +129,22 @@ def delete_audio_by_uuid(audio_uuid):  # noqa: E501
 
     return ('Success',200)
 
+
+def delete_decode_session(project_uuid, training_version):  # noqa: E501
+    """Delete the decoding session
+
+    Delete the active decoding session # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+
+    :rtype: None
+    """
+    return 'do some magic!'
+
+
 def get_all_audio():  # noqa: E501
     """Returns a list of available audio
 
@@ -124,6 +158,21 @@ def get_all_audio():  # noqa: E501
     for ar in audioresources:
         audiolist.append(mapper.db_audio_to_front(ar))
     return audiolist
+
+
+def get_all_decode_sessions(project_uuid, training_version):  # noqa: E501
+    """Get the all sessions
+
+    Get the current decode session # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+
+    :rtype: List[Resource]
+    """
+    return 'do some magic!'
 
 
 def get_audio_by_uuid(audio_uuid):  # noqa: E501
@@ -175,7 +224,22 @@ def get_audio_data(audio_uuid):  # noqa: E501
     return response
 
 
-def get_decode_result(project_uuid, training_version, decode_uuid):  # noqa: E501
+def get_current_decode_session(project_uuid, training_version):  # noqa: E501
+    """Get the current session
+
+    Get the current decode session # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+
+    :rtype: DecodeSession
+    """
+    return 'do some magic!'
+
+
+def get_decode_result(project_uuid, training_version, audio_uuid):  # noqa: E501
     """Get the result of a decoding task
 
     Returns the result of a decoding task # noqa: E501
@@ -184,10 +248,10 @@ def get_decode_result(project_uuid, training_version, decode_uuid):  # noqa: E50
     :type project_uuid: 
     :param training_version: Training version of the project
     :type training_version: int
-    :param decode_uuid: UUID of the decoding task
-    :type decode_uuid: 
+    :param audio_uuid: UUID of the audio
+    :type audio_uuid: 
 
-    :rtype: DecodeMessage
+    :rtype: DecodeAudio
     """
     current_user = connexion.context['token_info']['user']
 
@@ -201,7 +265,24 @@ def get_decode_result(project_uuid, training_version, decode_uuid):  # noqa: E50
     if not db_decoding:
         return ('Decoding not found', 404)
 
-    return DecodeMessage(uuid=db_decoding.uuid, transcripts=json.loads(db_decoding.transcripts))
+    return DecodeAudio(uuid=db_decoding.uuid, transcripts=json.loads(db_decoding.transcripts))
+
+
+def get_decode_session(project_uuid, training_version, session_uuid):  # noqa: E501
+    """Get a decode session
+
+    Gets a specified session # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+    :param session_uuid: UUID of the session
+    :type session_uuid: 
+
+    :rtype: DecodeSession
+    """
+    return 'do some magic!'
 
 
 def get_decodings(project_uuid, training_version):  # noqa: E501
@@ -214,7 +295,7 @@ def get_decodings(project_uuid, training_version):  # noqa: E501
     :param training_version: Training version of the project
     :type training_version: int
 
-    :rtype: List[DecodeMessage]
+    :rtype: List[DecodeAudio]
     """
     current_user = connexion.context['token_info']['user']
 
@@ -235,30 +316,30 @@ def get_decodings(project_uuid, training_version):  # noqa: E501
     return decoding_list
 
 
-def start_decode(project_uuid, training_version, decode_uuid, audio_reference_with_callback_object=None):  # noqa: E501
-    """Decode audio to text
+def start_decode(project_uuid, training_version, session_uuid, callback_object=None):  # noqa: E501
+    """Commits the decode session for decoding
 
-    Decode audio data to text using the trained project and the given audio # noqa: E501
+    Enqueue the currently active session for decoding # noqa: E501
 
     :param project_uuid: UUID of the project
     :type project_uuid: 
     :param training_version: Training version of the project
     :type training_version: int
-    :param decode_uuid: UUID of the decoding task
-    :type decode_uuid: 
-    :param audio_reference_with_callback_object: Audio that needs to be decoded
-    :type audio_reference_with_callback_object: dict | bytes
+    :param session_uuid: UUID of the session
+    :type session_uuid: 
+    :param callback_object: Callbackobject that gets executed after process
+    :type callback_object: dict | bytes
 
-    :rtype: DecodeTaskReference
+    :rtype: DecodeSession
     """
     current_user = connexion.context['token_info']['user']
 
     if connexion.request.is_json:
-        audio_reference_with_callback_object = AudioReferenceWithCallbackObject.from_dict(connexion.request.get_json())  # noqa: E501
+        callback_object = CallbackObject.from_dict(connexion.request.get_json())  # noqa: E501
 
     # if user does not select file, browser also
     # submit an empty part without filename
-    if audio_reference_with_callback_object is None:
+    if callback_object is None:
         return ('Invalid input', 405)
 
     print('Received new file for decode: ' + str(audio_reference_with_callback_object))
@@ -295,6 +376,24 @@ def start_decode(project_uuid, training_version, decode_uuid, audio_reference_wi
     print('Created Decoding job: ' + str(db_decode))
 
     return (DecodeTaskReference(decode_uuid=db_decode.uuid),202)
+
+
+def unassign_audio_to_current_session(project_uuid, training_version, audio_uuid):  # noqa: E501
+    """Unassign Audio to decoding session
+
+    Unassign audio to current decoding session # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+    :param audio_uuid: UUID of the audio
+    :type audio_uuid: 
+
+    :rtype: None
+    """
+    return 'do some magic!'
+
 
 def upload_audio(upfile):  # noqa: E501
     """Uploads audio

@@ -2,6 +2,7 @@ import connexion
 import six
 import tempfile
 
+from openapi_server.models.callback_object import CallbackObject  # noqa: E501
 from openapi_server.models.resource import Resource  # noqa: E501
 from openapi_server.models.resource_reference_object import ResourceReferenceObject  # noqa: E501
 from openapi_server.models.training import Training  # noqa: E501
@@ -307,6 +308,19 @@ def get_corpus_of_training_resource(project_uuid, training_version, resource_uui
     return stream.read().decode('utf-8') if status else ""
 
 
+def get_current_training_for_project(project_uuid):  # noqa: E501
+    """Get current training
+
+     # noqa: E501
+
+    :param project_uuid: Get the current training for a specific project
+    :type project_uuid: 
+
+    :rtype: Training
+    """
+    return 'do some magic!'
+
+
 def get_training_by_version(project_uuid, training_version):  # noqa: E501
     """Find project training results by UUID
 
@@ -358,8 +372,24 @@ def get_trainings_for_project(project_uuid):  # noqa: E501
         traininglist.append(mapper.db_training_to_front(t))
     return traininglist
 
+
+def get_vocabulary_of_training(project_uuid, training_version):  # noqa: E501
+    """Get the entire vocabulary of the specified training
+
+    Returns the entire vocabulary of the specified training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid: 
+    :param training_version: Training version of the project
+    :type training_version: int
+
+    :rtype: str
+    """
+    return 'do some magic!'
+
+
 def prepare_training_by_version(project_uuid, training_version, callback_object=None):  # noqa: E501
-    """Start the specified training
+    """Prepare the specified training
 
     Start the preparation process for the specified training # noqa: E501
 

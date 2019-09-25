@@ -4,23 +4,29 @@ All URIs are relative to *http://localhost:8080/api/v1*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**assign_audio_to_training**](DecodeApi.md#assign_audio_to_training) | **POST** /project/{project_uuid}/training/{training_version}/decode | Assign Audio to training
+[**assign_audio_to_current_session**](DecodeApi.md#assign_audio_to_current_session) | **POST** /project/{project_uuid}/training/{training_version}/decode | Assign Audio to decoding session
+[**create_decode_session**](DecodeApi.md#create_decode_session) | **POST** /project/{project_uuid}/training/{training_version}/decode/session | Create a new decoding session
 [**delete_audio_by_uuid**](DecodeApi.md#delete_audio_by_uuid) | **DELETE** /audio/{audio_uuid} | Delete audio by UUID
+[**delete_decode_session**](DecodeApi.md#delete_decode_session) | **DELETE** /project/{project_uuid}/training/{training_version}/decode/session | Delete the decoding session
 [**get_all_audio**](DecodeApi.md#get_all_audio) | **GET** /audio | Returns a list of available audio
+[**get_all_decode_sessions**](DecodeApi.md#get_all_decode_sessions) | **GET** /project/{project_uuid}/training/{training_version}/decode/session | Get the all sessions
 [**get_audio_by_uuid**](DecodeApi.md#get_audio_by_uuid) | **GET** /audio/{audio_uuid} | Find audio by UUID
 [**get_audio_data**](DecodeApi.md#get_audio_data) | **GET** /audio/{audio_uuid}/data | Returns the audio content
-[**get_decode_result**](DecodeApi.md#get_decode_result) | **GET** /project/{project_uuid}/training/{training_version}/decode/{decode_uuid} | Get the result of a decoding task
+[**get_current_decode_session**](DecodeApi.md#get_current_decode_session) | **GET** /project/{project_uuid}/training/{training_version}/decode/session/current | Get the current session
+[**get_decode_result**](DecodeApi.md#get_decode_result) | **GET** /project/{project_uuid}/training/{training_version}/decode/{audio_uuid} | Get the result of a decoding task
+[**get_decode_session**](DecodeApi.md#get_decode_session) | **GET** /project/{project_uuid}/training/{training_version}/decode/session/{session_uuid} | Get a decode session
 [**get_decodings**](DecodeApi.md#get_decodings) | **GET** /project/{project_uuid}/training/{training_version}/decode | List of all decodings
-[**start_decode**](DecodeApi.md#start_decode) | **PUT** /project/{project_uuid}/training/{training_version}/decode/{decode_uuid}/enqueue | Decode audio to text
+[**start_decode**](DecodeApi.md#start_decode) | **PUT** /project/{project_uuid}/training/{training_version}/decode/session/{session_uuid}/commit | Commits the decode session for decoding
+[**unassign_audio_to_current_session**](DecodeApi.md#unassign_audio_to_current_session) | **DELETE** /project/{project_uuid}/training/{training_version}/decode/{audio_uuid} | Unassign Audio to decoding session
 [**upload_audio**](DecodeApi.md#upload_audio) | **POST** /audio | Uploads audio
 
 
-# **assign_audio_to_training**
-> DecodeTaskReference assign_audio_to_training(project_uuid, training_version, audio_reference_object)
+# **assign_audio_to_current_session**
+> DecodeAudio assign_audio_to_current_session(project_uuid, training_version, audio_reference_object)
 
-Assign Audio to training
+Assign Audio to decoding session
 
-Assign audio to to be decoded in a specific training
+Assign audio to current decoding session
 
 ### Example
 
@@ -44,11 +50,11 @@ training_version = 56 # int | Training version of the project
 audio_reference_object = openapi_client.AudioReferenceObject() # AudioReferenceObject | Audio that needs to be decoded
 
 try:
-    # Assign Audio to training
-    api_response = api_instance.assign_audio_to_training(project_uuid, training_version, audio_reference_object)
+    # Assign Audio to decoding session
+    api_response = api_instance.assign_audio_to_current_session(project_uuid, training_version, audio_reference_object)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling DecodeApi->assign_audio_to_training: %s\n" % e)
+    print("Exception when calling DecodeApi->assign_audio_to_current_session: %s\n" % e)
 ```
 
 ### Parameters
@@ -61,7 +67,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**DecodeTaskReference**](DecodeTaskReference.md)
+[**DecodeAudio**](DecodeAudio.md)
 
 ### Authorization
 
@@ -75,7 +81,72 @@ Name | Type | Description  | Notes
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-**201** | Audio successfully added to training |  -  |
+**201** | Audio successfully added to session |  -  |
+**403** | Forbidden |  -  |
+**404** | Project or training not found or no active session |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **create_decode_session**
+> DecodeSession create_decode_session(project_uuid, training_version)
+
+Create a new decoding session
+
+Create a new decoding session
+
+### Example
+
+* OAuth Authentication (oauth):
+```python
+from __future__ import print_function
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+configuration = openapi_client.Configuration()
+# Configure OAuth2 access token for authorization: oauth
+configuration.access_token = 'YOUR_ACCESS_TOKEN'
+
+# Defining host is optional and default to http://localhost:8080/api/v1
+configuration.host = "http://localhost:8080/api/v1"
+# Create an instance of the API class
+api_instance = openapi_client.DecodeApi(openapi_client.ApiClient(configuration))
+project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
+training_version = 56 # int | Training version of the project
+
+try:
+    # Create a new decoding session
+    api_response = api_instance.create_decode_session(project_uuid, training_version)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling DecodeApi->create_decode_session: %s\n" % e)
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **project_uuid** | [**str**](.md)| UUID of the project | 
+ **training_version** | **int**| Training version of the project | 
+
+### Return type
+
+[**DecodeSession**](DecodeSession.md)
+
+### Authorization
+
+[oauth](../README.md#oauth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | The new active DecodeSession |  -  |
+**400** | An active session already exists |  -  |
 **403** | Forbidden |  -  |
 **404** | Project or training not found |  -  |
 
@@ -142,6 +213,69 @@ void (empty response body)
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **delete_decode_session**
+> delete_decode_session(project_uuid, training_version)
+
+Delete the decoding session
+
+Delete the active decoding session
+
+### Example
+
+* OAuth Authentication (oauth):
+```python
+from __future__ import print_function
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+configuration = openapi_client.Configuration()
+# Configure OAuth2 access token for authorization: oauth
+configuration.access_token = 'YOUR_ACCESS_TOKEN'
+
+# Defining host is optional and default to http://localhost:8080/api/v1
+configuration.host = "http://localhost:8080/api/v1"
+# Create an instance of the API class
+api_instance = openapi_client.DecodeApi(openapi_client.ApiClient(configuration))
+project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
+training_version = 56 # int | Training version of the project
+
+try:
+    # Delete the decoding session
+    api_instance.delete_decode_session(project_uuid, training_version)
+except ApiException as e:
+    print("Exception when calling DecodeApi->delete_decode_session: %s\n" % e)
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **project_uuid** | [**str**](.md)| UUID of the project | 
+ **training_version** | **int**| Training version of the project | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[oauth](../README.md#oauth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Session deleted |  -  |
+**403** | Forbidden |  -  |
+**404** | Project or training not found or no active decoding session |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **get_all_audio**
 > list[Audio] get_all_audio()
 
@@ -194,6 +328,70 @@ This endpoint does not need any parameter.
 |-------------|-------------|------------------|
 **200** | List of resources |  -  |
 **403** | Forbidden |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **get_all_decode_sessions**
+> list[Resource] get_all_decode_sessions(project_uuid, training_version)
+
+Get the all sessions
+
+Get the current decode session
+
+### Example
+
+* OAuth Authentication (oauth):
+```python
+from __future__ import print_function
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+configuration = openapi_client.Configuration()
+# Configure OAuth2 access token for authorization: oauth
+configuration.access_token = 'YOUR_ACCESS_TOKEN'
+
+# Defining host is optional and default to http://localhost:8080/api/v1
+configuration.host = "http://localhost:8080/api/v1"
+# Create an instance of the API class
+api_instance = openapi_client.DecodeApi(openapi_client.ApiClient(configuration))
+project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
+training_version = 56 # int | Training version of the project
+
+try:
+    # Get the all sessions
+    api_response = api_instance.get_all_decode_sessions(project_uuid, training_version)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling DecodeApi->get_all_decode_sessions: %s\n" % e)
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **project_uuid** | [**str**](.md)| UUID of the project | 
+ **training_version** | **int**| Training version of the project | 
+
+### Return type
+
+[**list[Resource]**](Resource.md)
+
+### Authorization
+
+[oauth](../README.md#oauth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | The decode session for this training |  -  |
+**403** | Forbidden |  -  |
+**404** | Project or training not found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -321,8 +519,72 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **get_current_decode_session**
+> DecodeSession get_current_decode_session(project_uuid, training_version)
+
+Get the current session
+
+Get the current decode session
+
+### Example
+
+* OAuth Authentication (oauth):
+```python
+from __future__ import print_function
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+configuration = openapi_client.Configuration()
+# Configure OAuth2 access token for authorization: oauth
+configuration.access_token = 'YOUR_ACCESS_TOKEN'
+
+# Defining host is optional and default to http://localhost:8080/api/v1
+configuration.host = "http://localhost:8080/api/v1"
+# Create an instance of the API class
+api_instance = openapi_client.DecodeApi(openapi_client.ApiClient(configuration))
+project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
+training_version = 56 # int | Training version of the project
+
+try:
+    # Get the current session
+    api_response = api_instance.get_current_decode_session(project_uuid, training_version)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling DecodeApi->get_current_decode_session: %s\n" % e)
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **project_uuid** | [**str**](.md)| UUID of the project | 
+ **training_version** | **int**| Training version of the project | 
+
+### Return type
+
+[**DecodeSession**](DecodeSession.md)
+
+### Authorization
+
+[oauth](../README.md#oauth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | The active DecodeSession |  -  |
+**403** | Forbidden |  -  |
+**404** | Project or training not found or session not started |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **get_decode_result**
-> DecodeMessage get_decode_result(project_uuid, training_version, decode_uuid)
+> DecodeAudio get_decode_result(project_uuid, training_version, audio_uuid)
 
 Get the result of a decoding task
 
@@ -347,11 +609,11 @@ configuration.host = "http://localhost:8080/api/v1"
 api_instance = openapi_client.DecodeApi(openapi_client.ApiClient(configuration))
 project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
 training_version = 56 # int | Training version of the project
-decode_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the decoding task
+audio_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the audio
 
 try:
     # Get the result of a decoding task
-    api_response = api_instance.get_decode_result(project_uuid, training_version, decode_uuid)
+    api_response = api_instance.get_decode_result(project_uuid, training_version, audio_uuid)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling DecodeApi->get_decode_result: %s\n" % e)
@@ -363,11 +625,11 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **project_uuid** | [**str**](.md)| UUID of the project | 
  **training_version** | **int**| Training version of the project | 
- **decode_uuid** | [**str**](.md)| UUID of the decoding task | 
+ **audio_uuid** | [**str**](.md)| UUID of the audio | 
 
 ### Return type
 
-[**DecodeMessage**](DecodeMessage.md)
+[**DecodeAudio**](DecodeAudio.md)
 
 ### Authorization
 
@@ -389,8 +651,74 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **get_decode_session**
+> DecodeSession get_decode_session(project_uuid, training_version, session_uuid)
+
+Get a decode session
+
+Gets a specified session
+
+### Example
+
+* OAuth Authentication (oauth):
+```python
+from __future__ import print_function
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+configuration = openapi_client.Configuration()
+# Configure OAuth2 access token for authorization: oauth
+configuration.access_token = 'YOUR_ACCESS_TOKEN'
+
+# Defining host is optional and default to http://localhost:8080/api/v1
+configuration.host = "http://localhost:8080/api/v1"
+# Create an instance of the API class
+api_instance = openapi_client.DecodeApi(openapi_client.ApiClient(configuration))
+project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
+training_version = 56 # int | Training version of the project
+session_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the session
+
+try:
+    # Get a decode session
+    api_response = api_instance.get_decode_session(project_uuid, training_version, session_uuid)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling DecodeApi->get_decode_session: %s\n" % e)
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **project_uuid** | [**str**](.md)| UUID of the project | 
+ **training_version** | **int**| Training version of the project | 
+ **session_uuid** | [**str**](.md)| UUID of the session | 
+
+### Return type
+
+[**DecodeSession**](DecodeSession.md)
+
+### Authorization
+
+[oauth](../README.md#oauth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | The queried decode session |  -  |
+**403** | Forbidden |  -  |
+**404** | Project, training or session not found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **get_decodings**
-> list[DecodeMessage] get_decodings(project_uuid, training_version)
+> list[DecodeAudio] get_decodings(project_uuid, training_version)
 
 List of all decodings
 
@@ -433,7 +761,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**list[DecodeMessage]**](DecodeMessage.md)
+[**list[DecodeAudio]**](DecodeAudio.md)
 
 ### Authorization
 
@@ -455,11 +783,11 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **start_decode**
-> DecodeTaskReference start_decode(project_uuid, training_version, decode_uuid, audio_reference_with_callback_object)
+> DecodeSession start_decode(project_uuid, training_version, session_uuid, callback_object=callback_object)
 
-Decode audio to text
+Commits the decode session for decoding
 
-Decode audio data to text using the trained project and the given audio
+Enqueue the currently active session for decoding
 
 ### Example
 
@@ -480,12 +808,12 @@ configuration.host = "http://localhost:8080/api/v1"
 api_instance = openapi_client.DecodeApi(openapi_client.ApiClient(configuration))
 project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
 training_version = 56 # int | Training version of the project
-decode_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the decoding task
-audio_reference_with_callback_object = openapi_client.AudioReferenceWithCallbackObject() # AudioReferenceWithCallbackObject | Audio that needs to be decoded
+session_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the session
+callback_object = openapi_client.CallbackObject() # CallbackObject | Callbackobject that gets executed after process (optional)
 
 try:
-    # Decode audio to text
-    api_response = api_instance.start_decode(project_uuid, training_version, decode_uuid, audio_reference_with_callback_object)
+    # Commits the decode session for decoding
+    api_response = api_instance.start_decode(project_uuid, training_version, session_uuid, callback_object=callback_object)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling DecodeApi->start_decode: %s\n" % e)
@@ -497,12 +825,12 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **project_uuid** | [**str**](.md)| UUID of the project | 
  **training_version** | **int**| Training version of the project | 
- **decode_uuid** | [**str**](.md)| UUID of the decoding task | 
- **audio_reference_with_callback_object** | [**AudioReferenceWithCallbackObject**](AudioReferenceWithCallbackObject.md)| Audio that needs to be decoded | 
+ **session_uuid** | [**str**](.md)| UUID of the session | 
+ **callback_object** | [**CallbackObject**](CallbackObject.md)| Callbackobject that gets executed after process | [optional] 
 
 ### Return type
 
-[**DecodeTaskReference**](DecodeTaskReference.md)
+[**DecodeSession**](DecodeSession.md)
 
 ### Authorization
 
@@ -516,10 +844,75 @@ Name | Type | Description  | Notes
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-**202** | Decoding successfully queued |  -  |
-**400** | Training not finished or decode in progress |  -  |
+**202** | Session successfully commited |  -  |
+**400** | Training not finished or session already in progress |  -  |
 **403** | Forbidden |  -  |
 **404** | Project or training not found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **unassign_audio_to_current_session**
+> unassign_audio_to_current_session(project_uuid, training_version, audio_uuid)
+
+Unassign Audio to decoding session
+
+Unassign audio to current decoding session
+
+### Example
+
+* OAuth Authentication (oauth):
+```python
+from __future__ import print_function
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+configuration = openapi_client.Configuration()
+# Configure OAuth2 access token for authorization: oauth
+configuration.access_token = 'YOUR_ACCESS_TOKEN'
+
+# Defining host is optional and default to http://localhost:8080/api/v1
+configuration.host = "http://localhost:8080/api/v1"
+# Create an instance of the API class
+api_instance = openapi_client.DecodeApi(openapi_client.ApiClient(configuration))
+project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
+training_version = 56 # int | Training version of the project
+audio_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the audio
+
+try:
+    # Unassign Audio to decoding session
+    api_instance.unassign_audio_to_current_session(project_uuid, training_version, audio_uuid)
+except ApiException as e:
+    print("Exception when calling DecodeApi->unassign_audio_to_current_session: %s\n" % e)
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **project_uuid** | [**str**](.md)| UUID of the project | 
+ **training_version** | **int**| Training version of the project | 
+ **audio_uuid** | [**str**](.md)| UUID of the audio | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[oauth](../README.md#oauth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**201** | Audio successfully unassigned from session |  -  |
+**403** | Forbidden |  -  |
+**404** | Project or training not found or no active session or audio not in active session |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

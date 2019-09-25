@@ -4,16 +4,83 @@ All URIs are relative to *http://localhost:8080/api/v1*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**get_perparation_log**](LoggingApi.md#get_perparation_log) | **GET** /project/{project_uuid}/training/{training_version}/prepare/log | Get Training Log
+[**get_decode_session_log**](LoggingApi.md#get_decode_session_log) | **GET** /project/{project_uuid}/training/{training_version}/decode/session/{session_uuid}/log | Get decode session
+[**get_perparation_log**](LoggingApi.md#get_perparation_log) | **GET** /project/{project_uuid}/training/{training_version}/prepare/log | Get Preparation Log
 [**get_resource_log**](LoggingApi.md#get_resource_log) | **GET** /resource/{resource_uuid}/log | Find resource by UUID
 [**get_training_log**](LoggingApi.md#get_training_log) | **GET** /project/{project_uuid}/training/{training_version}/train/log | Get Training Log
 [**get_training_stats**](LoggingApi.md#get_training_stats) | **GET** /project/{project_uuid}/training/{training_version}/stats | Get Training Stats
 
 
+# **get_decode_session_log**
+> str get_decode_session_log(project_uuid, training_version, session_uuid)
+
+Get decode session
+
+Returns the log of a decoding session
+
+### Example
+
+* OAuth Authentication (oauth):
+```python
+from __future__ import print_function
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+configuration = openapi_client.Configuration()
+# Configure OAuth2 access token for authorization: oauth
+configuration.access_token = 'YOUR_ACCESS_TOKEN'
+
+# Defining host is optional and default to http://localhost:8080/api/v1
+configuration.host = "http://localhost:8080/api/v1"
+# Create an instance of the API class
+api_instance = openapi_client.LoggingApi(openapi_client.ApiClient(configuration))
+project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the project
+training_version = 56 # int | Training version of the project
+session_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the session
+
+try:
+    # Get decode session
+    api_response = api_instance.get_decode_session_log(project_uuid, training_version, session_uuid)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling LoggingApi->get_decode_session_log: %s\n" % e)
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **project_uuid** | [**str**](.md)| UUID of the project | 
+ **training_version** | **int**| Training version of the project | 
+ **session_uuid** | [**str**](.md)| UUID of the session | 
+
+### Return type
+
+**str**
+
+### Authorization
+
+[oauth](../README.md#oauth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: text/plain
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | log as plain text |  -  |
+**403** | Forbidden |  -  |
+**404** | Project, training or session not found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **get_perparation_log**
 > str get_perparation_log(project_uuid, training_version)
 
-Get Training Log
+Get Preparation Log
 
 Returns the log of a preparation
 
@@ -38,7 +105,7 @@ project_uuid = '550e8400-e29b-11d4-a716-446655440000' # str | UUID of the projec
 training_version = 56 # int | Training version of the project
 
 try:
-    # Get Training Log
+    # Get Preparation Log
     api_response = api_instance.get_perparation_log(project_uuid, training_version)
     pprint(api_response)
 except ApiException as e:

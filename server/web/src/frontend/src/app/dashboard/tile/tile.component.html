@@ -1,40 +1,58 @@
 <mat-card class="tile">
   <mat-card-header class="tileCardHeader">
-    <mat-card-title>Projekt: {{tileData.name}}</mat-card-title>
+    <mat-card-title>{{project.name}}</mat-card-title>
+    <mat-card-subtitle>Akustisches Modell: {{project.acoustic_model.name}}</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content class="cardContentContainer">
-    <mat-list>
-      <mat-list-item>
-        <p>Akustisches Modell: {{tileData.acoustic_model.name}}</p>
+    <mat-list style="width: 100%;">
+      <mat-list-item *ngIf="project.parent">
+        <p>Basis-Projekt: {{project.parent}}</p>
       </mat-list-item>
-      <mat-list-item>
-        <p>Basis-Projekt: {{tileData.parent}}</p>
-      </mat-list-item>
-      <mat-list-item>
-        <p>Trainingsversion: {{lastTraining?.version}}</p>
-      </mat-list-item>
-      <mat-list-item>
-        <p>Trainingsdatum: {{lastTraining?.creation_timestamp | date:"dd.MM.yyyy"}}</p>
-      </mat-list-item>
-      <mat-list-item>
-        <p [ngClass]="{
-          'colorOrange': lastTraining?.status === '100',
-          'colorBlue': lastTraining?.status === '200',
-          'colorGrey': lastTraining?.status === '210',
-          'colorYellow': lastTraining?.status === '220',
-          'colorGreen': lastTraining?.status === '300',
-          'colorRed': lastTraining?.status === '320'}">
-          Status: {{lastTraining?.status}}
-        </p>
-      </mat-list-item>
-      <mat-list-item>
-        <p>Erstellungsdatum: {{ tileData.creation_timestamp | date:"dd.MM.yyyy" }}</p>
-      </mat-list-item>
+
+      <mat-divider></mat-divider>
+
+      <div *ngIf="lastTraining">
+        <mat-list-item>
+          <p style="margin: 0 auto;">Letztes Training #{{lastTraining?.version}}</p>
+        </mat-list-item>
+        <mat-list-item class="small-item">
+            <p style="margin: 0 auto;"><small>vom {{lastTraining?.creation_timestamp | date:"dd.MM.yyyy"}}</small></p>
+        </mat-list-item>
+        <mat-list-item>
+          <p style="margin: 0 auto;" [ngClass]="{
+            'colorOrange': lastTraining?.status === '100',
+            'colorBlue': lastTraining?.status === '200',
+            'colorGrey': lastTraining?.status === '210',
+            'colorYellow': lastTraining?.status === '220',
+            'colorGreen': lastTraining?.status === '300',
+            'colorRed': lastTraining?.status === '320'}">
+            {{lastTraining?.status | message:'training'}}
+          </p>
+        </mat-list-item>
+        <mat-list-item>
+            <button mat-stroked-button (click)="openTraining()" style="margin: 0 auto;">
+              <mat-icon aria-hidden="false">open_in_new</mat-icon>
+               Training
+            </button>
+        </mat-list-item>
+      </div>
+      <div *ngIf="!lastTraining">
+          <mat-list-item>
+            <p style="margin: 0 auto;"><i>Noch kein Training erstellt.</i></p>
+          </mat-list-item>
+          <mat-list-item>
+              <button mat-stroked-button (click)="createTraining()" style="margin: 0 auto;">
+                <mat-icon aria-hidden="false">add</mat-icon>
+                 Training
+              </button>
+          </mat-list-item>
+      </div>
     </mat-list>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-stroked-button routerLink="/project/{{tileData.uuid}}" class="tileButton">
+    <button mat-stroked-button routerLink="/project/{{project.uuid}}" class="tileButton">
       <mat-icon aria-hidden="false">open_in_new</mat-icon>
+       Projekt
     </button>
   </mat-card-actions>
 </mat-card>
