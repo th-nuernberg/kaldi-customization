@@ -42,13 +42,13 @@ def create_kaldi_job(training_id, acoustic_model_id):
     redis_client.rpush(redis_queues["KALDI_QUEUE"], json.dumps(entry))
 
 
-def create_decode_job(decode_file, acoustic_model_id, training_id, decode_uuid):
+def create_decode_job(audio_uuids, acoustic_model_id, training_id, decode_uuid):
     '''
     Creates a new job in the queue for a decode worker.
     '''
 
     entry = {
-        "decode_file": decode_file,
+        "audio_uuids": audio_uuids,
         "acoustic_model_id": acoustic_model_id,
         "training_id": training_id,
         "decode_uuid": decode_uuid

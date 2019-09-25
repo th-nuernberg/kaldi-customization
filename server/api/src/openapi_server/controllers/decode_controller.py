@@ -15,7 +15,7 @@ from openapi_server import util
 
 from mapper import mapper
 
-from models import db, Project as DB_Project, Training as DB_Training, Decoding as DB_Decoding, DecodingStateEnum as DB_DecodingStateEnum, AudioResource as DB_AudioResource, AudioStateEnum as DB_AudioStateEnum
+from models import db, Project as DB_Project, Training as DB_Training, Decoding as DB_Decoding, DecodingStateEnum as DB_DecodingStateEnum, AudioResource as DB_AudioResource, AudioStateEnum as DB_AudioStateEnum, DecodingAudio as DB_DecodingAudio
 
 from werkzeug.utils import secure_filename
 
@@ -25,6 +25,13 @@ from flask import stream_with_context, Response
 
 TEMP_UPLOAD_FOLDER = '/tmp/fileupload'
 
+def get_current_db_decode_session(db_project,db_training):    
+    db_decoding = DB_Decoding.query.filter_by(training_id=db_training.id, status=DB_DecodingStateEnum.Init).first()
+
+    if not db_decoding:
+        return ("No active decoding session", 404)
+    
+    return (db_decoding, 200)
 
 def get_filetype(filename):
     '''
@@ -49,7 +56,7 @@ def assign_audio_to_current_session(project_uuid, training_version, audio_refere
     :param audio_reference_object: Audio that needs to be decoded
     :type audio_reference_object: dict | bytes
 
-    :rtype: DecodeTaskReference
+    :rtype: DecodeAudio
     """
     current_user = connexion.context['token_info']['user']
 
@@ -74,22 +81,31 @@ def assign_audio_to_current_session(project_uuid, training_version, audio_refere
 
     db_audioresource = DB_AudioResource.query.filter_by(uuid=audio_reference_object.audio_uuid).first()
 
-    db_decode = DB_Decoding(
-        training=db_training,
-        status=DB_DecodingStateEnum.Init,
-        audioresource_id=db_audioresource.id
+    if not db_audioresource:
+        return ("Audio Resouce not found",404)
+
+    db_decoding_audio = DB_DecodingAudio.query \
+        .join(DB_Decoding, DB_Decoding.id == DB_DecodingAudio.decoding_id) \
+        .filter(DB_Decoding.training_id == db_training.id) \
+        .filter(DB_DecodingAudio.audioresource_id == db_audioresource.id) \
+        .first()
+    if db_decoding_audio:
+        return ("Audio already in this training decoded",400)
+
+    #get current session or send error
+    session = get_current_db_decode_session(db_project,db_training)
+    if (session[1] != 200):
+        return session
+    db_session = session[0]
+
+    db_decode_audio = DB_DecodingAudio(
+        audioresource_id=db_audioresource.id,
+        decoding_id=db_session.id
     )
-    db.session.add(db_decode)
+    db.session.add(db_decode_audio)
     db.session.commit()
 
-    print('Added database entry: ' + str(db_decode))
-
-    minio_file_path = str(db_audioresource.uuid)
-
-    db.session.add(db_decode)
-    db.session.commit()
-
-    return DecodeTaskReference(decode_uuid=db_decode.uuid)
+    return DecodeAudio(transcripts=json.loads(db_decode_audio.transcripts),audio=mapper.db_audio_to_front(db_audioresource),session_uuid=db_session.uuid)
 
 
 def create_decode_session(project_uuid, training_version):  # noqa: E501
@@ -104,7 +120,32 @@ def create_decode_session(project_uuid, training_version):  # noqa: E501
 
     :rtype: DecodeSession
     """
-    return 'do some magic!'
+    current_user = connexion.context['token_info']['user']
+    
+    db_project = DB_Project.query.filter_by(uuid=project_uuid, owner_id=current_user.id).first()
+
+    if not db_project:
+        return ('Project not found', 404)
+
+    db_training = DB_Training.query.filter_by(
+        version=training_version, project=db_project).first()
+
+    if not db_training:
+        return ('Training not found', 404)
+
+    #get current session or send error
+    session = get_current_db_decode_session(db_project,db_training)
+    if (session[1] == 200):
+        return ("An active session already exists",400)
+    
+    db_session = DB_Decoding(
+        training_id=db_training.id,
+        status=DB_DecodingStateEnum.Init
+    )
+    db.session.add(db_session)
+    db.session.commit()
+
+    return (mapper.db_decoding_session_to_front(db_session),201)
 
 
 def delete_audio_by_uuid(audio_uuid):  # noqa: E501
@@ -142,7 +183,30 @@ def delete_decode_session(project_uuid, training_version):  # noqa: E501
 
     :rtype: None
     """
-    return 'do some magic!'
+    current_user = connexion.context['token_info']['user']
+
+    db_project = DB_Project.query.filter_by(uuid=project_uuid, owner_id=current_user.id).first()
+
+    if not db_project:
+        return ('Project not found', 404)
+
+    db_training = DB_Training.query.filter_by(
+        version=training_version, project=db_project).first()
+
+    if not db_training:
+        return ('Training not found', 404)
+
+    #get current session or send error
+    session = get_current_db_decode_session(db_project,db_training)
+    if (session[1] != 200):
+        return session
+    db_session = session[0]
+
+    DB_DecodingAudio.query.filter_by(decoding_id=db_session.id).delete()
+    DB_Decoding.query.filter_by(id=db_session.id).delete()
+    db.session.commit()
+
+    return ("Successfully deleted",200)
 
 
 def get_all_audio():  # noqa: E501
@@ -172,7 +236,26 @@ def get_all_decode_sessions(project_uuid, training_version):  # noqa: E501
 
     :rtype: List[Resource]
     """
-    return 'do some magic!'
+    current_user = connexion.context['token_info']['user']
+    
+    db_project = DB_Project.query.filter_by(uuid=project_uuid, owner_id=current_user.id).first()
+
+    if not db_project:
+        return ('Project not found', 404)
+
+    db_training = DB_Training.query.filter_by(
+        version=training_version, project=db_project).first()
+
+    if not db_training:
+        return ('Training not found', 404)
+
+    db_decodings = DB_Decoding.query.filter_by(training_id=db_training.id).all()
+
+    session_list = list()
+    for d in db_decodings:
+        session_list.append(mapper.db_decoding_session_to_front(d))
+    
+    return (session_list, 200)
 
 
 def get_audio_by_uuid(audio_uuid):  # noqa: E501
@@ -236,7 +319,26 @@ def get_current_decode_session(project_uuid, training_version):  # noqa: E501
 
     :rtype: DecodeSession
     """
-    return 'do some magic!'
+    current_user = connexion.context['token_info']['user']
+
+    db_project = DB_Project.query.filter_by(uuid=project_uuid, owner_id=current_user.id).first()
+
+    if not db_project:
+        return ('Project not found', 404)
+
+    db_training = DB_Training.query.filter_by(
+        version=training_version, project=db_project).first()
+
+    if not db_training:
+        return ('Training not found', 404)
+
+    #get current session or send error
+    session = get_current_db_decode_session(db_project,db_training)
+    if (session[1] != 200):
+        return session
+    db_session = session[0]
+
+    return (mapper.db_decoding_session_to_front(db_session),200)
 
 
 def get_decode_result(project_uuid, training_version, audio_uuid):  # noqa: E501
@@ -255,17 +357,34 @@ def get_decode_result(project_uuid, training_version, audio_uuid):  # noqa: E501
     """
     current_user = connexion.context['token_info']['user']
 
-    db_decoding = DB_Decoding.query \
-        .join(DB_Training, DB_Training.id == DB_Decoding.training_id) \
-        .join(DB_Project, DB_Training.project_id == DB_Project.id) \
-        .filter(DB_Decoding.uuid == decode_uuid) \
-        .filter(DB_Project.owner_id == current_user.id) \
+    db_project = DB_Project.query.filter_by(uuid=project_uuid, owner_id=current_user.id).first()
+
+    if not db_project:
+        return ('Project not found', 404)
+
+    db_training = DB_Training.query.filter_by(
+        version=training_version, project=db_project).first()
+
+    if not db_training:
+        return ('Training not found', 404)
+
+    db_audio = DB_AudioResource.query.filter_by(uuid=audio_uuid).first()
+
+    if not db_audio:
+        return ('Audio not found', 404)
+
+    db_decoding_audio = DB_DecodingAudio.query \
+        .join(DB_Decoding, DB_Decoding.id == DB_DecodingAudio.decoding_id) \
+        .filter(DB_Decoding.training_id == db_training.id) \
+        .filter(DB_DecodingAudio.audioresource_id == db_audio.id) \
         .first()
 
-    if not db_decoding:
+    if not db_decoding_audio:
         return ('Decoding not found', 404)
 
-    return DecodeAudio(uuid=db_decoding.uuid, transcripts=json.loads(db_decoding.transcripts))
+    db_session = DB_Decoding.query.filter_by(id=db_decoding_audio.decoding_id).first()
+
+    return DecodeAudio(transcripts=json.loads(db_decoding_audio.transcripts),audio=mapper.db_audio_to_front(db_audio),session_uuid=db_session.uuid)
 
 
 def get_decode_session(project_uuid, training_version, session_uuid):  # noqa: E501
@@ -282,7 +401,27 @@ def get_decode_session(project_uuid, training_version, session_uuid):  # noqa: E
 
     :rtype: DecodeSession
     """
-    return 'do some magic!'
+    current_user = connexion.context['token_info']['user']
+
+    db_project = DB_Project.query.filter_by(uuid=project_uuid, owner_id=current_user.id).first()
+
+    if not db_project:
+        return ('Project not found', 404)
+
+    db_training = DB_Training.query.filter_by(
+        version=training_version, project=db_project).first()
+
+    if not db_training:
+        return ('Training not found', 404)
+
+    db_session = DB_Decoding.query.filter_by(training_id=db_training.id, uuid=session_uuid).first()
+    
+    if not db_session:
+        return ('Session not found', 404)
+
+    
+    return (mapper.db_decoding_session_to_front(db_session),200)
+
 
 
 def get_decodings(project_uuid, training_version):  # noqa: E501
@@ -299,21 +438,32 @@ def get_decodings(project_uuid, training_version):  # noqa: E501
     """
     current_user = connexion.context['token_info']['user']
 
-    db_decodings = DB_Decoding.query \
-        .join(DB_Training, DB_Training.id == DB_Decoding.training_id) \
-        .join(DB_Project, DB_Training.project_id == DB_Project.id) \
-        .filter(DB_Project.uuid == project_uuid) \
-        .filter(DB_Project.owner_id == current_user.id) \
-        .filter(DB_Training.version == training_version) \
+    db_project = DB_Project.query.filter_by(uuid=project_uuid, owner_id=current_user.id).first()
+
+    if not db_project:
+        return ('Project not found', 404)
+
+    db_training = DB_Training.query.filter_by(
+        version=training_version, project=db_project).first()
+
+    if not db_training:
+        return ('Training not found', 404)
+
+    db_decoding_audios = DB_DecodingAudio.query \
+        .join(DB_Decoding, DB_Decoding.id == DB_DecodingAudio.decoding_id) \
+        .filter(DB_Decoding.training_id == db_training.id) \
         .all()
 
-    decoding_list = list()
+    decodings = list()
+    for da in db_decoding_audios:
+        db_session = DB_Decoding.query.filter_by(id=da.decoding_id).first()
+        db_audio = DB_AudioResource.query.filter_by(id=da.audioresource_id).first()
+        decodings.append(
+            DecodeAudio(transcripts=json.loads(da.transcripts),audio=mapper.db_audio_to_front(db_audio),session_uuid=db_session.uuid)
+        )
 
-    for decoding in db_decodings:
-        decoding_list.append(DecodeMessage(
-            uuid=decoding.uuid, transcripts=json.loads(decoding.transcripts)))
 
-    return decoding_list
+    return decodings
 
 
 def start_decode(project_uuid, training_version, session_uuid, callback_object=None):  # noqa: E501
@@ -333,17 +483,12 @@ def start_decode(project_uuid, training_version, session_uuid, callback_object=N
     :rtype: DecodeSession
     """
     current_user = connexion.context['token_info']['user']
+    try:
+        if connexion.request.is_json:
+            callback_object = CallbackObject.from_dict(connexion.request.get_json())  # noqa: E501
+    except: 
+        callback_object = None
 
-    if connexion.request.is_json:
-        callback_object = CallbackObject.from_dict(connexion.request.get_json())  # noqa: E501
-
-    # if user does not select file, browser also
-    # submit an empty part without filename
-    if callback_object is None:
-        return ('Invalid input', 405)
-
-    print('Received new file for decode: ' + str(audio_reference_with_callback_object))
-    
     db_project = DB_Project.query.filter_by(uuid=project_uuid, owner_id=current_user.id).first()
 
     if not db_project:
@@ -355,27 +500,30 @@ def start_decode(project_uuid, training_version, session_uuid, callback_object=N
     if not db_training:
         return ('Training not found', 404)
 
-    db_audioresource = DB_AudioResource.query.filter_by(uuid=audio_reference_with_callback_object.audio_uuid).first()
-    # TODO check if file is ready for decoding
-
-    db_decode = DB_Decoding.query.filter_by(training_id=db_training.id,audioresource_id=db_audioresource.id).first()
+    db_session = DB_Decoding.query.filter_by(training_id=db_training.id, uuid=session_uuid).first()
     
-    if(db_decode.status != DB_DecodingStateEnum.Init):
-        return ('Decoding already in progress or finishd',400)
+    if not db_session:
+        return ('Session not found', 404)
 
+    if(db_session.status != DB_DecodingStateEnum.Init):
+        return ('Decoding already in progress or finished',400)
 
-    minio_file_path = str(db_audioresource.uuid)
+    db_decode_audios = DB_DecodingAudio.query.filter_by(decoding_id=db_session.id).all()
 
-    create_decode_job(decode_file=minio_file_path,
-                        acoustic_model_id=db_project.acoustic_model_id, training_id=db_training.id, decode_uuid=db_decode.uuid)
+    audioresource_uuids = list()
+    for da in db_decode_audios:
+        audioresource_uuids.append(DB_AudioResource.query.filter_by(id=da.audioresource_id).first().uuid)
+    # TODO check if files are ready for decoding
 
-    db_decode.status = DB_DecodingStateEnum.Decoding_Pending
-    db.session.add(db_decode)
+    create_decode_job(audio_uuids=audioresource_uuids,
+                        acoustic_model_id=db_project.acoustic_model_id, training_id=db_training.id, decode_uuid=db_session.uuid)
+
+    db_session.status = DB_DecodingStateEnum.Decoding_Pending
+    db.session.add(db_session)
     db.session.commit()
 
-    print('Created Decoding job: ' + str(db_decode))
-
-    return (DecodeTaskReference(decode_uuid=db_decode.uuid),202)
+    print('Created Decoding job: ' + str(db_session))
+    return (mapper.db_decoding_session_to_front(db_session),202)
 
 
 def unassign_audio_to_current_session(project_uuid, training_version, audio_uuid):  # noqa: E501
@@ -390,9 +538,40 @@ def unassign_audio_to_current_session(project_uuid, training_version, audio_uuid
     :param audio_uuid: UUID of the audio
     :type audio_uuid: 
 
-    :rtype: None
+    :rtype: NoneWorlds
     """
-    return 'do some magic!'
+    current_user = connexion.context['token_info']['user']
+
+    db_project = DB_Project.query.filter_by(uuid=project_uuid, owner_id=current_user.id).first()
+
+    if not db_project:
+        return ('Project not found', 404)
+
+    db_training = DB_Training.query.filter_by(
+        version=training_version, project=db_project).first()
+
+    if not db_training:
+        return ('Training not found', 404)
+
+    db_audio = DB_AudioResource.query.filter_by(uuid=audio_uuid).first()
+
+    if not db_audio:
+        return ("Audio not found", 404)
+
+    #get current session or send error
+    session = get_current_db_decode_session(db_project,db_training)
+    if (session[1] != 200):
+        return session
+    db_session = session[0] 
+
+    db_decode_audio = DB_DecodingAudio.query.filter_by(audioresource_id=db_audio.id, decoding_id=db_session.id).first()
+    if not db_decode_audio:
+        return("Audio not in current decoding Session",404)
+    
+    DB_DecodingAudio.query.filter_by(audioresource_id=db_audio.id, decoding_id=db_session.id).delete()
+    db.session.commit()
+
+    return ("Successfully deleted", 200)
 
 
 def upload_audio(upfile):  # noqa: E501
