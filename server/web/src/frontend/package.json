@@ -14,7 +14,7 @@
     "build:ssr": "npm run build:client-and-server-bundles && npm run compile:server",
     "build:client-and-server-bundles": "ng build --prod && ng run frontend:server:production",
     "server": "node local.js",
-    "build:prod": "npm run build:swagger-client && npm run build:ssr",
+    "build:prod": "npm run build:ssr",
     "serve:prerender": "node static.js",
     "build:prerender": "npm run build:prod && node dist/prerender.js"
   },
