@@ -43,6 +43,7 @@ import { IdentityService } from '../identity.service';
 import { TileComponent } from './dashboard/tile/tile.component';
 import { LoginComponent } from './login/login.component';
 import { SafePipe } from './safe.pipe';
+import { StatusMessagePipe } from './status.message.pipe';
 
 @NgModule({
   declarations: [
@@ -56,7 +57,8 @@ import { SafePipe } from './safe.pipe';
     AccountComponent,
     TileComponent,
     LoginComponent,
-    SafePipe
+    SafePipe,
+    StatusMessagePipe
   ],
   imports: [
     ApiModule.forRoot(IdentityService.getApiConfiguration),

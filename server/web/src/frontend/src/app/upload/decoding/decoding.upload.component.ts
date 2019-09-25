@@ -12,7 +12,7 @@ import {
   DecodeService,
   ProjectService,
   TrainingService,
-  DecodeTaskReference
+  DecodeAudio
 } from 'swagger-client'
 import AppConstants from  '../../app.component';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -33,7 +33,7 @@ export class DecodingUploadComponent implements OnInit {
 
   currentAudios:Array<Audio>;
   allAudios:MatTableDataSource<Audio>;
-  currentDecodeTasks: Array<DecodeTaskReference>;
+  currentDecodeTasks: Array<DecodeAudio>;
 
   displayedColumns:Array<string> = ['select', 'name'];
 
@@ -106,13 +106,18 @@ export class DecodingUploadComponent implements OnInit {
   copyAudio() {
     this.historySelection.selected.forEach(audio => {
       this.snackBar.open("Kopiere Audio Datein in aktuelle Spracherkennung...", "", AppConstants.snackBarConfig);
-      this.decodeService.assignAudioToTraining(
+      this.decodeService.assignAudioToCurrentSession(
         this.projectUuid,
         this.trainingVersion,
         { audio_uuid: audio.uuid }
       ).subscribe(decodeTask => {
+        if(this.currentDecodeTasks.indexOf(decodeTask) !== -1 ||
+           this.currentAudios.indexOf(audio) !== -1) {
+          return;
+        }
+
         this.currentDecodeTasks.push(decodeTask);
-        this.currentAudios.push(audio)
+        this.currentAudios.push(audio);
       });
     });
   }
@@ -178,13 +183,15 @@ export class DecodingUploadComponent implements OnInit {
 
     this.decodeService.uploadAudio(blobFile)
       .subscribe(audio => {
-
-        //this.currentAudios.push(audio);
-        this.decodeService.assignAudioToTraining(
+        this.decodeService.assignAudioToCurrentSession(
         this.projectUuid,
         this.trainingVersion,
         { audio_uuid: audio.uuid }
       ).subscribe(decodeTask => {
+        if(this.currentDecodeTasks.indexOf(decodeTask) !== -1 ||
+        this.currentAudios.indexOf(audio) !== -1) {
+          return;
+        }
         this.currentDecodeTasks.push(decodeTask);
         this.currentAudios.push(audio)
       });

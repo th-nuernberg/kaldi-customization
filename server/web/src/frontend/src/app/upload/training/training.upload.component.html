@@ -60,7 +60,7 @@
                         mat-stroked-button
                         class="uploadComponentButtonContainer"
                         onclick="document.getElementById('fileInput').click()">
-                        Hochladen
+                        <mat-icon>publish</mat-icon>
                       </button>
                     </div>
                   </div>
@@ -73,7 +73,9 @@
                 matStepperNext
                 color="primary"
                 class="uploadComponentButtonContainer"
-                (click)="reloadProject(true)">Weiter</button>
+                (click)="reloadProject(true)">
+                <mat-icon>navigate_next</mat-icon>
+              </button>
             </div>
           </form>
         </mat-step>
@@ -127,13 +129,17 @@
               <button
                 mat-stroked-button
                 matStepperPrevious
-                class="uploadComponentButtonContainer">Zurück</button>
+                class="uploadComponentButtonContainer">
+                <mat-icon>navigate_before</mat-icon>
+              </button>
               <button
                 mat-raised-button
                 color="primary"
                 matStepperNext
                 class="uploadComponentButtonContainer"
-                (click)="reloadProject(true)">Weiter</button>
+                (click)="reloadProject(false)">
+                <mat-icon>navigate_next</mat-icon>
+              </button>
             </div>
           </form>
         </mat-step>
@@ -192,12 +198,17 @@
             <button
               mat-stroked-button
               matStepperPrevious
-              class="uploadComponentButtonContainer">Zurück</button>
-              <button
+              class="uploadComponentButtonContainer">
+              <mat-icon>navigate_before</mat-icon>
+            </button>
+            <button
               mat-raised-button
               color="primary"
               class="uploadComponentButtonContainer"
-              (click)="startTraining()">Start</button>
+              (click)="startTraining()">
+              <mat-icon>play_arrow</mat-icon>
+              Training
+            </button>
           </div>
         </mat-step>
     </mat-horizontal-stepper>

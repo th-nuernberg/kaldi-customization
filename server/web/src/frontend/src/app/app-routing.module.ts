@@ -11,7 +11,7 @@ import { LoginComponent } from './login/login.component';
 import { AuthGuard } from './_guards/auth.guard';
 
 const routes: Routes = [
-  { path: '', component: CoverComponent },
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'project/:uuid', component: ProjectComponent, canActivate: [AuthGuard] },
   { path: 'upload/decoding/:uuid/:id', component: DecodingUploadComponent, canActivate: [AuthGuard] },
