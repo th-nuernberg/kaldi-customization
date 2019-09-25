@@ -42,6 +42,7 @@ import { IdentityService } from '../identity.service';
 
 import { TileComponent } from './dashboard/tile/tile.component';
 import { LoginComponent } from './login/login.component';
+import { RegisterComponent } from './register/register.component';
 import { SafePipe } from './safe.pipe';
 import { StatusMessagePipe } from './status.message.pipe';
 
@@ -57,6 +58,7 @@ import { StatusMessagePipe } from './status.message.pipe';
     AccountComponent,
     TileComponent,
     LoginComponent,
+    RegisterComponent,
     SafePipe,
     StatusMessagePipe
   ],

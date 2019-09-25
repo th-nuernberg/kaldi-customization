@@ -2,7 +2,6 @@ export * from './acousticModel';
 export * from './acousticModelType';
 export * from './audio';
 export * from './audioReferenceObject';
-export * from './audioReferenceWithCallbackObject';
 export * from './audioStatus';
 export * from './binaryDecodeObject';
 export * from './binaryResourceObject';

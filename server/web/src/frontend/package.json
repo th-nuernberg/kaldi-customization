@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
-    "build:swagger-client": "ng build swagger-client",
+    "build:swagger-client": "npm install @angular/common@~7.2.0 rxjs@~6.3.3 && ng build swagger-client",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",

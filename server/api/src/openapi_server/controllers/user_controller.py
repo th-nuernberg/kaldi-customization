@@ -30,8 +30,8 @@ def create_user(user=None):  # noqa: E501
         return ("Invalid username/password/email", 400)
 
     db_user = DB_User(username=user.username,
-                      user_email=user.email,
-                      pw_hash=sha256_crypt.encrypt(user.password))
+                      email=user.email,
+                      password=sha256_crypt.encrypt(user.password))
 
     db.session.add(db_user)
 
@@ -41,7 +41,7 @@ def create_user(user=None):  # noqa: E501
         print("Failed to insert user into database: ", e)
         return ("Cannot create user", 400)
 
-    return (User(username=db_user.username, email=db_user.user_email),201)
+    return (User(username=db_user.username, email=db_user.email), 201)
 
 
 def get_user():  # noqa: E501
@@ -52,7 +52,12 @@ def get_user():  # noqa: E501
 
     :rtype: User
     """
-    return 'do some magic!'
+    current_user = connexion.context['token_info']['user']
+
+    if not current_user:
+        return ("User not authorized", 403)
+
+    return User(username=current_user.username, email=current_user.email)
 
 
 def login_user(email, password):  # noqa: E501
@@ -66,8 +71,16 @@ def login_user(email, password):  # noqa: E501
     :type password: str
 
     :rtype: None
-    """
-    return 'do some magic!'
+    """    
+    db_user = DB_User.query.filter_by(email=email).first()
+
+    if not db_user:
+        return ("Invalid email/password", 400)
+
+    if not db_user.check_password(password):
+        return ("Invalid email/password", 400)
+
+    return User(username=db_user.username, email=db_user.email)
 
 
 def logout_user():  # noqa: E501
