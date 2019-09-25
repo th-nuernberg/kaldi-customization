@@ -54,7 +54,7 @@
                         mat-stroked-button
                         class="uploadComponentButtonContainer"
                         onclick="document.getElementById('fileInput').click()">
-                        Hochladen
+                        <mat-icon>publish</mat-icon>
                       </button>
                     </div>
                   </div>
@@ -67,7 +67,9 @@
                 matStepperNext
                 class="uploadComponentButtonContainer"
                 color="primary"
-                (click)="reloadDecoding()">Weiter</button>
+                (click)="reloadDecoding()">
+                <mat-icon>navigate_next</mat-icon>
+              </button>
             </div>
         </form>
       </mat-step>
@@ -117,12 +119,16 @@
             <button
               mat-stroked-button
               matStepperPrevious
-              class="uploadComponentButtonContainer">Zurück</button>
+              class="uploadComponentButtonContainer">
+              <mat-icon>navigate_before</mat-icon>
+            </button>
             <button
               mat-raised-button
               matStepperNext
               class="uploadComponentButtonContainer"
-              color="primary">Weiter</button>
+              color="primary">
+              <mat-icon>navigate_next</mat-icon>
+            </button>
           </div>
         </form>
       </mat-step>
@@ -130,7 +136,7 @@
 
       <mat-step
         class="stepContainer">
-        <ng-template matStepLabel>Start</ng-template>
+        <ng-template matStepLabel>Starte Spracherkennung</ng-template>
         <ng-container
           *ngIf="{
             audios: audios$ | async,
@@ -173,12 +179,17 @@
           <button
             mat-stroked-button
             matStepperPrevious
-            class="uploadComponentButtonContainer">Zurück</button>
+            class="uploadComponentButtonContainer">
+            <mat-icon>navigate_before</mat-icon>
+          </button>
           <button
             mat-raised-button
             class="uploadComponentButtonContainer"
             color="primary"
-            (click)="startDecode()">Start</button>
+            (click)="startDecode()">
+            <mat-icon>play_arrow</mat-icon>
+            Decode
+          </button>
         </div>
       </mat-step>
     </mat-horizontal-stepper>

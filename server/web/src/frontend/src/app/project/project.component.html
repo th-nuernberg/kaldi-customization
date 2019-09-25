@@ -5,7 +5,8 @@
     <h1>{{overview?.project?.name}}</h1>
     <mat-tab-group
       class="projectMatTabGroupContainer">
-      <mat-tab>
+      <mat-tab
+        #trainingTab>
         <ng-template mat-tab-label>
           Trainings
         </ng-template>
@@ -22,13 +23,14 @@
               <button
                 mat-stroked-button
                 class="actionButton rightAlign"
+                [disabled]="wasTrainingSuccessful(training.status)"
                 (click)="createDecode(training.version)">
                   <mat-icon>mic</mat-icon>
               </button>
               <button
                 mat-stroked-button
                 class="actionButton"
-                [disabled]="isDownloadTrainingDisabled(training.status)"
+                [disabled]="wasTrainingSuccessful(training.status)"
                 (click)="downloadTraining(training.version)">
                   <mat-icon>get_app</mat-icon>
               </button>
@@ -56,19 +58,42 @@
                   class="listItemContainer"
                   *ngFor='let decoding of currentDecodings'>
                   <div class="matListTextContainer">
-                    <p matLine class="textContainer">Audio: {{decoding.audio.name}}</p>
                     <p
                       matLine
-                      class="textContainer"
-                      matTooltip="{{decoding.transcripts}}"
-                      matTooltipClass="toolTipContainer"
-                      >Text: {{decoding.transcripts}}</p>
+                      class="textContainer">
+                      <button
+                        mat-button
+                        color="{{ isPlaying(audio) ? 'accent' : 'primary' }}"
+                        (click)="triggerAudio($event, audio)">
+                        <mat-icon>{{ isPlaying(audio) ? 'pause_circle_outline' : 'play_circle_outline' }}</mat-icon>
+                      </button>
+                      Audio: {{decoding.audio.name}}</p>
+                    <p
+                      matLine
+                      class="textContainer">
+                      <button
+                        mat-button
+                        (click)="copyToClipboard(decoding.transcripts)">
+                        <mat-icon>post_add</mat-icon>
+                      </button>
+                      <span
+                        matTooltip="{{decoding.transcripts}}"
+                        matTooltipClass="toolTipContainer">
+                        Text: {{decoding.transcripts}}
+                      </span>
+                    </p>
                   </div>
                   <button
                     mat-stroked-button
-                    class="actionButton rightAlign">
+                    class="actionButton rightAlign"
+                    (click)="downloadTranscript(decoding.transcripts, decoding.audio.name)">
                       <mat-icon>get_app</mat-icon>
                   </button>
+                  <audio #audioPlayer
+                    [src]="currentlyPlayingAudio?.data | safe:'url'"
+                    type="audio/wav"
+                    (ended)="stopAudio()">
+                  </audio>
                   <mat-divider></mat-divider>
                 </mat-list-item>
               </mat-list>
@@ -78,12 +103,13 @@
       </mat-tab>
     </mat-tab-group>
     <button
-    mat-raised-button
-    color="primary"
-    class="tabGroupHeaderButton"
-    (click)="createTraining()">
-      <mat-icon>add</mat-icon>
-      Training
+      mat-raised-button
+      color="primary"
+      class="tabGroupHeaderButton"
+      *ngIf="trainingTab.isActive"
+      (click)="createTraining()">
+        <mat-icon>add</mat-icon>
+        Training
     </button>
   </ng-container>
 </div>

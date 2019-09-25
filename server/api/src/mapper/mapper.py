@@ -10,8 +10,13 @@ from openapi_server.models.resource_type import ResourceType
 from openapi_server.models.resource_status import ResourceStatus
 from openapi_server.models.audio import Audio
 from openapi_server.models.audio_status import AudioStatus
+from openapi_server.models.decode_session import DecodeSession
+from openapi_server.models.decode_session_status import DecodeSessionStatus
+from openapi_server.models.decode_audio import DecodeAudio
 
-from models import db, Project as DB_Project, TrainingStateEnum as DB_TrainingStateEnum, User as DB_User, AcousticModel as DB_AcousticModel
+import json
+
+from models import db, Project as DB_Project, TrainingStateEnum as DB_TrainingStateEnum, User as DB_User, AcousticModel as DB_AcousticModel, DecodingAudio as DB_DecodingAudio, AudioResource as DB_AudioResource
 from models.training_resource import TrainingResource as DB_TrainingResource
 from models.training import Training as DB_Training
 
@@ -92,8 +97,32 @@ def db_audio_to_front(db_audio):
         status=AudioStateEnum_to_AudioStatus(db_audio.status)
     )
 
+def db_decoding_session_to_front(db_decoding):
+    #get all assignes decode audios
+    decode_audios = DB_DecodingAudio.query.filter_by(decoding_id=db_decoding.id).all()
+    decodings = list()
+    for da in decode_audios:
+        audio = DB_AudioResource.query.filter_by(id=da.audioresource_id).first()
+        decodings.append(DecodeAudio(transcripts=json.loads(da.transcripts),audio=db_audio_to_front(audio),session_uuid=db_decoding.uuid))
+
+    return DecodeSession(
+        session_uuid=db_decoding.uuid,
+        creation_timestamp=db_decoding.creation_timestamp,
+        status=DecodingStateEnum_to_DecodingStatus(db_decoding.status),
+        decodings=decodings
+    )
+
 def db_training_resource_to_front(db_training_resource):
     return db_resource_to_front(db_training_resource.origin)
+
+def DecodingStateEnum_to_DecodingStatus(decodingState):
+    return {
+        100: DecodeSessionStatus.Init,
+        150: DecodeSessionStatus.Decoding_Pending,
+        200: DecodeSessionStatus.Decoding_InProgress,
+        300: DecodeSessionStatus.Decoding_Success,
+        320: DecodeSessionStatus.Decoding_Failure
+        }[decodingState]
 
 def ResourceTypeEnum_to_ResourceType(resourceType):
     return {

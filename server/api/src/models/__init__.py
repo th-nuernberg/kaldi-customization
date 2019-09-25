@@ -10,3 +10,4 @@ from .user import *
 from .decoding import *
 from .training import *
 from .audioresource import *
+from .decoding_audio import *
