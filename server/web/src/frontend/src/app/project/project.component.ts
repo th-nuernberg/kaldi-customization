@@ -1,8 +1,9 @@
 import { Observable } from 'rxjs';
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material';
 import {
+  Audio,
   TrainingStatus,
   TrainingService,
   Training,
@@ -12,6 +13,7 @@ import {
   ProjectService }
 from 'swagger-client';
 import AppConstants from  '../app.component';
+import { DomSanitizer } from '@angular/platform-browser';
 
 const DUMMY_DECODES: DecodeMessage[] = [
   {
@@ -67,9 +69,16 @@ export class ProjectComponent implements OnInit {
 
   graphUrl;
 
+  currentlyPlayingAudio? : {
+    audio: Audio,
+    data: string
+  } = null;
+  @ViewChild('audioPlayer') audioPlayer;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private sanitizer:DomSanitizer,
     public trainingService: TrainingService,
     public decodeService: DecodeService,
     public projectService: ProjectService,
@@ -95,6 +104,44 @@ export class ProjectComponent implements OnInit {
         });
       }
     });
+  }
+
+  audioData() {
+    if (!this.currentlyPlayingAudio)
+      return null;
+
+    return this.sanitizer.bypassSecurityTrustResourceUrl(this.currentlyPlayingAudio.data);
+  }
+
+  triggerAudio(event, audio) {
+    event.stopPropagation();
+
+    if (this.isPlaying(audio)) {
+      this.currentlyPlayingAudio = null;
+    } else {
+      this.decodeService.getAudioData(audio.uuid)
+        .subscribe(data => {
+          const audioData = URL.createObjectURL(data);
+          if (this.currentlyPlayingAudio) {
+            URL.revokeObjectURL(this.currentlyPlayingAudio.data);
+          }
+
+          this.currentlyPlayingAudio = {
+            audio: audio,
+            data: audioData
+          };
+
+          setTimeout(() => this.audioPlayer.nativeElement.play(), 0);
+        });
+      }
+  }
+
+  stopAudio() {
+    this.currentlyPlayingAudio = null;
+  }
+
+  isPlaying(audio: Audio) {
+    return (this.currentlyPlayingAudio && this.currentlyPlayingAudio.audio.uuid == audio.uuid);
   }
 
   // creates a new training and opens the training page
@@ -132,7 +179,7 @@ export class ProjectComponent implements OnInit {
     this.router.navigate(['/upload/decoding/' + this.projectUuid + "/" + trainingVersion]);
   }
 
-  isDownloadTrainingDisabled(trainingStatus:TrainingStatus) {
+  wasTrainingSuccessful(trainingStatus:TrainingStatus) {
     return trainingStatus != TrainingStatus.Training_Success;
   }
 
