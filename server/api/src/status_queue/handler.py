@@ -40,7 +40,8 @@ def handle_statue_queue(status_queue, app, db):
                     print('Invalid message, missing key __queue__ in data')
                     continue
 
-                db_session = db.create_scoped_session()
+                #db_session = db.create_scoped_session() Replaced! Krauthann -> Errors with double access
+                db_session = db.session
                 queue_handler[data['__queue__']](data, db_session)
             except Exception as e:
                 print("[Status] Exception at status queue: {}".format(type(e).__name__))

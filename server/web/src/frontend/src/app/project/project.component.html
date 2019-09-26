@@ -70,15 +70,18 @@
                       Audio: {{decoding.audio.name}}</p>
                     <p
                       matLine
-                      class="textContainer"
-                      matTooltip="{{decoding.transcripts}}"
-                      matTooltipClass="toolTipContainer">
+                      class="textContainer">
                       <button
                         mat-button
                         (click)="copyToClipboard(decoding.transcripts)">
                         <mat-icon>post_add</mat-icon>
                       </button>
-                      Text: {{decoding.transcripts}}</p>
+                      <span
+                        matTooltip="{{decoding.transcripts}}"
+                        matTooltipClass="toolTipContainer">
+                        Text: {{decoding.transcripts}}
+                      </span>
+                    </p>
                   </div>
                   <button
                     mat-stroked-button
