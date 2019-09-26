@@ -2,3 +2,4 @@ minio
 flask_sqlalchemy
 authlib
 mysqlclient
+passlib
