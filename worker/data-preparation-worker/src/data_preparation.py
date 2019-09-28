@@ -146,7 +146,7 @@ def infinite_loop():
             unique_word_list_result = upload_to_bucket(minio_client, minio_buckets["TRAINING_BUCKET"],
                                              "{}/unique_word_list.txt".format(task.training_id), "/data_prep_worker/out/final_word_list")
 
-            if not lexicon_result[0] or not corpus_result[0] or unique_word_list_result[0]:
+            if not lexicon_result[0] or not corpus_result[0] or not unique_word_list_result[0]:
                 print("At least one upload failed. It is not possible to finish this task successfully.")
                 log_file_handler.write("While trying to upload the lexicon.txt and corpus.txt files, the following error occurred: \n")
                 log_file_handler.write("############################################################################# \n")
