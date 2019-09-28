@@ -10,9 +10,8 @@ WORKDIR /www/frontend
 RUN npm install -g @angular/cli@7.3.8
 
 # install required dependencies to build swagger-client library
-RUN npm install --only=dev && \
-    npm install @angular/common@~7.2.0 rxjs@~6.3.3
-RUN ng build swagger-client
+RUN npm install --only=dev
+RUN npm run build:swagger-client
 
 # build the frontend
 RUN npm install

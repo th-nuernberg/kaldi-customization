@@ -42,7 +42,7 @@ class AuthorizationCodeGrant(grants.AuthorizationCodeGrant):
 class PasswordGrant(grants.ResourceOwnerPasswordCredentialsGrant):
     def authenticate_user(self, username, password):
         user = User.query.filter_by(username=username).first()
-        if user.check_password(password):
+        if user and user.check_password(password):
             return user
 
 
@@ -69,11 +69,11 @@ def config_oauth(app):
     authorization.init_app(app)
 
     # support all grants
-    authorization.register_grant(grants.ImplicitGrant)
-    authorization.register_grant(grants.ClientCredentialsGrant)
+    # authorization.register_grant(grants.ImplicitGrant)
+    # authorization.register_grant(grants.ClientCredentialsGrant)
     authorization.register_grant(AuthorizationCodeGrant)
     authorization.register_grant(PasswordGrant)
-    authorization.register_grant(RefreshTokenGrant)
+    # authorization.register_grant(RefreshTokenGrant)
 
     # support revocation
     revocation_cls = create_revocation_endpoint(db.session, OAuth2Token)
