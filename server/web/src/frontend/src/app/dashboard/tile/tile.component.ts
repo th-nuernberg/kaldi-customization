@@ -11,7 +11,6 @@ import { Router } from '@angular/router';
 export class TileComponent implements OnInit, OnChanges {
   @Input() project: Project;
   lastTraining: Training;
-  lastTrainingStatus: string;
 
   constructor(
     private router: Router,
@@ -19,8 +18,8 @@ export class TileComponent implements OnInit, OnChanges {
   ) { }
 
   ngOnChanges() {
-    this.lastTrainingStatus = this.lastTraining ? StatusMapperService.convertTrainingStatus(this.lastTraining.status): "";
   }
+
   ngOnInit() {
     this.lastTraining = this.project.trainings[this.project.trainings.length-1];
   }

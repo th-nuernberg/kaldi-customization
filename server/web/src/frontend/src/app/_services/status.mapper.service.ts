@@ -1,5 +1,6 @@
 import {
   AudioStatus,
+  DecodeSessionStatus,
   ResourceStatus,
   TrainingStatus
 } from 'swagger-client'
@@ -75,12 +76,32 @@ export default class StatusMapperService {
 
   public static convertTrainingStatus(value: any): string {
     const training = "Training";
+    const textPrep = "Textaufbereitung";
+    const dataPrep = "Datenaudbereitung";
     switch(+value) {
       case TrainingStatus.Init: {
         return training + this._isInitialized;
       }
+      case TrainingStatus.TextPrep_Pending: {
+        return textPrep + this._isPending;
+      }
+      case TrainingStatus.TextPrep_Failure: {
+        return textPrep +  this._hasFailed;
+      }
       case TrainingStatus.Trainable: {
         return training + this._isTrainingable;
+      }
+      case TrainingStatus.Training_DataPrep_Pending: {
+        return dataPrep +  this._isPending;
+      }
+      case TrainingStatus.Training_DataPrep_InProgress: {
+        return dataPrep + this._isInProgress;
+      }
+      case TrainingStatus.Training_DataPrep_Success: {
+        return dataPrep + this._wasSuccessful;
+      }
+      case TrainingStatus.Training_DataPrep_Failure: {
+        return dataPrep + this._hasFailed;
       }
       case TrainingStatus.Training_Pending: {
         return training + this._isPending;
@@ -93,6 +114,32 @@ export default class StatusMapperService {
       }
       case TrainingStatus.Training_Failure: {
         return training + this._hasFailed;
+      }
+      default: {
+        console.error('missing status code for training ' + value);
+        return value;
+      }
+    }
+  }
+
+  public static convertDecodeAudioSessionStatus(value: any): string {
+    const decodeAudioSession = "Spracherkennungssession";
+
+    switch(+value) {
+      case DecodeSessionStatus.Init: {
+        return decodeAudioSession +  this._isInitialized;
+      }
+      case DecodeSessionStatus.Decoding_Pending: {
+        return decodeAudioSession + this._isPending;
+      }
+      case DecodeSessionStatus.Decoding_InProgress: {
+        return decodeAudioSession + this._isInProgress;
+      }
+      case DecodeSessionStatus.Decoding_Success: {
+        return decodeAudioSession + this._wasSuccessful;
+      }
+      case DecodeSessionStatus.Decoding_Failure: {
+        return decodeAudioSession + this._hasFailed;
       }
       default: {
         console.error('missing status code for training ' + value);
