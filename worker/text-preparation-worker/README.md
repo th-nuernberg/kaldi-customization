@@ -52,8 +52,8 @@ The path which is used for uploading the **corpus.txt** file looks as follows:
 
 After uploading the **corpus.txt** file, the processing of the task finished officially.
 
-**IMAGE OF THE WORKFLOW**
-**INSERT**
+[Sequence diagram of the Text-Preparation-Worker](https://git.informatik.fh-nuernberg.de/kaldi/kaldi-customization/blob/master/worker/text-preparation-worker/tpwsequenz.png)  
+[Image of the Text-Preparation-Worker workflow](https://git.informatik.fh-nuernberg.de/kaldi/kaldi-customization/blob/master/worker/text-preparation-worker/tpwablauf.png)
 
 ## Structure of the TPW directory
 
