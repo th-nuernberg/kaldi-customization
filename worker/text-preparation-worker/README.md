@@ -13,9 +13,9 @@ This section will describe the functionality of the **TPW**. This is done by exp
 
 At the end of this section, there is an image of the workflow.
 
-Main goal of the **TPW** is to create a **corpus.txt** file which is afterwards needed by the **kaldi-worker**. How the **corpus.txt** file is generated is now explained.
+Main goal of the **TPW** is to create a **corpus.txt** file which is afterwards needed by the **data-preparation-worker**. How the **corpus.txt** file is generated is now explained.
 
-Before the actual processing is explained, it is necessary to know that the **TPW** is attached to the `text_prep_queue` and is waiting for a task. As soon as a task is placed within the `text_prep_queue`, the **TPW** starts to process this task.
+Before the actual processing is explained, it is necessary to know that the **TPW** is attached to the `text_prep_queue` and is waiting for a task. As soon as a task is placed within the `text_prep_queue`, the **TPW** is triggered.
 
 In order to process a task correctly, the following information needs to be provided:
 
@@ -28,9 +28,7 @@ The first important processing step is to download the needed file which is loca
 
 The needed file is saved within the MinIO-server with the following path: `RESOURCE_BUCKET/resource_uuid/source`
 
-If the download of the file was successfully, the processing continues, else the API-server will be updated that an error occurred during the processing of the task.
-
-After downloading the neede file, it is necessary to check whether the given `file_type` is supported or not. If the `file_type` is supported, its corresponding parser function is called and the processing continues. If the `file_type` is not supported, the API-server will be updated that the received task contained an unsupported `file_type`.
+After downloading the needed file, it is necessary to check whether the given `file_type` is supported or not. If the `file_type` is supported, its corresponding parser function is called and the processing continues. If the `file_type` is not supported, the API-server will be updated that the received task contained an unsupported `file_type`.
 
 The following file types are supported by the **TPW**:
 
@@ -68,21 +66,21 @@ In order to install the libraries execute one of the following commands (Unix/Li
 1. `sudo pip install -r requirements.txt`
 2. `sudo pip3 install -r requirements.txt`
 
-### out
+### out-directory
 
 This subdirectory contains all test-files which were used to test the functionality of the **TPW**.
 
 At the beginning of this project, all of these files were used. Currently, only one file of each type is used to test the functionality. More information about testing is provided within the `test` section.
 
-### src
+### src-directory
 
-This subdirectory contains the complete implementation of the **TPW**. `text_preparation.py`-file implements the whole workflow of the worker, while the `file_parser.py`-file implements all used parsers and the **corpus.txt** creation.
+This subdirectory contains the complete implementation of the **TPW**. `text_preparation.py`-file contains the implementation of the workers workflow. The `file_parser.py`-file contains the implementation of all parsers and the **corpus.txt** creation.
 
-### test
+### test-directory
 
 This subdirectory contains the test environment for the **TPW**. Therefore, it consits of an own `docker-compose.yml`-file which defines the environment.
 
-In addition to the `docker-compose.yml`-file, a `Dockerfile` is available. This `Dockerfile` creates the **test_text_preparation_worker** worker which is used to test the **TPW**.
+In addition to the `docker-compose.yml`-file, a `Dockerfile` is available. This `Dockerfile` creates the **test_text_preparation_worker** which is used to test the **TPW**.
 
 The implementation of all tests is located within the *src* directory.
 
