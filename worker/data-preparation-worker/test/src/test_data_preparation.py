@@ -42,6 +42,7 @@ def test_data_prep_worker(redis_client, minio_client):
     upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "5/corpus.txt", "test-files/5/corpus.txt")
     upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "6/corpus.txt", "test-files/6/corpus.txt")
     upload_to_bucket(minio_client, minio_buckets["ACOUSTIC_MODELS_BUCKET"], "Voxforge-RNN/g2p_model.fst", "test-files/g2p_model.fst")
+    upload_to_bucket(minio_client, minio_buckets["ACOUSTIC_MODELS_BUCKET"], "Voxforge-RNN/lexicon.txt", "test-files/lexicon.txt")
 
     # Step 3: Subscribe to the status-queue
     pubsub = redis_client.pubsub(ignore_subscribe_messages=True)

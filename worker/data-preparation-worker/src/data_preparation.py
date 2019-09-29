@@ -4,8 +4,8 @@ import json
 import os
 
 from connector import *
-from data_processing import (execute_phonetisaurus, merge_corpus_list,
-                             remove_local_files, save_txt_file, create_unique_word_list)
+from data_processing import (execute_phonetisaurus, merge_corpus_list, combine_old_and_new_lexicon_files,
+                             remove_local_files, save_txt_file, create_unique_word_list, compare_lexicon_with_word_list)
 from minio_communication import download_from_bucket, upload_to_bucket, minio_buckets
 
 
@@ -37,11 +37,14 @@ def infinite_loop():
 
             log_file_handler.write("Starting to download all needed files. \n")
             # Step 1: Download all files which were created by the Text-Preparation-Worker for this task.
-            #         In addition to that, download the G2P-graph from the acoustic-bucket:
+            #         In addition to that, download the G2P-graph and lexicon.txt files from the acoustic-bucket:
+            
             # Download of the graph
             download_results.append(download_from_bucket(minio_client, minio_buckets["ACOUSTIC_MODELS_BUCKET"],
                                                         "{}/g2p_model.fst".format(task.acoustic_model_id), "/data_prep_worker/in/g2p_model.fst"))
-
+            # Download of the lexicon.txt file
+            download_results.append(download_from_bucket(minio_client, minio_buckets["ACOUSTIC_MODELS_BUCKET"],
+                                                        "{}/lexicon.txt".format(task.acoustic_model_id), "/data_prep_worker/in/lexicon.txt"))
             corpus_list = list()
             for resource in task.resources:
                 # Download of all corpus files which were created within the TPW
@@ -83,31 +86,37 @@ def infinite_loop():
                 status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.FAILURE, training_id=task.training_id, message="Saving merged corpus file locally failed"))
             log_file_handler.write("Successfully saved the merged corpus file \n")
 
-            # Step 3.1: Create the unique word list by using the combined corpus
+            # Step 3.1: Create the final_word_list by using the combined corpus
             try:
-                log_file_handler.write("Processing continues. Next step is to create a unique word list \n")
+                log_file_handler.write("Processing continues. Next step is to create the final_word_list \n")
                 lexicon = create_unique_word_list("/data_prep_worker/out/corpus.txt")
             except Exception as e:
                 print(e)
-                log_file_handler.write("While trying to create the unique word list, the following error occurred: \n")
+                log_file_handler.write("While trying to create the final_word_list, the following error occurred: \n")
                 log_file_handler.write("############################################################################# \n")
-                log_file_handler.write("It was not possible to open the corpus-file correctly. Therefore, it was not possible to create the unique word list \n")
-                status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.FAILURE, training_id=task.training_id, message="Unique word list creation failed"))
-            log_file_handler.write("Successfully created the unique word list. \n")
+                log_file_handler.write("It was not possible to open the corpus-file correctly. Therefore, it was not possible to create the final_word_list \n")
+                status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.FAILURE, training_id=task.training_id, message="Final word list creation failed"))
+            log_file_handler.write("Successfully created the final_word_list. \n")
 
-            # Step 3.2: Save the unique word list locally
+            # Step 3.2: Save the final_word_list locally
             try:
                 log_file_handler.write("Saving the word list locally, before the processing continues. \n")
                 save_txt_file("/data_prep_worker/out/final_word_list", lexicon)
             except Exception as e:
                 print(e)
-                log_file_handler.write("While trying to save the unique word list locally, the following error occurred: \n")
+                log_file_handler.write("While trying to save the final_word_list locally, the following error occurred: \n")
                 log_file_handler.write("############################################################################# \n")
                 log_file_handler.write("It was not possible to save the file. \n")
                 status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.FAILURE, training_id=task.training_id, message="Saving unique word list locally failed"))
-            log_file_handler.write("Successfully saved the word list. \n")
+            log_file_handler.write("Successfully saved the final_word_list. \n")
 
-            # Step 4: Execute Phonetisaurus and create phones for the unique word
+            # Step 4.1: Compare the final_word_list with the existing lexicon.txt file 
+            unique_word_list = compare_lexicon_with_word_list(final_word_list="/data_prep_worker/out/final_word_list", lexicon="/data_prep_worker/in/lexicon.txt")
+
+            # Step 4.2: Save the unique_word_list locally 
+            save_txt_file(file_path="/data_prep_worker/out/unique_word_list", content_list=unique_word_list)
+
+            # Step 4.3: Execute Phonetisaurus and create phones for the unique_word_list
             try:
                 log_file_handler.write("Processing continues by executing the Phonetisaurus which will create the lexicon-file for the Kaldi-Framework. \n")
                 execute_phonetisaurus()
@@ -120,13 +129,24 @@ def infinite_loop():
             log_file_handler.write("Successfully created the lexicon-file. \n")
             print("Successfully created the lexicon-file")
 
-            # Step 5: Upload lexicon which was retrieved by phonetisaurus-apply and its graph
+            # Step 4.4: Append new word and phone list to the lexicon-file
+            lexicon = combine_old_and_new_lexicon_files(old_lexicon="/data_prep_worker/in/lexicon.txt", new_lexicon="/data_prep_worker/out/lexicon.txt")
+
+            # Step 4.5: Save final lexicon.txt file locally
+            save_txt_file(file_path="/data_prep_worker/out/lexicon.txt", content_list=lexicon)
+
+            # Step 5: Upload of lexicon.txt, corpus.txt and unique_word_list files
             log_file_handler.write("Processing continues by uploading the created lexicon-file and merged corpus to their corresponding MinIO-bucket \n")
             lexicon_result = upload_to_bucket(minio_client, minio_buckets["TRAINING_BUCKET"], 
                                               "{}/lexicon.txt".format(task.training_id), "/data_prep_worker/out/lexicon.txt")
+
             corpus_result = upload_to_bucket(minio_client, minio_buckets["TRAINING_BUCKET"], 
                                              "{}/corpus.txt".format(task.training_id), "/data_prep_worker/out/corpus.txt")
-            if not lexicon_result[0] or not corpus_result[0]:
+
+            unique_word_list_result = upload_to_bucket(minio_client, minio_buckets["TRAINING_BUCKET"],
+                                             "{}/unique_word_list.txt".format(task.training_id), "/data_prep_worker/out/final_word_list")
+
+            if not lexicon_result[0] or not corpus_result[0] or not unique_word_list_result[0]:
                 print("At least one upload failed. It is not possible to finish this task successfully.")
                 log_file_handler.write("While trying to upload the lexicon.txt and corpus.txt files, the following error occurred: \n")
                 log_file_handler.write("############################################################################# \n")
