@@ -165,8 +165,8 @@ if [[ $not_supported_files_result -eq 0 && \
 then
     echo "All test cases were executed successfully! Test-worker terminates with exit code 0!"
 else
-    echo "At least one test case failed. Test-Worker terminated with exit code -1!"
-    $exit_code=-1
+    echo "At least one test case failed. Test-Worker terminated with exit code 1!"
+    exit_code=1
 fi
 echo "###############################################################################################"
 exit $exit_code
