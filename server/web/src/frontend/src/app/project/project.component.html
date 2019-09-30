@@ -53,50 +53,55 @@
                   Training {{training.version}}
                 </mat-panel-title>
               </mat-expansion-panel-header>
-              <mat-list>
-                <mat-list-item
-                  class="listItemContainer"
-                  *ngFor='let decoding of currentDecodings'>
-                  <div class="matListTextContainer">
-                    <p
-                      matLine
-                      class="textContainer">
-                      <button
-                        mat-button
-                        color="{{ isPlaying(audio) ? 'accent' : 'primary' }}"
-                        (click)="triggerAudio($event, audio)">
-                        <mat-icon>{{ isPlaying(audio) ? 'pause_circle_outline' : 'play_circle_outline' }}</mat-icon>
-                      </button>
-                      Audio: {{decoding.audio.name}}</p>
-                    <p
-                      matLine
-                      class="textContainer">
-                      <button
-                        mat-button
-                        (click)="copyToClipboard(decoding.transcripts)">
-                        <mat-icon>post_add</mat-icon>
-                      </button>
-                      <span
-                        matTooltip="{{decoding.transcripts}}"
-                        matTooltipClass="toolTipContainer">
-                        Text: {{decoding.transcripts}}
-                      </span>
-                    </p>
-                  </div>
-                  <button
-                    mat-stroked-button
-                    class="actionButton rightAlign"
-                    (click)="downloadTranscript(decoding.transcripts, decoding.audio.name)">
-                      <mat-icon>get_app</mat-icon>
-                  </button>
-                  <audio #audioPlayer
-                    [src]="currentlyPlayingAudio?.data | safe:'url'"
-                    type="audio/wav"
-                    (ended)="stopAudio()">
-                  </audio>
-                  <mat-divider></mat-divider>
-                </mat-list-item>
-              </mat-list>
+              <ng-container
+                *ngFor='let decodingSessions of decodings | keyvalue'>
+                <mat-list
+                  *ngFor='let decodingSession of decodingSessions.value'>
+                  <mat-list-item
+                    class="listItemContainer"
+                    *ngFor='let decoding of decodingSession.decodings'>
+                    <div class="matListTextContainer">
+                      <p
+                        matLine
+                        class="textContainer">
+                        <button
+                          mat-button
+                          color="{{ isPlaying(audio) ? 'accent' : 'primary' }}"
+                          (click)="triggerAudio($event, audio)">
+                          <mat-icon>{{ isPlaying(audio) ? 'pause_circle_outline' : 'play_circle_outline' }}</mat-icon>
+                        </button>
+                        Audio: {{decoding.audio.name}}</p>
+                      <p
+                        matLine
+                        class="textContainer">
+                        <button
+                          mat-button
+                          (click)="copyToClipboard(decoding.transcripts)">
+                          <mat-icon>post_add</mat-icon>
+                        </button>
+                        <span
+                          matTooltip="{{decoding.transcripts}}"
+                          matTooltipClass="toolTipContainer">
+                          Text: {{decoding.transcripts}}
+                        </span>
+                      </p>
+                    </div>
+
+                    <button
+                      mat-stroked-button
+                      class="actionButton rightAlign"
+                      (click)="downloadTranscript(decoding.transcripts, decoding.audio.name)">
+                        <mat-icon>get_app</mat-icon>
+                    </button>
+                    <audio #audioPlayer
+                      [src]="currentlyPlayingAudio?.data | safe:'url'"
+                      type="audio/wav"
+                      (ended)="stopAudio()">
+                    </audio>
+                    <mat-divider></mat-divider>
+                  </mat-list-item>
+                </mat-list>
+              </ng-container>
             </mat-expansion-panel>
           </mat-accordion>
         </ng-container>

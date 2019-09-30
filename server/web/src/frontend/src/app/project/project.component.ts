@@ -6,49 +6,16 @@ import {
   Audio,
   TrainingStatus,
   TrainingService,
-  Training,
   DecodeService,
   DecodeAudio,
+  DecodeSession,
+  DecodeSessionStatus,
   Project,
-  ProjectService }
+  ProjectService,
+  AudioStatus}
 from 'swagger-client';
 import AppConstants from  '../app.component';
 import { DomSanitizer } from '@angular/platform-browser';
-
-const DUMMY_DECODES: DecodeAudio[] = [
-  {
-    transcripts: [
-      new Object("und die mühsam am auch liegt auf die diesen klicken einem texten zu produzieren"),
-      new Object("und die mühsam am auch liegt auf die diesen klicken einem texten zu produzieren"),
-      new Object("und die mühsam am auch liegt auf die diesen klicken einem texten zu produzieren")
-    ],
-    audio: {
-      uuid: "550e8400-e29b-11d4-a716-446655440000",
-      name: "text.wav",
-      status: 300
-    }
-  },
-  {
-    transcripts: [
-      new Object("und die mühsam am auch liegt auf die diesen klicken einem texten zu produzieren")
-    ],
-    audio: {
-      uuid: "550e8400-e29b-11d4-a716-446655440000",
-      name: "text2.wav",
-      status: 300
-    }
-  },
-  {
-    transcripts: [
-      new Object("und die mühsam am auch liegt auf die diesen klicken einem texten zu produzieren")
-    ],
-    audio: {
-      uuid: "550e8400-e29b-11d4-a716-446655440000",
-      name: "text3.wav",
-      status: 300
-    }
-  },
-];
 
 @Component({
   selector: 'app-project',
@@ -56,15 +23,13 @@ const DUMMY_DECODES: DecodeAudio[] = [
   styleUrls: ['./project.component.less']
 })
 export class ProjectComponent implements OnInit {
-  projectUuid: string;
-
-  training: Training;
-  currentDecodings: DecodeAudio[];
-
-  project$: Observable<Project>;
-  decodings$: Observable<DecodeAudio[]>;
 
   graphUrl;
+  projectUuid: string;
+  project$: Observable<Project>;
+
+  decodings: Map<number, Array<DecodeSession>>;
+  currentDecodeSessionOfTraining: Map<number, DecodeSession>;
 
   currentlyPlayingAudio? : {
     audio: Audio,
@@ -83,7 +48,72 @@ export class ProjectComponent implements OnInit {
     ) {}
 
   ngOnInit() {
-    this.currentDecodings = DUMMY_DECODES;
+    this.currentDecodeSessionOfTraining = new Map();
+    this.decodings = new Map();
+    this.decodings.set(0, [
+      {
+        session_uuid: "",
+        status: DecodeSessionStatus.Decoding_InProgress,
+        decodings: [
+          {
+            audio: {
+              uuid: "",
+              name: "test1.wav",
+              status: AudioStatus.AudioPrep_Success
+            }
+          },
+          {
+            audio: {
+              uuid: "",
+              name: "test2.wav",
+              status: AudioStatus.AudioPrep_Success
+            }
+          },
+        ]
+      },
+      {
+        session_uuid: "",
+        status: DecodeSessionStatus.Decoding_InProgress,
+        decodings: [
+          {
+            audio: {
+              uuid: "",
+              name: "test3.wav",
+              status: AudioStatus.AudioPrep_Success
+            }
+          },
+          {
+            audio: {
+              uuid: "",
+              name: "test4.wav",
+              status: AudioStatus.AudioPrep_Success
+            }
+          },
+        ]
+      }
+    ]);
+    this.decodings.set(1, [
+      {
+        session_uuid: "",
+        status: DecodeSessionStatus.Decoding_Success,
+        decodings: [
+          {
+            audio: {
+              uuid: "",
+              name: "test5.wav",
+              status: AudioStatus.AudioPrep_Success
+            }
+          },
+          {
+            audio: {
+              uuid: "",
+              name: "test6.wav",
+              status: AudioStatus.AudioPrep_Success
+            }
+          },
+        ]
+      }
+    ]);
 
     this.projectUuid = this.route.snapshot.paramMap.get('uuid');
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
@@ -91,13 +121,23 @@ export class ProjectComponent implements OnInit {
     this.project$.subscribe(project => {
       if (project.trainings.length) {
         project.trainings.forEach(training => {
-          // TODO what about decodings$ observable solution
-          this.decodeService.getDecodings(
+          this.decodeService.getAllDecodeSessions(
             this.projectUuid,
             training.version)
-            .subscribe(decodings => {
-              //this.currentDecodings.concat(decodings);
+            .subscribe(decodeSessions => {
+              decodeSessions.forEach(session => {
+                //this.decodings[training.version].push(session.decodings);
+              })
           });
+
+          this.decodeService.getCurrentDecodeSession(
+            this.projectUuid,
+            training.version
+          ).subscribe(session => {
+            if(session != null) {
+              this.currentDecodeSessionOfTraining.set(training.version, session);
+            }
+          })
         });
       }
     });
@@ -145,10 +185,9 @@ export class ProjectComponent implements OnInit {
   createTraining() {
     this.trainingService.createTraining(this.projectUuid)
       .subscribe(training => {
-        this.training = training;
         // opens training dialog
         this.snackBar.open("Erstelle neues Training...", "", AppConstants.snackBarConfig);
-        this.router.navigate(['/upload/training/' + this.projectUuid + "/" + this.training.version]);
+        this.router.navigate(['/upload/training/' + this.projectUuid + "/" + training.version]);
       });
   }
 
@@ -160,20 +199,14 @@ export class ProjectComponent implements OnInit {
     }else if (trainingStatus == TrainingStatus.Training_Failure) {
       this.trainingService.createTraining(this.projectUuid)
       .subscribe(training => {
-        this.training = training;
         // opens training dialog
         this.snackBar.open("Erstelle neues Training...", "", AppConstants.snackBarConfig);
-        this.router.navigate(['/upload/training/' + this.projectUuid + "/" + this.training.version]);
+        this.router.navigate(['/upload/training/' + this.projectUuid + "/" + training.version]);
       });
     }else {
       this.snackBar.open("Öffne Training...", "", AppConstants.snackBarConfig);
       this.router.navigate(['/upload/training/' + this.projectUuid + "/" + trainingVersion]);
     }
-  }
-
-  createDecode(trainingVersion:number): void {
-    this.snackBar.open("Erstelle neue Spracherkennung...", "", AppConstants.snackBarConfig);
-    this.router.navigate(['/upload/decoding/' + this.projectUuid + "/" + trainingVersion]);
   }
 
   wasTrainingSuccessful(trainingStatus:TrainingStatus) {
@@ -200,6 +233,28 @@ export class ProjectComponent implements OnInit {
         a.parentNode.removeChild(a);
       }, 5000);
     });
+  }
+
+  createDecode(trainingVersion:number): void {
+    let currentSession = this.currentDecodeSessionOfTraining.get(trainingVersion);
+
+    if(currentSession != null && currentSession.status == DecodeSessionStatus.Decoding_Success) {
+      this.snackBar.open("Öffne laufende Spracherkennung...", "", AppConstants.snackBarConfig);
+      this.router.navigate(['/upload/decoding/overview/' + this.projectUuid + "/" + trainingVersion + "/" + currentSession.session_uuid]);
+    } else {
+
+      this.decodeService.createDecodeSession(
+        this.projectUuid,
+        trainingVersion
+      ).subscribe(session => {
+        this.snackBar.open("Erstelle neue Spracherkennung...", "", AppConstants.snackBarConfig);
+        this.router.navigate(['/upload/decoding/' + this.projectUuid + "/" + trainingVersion + "/" + session.session_uuid]);
+      });
+    }
+  }
+
+  wasDecodingSessionSuccessful(sessionStatus:DecodeSessionStatus) {
+    return sessionStatus != DecodeSessionStatus.Decoding_Success;
   }
 
   downloadTranscript(data, name:string) {

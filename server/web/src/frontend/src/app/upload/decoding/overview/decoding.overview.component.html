@@ -1,0 +1,51 @@
+<div fxLayout="center center">
+  <ng-container *ngIf="{
+    project: project$ | async,
+    training: training$ | async,
+    decodeSession: decodeSession$ | async,
+    sessionLog: decodeSessionLog$ | async } as detail;">
+    <mat-card class="cardContainer">
+      <mat-card-content>
+        <h2>Status Spracherkennung</h2>
+        <mat-list>
+          <mat-list-item>
+            <p>Projekt: {{detail.project?.name}}</p>
+          </mat-list-item>
+          <mat-list-item>
+            <p>Modell: {{detail.project?.acoustic_model.name}}</p>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+
+          <mat-list-item>
+            <p>Training: {{detail.training?.version}}</p>
+          </mat-list-item>
+
+          <mat-list-item>
+            <p>Spracherkennung-Status: {{detail.decodeSession?.status}}</p>
+          </mat-list-item>
+
+          <mat-list-item>
+            <p>Anzahl der eindeutigen Wörter: {{detail.trainingStats?.unqiue_words_count}}</p>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+        </mat-list>
+        <div>
+          <button
+            mat-stroked-button
+            class="uploadFile_Button"
+            (click)="downloadLog(detail.sessionLog, 'DecodeSessionLog')">
+            <mat-icon>get_app</mat-icon>
+            Spracherkennung Log
+          </button>
+          <button
+            mat-flat-button
+            class="uploadFile_Button"
+            color="primary"
+            (click)="backToProjectOverview()">
+            <mat-icon>home</mat-icon>
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+</div>

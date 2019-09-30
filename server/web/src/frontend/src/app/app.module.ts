@@ -34,6 +34,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { ProjectComponent } from './project/project.component';
 import { CoverComponent } from './cover/cover.component';
 import { DecodingUploadComponent } from './upload/decoding/decoding.upload.component';
+import { DecodingOverviewComponent } from './upload/decoding/overview/decoding.overview.component';
 import { TrainingUploadComponent } from './upload/training/training.upload.component';
 import { TrainingOverviewComponent } from './upload/training/overview/training.overview.component';
 import { AccountComponent } from './account/account.component';
@@ -53,6 +54,7 @@ import { StatusMessagePipe } from './status.message.pipe';
     ProjectComponent,
     CoverComponent,
     DecodingUploadComponent,
+    DecodingOverviewComponent,
     TrainingUploadComponent,
     TrainingOverviewComponent,
     AccountComponent,
