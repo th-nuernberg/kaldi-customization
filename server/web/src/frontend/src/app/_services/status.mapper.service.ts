@@ -77,7 +77,7 @@ export default class StatusMapperService {
   public static convertTrainingStatus(value: any): string {
     const training = "Training";
     const textPrep = "Textaufbereitung";
-    const dataPrep = "Datenaudbereitung";
+    const dataPrep = "Datenaufbereitung";
     switch(+value) {
       case TrainingStatus.Init: {
         return training + this._isInitialized;
