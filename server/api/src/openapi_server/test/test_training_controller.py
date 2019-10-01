@@ -6,6 +6,7 @@ import unittest
 from flask import json
 from six import BytesIO
 
+from openapi_server.models.callback_object import CallbackObject  # noqa: E501
 from openapi_server.models.resource import Resource  # noqa: E501
 from openapi_server.models.resource_reference_object import ResourceReferenceObject  # noqa: E501
 from openapi_server.models.training import Training  # noqa: E501
@@ -78,7 +79,7 @@ class TestTrainingController(BaseTestCase):
             'Authorization': 'Bearer special-key',
         }
         response = self.client.open(
-            '/api/v1/project/{project_uuid}/training/{training_version}/model'.format(project_uuid='project_uuid_example', training_version='training_version_example'),
+            '/api/v1/project/{project_uuid}/training/{training_version}/model'.format(project_uuid='project_uuid_example', training_version=56),
             method='GET',
             headers=headers)
         self.assert200(response,
@@ -132,6 +133,44 @@ class TestTrainingController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    def test_get_trainings_for_project(self):
+        """Test case for get_trainings_for_project
+
+        Lists all Trainings of a Project
+        """
+        headers = { 
+            'Accept': 'application/json',
+            'Authorization': 'Bearer special-key',
+        }
+        response = self.client.open(
+            '/api/v1/project/{project_uuid}/training'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000),
+            method='GET',
+            headers=headers)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_prepare_training_by_version(self):
+        """Test case for prepare_training_by_version
+
+        Start the specified training
+        """
+        callback_object = {
+  "url" : "url"
+}
+        headers = { 
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer special-key',
+        }
+        response = self.client.open(
+            '/api/v1/project/{project_uuid}/training/{training_version}/prepare'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
+            method='PUT',
+            headers=headers,
+            data=json.dumps(callback_object),
+            content_type='application/json')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     @unittest.skip("text/plain not supported by Connexion")
     def test_set_corpus_of_training_resource(self):
         """Test case for set_corpus_of_training_resource
@@ -157,14 +196,20 @@ class TestTrainingController(BaseTestCase):
 
         Start the specified training
         """
+        callback_object = {
+  "url" : "url"
+}
         headers = { 
             'Accept': 'application/json',
+            'Content-Type': 'application/json',
             'Authorization': 'Bearer special-key',
         }
         response = self.client.open(
-            '/api/v1/project/{project_uuid}/training/{training_version}'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
-            method='POST',
-            headers=headers)
+            '/api/v1/project/{project_uuid}/training/{training_version}/train'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
+            method='PUT',
+            headers=headers,
+            data=json.dumps(callback_object),
+            content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
