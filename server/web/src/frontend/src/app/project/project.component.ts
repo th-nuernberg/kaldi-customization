@@ -28,7 +28,7 @@ export class ProjectComponent implements OnInit {
   projectUuid: string;
   project$: Observable<Project>;
 
-  decodings: Map<number, Array<DecodeAudio>>;
+  decodings: Map<number, Array<DecodeSession>>;
   currentDecodeSessionOfTraining: Map<number, DecodeSession>;
 
   currentlyPlayingAudio? : {
@@ -58,9 +58,9 @@ export class ProjectComponent implements OnInit {
       if (project.trainings.length) {
         project.trainings.forEach(training => {
 
-          this.decodeService.getDecodings(project.uuid, training.version)
-            .subscribe(decodeAudios => {
-              this.decodings.set(training.version, decodeAudios);
+          this.decodeService.getAllDecodeSessions(project.uuid, training.version)
+            .subscribe(decodeSessions => {
+              this.decodings.set(training.version, decodeSessions);
           });
 
           this.decodeService.getCurrentDecodeSession(
@@ -168,14 +168,14 @@ export class ProjectComponent implements OnInit {
     });
   }
 
-  createDecode(trainingVersion:number): void {
+  createDecode(event, trainingVersion:number): void {
+
+    event.stopPropagation();
     let currentSession = this.currentDecodeSessionOfTraining.get(trainingVersion);
-
-    if(currentSession != null && currentSession.status == DecodeSessionStatus.Decoding_Success) {
+    if(currentSession != null) {
       this.snackBar.open("Öffne laufende Spracherkennung...", "", AppConstants.snackBarConfig);
-      this.router.navigate(['/upload/decoding/overview/' + this.projectUuid + "/" + trainingVersion + "/" + currentSession.session_uuid]);
+      this.router.navigate(['/upload/decoding/' + this.projectUuid + "/" + trainingVersion + "/" + currentSession.session_uuid]);
     } else {
-
       this.decodeService.createDecodeSession(
         this.projectUuid,
         trainingVersion
@@ -223,5 +223,11 @@ export class ProjectComponent implements OnInit {
     tempTextArea.focus();
     document.execCommand('copy');
     document.body.removeChild(tempTextArea);
+  }
+
+  openDecodeSessionOverview(trainingVersion:number, decodeSessionUuid: string) {
+
+    this.snackBar.open("Öffne Spracherkennung Übersicht...", "", AppConstants.snackBarConfig);
+    this.router.navigate(['/upload/decoding/overview/' + this.projectUuid + "/" + trainingVersion + "/" + decodeSessionUuid]);
   }
 }
