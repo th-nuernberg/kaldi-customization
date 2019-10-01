@@ -17,7 +17,7 @@
             <p>Modell: {{detail.project?.acoustic_model.name}}</p>
           </mat-list-item>
           <mat-list-item>
-            <p>Modell: {{detail.project?.acoustic_model.model_type}}</p>
+            <p>Modell: {{detail.project?.acoustic_model.model_type | type: 'acousticModel'}}</p>
           </mat-list-item>
           <mat-divider></mat-divider>
 
@@ -26,7 +26,7 @@
           </mat-list-item>
 
           <mat-list-item>
-            <p>Erstellungszeit: {{detail.training?.creation_timestamp}}</p>
+            <p>Erstellungszeit: {{detail.training?.creation_timestamp | date: "dd.MM.yyyy"}}</p>
           </mat-list-item>
 
           <mat-list-item>
@@ -68,13 +68,6 @@
             Training Log
           </button>
 
-          <button
-            mat-stroked-button
-            class="uploadFile_Button"
-            (click)="downloadLog(detail.resourceLog, 'ResourceLog')">
-            <mat-icon>get_app</mat-icon>
-            Resource Log
-          </button>
           <button
             mat-flat-button
             class="uploadFile_Button"
