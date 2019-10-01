@@ -23,7 +23,6 @@ import { AudioReferenceObject } from '../model/audioReferenceObject';
 import { CallbackObject } from '../model/callbackObject';
 import { DecodeAudio } from '../model/decodeAudio';
 import { DecodeSession } from '../model/decodeSession';
-import { Resource } from '../model/resource';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
@@ -329,9 +328,9 @@ export class DecodeService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getAllDecodeSessions(project_uuid: string, training_version: number, observe?: 'body', reportProgress?: boolean): Observable<Array<Resource>>;
-    public getAllDecodeSessions(project_uuid: string, training_version: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Resource>>>;
-    public getAllDecodeSessions(project_uuid: string, training_version: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Resource>>>;
+    public getAllDecodeSessions(project_uuid: string, training_version: number, observe?: 'body', reportProgress?: boolean): Observable<Array<DecodeSession>>;
+    public getAllDecodeSessions(project_uuid: string, training_version: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DecodeSession>>>;
+    public getAllDecodeSessions(project_uuid: string, training_version: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DecodeSession>>>;
     public getAllDecodeSessions(project_uuid: string, training_version: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (project_uuid === null || project_uuid === undefined) {
             throw new Error('Required parameter project_uuid was null or undefined when calling getAllDecodeSessions.');
@@ -363,7 +362,7 @@ export class DecodeService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<Array<Resource>>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/decode/session`,
+        return this.httpClient.get<Array<DecodeSession>>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/decode/session`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,

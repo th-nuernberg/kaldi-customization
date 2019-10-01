@@ -145,7 +145,7 @@ Name | Type | Description  | Notes
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-**200** | The new active DecodeSession |  -  |
+**201** | The new active DecodeSession |  -  |
 **400** | An active session already exists |  -  |
 **403** | Forbidden |  -  |
 **404** | Project or training not found |  -  |
@@ -332,7 +332,7 @@ This endpoint does not need any parameter.
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_all_decode_sessions**
-> list[Resource] get_all_decode_sessions(project_uuid, training_version)
+> list[DecodeSession] get_all_decode_sessions(project_uuid, training_version)
 
 Get the all sessions
 
@@ -375,7 +375,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**list[Resource]**](Resource.md)
+[**list[DecodeSession]**](DecodeSession.md)
 
 ### Authorization
 
