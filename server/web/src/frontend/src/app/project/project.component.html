@@ -54,12 +54,11 @@
                 </mat-panel-title>
               </mat-expansion-panel-header>
               <ng-container
-                *ngFor='let decodingSessions of decodings | keyvalue'>
-                <mat-list
-                  *ngFor='let decodingSession of decodingSessions.value'>
+                matExpansionPanelContent>
+                <mat-list>
                   <mat-list-item
                     class="listItemContainer"
-                    *ngFor='let decoding of decodingSession.decodings'>
+                    *ngFor='let decodingAudio of decodings.get(training.version)'>
                     <div class="matListTextContainer">
                       <p
                         matLine
@@ -70,19 +69,19 @@
                           (click)="triggerAudio($event, audio)">
                           <mat-icon>{{ isPlaying(audio) ? 'pause_circle_outline' : 'play_circle_outline' }}</mat-icon>
                         </button>
-                        Audio: {{decoding.audio.name}}</p>
+                        Audio: {{decodingAudio.audio.name}}</p>
                       <p
                         matLine
                         class="textContainer">
                         <button
                           mat-button
-                          (click)="copyToClipboard(decoding.transcripts)">
+                          (click)="copyToClipboard(decodingAudio.transcripts)">
                           <mat-icon>post_add</mat-icon>
                         </button>
                         <span
-                          matTooltip="{{decoding.transcripts}}"
+                          matTooltip="{{decodingAudio.transcripts}}"
                           matTooltipClass="toolTipContainer">
-                          Text: {{decoding.transcripts}}
+                          Text: {{decodingAudio.transcripts}}
                         </span>
                       </p>
                     </div>
@@ -90,7 +89,7 @@
                     <button
                       mat-stroked-button
                       class="actionButton rightAlign"
-                      (click)="downloadTranscript(decoding.transcripts, decoding.audio.name)">
+                      (click)="downloadTranscript(decodingAudio.transcripts, decodingAudio.audio.name)">
                         <mat-icon>get_app</mat-icon>
                     </button>
                     <audio #audioPlayer

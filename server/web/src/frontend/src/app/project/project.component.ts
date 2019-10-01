@@ -28,7 +28,7 @@ export class ProjectComponent implements OnInit {
   projectUuid: string;
   project$: Observable<Project>;
 
-  decodings: Map<number, Array<DecodeSession>>;
+  decodings: Map<number, Array<DecodeAudio>>;
   currentDecodeSessionOfTraining: Map<number, DecodeSession>;
 
   currentlyPlayingAudio? : {
@@ -50,70 +50,6 @@ export class ProjectComponent implements OnInit {
   ngOnInit() {
     this.currentDecodeSessionOfTraining = new Map();
     this.decodings = new Map();
-    this.decodings.set(0, [
-      {
-        session_uuid: "",
-        status: DecodeSessionStatus.Decoding_InProgress,
-        decodings: [
-          {
-            audio: {
-              uuid: "",
-              name: "test1.wav",
-              status: AudioStatus.AudioPrep_Success
-            }
-          },
-          {
-            audio: {
-              uuid: "",
-              name: "test2.wav",
-              status: AudioStatus.AudioPrep_Success
-            }
-          },
-        ]
-      },
-      {
-        session_uuid: "",
-        status: DecodeSessionStatus.Decoding_InProgress,
-        decodings: [
-          {
-            audio: {
-              uuid: "",
-              name: "test3.wav",
-              status: AudioStatus.AudioPrep_Success
-            }
-          },
-          {
-            audio: {
-              uuid: "",
-              name: "test4.wav",
-              status: AudioStatus.AudioPrep_Success
-            }
-          },
-        ]
-      }
-    ]);
-    this.decodings.set(1, [
-      {
-        session_uuid: "",
-        status: DecodeSessionStatus.Decoding_Success,
-        decodings: [
-          {
-            audio: {
-              uuid: "",
-              name: "test5.wav",
-              status: AudioStatus.AudioPrep_Success
-            }
-          },
-          {
-            audio: {
-              uuid: "",
-              name: "test6.wav",
-              status: AudioStatus.AudioPrep_Success
-            }
-          },
-        ]
-      }
-    ]);
 
     this.projectUuid = this.route.snapshot.paramMap.get('uuid');
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
@@ -121,13 +57,11 @@ export class ProjectComponent implements OnInit {
     this.project$.subscribe(project => {
       if (project.trainings.length) {
         project.trainings.forEach(training => {
-          this.decodeService.getAllDecodeSessions(
-            this.projectUuid,
-            training.version)
-            .subscribe(decodeSessions => {
-              decodeSessions.forEach(session => {
-                //this.decodings[training.version].push(session.decodings);
-              })
+
+          this.decodeService.getDecodings(project.uuid, training.version)
+            .subscribe(decodeAudios => {
+              console.log(decodeAudios.length);
+              this.decodings.set(training.version, decodeAudios);
           });
 
           this.decodeService.getCurrentDecodeSession(
