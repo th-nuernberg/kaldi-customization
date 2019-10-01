@@ -1887,7 +1887,11 @@ paths:
         style: form
       responses:
         200:
-          content: {}
+          content:
+            text/plain:
+              schema:
+                description: Access token for default (web) client
+                type: string
           description: successful operation
           headers:
             X-Rate-Limit:
@@ -1911,9 +1915,20 @@ paths:
       tags:
       - user
       x-openapi-router-controller: openapi_server.controllers.user_controller
-  /user/logout:
+  /user/logout/{token}:
     post:
       operationId: logout_user
+      parameters:
+      - description: Access token to revoke
+        explode: false
+        in: path
+        name: token
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
       responses:
         200:
           content: {}

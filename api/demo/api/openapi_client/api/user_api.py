@@ -262,7 +262,7 @@ class UserApi(object):
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :return: None
+        :return: str
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -289,7 +289,7 @@ class UserApi(object):
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :return: None
+        :return: tuple(str, status_code(int), headers(HTTPHeaderDict))
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -335,6 +335,10 @@ class UserApi(object):
         local_var_files = {}
 
         body_params = None
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['text/plain'])  # noqa: E501
+
         # Authentication setting
         auth_settings = []  # noqa: E501
 
@@ -346,7 +350,7 @@ class UserApi(object):
             body=body_params,
             post_params=form_params,
             files=local_var_files,
-            response_type=None,  # noqa: E501
+            response_type='str',  # noqa: E501
             auth_settings=auth_settings,
             async_req=local_var_params.get('async_req'),
             _return_http_data_only=local_var_params.get('_return_http_data_only'),  # noqa: E501
@@ -354,15 +358,16 @@ class UserApi(object):
             _request_timeout=local_var_params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def logout_user(self, **kwargs):  # noqa: E501
+    def logout_user(self, token, **kwargs):  # noqa: E501
         """Logs out current logged in user session  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.logout_user(async_req=True)
+        >>> thread = api.logout_user(token, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool: execute request asynchronously
+        :param str token: Access token to revoke (required)
         :param _preload_content: if False, the urllib3.HTTPResponse object will
                                  be returned without reading/decoding response
                                  data. Default is True.
@@ -375,17 +380,18 @@ class UserApi(object):
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
-        return self.logout_user_with_http_info(**kwargs)  # noqa: E501
+        return self.logout_user_with_http_info(token, **kwargs)  # noqa: E501
 
-    def logout_user_with_http_info(self, **kwargs):  # noqa: E501
+    def logout_user_with_http_info(self, token, **kwargs):  # noqa: E501
         """Logs out current logged in user session  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.logout_user_with_http_info(async_req=True)
+        >>> thread = api.logout_user_with_http_info(token, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool: execute request asynchronously
+        :param str token: Access token to revoke (required)
         :param _return_http_data_only: response data without head status code
                                        and headers
         :param _preload_content: if False, the urllib3.HTTPResponse object will
@@ -402,7 +408,7 @@ class UserApi(object):
 
         local_var_params = locals()
 
-        all_params = []  # noqa: E501
+        all_params = ['token']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -416,10 +422,16 @@ class UserApi(object):
                 )
             local_var_params[key] = val
         del local_var_params['kwargs']
+        # verify the required parameter 'token' is set
+        if ('token' not in local_var_params or
+                local_var_params['token'] is None):
+            raise ApiValueError("Missing the required parameter `token` when calling `logout_user`")  # noqa: E501
 
         collection_formats = {}
 
         path_params = {}
+        if 'token' in local_var_params:
+            path_params['token'] = local_var_params['token']  # noqa: E501
 
         query_params = []
 
@@ -433,7 +445,7 @@ class UserApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/user/logout', 'POST',
+            '/user/logout/{token}', 'POST',
             path_params,
             query_params,
             header_params,

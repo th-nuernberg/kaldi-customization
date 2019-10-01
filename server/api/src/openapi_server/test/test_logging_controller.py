@@ -13,10 +13,26 @@ from openapi_server.test import BaseTestCase
 class TestLoggingController(BaseTestCase):
     """LoggingController integration test stubs"""
 
+    def test_get_decode_session_log(self):
+        """Test case for get_decode_session_log
+
+        Get decode session
+        """
+        headers = { 
+            'Accept': 'text/plain',
+            'Authorization': 'Bearer special-key',
+        }
+        response = self.client.open(
+            '/api/v1/project/{project_uuid}/training/{training_version}/decode/session/{session_uuid}/log'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56, session_uuid=550e8400-e29b-11d4-a716-446655440000),
+            method='GET',
+            headers=headers)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     def test_get_perparation_log(self):
         """Test case for get_perparation_log
 
-        Get Training Log
+        Get Preparation Log
         """
         headers = { 
             'Accept': 'text/plain',

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Configuration } from '../projects/swagger-client/src';
+import { Configuration } from 'swagger-client';
 
 @Injectable({
   providedIn: 'root'
@@ -8,13 +8,9 @@ export class IdentityService {
 
   constructor() { }
 
+  static config = new Configuration({ basePath: "/api/v1" });
+
   static getApiConfiguration(): Configuration {
-    return new Configuration(
-      {
-        basePath: "/api/v1",
-        username: "kaldi3",
-        password: "valid",
-        accessToken: "bokvORLZjjHCG7AEQ1oumFHBRHHopsDStsMUvKgSMd",
-    });
+    return IdentityService.config;
   }
 }

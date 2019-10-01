@@ -7,7 +7,7 @@ Method | HTTP request | Description
 [**create_user**](UserApi.md#create_user) | **POST** /user | Create user
 [**get_user**](UserApi.md#get_user) | **GET** /user | Get current user
 [**login_user**](UserApi.md#login_user) | **PUT** /user/login | Logs user into the system
-[**logout_user**](UserApi.md#logout_user) | **POST** /user/logout | Logs out current logged in user session
+[**logout_user**](UserApi.md#logout_user) | **POST** /user/logout/{token} | Logs out current logged in user session
 
 
 # **create_user**
@@ -122,7 +122,7 @@ This endpoint does not need any parameter.
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **login_user**
-> login_user(email, password)
+> str login_user(email, password)
 
 Logs user into the system
 
@@ -142,7 +142,8 @@ password = 'password_example' # str | The password for login in clear text
 
 try:
     # Logs user into the system
-    api_instance.login_user(email, password)
+    api_response = api_instance.login_user(email, password)
+    pprint(api_response)
 except ApiException as e:
     print("Exception when calling UserApi->login_user: %s\n" % e)
 ```
@@ -156,7 +157,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-void (empty response body)
+**str**
 
 ### Authorization
 
@@ -165,7 +166,7 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: Not defined
+ - **Accept**: text/plain
 
 ### HTTP response details
 | Status code | Description | Response headers |
@@ -176,7 +177,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **logout_user**
-> logout_user()
+> logout_user(token)
 
 Logs out current logged in user session
 
@@ -191,16 +192,20 @@ from pprint import pprint
 
 # Create an instance of the API class
 api_instance = openapi_client.UserApi()
+token = '550e8400-e29b-11d4-a716-446655440000' # str | Access token to revoke
 
 try:
     # Logs out current logged in user session
-    api_instance.logout_user()
+    api_instance.logout_user(token)
 except ApiException as e:
     print("Exception when calling UserApi->logout_user: %s\n" % e)
 ```
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **token** | [**str**](.md)| Access token to revoke | 
 
 ### Return type
 

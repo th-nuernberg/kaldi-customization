@@ -117,6 +117,22 @@ class TestTrainingController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    def test_get_current_training_for_project(self):
+        """Test case for get_current_training_for_project
+
+        Get current training
+        """
+        headers = { 
+            'Accept': 'application/json',
+            'Authorization': 'Bearer special-key',
+        }
+        response = self.client.open(
+            '/api/v1/project/{project_uuid}/training/current'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000),
+            method='GET',
+            headers=headers)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     def test_get_training_by_version(self):
         """Test case for get_training_by_version
 
@@ -149,10 +165,26 @@ class TestTrainingController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    def test_get_vocabulary_of_training(self):
+        """Test case for get_vocabulary_of_training
+
+        Get the entire vocabulary of the specified training
+        """
+        headers = { 
+            'Accept': 'text/plain',
+            'Authorization': 'Bearer special-key',
+        }
+        response = self.client.open(
+            '/api/v1/project/{project_uuid}/training/{training_version}/vocabulary'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
+            method='GET',
+            headers=headers)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     def test_prepare_training_by_version(self):
         """Test case for prepare_training_by_version
 
-        Start the specified training
+        Prepare the specified training
         """
         callback_object = {
   "url" : "url"
@@ -205,7 +237,7 @@ class TestTrainingController(BaseTestCase):
             'Authorization': 'Bearer special-key',
         }
         response = self.client.open(
-            '/api/v1/project/{project_uuid}/training/{training_version}/train'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
+            '/api/v1/project/{project_uuid}/training/{training_version}/enqueue'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
             method='PUT',
             headers=headers,
             data=json.dumps(callback_object),

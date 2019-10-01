@@ -6,9 +6,11 @@ from openapi_server import util
 
 from models import db
 from models.user import User as DB_User
+from models.auth import OAuth2Client as DB_OAuth2Client, OAuth2Token as DB_OAuth2Token
 
-from sqlalchemy import exc
 from passlib.hash import sha256_crypt
+from sqlalchemy import exc
+from werkzeug.security import gen_salt
 
 
 def create_user(user=None):  # noqa: E501
@@ -41,6 +43,22 @@ def create_user(user=None):  # noqa: E501
         print("Failed to insert user into database: ", e)
         return ("Cannot create user", 400)
 
+    db_client = DB_OAuth2Client(
+        client_name='default',
+        client_uri='/',
+        # TODO: get all scopes from openapi.yaml
+        scope='decode:projects read:projects train:projects write:projects read:resources read:audio write:resources read:user write:user write:audio',
+        redirect_uri='/',
+        grant_type='password',
+        response_type='code',
+        token_endpoint_auth_method='client_secret_basic')
+    db_client.user_id = db_user.id
+    db_client.client_id = gen_salt(24)
+    db_client.client_secret = gen_salt(48)
+
+    db.session.add(db_client)
+    db.session.commit()
+
     return (User(username=db_user.username, email=db_user.email), 201)
 
 
@@ -70,7 +88,7 @@ def login_user(email, password):  # noqa: E501
     :param password: The password for login in clear text
     :type password: str
 
-    :rtype: None
+    :rtype: str
     """    
     db_user = DB_User.query.filter_by(email=email).first()
 
@@ -80,15 +98,45 @@ def login_user(email, password):  # noqa: E501
     if not db_user.check_password(password):
         return ("Invalid email/password", 400)
 
-    return User(username=db_user.username, email=db_user.email)
+    db_client = DB_OAuth2Client.query.filter_by(
+        user_id=db_user.id,
+        client_name='default').first()
+
+    if not db_client:
+        return ("Missing client for web login ('default')")
+
+    db_token = DB_OAuth2Token(
+        client_id=db_client.client_id,
+        token_type='Baerer',
+        access_token=gen_salt(42),
+        refresh_token=None,
+        scope=db_client.scope,
+        revoked=0,
+        expires_in=864000,
+        user_id=db_user.id)
+
+    db.session.add(db_token)
+    db.session.commit()
+
+    return db_token.access_token
 
 
-def logout_user():  # noqa: E501
+def logout_user(token):  # noqa: E501
     """Logs out current logged in user session
 
      # noqa: E501
 
+    :param token: Access token to revoke
+    :type token: 
 
     :rtype: None
     """
+    db_token = DB_OAuth2Token.query.filter_by(
+        access_token=token).first()
+
+    if db_token:
+        db_token.revoked = 1
+        db.session.add(db_token)
+        db.session.commit()
+
     return 'do some magic!'

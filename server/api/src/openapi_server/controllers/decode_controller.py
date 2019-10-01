@@ -538,7 +538,7 @@ def unassign_audio_to_current_session(project_uuid, training_version, audio_uuid
     :param audio_uuid: UUID of the audio
     :type audio_uuid: 
 
-    :rtype: NoneWorlds
+    :rtype: None
     """
     current_user = connexion.context['token_info']['user']
 

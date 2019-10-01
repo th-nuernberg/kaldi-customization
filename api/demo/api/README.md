@@ -124,7 +124,7 @@ Class | Method | HTTP request | Description
 *UserApi* | [**create_user**](docs/UserApi.md#create_user) | **POST** /user | Create user
 *UserApi* | [**get_user**](docs/UserApi.md#get_user) | **GET** /user | Get current user
 *UserApi* | [**login_user**](docs/UserApi.md#login_user) | **PUT** /user/login | Logs user into the system
-*UserApi* | [**logout_user**](docs/UserApi.md#logout_user) | **POST** /user/logout | Logs out current logged in user session
+*UserApi* | [**logout_user**](docs/UserApi.md#logout_user) | **POST** /user/logout/{token} | Logs out current logged in user session
 
 
 ## Documentation For Models
