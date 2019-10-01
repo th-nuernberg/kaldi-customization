@@ -30,7 +30,7 @@
           </mat-list-item>
 
           <mat-list-item>
-            <p>Trainingsstatus: {{detail.training?.status}}</p>
+            <p>Trainingsstatus: {{detail.training?.status | message: 'training'}}</p>
           </mat-list-item>
           <mat-divider></mat-divider>
 

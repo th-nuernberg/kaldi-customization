@@ -166,7 +166,7 @@
                       <p>Modell: {{detail.project?.acoustic_model.name}}</p>
                     </mat-list-item>
                     <mat-list-item>
-                      <p>Modelltyp: {{detail.project?.acoustic_model.model_type}}</p>
+                      <p>Modelltyp: {{detail.project?.acoustic_model.model_type | type: 'acousticModel'}}</p>
                     </mat-list-item>
                     <mat-list-item>
                       <p>Training: {{detail.training?.version}}</p>
@@ -175,7 +175,7 @@
                       <p>Erstellungszeit: {{detail.training?.creation_timestamp | date: "dd.MM.yyyy"}}</p>
                     </mat-list-item>
                     <mat-list-item>
-                      <p>Trainingsstatus: {{detail.training?.status}}</p>
+                      <p>Trainingsstatus: {{detail.training?.status | message: 'training'}}</p>
                     </mat-list-item>
                     <mat-divider></mat-divider>
                     <mat-list *ngFor="let resource of detail.training?.resources">
@@ -183,10 +183,10 @@
                         <p>Resource Name: {{resource.name}}</p>
                       </mat-list-item>
                       <mat-list-item>
-                        <p>Typ: {{resource.resource_type}}</p>
+                        <p>Typ: {{resource.resource_type | type: 'resource'}}</p>
                       </mat-list-item>
                       <mat-list-item>
-                        <p>Status: {{resource.status}}</p>
+                        <p>Status: {{resource.status | message: 'resource'}}</p>
                       </mat-list-item>
                     </mat-list>
                   </mat-list>

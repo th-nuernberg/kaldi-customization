@@ -21,7 +21,7 @@
           </mat-list-item>
 
           <mat-list-item>
-            <p>Spracherkennung-Status: {{detail.decodeSession?.status}}</p>
+            <p>Spracherkennung-Status: {{detail.decodeSession?.status | message: 'decodeAudioSession'}}</p>
           </mat-list-item>
 
           <mat-list-item>

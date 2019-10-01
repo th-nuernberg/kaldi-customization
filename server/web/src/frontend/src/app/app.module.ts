@@ -46,6 +46,7 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { SafePipe } from './safe.pipe';
 import { StatusMessagePipe } from './status.message.pipe';
+import { TypeMessagePipe } from './type.message.pipe';
 
 @NgModule({
   declarations: [
@@ -62,7 +63,8 @@ import { StatusMessagePipe } from './status.message.pipe';
     LoginComponent,
     RegisterComponent,
     SafePipe,
-    StatusMessagePipe
+    StatusMessagePipe,
+    TypeMessagePipe
   ],
   imports: [
     ApiModule.forRoot(IdentityService.getApiConfiguration),
