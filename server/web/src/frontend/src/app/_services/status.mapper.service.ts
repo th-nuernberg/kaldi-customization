@@ -43,7 +43,7 @@ export default class StatusMapperService {
 
   public static convertResourceStatus(value: any): string {
     const upload = "Upload";
-    const textPrep = "Textvorbereitung";
+    const textPrep = "Textaufbereitung";
 
     switch(+value) {
       case ResourceStatus.Upload_InProgress: {
