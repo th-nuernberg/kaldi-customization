@@ -60,7 +60,6 @@ export class ProjectComponent implements OnInit {
 
           this.decodeService.getDecodings(project.uuid, training.version)
             .subscribe(decodeAudios => {
-              console.log(decodeAudios.length);
               this.decodings.set(training.version, decodeAudios);
           });
 

@@ -141,7 +141,6 @@ export class TrainingUploadComponent implements OnInit {
     } else {
       selectedResources.forEach(selectedElement => {
         const selectedResource:Resource = selectedElement.value;
-        //console.log("Selected: " + selectedElement.selected);
         for(let item of this.currentTrainingResourcesWithCorupus) {
           const resourceWithCorpus = item[0];
           const corpusContent = item[1];

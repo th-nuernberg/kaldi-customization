@@ -108,7 +108,6 @@ export class DecodingUploadComponent implements OnInit {
   copyAudio() {
     this.historySelection.selected.forEach(selectedAudio => {
       this.snackBar.open("Kopiere Audio Datein in aktuelle Spracherkennung...", "", AppConstants.snackBarConfig);
-      console.log("Assgin audio to decode");
       this.decodeService.assignAudioToCurrentSession(
         this.projectUuid,
         this.trainingVersion,
@@ -117,7 +116,6 @@ export class DecodingUploadComponent implements OnInit {
         if(this.currentAudios.indexOf(selectedAudio) !== -1) {
           return;
         }
-        console.log("Copy assigned audio");
         this.currentAudios.push(selectedAudio);
       });
     });
