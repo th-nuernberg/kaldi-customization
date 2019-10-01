@@ -49,6 +49,8 @@ def create_client():
         return redirect('/api/')
     if request.method == 'GET':
         return render_template('create_client.html')
+    print(request.form.to_dict(flat=True))
+    return ''
     client = OAuth2Client(**request.form.to_dict(flat=True))
     client.user_id = user.id
     client.client_id = gen_salt(24)

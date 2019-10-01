@@ -156,9 +156,9 @@ export class UserService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public loginUser(email: string, password: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public loginUser(email: string, password: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public loginUser(email: string, password: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public loginUser(email: string, password: string, observe?: 'body', reportProgress?: boolean): Observable<string>;
+    public loginUser(email: string, password: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
+    public loginUser(email: string, password: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
     public loginUser(email: string, password: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (email === null || email === undefined) {
             throw new Error('Required parameter email was null or undefined when calling loginUser.');
@@ -179,6 +179,7 @@ export class UserService {
 
         // to determine the Accept header
         const httpHeaderAccepts: string[] = [
+            'text/plain'
         ];
         const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         if (httpHeaderAcceptSelected !== undefined) {
@@ -189,14 +190,15 @@ export class UserService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.put<any>(`${this.configuration.basePath}/user/login`,
+        return this.httpClient.put(`${this.configuration.basePath}/user/login`,
             null,
             {
                 params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
-                reportProgress: reportProgress
+                reportProgress: reportProgress,
+                responseType: 'text'
             }
         );
     }
@@ -204,13 +206,17 @@ export class UserService {
     /**
      * Logs out current logged in user session
      * 
+     * @param token Access token to revoke
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public logoutUser(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public logoutUser(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public logoutUser(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public logoutUser(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public logoutUser(token: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public logoutUser(token: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public logoutUser(token: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public logoutUser(token: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (token === null || token === undefined) {
+            throw new Error('Required parameter token was null or undefined when calling logoutUser.');
+        }
 
         let headers = this.defaultHeaders;
 
@@ -226,7 +232,7 @@ export class UserService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.post<any>(`${this.configuration.basePath}/user/logout`,
+        return this.httpClient.post<any>(`${this.configuration.basePath}/user/logout/${encodeURIComponent(String(token))}`,
             null,
             {
                 withCredentials: this.configuration.withCredentials,

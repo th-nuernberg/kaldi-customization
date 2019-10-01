@@ -145,7 +145,7 @@ Name | Type | Description  | Notes
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-**200** | The new active DecodeSession |  -  |
+**201** | The new active DecodeSession |  -  |
 **400** | An active session already exists |  -  |
 **403** | Forbidden |  -  |
 **404** | Project or training not found |  -  |
