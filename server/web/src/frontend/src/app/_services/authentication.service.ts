@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { map, concatMap } from 'rxjs/operators';
 
 import { User, UserService } from 'swagger-client';
-import { IdentityService } from 'src/identity.service';
+import { IdentityService } from '../../identity.service';
 import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
@@ -29,11 +29,7 @@ export class AuthenticationService {
     }
 
     public get currentToken(): string {
-        if (this.currentUserSubject.value) {
-            return (<object>this.currentUserSubject.value)['token'];
-        } else {
-            return '';
-        }
+        return this.currentUserSubject.value ? (<object>this.currentUserSubject.value)['token'] : '';
     }
 
     login(username: string, password: string) {

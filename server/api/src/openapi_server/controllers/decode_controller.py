@@ -234,7 +234,7 @@ def get_all_decode_sessions(project_uuid, training_version):  # noqa: E501
     :param training_version: Training version of the project
     :type training_version: int
 
-    :rtype: List[Resource]
+    :rtype: List[DecodeSession]
     """
     current_user = connexion.context['token_info']['user']
     
@@ -538,7 +538,7 @@ def unassign_audio_to_current_session(project_uuid, training_version, audio_uuid
     :param audio_uuid: UUID of the audio
     :type audio_uuid: 
 
-    :rtype: NoneWorlds
+    :rtype: None
     """
     current_user = connexion.context['token_info']['user']
 

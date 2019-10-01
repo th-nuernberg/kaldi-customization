@@ -939,7 +939,7 @@ paths:
             application/json:
                 schema:
                   items:
-                    $ref: '#/components/schemas/Resource'
+                    $ref: '#/components/schemas/DecodeSession'
                   type: array
           description: The decode session for this training
         403:
