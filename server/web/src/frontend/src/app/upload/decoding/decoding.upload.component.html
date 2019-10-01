@@ -141,7 +141,7 @@
           *ngIf="{
             audios: audios$ | async,
             project: project$ | async,
-            training: training$ | async } as overview;">
+            decodeSession: decodeSession$ | async} as overview;">
           <div fxLayout="center center">
             <mat-card class="cardContainer">
               <mat-card-content>
@@ -156,19 +156,15 @@
                   </mat-list-item>
                   <mat-divider></mat-divider>
                   <mat-list-item>
-                    <p>Training: {{overview?.training?.version}}</p>
+                    <p>Status: {{overview?.decodeSession?.status | message: 'decodeAudioSession'}}</p>
                   </mat-list-item>
                   <mat-divider></mat-divider>
                   <mat-list-item>
-                    <p>Status: {{overview?.training?.status | message: 'training'}}</p>
+                    <p>Anzahl Audio Dateien: {{overview?.decodeSession?.decodings?.length}}</p>
                   </mat-list-item>
                   <mat-divider></mat-divider>
-                  <mat-list-item>
-                    <p>Anzahl Audio Dateien: {{overview?.audios?.length}}</p>
-                  </mat-list-item>
-                  <mat-divider></mat-divider>
-                  <mat-list-item *ngFor="let audio of overview?.audios">
-                    <p>Audio Dateien: {{audio}}</p>
+                  <mat-list-item *ngFor="let decodeAudio of overview?.decodeSession?.decodings">
+                    <p>Audio Dateien: {{decodeAudio.audio.name}}</p>
                   </mat-list-item>
                 </mat-list>
               </mat-card-content>

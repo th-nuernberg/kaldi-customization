@@ -202,16 +202,14 @@ export class DecodingUploadComponent implements OnInit {
   }
 
   startDecode() {
-    this.currentAudios.forEach(decodeAudio => {
-      this.decodeService.startDecode(
-        this.projectUuid,
-        this.trainingVersion,
-        this.decodeSessionUuid
-      ).subscribe(session => {
-        this.snackBar.open("Starte Spracherkennung", "", AppConstants.snackBarConfig);
-        this.router.navigate(["/upload/decoding/overview/" + this.projectUuid + "/" + this.trainingVersion + "/" + this.decodeSessionUuid]);
-      });
-    })
+    this.decodeService.startDecode(
+      this.projectUuid,
+      this.trainingVersion,
+      this.decodeSessionUuid
+    ).subscribe(session => {
+      this.snackBar.open("Starte Spracherkennung", "", AppConstants.snackBarConfig);
+      this.router.navigate(["/upload/decoding/overview/" + this.projectUuid + "/" + this.trainingVersion + "/" + this.decodeSessionUuid]);
+    });
   }
 
   async reloadDecoding() {

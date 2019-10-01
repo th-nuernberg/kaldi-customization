@@ -4,6 +4,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { ProjectComponent } from './project/project.component';
 import { CoverComponent } from './cover/cover.component';
 import { DecodingUploadComponent } from './upload/decoding/decoding.upload.component';
+import { DecodingOverviewComponent } from './upload/decoding/overview/decoding.overview.component';
 import { TrainingUploadComponent } from './upload/training/training.upload.component';
 import { TrainingOverviewComponent } from './upload/training/overview/training.overview.component';
 import { AccountComponent } from './account/account.component';
@@ -16,7 +17,7 @@ const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'project/:uuid', component: ProjectComponent, canActivate: [AuthGuard] },
   { path: 'upload/decoding/:puuid/:id/:duuid', component: DecodingUploadComponent, canActivate: [AuthGuard] },
-  { path: 'upload/decoding/overview/:uuid/:id/:duuid', component: TrainingOverviewComponent, canActivate: [AuthGuard] },
+  { path: 'upload/decoding/overview/:puuid/:id/:duuid', component: DecodingOverviewComponent, canActivate: [AuthGuard] },
   { path: 'upload/training/:uuid/:id', component: TrainingUploadComponent, canActivate: [AuthGuard] },
   { path: 'upload/training/overview/:uuid/:id', component: TrainingOverviewComponent, canActivate: [AuthGuard] },
   { path: 'account',   component: AccountComponent, canActivate: [AuthGuard] },

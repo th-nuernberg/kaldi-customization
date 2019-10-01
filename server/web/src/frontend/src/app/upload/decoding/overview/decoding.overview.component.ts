@@ -44,7 +44,7 @@ export class DecodingOverviewComponent implements OnInit {
 	) { }
 	ngOnInit() {
       this.projectUuid = this.route.snapshot.paramMap.get('puuid');
-    	this.sessionUuid = this.route.snapshot.paramMap.get('puuid');
+    	this.sessionUuid = this.route.snapshot.paramMap.get('duuid');
     	this.trainingVersion =  +this.route.snapshot.paramMap.get('id');
 
     	this.project$ = this.projectService.getProjectByUuid(this.projectUuid)
