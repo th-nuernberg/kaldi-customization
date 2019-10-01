@@ -7,7 +7,6 @@ import { DecodingUploadComponent } from './upload/decoding/decoding.upload.compo
 import { DecodingOverviewComponent } from './upload/decoding/overview/decoding.overview.component';
 import { TrainingUploadComponent } from './upload/training/training.upload.component';
 import { TrainingOverviewComponent } from './upload/training/overview/training.overview.component';
-import { AccountComponent } from './account/account.component';
 import { LoginComponent } from './login/login.component';
 import { AuthGuard } from './_guards/auth.guard';
 import { RegisterComponent } from './register/register.component';
@@ -20,7 +19,6 @@ const routes: Routes = [
   { path: 'upload/decoding/overview/:puuid/:id/:duuid', component: DecodingOverviewComponent, canActivate: [AuthGuard] },
   { path: 'upload/training/:uuid/:id', component: TrainingUploadComponent, canActivate: [AuthGuard] },
   { path: 'upload/training/overview/:uuid/:id', component: TrainingOverviewComponent, canActivate: [AuthGuard] },
-  { path: 'account',   component: AccountComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
 ];

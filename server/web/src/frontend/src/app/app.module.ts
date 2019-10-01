@@ -37,7 +37,6 @@ import { DecodingUploadComponent } from './upload/decoding/decoding.upload.compo
 import { DecodingOverviewComponent } from './upload/decoding/overview/decoding.overview.component';
 import { TrainingUploadComponent } from './upload/training/training.upload.component';
 import { TrainingOverviewComponent } from './upload/training/overview/training.overview.component';
-import { AccountComponent } from './account/account.component';
 import { ApiModule } from 'swagger-client';
 import { IdentityService } from '../identity.service';
 
@@ -58,7 +57,6 @@ import { TypeMessagePipe } from './type.message.pipe';
     DecodingOverviewComponent,
     TrainingUploadComponent,
     TrainingOverviewComponent,
-    AccountComponent,
     TileComponent,
     LoginComponent,
     RegisterComponent,
