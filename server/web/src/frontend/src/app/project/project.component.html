@@ -66,9 +66,9 @@
                         class="textContainer">
                         <button
                           mat-button
-                          color="{{ isPlaying(audio) ? 'accent' : 'primary' }}"
-                          (click)="triggerAudio($event, audio)">
-                          <mat-icon>{{ isPlaying(audio) ? 'pause_circle_outline' : 'play_circle_outline' }}</mat-icon>
+                          color="{{ isPlaying(decodingAudio.audio) ? 'accent' : 'primary' }}"
+                          (click)="triggerAudio($event, decodingAudio.audio)">
+                          <mat-icon>{{ isPlaying(decodingAudio.audio) ? 'pause_circle_outline' : 'play_circle_outline' }}</mat-icon>
                         </button>
                         Audio: {{decodingAudio.audio.name}}</p>
                       <p
@@ -95,7 +95,7 @@
                     </button>
                     <button
                       mat-stroked-button
-                      class="actionButton rightAlign"
+                      class="actionButton"
                       (click)="downloadTranscript(decodingAudio.transcripts, decodingAudio.audio.name)">
                         <mat-icon>get_app</mat-icon>
                     </button>
