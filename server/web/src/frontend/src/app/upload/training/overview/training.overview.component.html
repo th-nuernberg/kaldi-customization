@@ -17,20 +17,45 @@
             <p>Modell: {{detail.project?.acoustic_model.name}}</p>
           </mat-list-item>
           <mat-list-item>
-            <p>Modell: {{detail.project?.acoustic_model.model_type | type: 'acousticModel'}}</p>
+            <p>Modelltyp: {{detail.project?.acoustic_model.model_type | type: 'acousticModel'}}</p>
+          </mat-list-item>
+          <mat-list-item>
+            <p>Modellsprache: {{detail.project?.acoustic_model.language.name}}</p>
           </mat-list-item>
           <mat-divider></mat-divider>
 
           <mat-list-item>
             <p>Training: {{detail.training?.version}}</p>
           </mat-list-item>
-
           <mat-list-item>
             <p>Erstellungszeit: {{detail.training?.creation_timestamp | date: "dd.MM.yyyy"}}</p>
           </mat-list-item>
-
           <mat-list-item>
             <p>Trainingsstatus: {{detail.training?.status | message: 'training'}}</p>
+          </mat-list-item>
+          <mat-list-item>
+            <p>Anzahl Ressourcen: {{detail.training?.resources?.length }}</p>
+          </mat-list-item>
+          <mat-list-item
+            *ngFor='let resource of detail.training?.resources'>
+            <mat-list-item>
+              Name: {{resource.name}}
+            </mat-list-item>
+            <mat-list-item>
+            Type: {{resource.resource_type | type: 'resource'}}
+            </mat-list-item>
+            <mat-list-item>
+            Status: {{resource.status | message: 'resource'}}
+            </mat-list-item>
+            <mat-list-item>
+              <button
+                mat-stroked-button
+                class="uploadFile_Button"
+                (click)="downloadLog(detail.resourceLog, resource.name + '_ResourceLog')">
+                <mat-icon>get_app</mat-icon>
+                Resource Log
+              </button>
+            </mat-list-item>
           </mat-list-item>
           <mat-divider></mat-divider>
 
@@ -57,7 +82,7 @@
             class="uploadFile_Button"
             (click)="downloadLog(detail.prepLog, 'PreparationLog')">
             <mat-icon>get_app</mat-icon>
-            Preparation Log
+            Aufbereitung Log
           </button>
 
           <button

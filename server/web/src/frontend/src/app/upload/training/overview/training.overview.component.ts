@@ -52,7 +52,7 @@ export class TrainingOverviewComponent implements OnInit {
     	this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
 
       this.preparationLog$ = this.loggingService.getPerparationLog(this.projectUuid, this.trainingVersion);
-      //this.resourceLog$ = this.loggingService.getResourceLog(this.projectUuid);
+      this.resourceLog$ = this.loggingService.getResourceLog(this.projectUuid);
       this.trainingLog$ = this.loggingService.getTrainingLog(this.projectUuid, this.trainingVersion);
 
       this.trainingStats$ = this.loggingService.getTrainingStats(this.projectUuid, this.trainingVersion);
