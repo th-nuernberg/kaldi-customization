@@ -14,18 +14,67 @@
           <mat-list-item>
             <p>Modell: {{detail.project?.acoustic_model.name}}</p>
           </mat-list-item>
-          <mat-divider></mat-divider>
-
+          <mat-list-item>
+            <p>Modelltyp: {{detail.project?.acoustic_model.model_type | type: 'acousticModel'}}</p>
+          </mat-list-item>
+          <mat-list-item>
+            <p>Modellsprache: {{detail.project?.acoustic_model.language.name}}</p>
+          </mat-list-item>
           <mat-list-item>
             <p>Training: {{detail.training?.version}}</p>
           </mat-list-item>
-
           <mat-list-item>
-            <p>Spracherkennung-Status: {{detail.decodeSession?.status | message: 'decodeAudioSession'}}</p>
+            <p>Trainingsstatus: {{detail.training?.status | message: 'training'}}</p>
           </mat-list-item>
+          <mat-divider></mat-divider>
 
           <mat-list-item>
-            <p>Anzahl der eindeutigen Wörter: {{detail.trainingStats?.unqiue_words_count}}</p>
+            <p>Spracherkennungsstatus: {{detail.decodeSession?.status | message: 'decodeAudioSession'}}</p>
+          </mat-list-item>
+          <mat-list-item>
+            <p>Erstellungszeit: {{detail.decodeSession?.creation_timestamp | date: "dd.MM.yyyy"}}</p>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+
+          <mat-list-item>
+            <p>Anzahl Audiodateien: {{detail.decodeSession?.decodings.length}}</p>
+          </mat-list-item>
+          <mat-list-item
+            *ngFor='let decoding of detail.decodeSession?.decodings'>
+            <mat-list-item>
+              <audio #audioPlayer
+                [src]="currentlyPlayingAudio?.data | safe:'url'"
+                type="audio/wav"
+                (ended)="stopAudio()">
+              </audio>
+              <button
+                mat-button
+                color="{{ isPlaying(decoding.audio) ? 'accent' : 'primary' }}"
+                (click)="triggerAudio($event, decoding.audio)">
+                <mat-icon>{{ isPlaying(decoding.audio) ? 'pause_circle_outline' : 'play_circle_outline' }}</mat-icon>
+              </button>
+              Audio: {{decoding.audio.name}}
+            </mat-list-item>
+            <mat-list-item>
+              Status: {{decoding.audio.status | message: 'audio'}}
+            </mat-list-item>
+            <mat-list-item
+              class="textContainer">
+              <button
+                mat-button
+                (click)="copyToClipboard(decoding.transcripts)">
+                <mat-icon>post_add</mat-icon>
+              </button>
+              Text: {{decoding.transcripts}}
+            </mat-list-item>
+            <mat-list-item>
+            <button
+              mat-stroked-button
+              class="actionButton"
+              (click)="downloadTranscript(decoding.transcripts, decoding.audio.name)">
+                <mat-icon>get_app</mat-icon>
+            </button>
+            </mat-list-item>
           </mat-list-item>
           <mat-divider></mat-divider>
         </mat-list>
