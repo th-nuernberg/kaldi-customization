@@ -5,8 +5,17 @@ import os
 
 from connector import *
 from data_processing import (execute_phonetisaurus, merge_corpus_list, combine_old_and_new_lexicon_files,
-                             remove_local_files, save_txt_file, create_unique_word_list, compare_lexicon_with_word_list)
+                             remove_local_files, save_txt_file, create_unique_word_list, compare_lexicon_with_word_list,
+                             gather_corpus_information, save_json_file)
 from minio_communication import download_from_bucket, upload_to_bucket, minio_buckets
+
+
+def finish_logging(log_file_handler, minio_client, task):
+    log_file_handler.close()
+    logfile_result = upload_to_bucket(minio_client, minio_buckets["LOG_BUCKET"], "data_preparation_worker/{}/{}".format(task.training_id, "log.txt"), "/log.txt")
+    if not logfile_result[0]:
+        print("An error occurred during the upload of the logfile.")
+    print("Logfile was successfully uploaded")
 
 
 def infinite_loop():
@@ -60,6 +69,9 @@ def infinite_loop():
                     log_file_handler.write("While the task was processed, the following error has occurred: \n")
                     log_file_handler.write("############################################################### \n")
                     log_file_handler.write("At least one download failed. Task failed!\n")
+
+                    finish_logging(log_file_handler=log_file_handler, minio_client=minio_client, task=task)
+
                     status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.FAILURE, training_id=task.training_id, message="Download failed"))
             log_file_handler.write("All needed files were successfully downloaded. Processing continues \n")
 
@@ -72,6 +84,9 @@ def infinite_loop():
                 log_file_handler.write("While all corpus files were merged into one, the following error occurred: \n")
                 log_file_handler.write("############################################################################# \n")
                 log_file_handler.write("Either the given list is empty, or it was not possible to open a given corpus file. \n")
+
+                finish_logging(log_file_handler=log_file_handler, minio_client=minio_client, task=task)
+
                 status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.FAILURE, training_id=task.training_id, message="Corpus merge failed"))
 
             # Step 2.2: Save merged corpus file locally
@@ -83,18 +98,24 @@ def infinite_loop():
                 log_file_handler.write("While the merged corpus list was saved locally, the following error occurred: \n")
                 log_file_handler.write("############################################################################# \n")
                 log_file_handler.write("It was not possible to save the file. \n")
+
+                finish_logging(log_file_handler=log_file_handler, minio_client=minio_client, task=task)
+
                 status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.FAILURE, training_id=task.training_id, message="Saving merged corpus file locally failed"))
             log_file_handler.write("Successfully saved the merged corpus file \n")
 
-            # Step 3.1: Create the final_word_list by using the combined corpus
+            # Step 3.1: Create the final_word_list, using the combined corpus
             try:
                 log_file_handler.write("Processing continues. Next step is to create the final_word_list \n")
-                lexicon = create_unique_word_list("/data_prep_worker/out/corpus.txt")
+                lexicon = create_unique_word_list("/data_prep_worker/out/corpus.txt")                
             except Exception as e:
                 print(e)
                 log_file_handler.write("While trying to create the final_word_list, the following error occurred: \n")
                 log_file_handler.write("############################################################################# \n")
                 log_file_handler.write("It was not possible to open the corpus-file correctly. Therefore, it was not possible to create the final_word_list \n")
+
+                finish_logging(log_file_handler=log_file_handler, minio_client=minio_client, task=task)
+
                 status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.FAILURE, training_id=task.training_id, message="Final word list creation failed"))
             log_file_handler.write("Successfully created the final_word_list. \n")
 
@@ -107,8 +128,29 @@ def infinite_loop():
                 log_file_handler.write("While trying to save the final_word_list locally, the following error occurred: \n")
                 log_file_handler.write("############################################################################# \n")
                 log_file_handler.write("It was not possible to save the file. \n")
+
+                finish_logging(log_file_handler=log_file_handler, minio_client=minio_client, task=task)
+
                 status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.FAILURE, training_id=task.training_id, message="Saving unique word list locally failed"))
             log_file_handler.write("Successfully saved the final_word_list. \n")
+                        
+            # Step 3.3: Gather all needed stats which are needed for the frontend and create a JSON-file
+            try:
+                log_file_handler.write("Processing continues by collecting all needed stats for the Frontend! \n")
+                number_of_words, number_of_lines = gather_corpus_information("/data_prep_worker/out/corpus.txt")
+                number_of_unique_words = len(lexicon)
+                number_of_processed_corpus_files = len(corpus_list)
+                save_json_file(number_of_words, number_of_lines, number_of_unique_words, number_of_processed_corpus_files)
+            except Exception as e:
+                print(e)
+                log_file_handler.write("While trying to create the final_word_list, the following error occurred: \n")
+                log_file_handler.write("############################################################################# \n")
+                log_file_handler.write("It was not possible to retrieve all needed information!")
+
+                finish_logging(log_file_handler=log_file_handler, minio_client=minio_client, task=task)
+
+                status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.FAILURE, training_id=task.training_id, message="Failed to retrieve needed stats for the frontend"))
+            log_file_handler.write("Successfully retrieved all needed stats for the frontend! \n")
 
             # Step 4.1: Compare the final_word_list with the existing lexicon.txt file 
             unique_word_list = compare_lexicon_with_word_list(final_word_list="/data_prep_worker/out/final_word_list", lexicon="/data_prep_worker/in/lexicon.txt")
@@ -125,6 +167,9 @@ def infinite_loop():
                 log_file_handler.write("While trying to execute the Phonetisaurus, the following error occurred: \n")
                 log_file_handler.write("############################################################################# \n")
                 log_file_handler.write("It was either not possible to read the unique word list properly, or an error occured while executing the Phonetisaurus! \n")
+
+                finish_logging(log_file_handler=log_file_handler, minio_client=minio_client, task=task)
+
                 status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.FAILURE, training_id=task.training_id, message="Failing while executing the Phonetisaurus"))
             log_file_handler.write("Successfully created the lexicon-file. \n")
             print("Successfully created the lexicon-file")
@@ -146,25 +191,27 @@ def infinite_loop():
             unique_word_list_result = upload_to_bucket(minio_client, minio_buckets["TRAINING_BUCKET"],
                                              "{}/unique_word_list.txt".format(task.training_id), "/data_prep_worker/out/final_word_list")
 
-            if not lexicon_result[0] or not corpus_result[0] or not unique_word_list_result[0]:
+            json_result = upload_to_bucket(minio_client, minio_buckets["TRAINING_BUCKET"],
+                                             "{}/stats.json".format(task.training_id), "/data_prep_worker/out/stats.json")
+
+            if not lexicon_result[0] or not corpus_result[0] or not unique_word_list_result[0] or not json_result[0]:
                 print("At least one upload failed. It is not possible to finish this task successfully.")
                 log_file_handler.write("While trying to upload the lexicon.txt and corpus.txt files, the following error occurred: \n")
                 log_file_handler.write("############################################################################# \n")
                 log_file_handler.write("It was not possible to upload at least one file. Please check your internet connection. \n")
+
+                finish_logging(log_file_handler=log_file_handler, minio_client=minio_client, task=task)
+
                 status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.FAILURE, training_id=task.training_id, message="At least one upload failed"))
+                continue
+
             log_file_handler.write("Successfully uploaded lexicon.txt and corpus.txt \n")
 
             # Step 6: Delete all files which were downloaded or created for this task
             remove_local_files("/data_prep_worker/in/")
             remove_local_files("/data_prep_worker/out/")
 
-            log_file_handler.close()
-            logfile_result = upload_to_bucket(minio_client, minio_buckets["LOG_BUCKET"], "data_preparation_worker/{}/{}".format(task.training_id, "log.txt"), "/log.txt")
-            if not logfile_result[0]:
-                print("An error occurred during the upload of the logfile.")
-            print("Logfile was successfully uploaded")
-
-            #TODO: Create stats-files for the frontend
+            finish_logging(log_file_handler=log_file_handler, minio_client=minio_client, task=task)
 
             # Step 7: Update status queue to: Successfull if this point is reached
             status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.SUCCESS,
