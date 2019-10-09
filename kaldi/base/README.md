@@ -15,7 +15,7 @@ docker build . -t <name> [--squash]
  - The option `--squash` reduces the image size by diffing all layers into a new one.  
  This is an [experimental feature](https://github.com/docker/docker-ce/blob/master/components/cli/experimental/README.md) and not enabled by default so far (docker engine 18.09).
 
-For the `kaldi-base` image the command looks like this:
+For the `th-nuernberg/kaldi-base` image the command looks like this:
 ```bash
-docker build . -t kaldi-base --squash
+docker build . -t th-nuernberg/kaldi-base --squash
 ```

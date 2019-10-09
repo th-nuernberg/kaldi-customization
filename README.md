@@ -19,6 +19,7 @@ The [report](https://git.informatik.fh-nuernberg.de/kaldi/documentation/blob/mas
  * Start the customization service:
     * Load the compose with `docker-compose up` and have a cup of tea or coffee
     * Wait until the service is online (website is reachable: [localhost:8080](http://localhost:8080))
+    * To scale the amount of workers, use the [`--scale` parameter](https://docs.docker.com/compose/reference/up/) for `docker-compose up`, available workers are `text-preparation-worker`, `data-preparation-worker`, `kaldi-worker` and `decode-worker`
  * Use the initialization script [initialization/init.py](initialization/init.py) (first time only):
     * A few [modules](initialization/requirements.txt) are required to execute the script: For example use [pip](https://pip.pypa.io/) and [pipenv](https://docs.pipenv.org/en/latest/basics/#example-pipenv-workflow):
         * Open another shell in the initialization directory of this repository
