@@ -1,5 +1,6 @@
 dfs/
 
+.DS_Store
 *.pyc
 
 ### Idea ###
