@@ -8,20 +8,20 @@ class DecodeTask(dict):
        The dict-type ensures that the class can be handled by the json
        package without special handling.
     """
-    def __init__(self, decode_uuid, acoustic_model_id, training_id, decode_file):
+    def __init__(self, decode_uuid, acoustic_model_id, training_id, audio_uuids):
         dict.__init__(self,
                       decode_uuid=decode_uuid,
                       acoustic_model_id=acoustic_model_id,
                       training_id=training_id,
-                      decode_file=decode_file)
+                      audio_uuids=audio_uuids)
 
     @property
     def decode_uuid(self):
         return self['decode_uuid']
     
     @property
-    def decode_file(self):
-        return self['decode_file']
+    def audio_uuids(self):
+        return self['audio_uuids']
 
     @property
     def acoustic_model_id(self):

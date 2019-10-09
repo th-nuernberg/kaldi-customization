@@ -196,7 +196,7 @@ def infinite_loop():
 
             if not lexicon_result[0] or not corpus_result[0] or not unique_word_list_result[0] or not json_result[0]:
                 print("At least one upload failed. It is not possible to finish this task successfully.")
-                log_file_handler.write("While trying to upload the lexicon.txt and corpus.txt files, the following error occurred: \n")
+                log_file_handler.write("While trying to upload the lexicon.txt, corpus.txt, unique_word_list.txt and stats.json files, the following error occurred: \n")
                 log_file_handler.write("############################################################################# \n")
                 log_file_handler.write("It was not possible to upload at least one file. Please check your internet connection. \n")
 
@@ -205,7 +205,7 @@ def infinite_loop():
                 status_queue.submit(DataPrepStatus(id=DataPrepStatusCode.FAILURE, training_id=task.training_id, message="At least one upload failed"))
                 continue
 
-            log_file_handler.write("Successfully uploaded lexicon.txt and corpus.txt \n")
+            log_file_handler.write("Successfully uploaded lexicon.txt, corpus.txt, unique_word_list.txt and stats.json \n")
 
             # Step 6: Delete all files which were downloaded or created for this task
             remove_local_files("/data_prep_worker/in/")
