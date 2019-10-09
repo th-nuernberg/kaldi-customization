@@ -2,6 +2,29 @@
 import os
 import re
 import subprocess
+import json
+
+
+def gather_corpus_information(file_path):
+
+    with open(file_path, "r") as file_handler:
+        text = file_handler.read()
+        number_of_words = text.split()
+        number_of_lines = text.split("\n")
+
+    return len(number_of_words), len(number_of_lines)
+
+
+def save_json_file(number_of_words, number_of_lines, number_of_unique_words, number_of_processed_corpus_files):    
+    data = {
+        "total_words_count":number_of_words,
+        "lines_count":number_of_lines,
+        "unique_words":number_of_unique_words,
+        "files_count":number_of_processed_corpus_files
+    }
+
+    with open("/data_prep_worker/out/stats.json", "w") as file_handler:
+        json.dump(data, file_handler, indent=4, ensure_ascii=False)
 
 
 def compare_lexicon_with_word_list(final_word_list, lexicon):
