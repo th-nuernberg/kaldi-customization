@@ -135,7 +135,7 @@ def create_training(project_uuid):  # noqa: E501
     db_last_training = DB_Training.query.filter_by(
         project_id=db_proj.id).order_by(DB_Training.version.desc()).first()
 
-    version = db_last_training.id + 1 if db_last_training else 1
+    version = db_last_training.version + 1 if db_last_training else 1
 
     db_training = DB_Training(
         project=db_proj,
@@ -143,6 +143,27 @@ def create_training(project_uuid):  # noqa: E501
     )
     db.session.add(db_training)
     db.session.commit()
+
+    if db_last_training:
+        #copy all resource files from last training
+        db_last_training_resources = DB_TrainingResource.query.filter_by(training_id=db_last_training.id).all()
+
+        has_pending_resources = False
+
+        for tr in db_last_training_resources:
+            db_training_resource = DB_TrainingResource(training=db_training,origin=tr.origin)
+            db.session.add(db_training_resource)
+            db.session.commit()
+            if tr.origin.status == DB_ResourceStateEnum.TextPreparation_Success:
+                copy_object_in_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], str(tr.id) + "/corpus.txt",
+                    minio_buckets["TRAINING_RESOURCE_BUCKET"], str(db_training_resource.id) + "/corpus.txt")
+            else:
+                has_pending_resources = True
+            
+        if has_pending_resources:
+            db_training.status = DB_TrainingStateEnum.TextPrep_Pending
+            db.session.add(db_training)
+            db.session.commit()
 
     return (mapper.db_training_to_front(db_training),201)
 
