@@ -22,10 +22,10 @@ The [report](https://git.informatik.fh-nuernberg.de/kaldi/documentation/blob/mas
     * To scale the amount of workers, use the [`--scale` parameter](https://docs.docker.com/compose/reference/up/) for `docker-compose up`, available workers are `text-preparation-worker`, `data-preparation-worker`, `kaldi-worker` and `decode-worker`
  * Use the initialization script [initialization/init.py](initialization/init.py) (first time only):
     * A few [modules](initialization/requirements.txt) are required to execute the script: For example use [pip](https://pip.pypa.io/) and [pipenv](http://docs.pipenv.org/en/latest/basics/#example-pipenv-workflow):
-        * Open another shell in the initialization directory of this repository
-        * `pipenv install` to install the [requirements](initialization/requirements.txt)
-        * `pipenv shell` to activate the pipenv shell
-    * Execute `python init.py` to prepare the database and upload default model data
+        * Open another shell
+        * `pipenv install` and `pipenv shell` to activate the pipenv shell
+        * `pip install -r ./initialization/requirements.txt` to install the [requirements](initialization/requirements.txt)
+    * Execute `python ./initialization/init.py` to prepare the database and upload default model data
 
 ### The customization service is now available
  * Web Interface: [localhost:8080](http://localhost:8080)
