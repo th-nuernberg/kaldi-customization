@@ -169,10 +169,13 @@
                       <p>Modelltyp: {{detail.project?.acoustic_model.model_type | type: 'acousticModel'}}</p>
                     </mat-list-item>
                     <mat-list-item>
+                      <p>Modellsprache: {{detail.project?.acoustic_model.language.name | language: 'language'}}</p>
+                    </mat-list-item>
+                    <mat-list-item>
                       <p>Training: {{detail.training?.version}}</p>
                     </mat-list-item>
                     <mat-list-item>
-                      <p>Erstellungszeit: {{detail.training?.creation_timestamp | date: "dd.MM.yyyy"}}</p>
+                      <p>Erstellungsdatum: {{detail.training?.creation_timestamp | date: "dd.MM.yyyy"}}</p>
                     </mat-list-item>
                     <mat-list-item>
                       <p>Trainingsstatus: {{detail.training?.status | message: 'training'}}</p>

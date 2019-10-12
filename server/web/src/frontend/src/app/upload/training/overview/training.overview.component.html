@@ -20,7 +20,7 @@
             <p>Modelltyp: {{detail.project?.acoustic_model.model_type | type: 'acousticModel'}}</p>
           </mat-list-item>
           <mat-list-item>
-            <p>Modellsprache: {{detail.project?.acoustic_model.language.name}}</p>
+            <p>Modellsprache: {{detail.project?.acoustic_model.language.name | language: 'language'}}</p>
           </mat-list-item>
           <mat-divider></mat-divider>
 
@@ -28,7 +28,7 @@
             <p>Training: {{detail.training?.version}}</p>
           </mat-list-item>
           <mat-list-item>
-            <p>Erstellungszeit: {{detail.training?.creation_timestamp | date: "dd.MM.yyyy"}}</p>
+            <p>Erstellungsdatum: {{detail.training?.creation_timestamp | date: "dd.MM.yyyy"}}</p>
           </mat-list-item>
           <mat-list-item>
             <p>Trainingsstatus: {{detail.training?.status | message: 'training'}}</p>
@@ -53,7 +53,7 @@
                 class="uploadFile_Button"
                 (click)="downloadLog(detail.resourceLog, resource.name + '_ResourceLog')">
                 <mat-icon>get_app</mat-icon>
-                Resource Log
+                Ressourcenprotokoll
               </button>
             </mat-list-item>
           </mat-list-item>
@@ -82,7 +82,7 @@
             class="uploadFile_Button"
             (click)="downloadLog(detail.prepLog, 'PreparationLog')">
             <mat-icon>get_app</mat-icon>
-            Aufbereitung Log
+            Aufbereitungsprotokoll
           </button>
 
           <button
@@ -90,7 +90,7 @@
             class="uploadFile_Button"
             (click)="downloadLog(detail.trainingLog, 'TrainingLog')">
             <mat-icon>get_app</mat-icon>
-            Training Log
+            Trainingsprotokoll
           </button>
 
           <button

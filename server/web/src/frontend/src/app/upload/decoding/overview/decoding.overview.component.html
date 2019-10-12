@@ -18,7 +18,7 @@
             <p>Modelltyp: {{detail.project?.acoustic_model.model_type | type: 'acousticModel'}}</p>
           </mat-list-item>
           <mat-list-item>
-            <p>Modellsprache: {{detail.project?.acoustic_model.language.name}}</p>
+            <p>Modellsprache: {{detail.project?.acoustic_model.language.name | language: 'language'}}</p>
           </mat-list-item>
           <mat-list-item>
             <p>Training: {{detail.training?.version}}</p>
@@ -32,7 +32,7 @@
             <p>Spracherkennungsstatus: {{detail.decodeSession?.status | message: 'decodeAudioSession'}}</p>
           </mat-list-item>
           <mat-list-item>
-            <p>Erstellungszeit: {{detail.decodeSession?.creation_timestamp | date: "dd.MM.yyyy"}}</p>
+            <p>Erstellungsdatum: {{detail.decodeSession?.creation_timestamp | date: "dd.MM.yyyy"}}</p>
           </mat-list-item>
           <mat-divider></mat-divider>
 
@@ -65,7 +65,9 @@
                 (click)="copyToClipboard(decoding.transcripts)">
                 <mat-icon>post_add</mat-icon>
               </button>
-              Text: {{decoding.transcripts}}
+              <span>
+                Text: {{decoding.transcripts}}
+              </span>
             </mat-list-item>
             <mat-list-item>
             <button
@@ -84,7 +86,7 @@
             class="uploadFile_Button"
             (click)="downloadLog(detail.sessionLog, 'DecodeSessionLog')">
             <mat-icon>get_app</mat-icon>
-            Spracherkennung Log
+            Spracherkennungsprotokoll
           </button>
           <button
             mat-flat-button
