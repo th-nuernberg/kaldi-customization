@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material';
 import {
   ProjectService,
@@ -24,10 +25,11 @@ export class DashboardComponent implements OnInit {
   createProjectForm: FormGroup;
 
   constructor(
+    private router: Router,
     private projectService: ProjectService,
-     private globalService: GlobalService,
-     private formBuilder: FormBuilder,
-     private snackBar: MatSnackBar){
+    private globalService: GlobalService,
+    private formBuilder: FormBuilder,
+    private snackBar: MatSnackBar){
   }
 
   ngOnInit() {
@@ -74,6 +76,8 @@ export class DashboardComponent implements OnInit {
       this.gridProjectTiles.push(project);
       this.createProjectSubmitted = false;
       this.createProjectForm.reset();
+
+      this.router.navigate(["/project/"+ project.uuid]);
      });
 
   }
