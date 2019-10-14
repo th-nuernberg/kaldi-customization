@@ -45,7 +45,7 @@
     </mat-card>
 
     <app-tile
-      *ngFor="let tile of gridProjectTiles.reverse()"
+      *ngFor="let tile of gridProjectTiles | reverse"
       [project]="tile"></app-tile>
   </div>
 

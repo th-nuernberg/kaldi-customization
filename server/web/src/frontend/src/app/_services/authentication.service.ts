@@ -54,6 +54,8 @@ export class AuthenticationService {
         }
 
         if (this.currentToken) {
+            IdentityService.config.accessToken = null;
+
             this.userService.logoutUser(this.currentToken).subscribe(() => {
                 _logout();
             });
