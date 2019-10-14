@@ -22,7 +22,6 @@ from openapi_client.models.audio_reference_with_callback_object import AudioRefe
 from openapi_client.models.audio_status import AudioStatus
 from openapi_client.models.binary_decode_object import BinaryDecodeObject
 from openapi_client.models.binary_resource_object import BinaryResourceObject
-from openapi_client.models.callback_method import CallbackMethod
 from openapi_client.models.callback_object import CallbackObject
 from openapi_client.models.create_project_object import CreateProjectObject
 from openapi_client.models.data_prep_stats import DataPrepStats

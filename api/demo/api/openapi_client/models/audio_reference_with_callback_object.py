@@ -32,7 +32,7 @@ class AudioReferenceWithCallbackObject(object):
     """
     openapi_types = {
         'audio_uuid': 'str',
-        'callback': 'str'
+        'callback': 'CallbackObject'
     }
 
     attribute_map = {
@@ -80,10 +80,9 @@ class AudioReferenceWithCallbackObject(object):
     def callback(self):
         """Gets the callback of this AudioReferenceWithCallbackObject.  # noqa: E501
 
-        Callback URL when decoding finished  # noqa: E501
 
         :return: The callback of this AudioReferenceWithCallbackObject.  # noqa: E501
-        :rtype: str
+        :rtype: CallbackObject
         """
         return self._callback
 
@@ -91,10 +90,9 @@ class AudioReferenceWithCallbackObject(object):
     def callback(self, callback):
         """Sets the callback of this AudioReferenceWithCallbackObject.
 
-        Callback URL when decoding finished  # noqa: E501
 
         :param callback: The callback of this AudioReferenceWithCallbackObject.  # noqa: E501
-        :type: str
+        :type: CallbackObject
         """
 
         self._callback = callback

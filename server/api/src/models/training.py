@@ -78,6 +78,9 @@ class Training(db.Model):
     creation_timestamp = db.Column(db.DateTime(timezone=False), default=datetime.datetime.utcnow)
     status = db.Column(db.Enum(TrainingStateEnum), default=TrainingStateEnum.Init)
 
+    prepare_callback = db.Column(db.Text, default='{}')
+    train_callback = db.Column(db.Text, default='{}')
+
     def can_assign_resource(self):
         return self.status in (TrainingStateEnum.Init,
                                TrainingStateEnum.TextPrep_Pending,

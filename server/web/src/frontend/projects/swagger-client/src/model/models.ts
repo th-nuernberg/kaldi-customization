@@ -6,7 +6,6 @@ export * from './audioReferenceWithCallbackObject';
 export * from './audioStatus';
 export * from './binaryDecodeObject';
 export * from './binaryResourceObject';
-export * from './callbackMethod';
 export * from './callbackObject';
 export * from './createProjectObject';
 export * from './dataPrepStats';

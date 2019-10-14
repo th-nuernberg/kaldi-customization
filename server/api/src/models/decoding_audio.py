@@ -16,6 +16,8 @@ class DecodingAudio(db.Model):
     decoding_id = db.Column(db.Integer, db.ForeignKey("decodings.id"))
     decoding = db.relationship('Decoding', uselist=False)
 
+    callback = db.Column(db.Text, default='{}')
+
     def __repr__(self):
         return json.dumps(self, cls=AlchemyEncoder)
     

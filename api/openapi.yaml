@@ -2187,14 +2187,6 @@ components:
       - pdf
       - png
       - jpg
-    CallbackMethod:
-      enum:
-      - 0
-      - 1
-      type: integer
-      x-enum-varnames:
-      - GET
-      - POST
     TrainingStatus:
       enum:
       - 100
@@ -2370,8 +2362,7 @@ components:
           format: uuid
           type: string
         callback:
-          type: string
-          description: Callback URL when decoding finished
+          $ref: '#/components/schemas/CallbackObject'
       required:
       - audio_uuid
       type: object
@@ -2390,7 +2381,8 @@ components:
           description: The URL to be called 
           type: string
         method:
-          $ref: '#/components/schemas/CallbackMethod'
+          description: Action to be performed (GET|POST) 
+          type: string
       required:
       - url
       - method
