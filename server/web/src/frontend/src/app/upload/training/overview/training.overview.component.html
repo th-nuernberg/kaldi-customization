@@ -68,11 +68,11 @@
           </mat-list-item>
 
           <mat-list-item>
-            <p>Anzahl der Wörter: {{detail.trainingStats?.words_count}}</p>
+            <p>Anzahl der Wörter: {{detail.trainingStats?.total_words_count}}</p>
           </mat-list-item>
 
           <mat-list-item>
-            <p>Anzahl der eindeutigen Wörter: {{detail.trainingStats?.unqiue_words_count}}</p>
+            <p>Anzahl der eindeutigen Wörter: {{detail.trainingStats?.unique_words_count}}</p>
           </mat-list-item>
           <mat-divider></mat-divider>
         </mat-list>
@@ -116,6 +116,9 @@
           <textarea
             matInput
             placeholder="Hier stehen die eindeutigen Wörter des Trainings"
+            cdkTextareaAutosize
+            cdkAutosizeMinRows="20"
+            cdkAutosizeMaxRows="20"
             readonly=true>
             {{detail.uniqueWordList}}
           </textarea>
