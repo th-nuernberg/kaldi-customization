@@ -93,7 +93,7 @@
                         <button
                           mat-button
                           color="{{ isPlaying(decodeAudio.audio) ? 'accent' : 'primary' }}"
-                          (click)="triggerAudio($event, decodeAudio)">
+                          (click)="triggerAudio($event, decodeAudio.audio)">
                           <mat-icon>{{ isPlaying(decodeAudio.audio) ? 'pause_circle_outline' : 'play_circle_outline' }}</mat-icon>
                         </button>
                       {{decodeAudio.audio.name}}</p>
@@ -182,6 +182,7 @@
             mat-raised-button
             class="uploadComponentButtonContainer"
             color="primary"
+            [disabled]="!canStartDecodeSession"
             (click)="startDecode()">
             <mat-icon>play_arrow</mat-icon>
             Decode

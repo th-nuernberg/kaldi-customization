@@ -58,12 +58,6 @@ export class DecodingOverviewComponent implements OnInit {
       this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
       this.decodeSession$ = this.decodeService.getDecodeSession(this.projectUuid, this.trainingVersion, this.sessionUuid);
       this.decodeSessionLog$ = this.loggingService.getDecodeSessionLog(this.projectUuid, this.trainingVersion, this.sessionUuid);
-
-      /*
-        Play audio
-        copy to clipboard - transcripts
-        download - transcripts
-      */
 	}
 
 	ngOnDestroy() {	}
