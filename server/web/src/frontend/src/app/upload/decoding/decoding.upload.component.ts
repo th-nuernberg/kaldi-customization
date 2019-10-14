@@ -3,7 +3,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar, MatSelectionList, MatListOption } from '@angular/material';
 import {
   Audio,
   Project,
@@ -44,6 +44,7 @@ export class DecodingUploadComponent implements OnInit {
     data: string
   } = null;
   @ViewChild('audioPlayer') audioPlayer;
+  @ViewChild(MatSelectionList) selectionList: MatSelectionList;
 
   public historySelection = new SelectionModel<Audio>(true, []);
 
@@ -58,6 +59,7 @@ export class DecodingUploadComponent implements OnInit {
 
   ngOnInit() {
     this.currentAudios = [];
+    this.selectionList.selectedOptions = new SelectionModel<MatListOption>(false);
 
     this.projectUuid = this.route.snapshot.paramMap.get('puuid');
     this.trainingVersion =  +this.route.snapshot.paramMap.get('id');
@@ -71,6 +73,16 @@ export class DecodingUploadComponent implements OnInit {
 
     this.audios$.subscribe(audios => {
       this.allAudios = new MatTableDataSource<Audio>(audios);
+
+      // pre selects audios that are already assigned to training
+      this.allAudios.data.forEach(row => {
+
+        this.currentAudios.forEach(decodeAudio => {
+          if(decodeAudio.audio.uuid == row.uuid) {
+            this.historySelection.select(row);
+          }
+        });
+      });
     })
 
     this.decodeSession$.subscribe(decodeSession => {

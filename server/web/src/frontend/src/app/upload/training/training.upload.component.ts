@@ -1,9 +1,9 @@
 import { Observable } from 'rxjs';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar, MatSelectionList, MatListOption } from '@angular/material';
 
 import {
   Project,
@@ -44,6 +44,8 @@ export class TrainingUploadComponent implements OnInit {
 
   public historySelection = new SelectionModel<Resource>(true, []);
 
+  @ViewChild(MatSelectionList) selectionList: MatSelectionList;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -54,6 +56,7 @@ export class TrainingUploadComponent implements OnInit {
     ) {}
   // TODO post model information to the API: text files, project name, model name, prev model etc..
   ngOnInit() {
+    this.selectionList.selectedOptions = new SelectionModel<MatListOption>(false);
     this.currentTrainingResources = [];
     this.currentTrainingResourcesWithCorupus = [];
 
@@ -65,14 +68,24 @@ export class TrainingUploadComponent implements OnInit {
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
     this.resources$ = this.resourceService.getResource();
 
-    // init all training resources - first view
-    this.resources$.subscribe(resources => {
-      this.allResources = new MatTableDataSource<Resource>(resources);
-    });
-
     // init current training resources - second view
     this.training$.subscribe(training => {
       this.currentTrainingResources = training.resources;
+    });
+
+    // init all training resources - first view
+    this.resources$.subscribe(resources => {
+      this.allResources = new MatTableDataSource<Resource>(resources);
+
+      // pre selects resources that are already assigned to training
+      this.allResources.data.forEach(row => {
+
+        this.currentTrainingResources.forEach(resource => {
+          if(resource.uuid == row.uuid) {
+            this.historySelection.select(row);
+          }
+        });
+      });
     });
 
     // init preview

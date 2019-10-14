@@ -90,8 +90,8 @@
                   <div>
                     <h2>Aktuelles Modell</h2>
                     <mat-selection-list
-                      #resources
-                      (selectionChange)="onSelectionChange($event, resources.selectedOptions.selected)">
+                      #selectionList
+                      (selectionChange)="onSelectionChange($event, selectionList.selectedOptions.selected)">
                       <mat-list-option
                         *ngFor='let resource of currentTrainingResources'
                         [value]="resource">
@@ -102,7 +102,7 @@
                       mat-flat-button
                       color="warn"
                       class="uploadComponentButtonContainer removeButtonColor"
-                      (click)="remove(resources.selectedOptions.selected)">
+                      (click)="remove(selectionList.selectedOptions.selected)">
                       <mat-icon>delete</mat-icon>
                     </button>
                     <div>

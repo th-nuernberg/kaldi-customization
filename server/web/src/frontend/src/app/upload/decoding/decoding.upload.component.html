@@ -85,18 +85,18 @@
                 <!-- Current File panel -->
                 <div>
                   <mat-selection-list
-                    #resources>
+                    #selectionList>
                     <mat-list-option
-                      *ngFor='let audio of currentAudios'
-                      [value]="audio">
+                      *ngFor='let decodeAudio of currentAudios'
+                      [value]="decodeAudio.audio">
                       <p mat-line>
                         <button
                           mat-button
-                          color="{{ isPlaying(audio) ? 'accent' : 'primary' }}"
-                          (click)="triggerAudio($event, audio)">
-                          <mat-icon>{{ isPlaying(audio) ? 'pause_circle_outline' : 'play_circle_outline' }}</mat-icon>
+                          color="{{ isPlaying(decodeAudio.audio) ? 'accent' : 'primary' }}"
+                          (click)="triggerAudio($event, decodeAudio)">
+                          <mat-icon>{{ isPlaying(decodeAudio.audio) ? 'pause_circle_outline' : 'play_circle_outline' }}</mat-icon>
                         </button>
-                      {{audio.name}}</p>
+                      {{decodeAudio.audio.name}}</p>
                     </mat-list-option>
                   </mat-selection-list>
                   <audio #audioPlayer
@@ -108,7 +108,7 @@
                     mat-flat-button
                     class="uploadComponentButtonContainer"
                     color="warn"
-                    (click)="remove(resources.selectedOptions.selected)">
+                    (click)="remove(selectionList.selectedOptions.selected)">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </div>
