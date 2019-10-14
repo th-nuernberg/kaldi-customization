@@ -108,13 +108,16 @@
 <div>
   <mat-card class="cardContainer">
     <mat-card-content>
-      <ng-container>
+      <ng-container
+        *ngIf="{
+          uniqueWordList: uniqueWordList$ | async } as detail;">
         <h2>Eindeutige Wordliste</h2>
         <div>
           <textarea
             matInput
             placeholder="Hier stehen die eindeutigen Wörter des Trainings"
             readonly=true>
+            {{detail.uniqueWordList}}
           </textarea>
         </div>
       </ng-container>

@@ -33,6 +33,7 @@ export class TrainingOverviewComponent implements OnInit {
   trainingLog$:Observable<string>;
 
   trainingStats$:Observable<DataPrepStats>;
+  uniqueWordList$:Observable<string>;
 
   graphUrl;
 
@@ -56,6 +57,7 @@ export class TrainingOverviewComponent implements OnInit {
       this.trainingLog$ = this.loggingService.getTrainingLog(this.projectUuid, this.trainingVersion);
 
       this.trainingStats$ = this.loggingService.getTrainingStats(this.projectUuid, this.trainingVersion);
+      this.uniqueWordList$ = this.trainingService.getVocabularyOfTraining(this.projectUuid, this.trainingVersion);
 	}
 
 	ngOnDestroy() {	}
