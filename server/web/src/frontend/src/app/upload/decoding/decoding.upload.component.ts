@@ -9,6 +9,7 @@ import {
   Project,
   Resource,
   Training,
+  DecodeAudio,
   DecodeService,
   ProjectService,
   TrainingService,
@@ -33,7 +34,7 @@ export class DecodingUploadComponent implements OnInit {
   audios$:Observable<Array<Audio>>;
   decodeSession$: Observable<DecodeSession>;
 
-  currentAudios:Array<Audio>;
+  currentAudios:Array<DecodeAudio>;
   allAudios:MatTableDataSource<Audio>;
 
   displayedColumns:Array<string> = ['select', 'name'];
@@ -72,6 +73,9 @@ export class DecodingUploadComponent implements OnInit {
       this.allAudios = new MatTableDataSource<Audio>(audios);
     })
 
+    this.decodeSession$.subscribe(decodeSession => {
+      this.currentAudios = decodeSession.decodings;
+    })
   }
 
   audioData() {
@@ -113,10 +117,10 @@ export class DecodingUploadComponent implements OnInit {
         this.trainingVersion,
         { audio_uuid: selectedAudio.uuid }
       ).subscribe(decodeAudio => {
-        if(this.currentAudios.indexOf(selectedAudio) !== -1) {
+        if(this.currentAudios.indexOf(decodeAudio) !== -1) {
           return;
         }
-        this.currentAudios.push(selectedAudio);
+        this.currentAudios.push(decodeAudio);
       });
     });
   }
@@ -125,14 +129,14 @@ export class DecodingUploadComponent implements OnInit {
   remove(selectedAudio) {
 
     selectedAudio.forEach(item => {
-      const audio:Audio = item.value;
+      const audio:DecodeAudio = item.value;
       let index:number = this.currentAudios.findIndex(d => d === audio);
 
       if(index > -1) {
         this.decodeService.unassignAudioToCurrentSession(
           this.projectUuid,
           this.trainingVersion,
-          audio.uuid
+          audio.session_uuid
         ).subscribe(r => {
           this.currentAudios.splice(index, 1);
         });
@@ -188,11 +192,11 @@ export class DecodingUploadComponent implements OnInit {
         this.trainingVersion,
         { audio_uuid: audio.uuid }
       ).subscribe(decodeAudio => {
-        if(this.currentAudios.indexOf(audio) !== -1) {
+        if(this.currentAudios.indexOf(decodeAudio) !== -1) {
           return;
         }
 
-        this.currentAudios.push(audio)
+        this.currentAudios.push(decodeAudio)
       });
     });
 
