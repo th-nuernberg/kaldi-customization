@@ -66,6 +66,7 @@ voxfore_rnn_id = 1
 # Voxforge-RNN
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/model.zip"  , "initialization/acoustic-models/voxforge-rnn/model.zip")
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/final.mdl"  , "initialization/acoustic-models/voxforge-rnn/final.mdl")
+upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/corpus.txt"  , "initialization/acoustic-models/voxforge-rnn/corpus.txt")
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/lexicon.txt"  , "initialization/acoustic-models/voxforge-rnn/lexicon.txt")
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/tree"  , "initialization/acoustic-models/voxforge-rnn/tree")
 upload_to_bucket(minio_client,minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(voxfore_rnn_id) + "/phones.txt"  , "initialization/acoustic-models/voxforge-rnn/phones.txt")

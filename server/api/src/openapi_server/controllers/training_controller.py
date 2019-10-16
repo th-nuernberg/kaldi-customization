@@ -15,6 +15,7 @@ from models.acousticmodel import AcousticModel as DB_AcousticModel
 from models.resource import Resource as DB_Resource, ResourceStateEnum as DB_ResourceStateEnum
 from models.training import Training as DB_Training, TrainingStateEnum as DB_TrainingStateEnum
 from models.training_resource import TrainingResource as DB_TrainingResource
+from models.resource import ResourceTypeEnum as DB_ResourceType
 
 from redis_communication import create_dataprep_job, create_kaldi_job
 from minio_communication import upload_to_bucket, download_from_bucket, minio_buckets, copy_object_in_bucket
@@ -127,6 +128,8 @@ def create_training(project_uuid):  # noqa: E501
     """
     current_user = connexion.context['token_info']['user']
 
+    print(current_user)
+
     db_proj = DB_Project.query.filter_by(
         uuid=project_uuid, owner_id=current_user.id).first()
 
@@ -165,6 +168,31 @@ def create_training(project_uuid):  # noqa: E501
             db_training.status = DB_TrainingStateEnum.TextPrep_Pending
             db.session.add(db_training)
             db.session.commit()
+    else:
+        #copy base corpus
+        db_resource = DB_Resource(
+            status=DB_ResourceStateEnum.TextPreparation_Success,
+            resource_type=DB_ResourceType.txt,
+            owner=current_user,
+            name="PROJ_" + str(db_proj.name) + "_ORIGINAL_CORPUS.txt"
+        )
+
+        db.session.add(db_resource)
+        db.session.commit()
+
+        db_training_resource = DB_TrainingResource(training=db_training,origin=db_resource)
+        db.session.add(db_training_resource)
+        db.session.commit()
+
+        #copy base Corpus to Resource Bucket twice, since it is an txt file corpus = source
+        copy_object_in_bucket(minio_client, minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(db_proj.acoustic_model_id) + "/corpus.txt",
+            minio_buckets["RESOURCE_BUCKET"], str(db_resource.uuid) + "/source")
+        copy_object_in_bucket(minio_client, minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(db_proj.acoustic_model_id) + "/corpus.txt",
+            minio_buckets["RESOURCE_BUCKET"], str(db_resource.uuid) + "/corpus.txt")
+
+        #also copy it to the training_resource bucket
+        copy_object_in_bucket(minio_client, minio_buckets["ACOUSTIC_MODELS_BUCKET"], str(db_proj.acoustic_model_id) + "/corpus.txt",
+            minio_buckets["TRAINING_RESOURCE_BUCKET"], str(db_training_resource.id) + "/corpus.txt")
 
     return (mapper.db_training_to_front(db_training),201)
 
