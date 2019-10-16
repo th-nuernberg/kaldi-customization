@@ -9,6 +9,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { CallbackObject } from './callbackObject';
 
 
 export interface AudioReferenceWithCallbackObject { 
@@ -16,9 +17,6 @@ export interface AudioReferenceWithCallbackObject {
      * UUID of the audio file
      */
     audio_uuid: string;
-    /**
-     * Callback URL when decoding finished
-     */
-    callback?: string;
+    callback?: CallbackObject;
 }
 

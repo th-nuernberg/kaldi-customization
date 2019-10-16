@@ -56,6 +56,8 @@ class Resource(db.Model):
     owner_id = db.Column(db.Integer,db.ForeignKey("users.id"))
     owner = db.relationship('User')
 
+    callback = db.Column(db.Text, default='{}')
+
     def __repr__(self):
         return json.dumps(self, cls=AlchemyEncoder)
 

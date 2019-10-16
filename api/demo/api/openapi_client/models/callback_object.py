@@ -32,7 +32,7 @@ class CallbackObject(object):
     """
     openapi_types = {
         'url': 'str',
-        'method': 'CallbackMethod'
+        'method': 'str'
     }
 
     attribute_map = {
@@ -79,9 +79,10 @@ class CallbackObject(object):
     def method(self):
         """Gets the method of this CallbackObject.  # noqa: E501
 
+        Action to be performed (GET|POST)  # noqa: E501
 
         :return: The method of this CallbackObject.  # noqa: E501
-        :rtype: CallbackMethod
+        :rtype: str
         """
         return self._method
 
@@ -89,9 +90,10 @@ class CallbackObject(object):
     def method(self, method):
         """Sets the method of this CallbackObject.
 
+        Action to be performed (GET|POST)  # noqa: E501
 
         :param method: The method of this CallbackObject.  # noqa: E501
-        :type: CallbackMethod
+        :type: str
         """
         if method is None:
             raise ValueError("Invalid value for `method`, must not be `None`")  # noqa: E501

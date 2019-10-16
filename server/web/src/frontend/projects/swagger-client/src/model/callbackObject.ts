@@ -9,7 +9,6 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { CallbackMethod } from './callbackMethod';
 
 
 export interface CallbackObject { 
@@ -17,6 +16,9 @@ export interface CallbackObject {
      * The URL to be called
      */
     url: string;
-    method: CallbackMethod;
+    /**
+     * Action to be performed (GET|POST)
+     */
+    method: string;
 }
 

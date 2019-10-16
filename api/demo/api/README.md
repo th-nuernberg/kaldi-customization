@@ -137,7 +137,6 @@ Class | Method | HTTP request | Description
  - [AudioStatus](docs/AudioStatus.md)
  - [BinaryDecodeObject](docs/BinaryDecodeObject.md)
  - [BinaryResourceObject](docs/BinaryResourceObject.md)
- - [CallbackMethod](docs/CallbackMethod.md)
  - [CallbackObject](docs/CallbackObject.md)
  - [CreateProjectObject](docs/CreateProjectObject.md)
  - [DataPrepStats](docs/DataPrepStats.md)

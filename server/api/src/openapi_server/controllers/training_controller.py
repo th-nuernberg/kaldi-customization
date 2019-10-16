@@ -21,6 +21,7 @@ from minio_communication import upload_to_bucket, download_from_bucket, minio_bu
 from config import minio_client
 
 import os
+import json
 from mapper import mapper
 from flask import stream_with_context, Response
 
@@ -406,7 +407,24 @@ def get_vocabulary_of_training(project_uuid, training_version):  # noqa: E501
 
     :rtype: str
     """
-    return 'do some magic!'
+    current_user = connexion.context['token_info']['user']
+
+    db_project = DB_Project.query.filter_by(
+        uuid=project_uuid, owner_id=current_user.id).first()
+
+    if db_project is None:
+        return ("Project not found", 404)
+
+    db_training = DB_Training.query.filter_by(version=training_version) \
+        .filter_by(project_id=db_project.id).first()
+
+    if db_training is None:
+        return ("Training not found", 404)
+
+    status, stream = download_from_bucket(
+        minio_client, minio_buckets["TRAINING_BUCKET"], "{}/unique_word_list.txt".format(db_training.id))
+
+    return stream.read().decode('utf-8') if status else ""
 
 
 def prepare_training_by_version(project_uuid, training_version, callback_object=None):  # noqa: E501
@@ -423,9 +441,15 @@ def prepare_training_by_version(project_uuid, training_version, callback_object=
 
     :rtype: Training
     """
+    callback_json = "{}"
     try:
         if connexion.request.is_json:
             callback_object = CallbackObject.from_dict(connexion.request.get_json())  # noqa: E501
+        cb = dict()
+        cb["url"] = callback_object.url
+        cb["method"] = callback_object.method
+        callback_json = json.dumps(cb)
+
     except:
         callback_object = None
     
@@ -443,12 +467,17 @@ def prepare_training_by_version(project_uuid, training_version, callback_object=
     if not db_training:
         return ("Training not found",404)
 
+    if db_training.status == DB_TrainingStateEnum.Init:
+        return ("training only initialized or no changed since last training", 400)
+
     if db_training.status != DB_TrainingStateEnum.Trainable:
         return ("training already done or pending", 400)
 
     db_training.status = DB_TrainingStateEnum.Training_DataPrep_Pending
     db_training_resources = DB_TrainingResource.query.filter(
     DB_TrainingResource.training_id == db_training.id).all()
+
+    db_training.prepare_callback = callback_json
 
     db.session.add(db_training)
     db.session.commit()
@@ -532,9 +561,15 @@ def start_training_by_version(project_uuid, training_version, callback_object=No
 
     :rtype: Training
     """
+    callback_json = "{}"
     try:
         if connexion.request.is_json:
             callback_object = CallbackObject.from_dict(connexion.request.get_json())  # noqa: E501
+        cb = dict()
+        cb["url"] = callback_object.url
+        cb["method"] = callback_object.method
+        callback_json = json.dumps(cb)
+
     except:
         callback_object = None
         
@@ -553,6 +588,7 @@ def start_training_by_version(project_uuid, training_version, callback_object=No
         return ("Training not found",404)
 
     if db_training.status == DB_TrainingStateEnum.Training_DataPrep_Success:
+        db_training.train_callback = callback_json
         db_training.status = DB_TrainingStateEnum.Training_Pending
         db.session.add(db_training)
         db.session.commit()
