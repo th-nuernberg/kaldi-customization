@@ -9,6 +9,7 @@ import {
   Project,
   Resource,
   Training,
+  TrainingStatus,
   ProjectService,
   ResourceService,
   TrainingService,
@@ -37,10 +38,12 @@ export class TrainingUploadComponent implements OnInit {
   allResources:MatTableDataSource<Resource>;
 
   getCorpusInterval:any;
+  getTrainingStatusInterval:any;
   displayedColumns: string[] = ['select', 'name', 'type'];
-  show:boolean = true;
+
   showContentPreview:boolean;
   fileContent: string | ArrayBuffer;
+  canStartTraining:boolean = false;
 
   public historySelection = new SelectionModel<Resource>(true, []);
 
@@ -95,6 +98,10 @@ export class TrainingUploadComponent implements OnInit {
     this.getCorpusInterval = setInterval(
       () => this.getResourceCorpusResult(),
       10000);
+
+    this.getTrainingStatusInterval = setInterval(
+      () => this.getTrainingStatus(),
+      5000);
   }
 
   ngOnDestroy() {
@@ -102,6 +109,7 @@ export class TrainingUploadComponent implements OnInit {
     this.currentTrainingResourcesWithCorupus = [];
 
     clearInterval(this.getCorpusInterval);
+    clearInterval(this.getTrainingStatusInterval);
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -250,6 +258,12 @@ export class TrainingUploadComponent implements OnInit {
       .subscribe(training => {
         this.snackBar.open("Bereite Training vor...", "", AppConstants.snackBarConfig);
       })
+  }
+
+  getTrainingStatus() {
+    this.training$.subscribe(training => {
+      this.canStartTraining = training.status == TrainingStatus.Training_DataPrep_Success;
+    });
   }
 
   // starts the training

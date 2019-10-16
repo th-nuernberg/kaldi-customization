@@ -93,7 +93,7 @@
                         <button
                           mat-button
                           color="{{ isPlaying(decodeAudio.audio) ? 'accent' : 'primary' }}"
-                          (click)="triggerAudio($event, decodeAudio)">
+                          (click)="triggerAudio($event, decodeAudio.audio)">
                           <mat-icon>{{ isPlaying(decodeAudio.audio) ? 'pause_circle_outline' : 'play_circle_outline' }}</mat-icon>
                         </button>
                       {{decodeAudio.audio.name}}</p>
@@ -160,7 +160,7 @@
                   </mat-list-item>
                   <mat-divider></mat-divider>
                   <mat-list-item>
-                    <p>Anzahl Audio Dateien: {{overview?.decodeSession?.decodings?.length}}</p>
+                    <p>Anzahl Audio Dateien: {{currentAudios?.length}}</p>
                   </mat-list-item>
                   <mat-divider></mat-divider>
                   <mat-list-item *ngFor="let decodeAudio of overview?.decodeSession?.decodings">
@@ -182,6 +182,7 @@
             mat-raised-button
             class="uploadComponentButtonContainer"
             color="primary"
+            [disabled]="!canStartDecodeSession"
             (click)="startDecode()">
             <mat-icon>play_arrow</mat-icon>
             Decode

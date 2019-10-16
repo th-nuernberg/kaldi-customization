@@ -208,6 +208,7 @@
               mat-raised-button
               color="primary"
               class="uploadComponentButtonContainer"
+              [disabled]="!canStartTraining"
               (click)="startTraining()">
               <mat-icon>play_arrow</mat-icon>
               Training

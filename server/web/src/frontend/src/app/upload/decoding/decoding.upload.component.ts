@@ -6,6 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatSnackBar, MatSelectionList, MatListOption } from '@angular/material';
 import {
   Audio,
+  AudioStatus,
   Project,
   Resource,
   Training,
@@ -48,6 +49,9 @@ export class DecodingUploadComponent implements OnInit {
 
   public historySelection = new SelectionModel<Audio>(true, []);
 
+  getDecodeSessionStatusInterval:any;
+  canStartDecodeSession:boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -71,6 +75,10 @@ export class DecodingUploadComponent implements OnInit {
     this.audios$ = this.decodeService.getAllAudio();
     this.decodeSession$ = this.decodeService.getDecodeSession(this.projectUuid, this.trainingVersion, this.decodeSessionUuid);
 
+    this.decodeSession$.subscribe(decodeSession => {
+      this.currentAudios = decodeSession.decodings;
+    });
+
     this.audios$.subscribe(audios => {
       this.allAudios = new MatTableDataSource<Audio>(audios);
 
@@ -85,9 +93,13 @@ export class DecodingUploadComponent implements OnInit {
       });
     })
 
-    this.decodeSession$.subscribe(decodeSession => {
-      this.currentAudios = decodeSession.decodings;
-    })
+    this.getDecodeSessionStatusInterval = setInterval(
+      () => this.getDecodeSessionStatus(),
+      5000);
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.getDecodeSessionStatusInterval);
   }
 
   audioData() {
@@ -231,5 +243,23 @@ export class DecodingUploadComponent implements OnInit {
 
     this.project$ = this.projectService.getProjectByUuid(this.projectUuid);
     this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
+  }
+
+  getDecodeSessionStatus() {
+    this.decodeSession$.subscribe(decodeSession => {
+      if(decodeSession.decodings.length == 0) {
+        this.canStartDecodeSession = false;
+        return;
+      }
+
+      decodeSession.decodings.forEach(decodeAudio => {
+        if(decodeAudio.audio.status != AudioStatus.AudioPrep_Success) {
+          this.canStartDecodeSession = false;
+          return;
+        }
+      });
+
+      this.canStartDecodeSession = true;
+    });
   }
 }
