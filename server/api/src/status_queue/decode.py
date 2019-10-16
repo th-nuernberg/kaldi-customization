@@ -2,6 +2,7 @@ from connector import *
 from models import Decoding, DecodingStateEnum, DecodingAudio, AudioResource
 
 import json
+from .requests_util import make_async_request
 
 
 decode_status_mapping = {
@@ -28,6 +29,11 @@ def handle_decode_status(msg_data, db_session):
     except KeyError:
         print('[Error] Received invalid status id from decode')
         return
+
+    if(db_decoding_session.callback != "{}"):
+        callback = json.loads(db_decoding_session.callback)
+        print("Preparing callback")
+        make_async_request(method=callback["method"], url=callback["url"], data=str(db_decoding_session))
 
     #read all transcripts and write them to database
     for key in status.transcripts:

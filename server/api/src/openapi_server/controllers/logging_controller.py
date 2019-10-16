@@ -112,7 +112,6 @@ def get_training_stats(project_uuid, training_version):  # noqa: E501
         minio_client, minio_buckets["TRAINING_BUCKET"], "{}/stats.json".format(db_training.id))
 
     json_object = json.loads(stream.read().decode('utf-8'))
-    print(json_object)
     return (DataPrepStats(unique_words_count=json_object["unique_words"],
         total_words_count=json_object["total_words_count"],
         lines_count=json_object["lines_count"],

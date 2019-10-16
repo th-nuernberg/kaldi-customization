@@ -483,10 +483,16 @@ def start_decode(project_uuid, training_version, session_uuid, callback_object=N
     :rtype: DecodeSession
     """
     current_user = connexion.context['token_info']['user']
+    callback_json = "{}"
     try:
         if connexion.request.is_json:
             callback_object = CallbackObject.from_dict(connexion.request.get_json())  # noqa: E501
-    except: 
+        cb = dict()
+        cb["url"] = callback_object.url
+        cb["method"] = callback_object.method
+        callback_json = json.dumps(cb)
+
+    except:
         callback_object = None
 
     db_project = DB_Project.query.filter_by(uuid=project_uuid, owner_id=current_user.id).first()
@@ -519,6 +525,7 @@ def start_decode(project_uuid, training_version, session_uuid, callback_object=N
                         acoustic_model_id=db_project.acoustic_model_id, training_id=db_training.id, decode_uuid=db_session.uuid)
 
     db_session.status = DB_DecodingStateEnum.Decoding_Pending
+    db_session.callback = callback_json
     db.session.add(db_session)
     db.session.commit()
 

@@ -37,5 +37,7 @@ class Decoding(db.Model):
    
     creation_timestamp = db.Column(db.DateTime(timezone=False), default=datetime.datetime.utcnow)
 
+    callback = db.Column(db.Text, default='{}')
+
     def __repr__(self):
         return json.dumps(self, cls=AlchemyEncoder)
