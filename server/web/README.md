@@ -64,7 +64,7 @@ Each training shows the training version, the training status and allows, if the
 
 All decode sessions are represented in a expansion panel.
 Each decoding session is related to a training and shows the decoded audio files with the transformed transcripts.
-The audio file can be played
+The audio file can be played.
 The transcripts can be copied to clipboard or downloaded in a text file.
 
 It is only possible to create a decoding session of a training, if no decoding session is already active! (One decoding session for a training at a time)
