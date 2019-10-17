@@ -1,5 +1,5 @@
 FROM node:8.15.1-alpine
-LABEL maintainer="Tobias Kruse <***REMOVED***>"
+LABEL maintainer="***REMOVED***"
 
 EXPOSE 4200
 

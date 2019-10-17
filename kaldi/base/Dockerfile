@@ -1,5 +1,5 @@
 FROM alpine:3.7
-LABEL maintainer="Tobias Kruse <***REMOVED***>"
+LABEL maintainer="***REMOVED***"
 
 ARG KALDI_ARGS=--shared
 

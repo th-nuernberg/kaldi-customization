@@ -5,6 +5,10 @@ import {
 
 export default class TypeMapperService {
 
+  /**
+  * Converts the acoustic model type into text.
+  * @param value The acoustic model type.
+  */
   public static convertAcousticModelType(value: any): string {
     const HMM = "HMM";
     switch(+value) {
@@ -24,6 +28,10 @@ export default class TypeMapperService {
     }
   }
 
+  /**
+  * Converts the resource type into text.
+  * @param value The resource type.
+  */
   public static convertResourceType(value: any): string {
     switch(+value) {
       case ResourceType.html: {

@@ -62,10 +62,18 @@ export class TrainingOverviewComponent implements OnInit {
 
 	ngOnDestroy() {	}
 
+  /**
+   * Goes back to the project overview page.
+   */
 	backToProjectOverview() {
   		this.router.navigate(["/project/" + this.projectUuid]);
   }
 
+  /**
+   * Downloads the log file.
+   * @param data The data of the log.
+   * @param name The name for the log file.
+   */
   downloadLog(data:string, name:string) {
     this.snackBar.open("Lade" + name + " Log herunter...", "", AppConstants.snackBarConfig);
 

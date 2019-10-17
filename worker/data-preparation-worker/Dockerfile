@@ -1,5 +1,5 @@
 FROM python:2.7-alpine3.10
-LABEL maintainer="Dino Pehratovic <***REMOVED***>"
+LABEL maintainer="***REMOVED***"
 
 RUN mkdir /data_prep_worker/ && \
     mkdir /data_prep_worker/in/ && \

@@ -16,6 +16,10 @@ export default class StatusMapperService {
   static readonly _hasFailed = " ist fehlgeschlagen";
   static readonly _isTrainingable = " ist trainierbar";
 
+  /**
+  * Converts the audio status code into text into text.
+  * @param value The audio status code
+  */
   public static convertAudioStatus(value: any): string {
     const audioPrep = "Audiovorbereitung";
     switch(+value) {
@@ -41,6 +45,10 @@ export default class StatusMapperService {
     }
   }
 
+  /**
+  * Converts the resource status code into text.
+  * @param value The resource status code.
+  */
   public static convertResourceStatus(value: any): string {
     const upload = "Upload";
     const textPrep = "Textaufbereitung";
@@ -74,6 +82,10 @@ export default class StatusMapperService {
     }
   }
 
+  /**
+  * Converts the training status code into text.
+  * @param value The training status code.
+  */
   public static convertTrainingStatus(value: any): string {
     const training = "Training";
     const textPrep = "Textaufbereitung";
@@ -122,6 +134,10 @@ export default class StatusMapperService {
     }
   }
 
+  /**
+  * Converts the decode audio session status code into text.
+  * @param value The decode audio session status code.
+  */
   public static convertDecodeAudioSessionStatus(value: any): string {
     const decodeAudioSession = "Spracherkennungssession";
 

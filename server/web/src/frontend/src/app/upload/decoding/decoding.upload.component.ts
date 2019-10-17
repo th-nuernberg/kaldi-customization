@@ -102,6 +102,9 @@ export class DecodingUploadComponent implements OnInit {
     clearInterval(this.getDecodeSessionStatusInterval);
   }
 
+  /**
+   * Transforms the playing audio data into a secure resource url.
+   */
   audioData() {
     if (!this.currentlyPlayingAudio)
       return null;
@@ -109,21 +112,28 @@ export class DecodingUploadComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustResourceUrl(this.currentlyPlayingAudio.data);
   }
 
-/** Whether the number of selected elements matches the total number of rows. */
+  /**
+   * Checks if all table checkboxes are selected.
+   */
   isAllSelected() {
     const numSelected = this.historySelection.selected.length;
     const numRows = this.allAudios.data.length;
     return numSelected === numRows;
   }
 
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  /**
+   * Master toggles all checkboxes of the table.
+   */
   masterToggle() {
     this.isAllSelected() ?
         this.historySelection.clear() :
         this.allAudios.data.forEach(row => this.historySelection.select(row));
   }
 
-  /** The label for the checkbox on the passed row */
+  /**
+   * Gets the label of the checkbox value.
+   * @param row The row of the table.
+   */
   checkboxLabel(row?: Resource): string {
     if (!row) {
       return "${this.isAllSelected() ? 'select' : 'deselect'} all";
@@ -132,7 +142,9 @@ export class DecodingUploadComponent implements OnInit {
     return "${this.historySelection.isSelected(row) ? 'deselect' : 'select'} row ${row}";
   }
 
-  // copies selected history elements to current panel
+  /**
+   * Copies the selected audio files in the table to the current decode audio session.
+   */
   copyAudio() {
     this.historySelection.selected.forEach(selectedAudio => {
       this.snackBar.open("Kopiere Audio Datein in aktuelle Spracherkennung...", "", AppConstants.snackBarConfig);
@@ -149,7 +161,10 @@ export class DecodingUploadComponent implements OnInit {
     });
   }
 
-  // removes selected training resources
+  /**
+   * Removes the selected audio file from the current decode session.
+   * @param selectedAudio The selected audio file
+   */
   remove(selectedAudio) {
 
     selectedAudio.forEach(item => {
@@ -170,6 +185,11 @@ export class DecodingUploadComponent implements OnInit {
     this.snackBar.open("Lösche Audio Datei von aktueller Spracherkennung...", "", AppConstants.snackBarConfig);
   }
 
+  /**
+   * Starts the selected audio file.
+   * @param event The passed event of the audio player.
+   * @param audio The selected audio file.
+   */
   triggerAudio(event, audio) {
     event.stopPropagation();
 
@@ -193,19 +213,33 @@ export class DecodingUploadComponent implements OnInit {
       }
   }
 
+  /**
+  * Stops the running audio file.
+  */
   stopAudio() {
     this.currentlyPlayingAudio = null;
   }
 
+  /**
+  * Checks if the selected audio file is playing
+  * @param audio The selected audio file.
+  */
   isPlaying(audio: Audio) {
     return (this.currentlyPlayingAudio && this.currentlyPlayingAudio.audio.uuid == audio.uuid);
   }
 
-  // uploads file and show preview
+  /**
+   * Uploads a new audio file to the decode audio session
+   * @param file The audio file.
+   */
   loadFile(file:HTMLInputElement) {
     this.uploadAudio(file);
   }
 
+  /**
+   * Uploads a new audio file to the decode audio session
+   * @param file The audio file.
+   */
   uploadAudio(file) {
     const blobFile:Blob = file.files[0] as Blob;
 
@@ -227,6 +261,9 @@ export class DecodingUploadComponent implements OnInit {
     this.snackBar.open("Lade Audio Datei hoch...", "", AppConstants.snackBarConfig);
   }
 
+  /**
+   * Starts the decode.
+   */
   startDecode() {
     this.decodeService.startDecode(
       this.projectUuid,
@@ -238,6 +275,9 @@ export class DecodingUploadComponent implements OnInit {
     });
   }
 
+  /**
+   * Reloads values manually.
+   */
   async reloadDecoding() {
     await this.copyAudio();
 
@@ -245,6 +285,9 @@ export class DecodingUploadComponent implements OnInit {
     this.training$ = this.trainingService.getTrainingByVersion(this.projectUuid, this.trainingVersion);
   }
 
+  /**
+   * Gets the current decode session status.
+   */
   getDecodeSessionStatus() {
     this.decodeSession$.subscribe(decodeSession => {
       if(decodeSession.decodings.length == 0) {

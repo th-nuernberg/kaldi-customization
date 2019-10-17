@@ -54,7 +54,9 @@ export class DashboardComponent implements OnInit {
 
   get f() { return this.createProjectForm.controls; }
 
-  // creates a new project with the passed project name and acoustic model uuid
+  /**
+  * Creates a new project with the passed project name and acoustic model from the form.
+  */
   createProject() {
     this.createProjectSubmitted = true;
 

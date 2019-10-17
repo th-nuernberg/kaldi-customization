@@ -62,10 +62,18 @@ export class DecodingOverviewComponent implements OnInit {
 
 	ngOnDestroy() {	}
 
+  /**
+   * Goes back to the project overview page.
+   */
 	backToProjectOverview() {
   		this.router.navigate(["/project/" + this.projectUuid]);
   }
 
+  /**
+   * Downloads the log file.
+   * @param data The data of the log.
+   * @param name The name for the log file.
+   */
   downloadLog(data:string, name:string) {
     this.snackBar.open("Lade" + name + " Log herunter...", "", AppConstants.snackBarConfig);
 
@@ -85,6 +93,11 @@ export class DecodingOverviewComponent implements OnInit {
     a.dispatchEvent(event);
   }
 
+  /**
+   * Downloads the created transcript of the decoded audio file.
+   * @param data The data of the transcript.
+   * @param name The name of the transcript file.
+   */
   downloadTranscript(data, name:string) {
     let fileName = name.split('.').slice(0, -1).join('.');
     this.snackBar.open("Lade" + fileName + " Transkript herunter...", "", AppConstants.snackBarConfig);
@@ -105,6 +118,10 @@ export class DecodingOverviewComponent implements OnInit {
     a.dispatchEvent(event);
   }
 
+  /**
+   * Copies the content to the clipboard.
+   * @param text The content of the data.
+   */
   copyToClipboard(text) {
     let tempTextArea = document.createElement('textarea');
     tempTextArea.style.position = 'fixed';
@@ -120,6 +137,9 @@ export class DecodingOverviewComponent implements OnInit {
     document.body.removeChild(tempTextArea);
   }
 
+  /**
+   * Transforms the playing audio data into a secure resource url.
+   */
   audioData() {
     if (!this.currentlyPlayingAudio)
       return null;
@@ -127,6 +147,11 @@ export class DecodingOverviewComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustResourceUrl(this.currentlyPlayingAudio.data);
   }
 
+  /**
+   * Starts the selected audio file.
+   * @param event The passed event of the audio player.
+   * @param audio The selected audio file.
+   */
   triggerAudio(event, audio) {
     event.stopPropagation();
 
@@ -150,10 +175,17 @@ export class DecodingOverviewComponent implements OnInit {
       }
   }
 
+  /**
+  * Stops the running audio file.
+  */
   stopAudio() {
     this.currentlyPlayingAudio = null;
   }
 
+  /**
+  * Checks if the selected audio file is playing
+  * @param audio The selected audio file.
+  */
   isPlaying(audio: Audio) {
     return (this.currentlyPlayingAudio && this.currentlyPlayingAudio.audio.uuid == audio.uuid);
   }

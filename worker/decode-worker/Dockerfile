@@ -1,4 +1,4 @@
-FROM th-nuernberg/kaldi-base:latest
+FROM toksicon/kaldi-base:latest
 LABEL maintainer="***REMOVED***"
 
 ADD shared/connector/requirements.txt /kaldi/connector/requirements.txt

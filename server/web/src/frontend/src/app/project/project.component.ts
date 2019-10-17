@@ -7,12 +7,11 @@ import {
   TrainingStatus,
   TrainingService,
   DecodeService,
-  DecodeAudio,
   DecodeSession,
   DecodeSessionStatus,
   Project,
   ProjectService,
-  AudioStatus}
+}
 from 'swagger-client';
 import AppConstants from  '../app.component';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -76,6 +75,9 @@ export class ProjectComponent implements OnInit {
     });
   }
 
+  /**
+   * Transforms the playing audio data into a secure resource url.
+   */
   audioData() {
     if (!this.currentlyPlayingAudio)
       return null;
@@ -83,6 +85,11 @@ export class ProjectComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustResourceUrl(this.currentlyPlayingAudio.data);
   }
 
+  /**
+   * Starts the selected audio file.
+   * @param event The passed event of the audio player.
+   * @param audio The selected audio file.
+   */
   triggerAudio(event, audio) {
     event.stopPropagation();
 
@@ -106,15 +113,24 @@ export class ProjectComponent implements OnInit {
       }
   }
 
+  /**
+  * Stops the running audio file.
+  */
   stopAudio() {
     this.currentlyPlayingAudio = null;
   }
 
+  /**
+  * Checks if the selected audio file is playing
+  * @param audio The selected audio file.
+  */
   isPlaying(audio: Audio) {
     return (this.currentlyPlayingAudio && this.currentlyPlayingAudio.audio.uuid == audio.uuid);
   }
 
-  // creates a new training and opens the training page
+  /**
+  * Creates a new training and opens the training page.
+  */
   createTraining() {
     this.trainingService.createTraining(this.projectUuid)
       .subscribe(training => {
@@ -124,6 +140,11 @@ export class ProjectComponent implements OnInit {
       });
   }
 
+  /**
+  * Opens the specific training or with a successful training the training overview.
+  * @param trainingVersion The training version of the selected training.
+  * @param trainingStatus The training status of the selected training.
+  */
   openTraining(trainingVersion:number, trainingStatus:TrainingStatus) {
     if(trainingStatus == TrainingStatus.Training_Success)
     {
@@ -142,10 +163,18 @@ export class ProjectComponent implements OnInit {
     }
   }
 
+   /**
+  * Checks if the training was successful.
+  * @param trainingStatus The current training status.
+  */
   wasTrainingSuccessful(trainingStatus:TrainingStatus) {
     return trainingStatus != TrainingStatus.Training_Success;
   }
 
+  /**
+  * Downloads the results and the content of a specific training.
+  * @param trainingVersion The training version.
+  */
   downloadTraining(trainingVersion:number) {
     this.snackBar.open("Lade Training herunter...", "", AppConstants.snackBarConfig);
     this.trainingService.downloadModelForTraining(
@@ -168,6 +197,11 @@ export class ProjectComponent implements OnInit {
     });
   }
 
+  /**
+  * Creates a new decode session of a specific training.
+  * @param event The passed event.
+  * @param trainingVersion The specific training version.
+  */
   createDecode(event, trainingVersion:number): void {
 
     event.stopPropagation();
@@ -186,10 +220,19 @@ export class ProjectComponent implements OnInit {
     }
   }
 
+  /**
+   * Checks if decoding session was succesful.
+   * @param sessionStatus Status of the decoding session
+   */
   wasDecodingSessionSuccessful(sessionStatus:DecodeSessionStatus) {
     return sessionStatus != DecodeSessionStatus.Decoding_Success;
   }
 
+  /**
+   * Downloads the created transcript of the decoded audio file.
+   * @param data The data of the transcript.
+   * @param name The name of the transcript file.
+   */
   downloadTranscript(data, name:string) {
     let fileName = name.split('.').slice(0, -1).join('.');
     this.snackBar.open("Lade" + fileName + " Transkript herunter...", "", AppConstants.snackBarConfig);
@@ -210,6 +253,10 @@ export class ProjectComponent implements OnInit {
     a.dispatchEvent(event);
   }
 
+  /**
+   * Copies the content to the clipboard.
+   * @param text The content of the data.
+   */
   copyToClipboard(text) {
     let tempTextArea = document.createElement('textarea');
     tempTextArea.style.position = 'fixed';
@@ -225,6 +272,11 @@ export class ProjectComponent implements OnInit {
     document.body.removeChild(tempTextArea);
   }
 
+  /**
+   * Opens the decode session overview.
+   * @param trainingVersion The specific training version.
+   * @param decodeSessionUuid The specific decode session.
+   */
   openDecodeSessionOverview(trainingVersion:number, decodeSessionUuid: string) {
 
     this.snackBar.open("Öffne Spracherkennung Übersicht...", "", AppConstants.snackBarConfig);

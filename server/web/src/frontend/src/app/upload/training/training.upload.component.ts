@@ -57,7 +57,7 @@ export class TrainingUploadComponent implements OnInit {
     private projectService: ProjectService,
     private snackBar: MatSnackBar
     ) {}
-  // TODO post model information to the API: text files, project name, model name, prev model etc..
+
   ngOnInit() {
     this.selectionList.selectedOptions = new SelectionModel<MatListOption>(false);
     this.currentTrainingResources = [];
@@ -112,21 +112,28 @@ export class TrainingUploadComponent implements OnInit {
     clearInterval(this.getTrainingStatusInterval);
   }
 
-  /** Whether the number of selected elements matches the total number of rows. */
+  /**
+   * Checks if all table checkboxes are selected.
+   */
   isAllSelected() {
     const numSelected = this.historySelection.selected.length;
     const numRows = this.allResources.data.length;
     return numSelected === numRows;
   }
 
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  /**
+   * Master toggles all checkboxes of the table.
+   */
   masterToggle() {
     this.isAllSelected() ?
         this.historySelection.clear() :
         this.allResources.data.forEach(row => this.historySelection.select(row));
   }
 
-  /** The label for the checkbox on the passed row */
+  /**
+   * Gets the label of the checkbox value.
+   * @param row The row of the table.
+   */
   checkboxLabel(row?: Resource): string {
     if (!row) {
       return "${this.isAllSelected() ? 'select' : 'deselect'} all";
@@ -135,7 +142,9 @@ export class TrainingUploadComponent implements OnInit {
     return "${this.historySelection.isSelected(row) ? 'deselect' : 'select'} row ${row}";
   }
 
-  // copies selected history elements to current panel
+  /**
+   * Copies the selected resource files to the current training.
+   */
   copyResource() {
     this.historySelection.selected.forEach(resource => {
       this.trainingService.assignResourceToTraining(
@@ -154,7 +163,11 @@ export class TrainingUploadComponent implements OnInit {
     this.snackBar.open("Kopiere Ressource in das aktuelle Training...", "", AppConstants.snackBarConfig);
   }
 
-  // show the selected content of a corpus
+  /**
+   * Shows the corpus content of the selected resource
+   * @param ev The selection event.
+   * @param selectedResources The selected training resource.
+   */
   onSelectionChange(ev, selectedResources) {
     if(ev.option.selected === false) {
       this.showContentPreview = false;
@@ -175,7 +188,10 @@ export class TrainingUploadComponent implements OnInit {
     }
   }
 
-  // removes selected training resources
+  /**
+   * Removes the selected training resources from the training.
+   * @param selectedResources
+   */
   remove(selectedResources) {
 
     selectedResources.forEach(item => {
@@ -196,12 +212,18 @@ export class TrainingUploadComponent implements OnInit {
     this.snackBar.open("Lösche Ressource vom aktuellen Training...", "", AppConstants.snackBarConfig);
   }
 
-  // uploads file and show preview
+  /**
+   * Uploads a new resource file to the training session
+   * @param file The training resource file.
+   */
   loadFile(file:HTMLInputElement) {
     this.uploadResource(file);
   }
 
-  // uploads new resource and assigns to training
+  /**
+   * Uploads a new resource file to the training session
+   * @param file The training resource file.
+   */
   uploadResource(file) {
     const blobFile:Blob = file.files[0] as Blob;
     // creates resource and starts the TextPrepWorker to create the corupus
@@ -223,7 +245,10 @@ export class TrainingUploadComponent implements OnInit {
     this.snackBar.open("Lade neue Ressource hoch...", "", AppConstants.snackBarConfig);
   }
 
-  // reloads project, copies existing resources to training or prepares training
+  /**
+   * Reloads the training page manually.
+   * @param newResources Flag to copy resource or prepare training.
+   */
   async reloadProject(newResources:boolean=false) {
     if(newResources) {
       await this.copyResource();
@@ -240,7 +265,9 @@ export class TrainingUploadComponent implements OnInit {
     });
   }
 
-  // gets the content of all assigned corpuses
+  /**
+   * Gets the corpus content.
+   */
   getResourceCorpusResult() {
     this.currentTrainingResources.forEach(resource => {
       this.trainingService.getCorpusOfTrainingResource(
@@ -252,7 +279,9 @@ export class TrainingUploadComponent implements OnInit {
     });
   }
 
-  // prepares training and executes the text preparation worker
+  /**
+   * Prepares the current training by starting the data preparation.
+   */
   prepareTraining() {
     this.trainingService.prepareTrainingByVersion(this.projectUuid, this.trainingVersion)
       .subscribe(training => {
@@ -260,13 +289,18 @@ export class TrainingUploadComponent implements OnInit {
       })
   }
 
+  /**
+   * Gets the current training status.
+   */
   getTrainingStatus() {
     this.training$.subscribe(training => {
       this.canStartTraining = training.status == TrainingStatus.Training_DataPrep_Success;
     });
   }
 
-  // starts the training
+  /**
+   * Starts the current training.
+   */
   startTraining() {
     this.trainingService.startTrainingByVersion(this.projectUuid, this.trainingVersion)
     .subscribe(training => {

@@ -24,6 +24,9 @@ export class TileComponent implements OnInit, OnChanges {
     this.lastTraining = this.project.trainings[this.project.trainings.length-1];
   }
 
+  /**
+  * Opens a specific training or training overview.
+  */
   openTraining() {
     if (this.lastTraining.status >= TrainingStatus.Training_Pending) {
       this.router.navigate(['/upload/training/overview/' + this.project.uuid + "/" + this.lastTraining.version]);
@@ -32,7 +35,9 @@ export class TileComponent implements OnInit, OnChanges {
     }
   }
 
-  // creates a new training and opens the training page
+  /**
+  * Creates a new training and opens the training page.
+  */
   createTraining() {
     this.trainingService.createTraining(this.project.uuid)
       .subscribe(training =>
