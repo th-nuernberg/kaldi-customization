@@ -8,13 +8,14 @@ The [report](https://git.informatik.fh-nuernberg.de/kaldi/documentation/blob/mas
  * [Docker Compose](https://docs.docker.com/compose/)
  * [Git](https://git-scm.com/) to download this repository
  * [Python3](https://www.python.org/) for the initialization
+ * Prerequisites for the python package [mysqlclient](https://pypi.org/project/mysqlclient/) also for the initialization
 
 ### Start the compose
  * Open a shell
  * Clone this repository to your local system: `git clone https://git.informatik.fh-nuernberg.de/kaldi/kaldi-customization.git` and switch into the repository folder (first time only)
  * Use the [env.cmd](env.cmd) or [env.sh](env.sh) script in your shell to setup the environment variables for docker-compose
  * Build or import missing docker images (first time only)
-    * kaldi-base: See [kaldi/base/README.md](kaldi/base/README.md)
+    * kaldi-base: See [kaldi/base/README.md](kaldi/base/README.md). Note: Make sure the name of the image matches the name in the corresponding [Dockerfile](worker/kaldi-worker/Dockerfile#L1).
     * Create all other images by starting the docker-compose or by executing `docker-compose build`
  * Start the customization service:
     * Load the compose with `docker-compose up` and have a cup of tea or coffee
@@ -25,6 +26,7 @@ The [report](https://git.informatik.fh-nuernberg.de/kaldi/documentation/blob/mas
         * Open another shell
         * `pipenv install` and `pipenv shell` to activate the pipenv shell
         * `pip install -r ./initialization/requirements.txt` to install the [requirements](initialization/requirements.txt)
+        * Note: If an error occurs, verify that the prerequisites for the python package [mysqlclient](https://pypi.org/project/mysqlclient/) are installed
     * Execute `python ./initialization/init.py` to prepare the database and upload default model data
 
 ### The customization service is now available
@@ -33,8 +35,9 @@ The [report](https://git.informatik.fh-nuernberg.de/kaldi/documentation/blob/mas
 
 ### Stop the service
  * Make sure that there are no running jobs like a training
- * Use `docker-compose down` in the repository folder or press `Ctrl + c` in the shell where you startet the compose
+ * Use `docker-compose stop` in the repository folder or press `Ctrl + c` in the shell where you startet the compose
  * All data (database, files) are stored persistantly on the local disk
+ * Use `docker-compose down` to shut down the service *and delete the database*
 
 ## Structure of the repository
 ### [/docker-compose.yml](docker-compose.yml)
