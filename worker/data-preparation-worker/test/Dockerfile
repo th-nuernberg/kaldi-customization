@@ -1,5 +1,5 @@
 FROM python:3.7-alpine3.9
-LABEL maintainer="Dino Pehratovic <@dinomite94>"
+LABEL maintainer="@dinomite94"
 
 RUN mkdir /test_data_prep_worker/ && \
     mkdir /tools/

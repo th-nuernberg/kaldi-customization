@@ -1,5 +1,5 @@
 FROM toksicon/kaldi-base:latest
-LABEL maintainer="Raphael Krauthann <@TheGarkine>"
+LABEL maintainer="@TheGarkine"
 
 ADD shared/connector/requirements.txt /kaldi/connector/requirements.txt
 
