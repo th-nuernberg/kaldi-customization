@@ -1,5 +1,5 @@
 FROM alpine:3.7
-LABEL maintainer="***REMOVED***"
+LABEL maintainer="Tobias Kruse <@toksicon>"
 
 ARG KALDI_ARGS=--shared
 

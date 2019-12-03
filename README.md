@@ -80,40 +80,4 @@ A SQL Server for the persistent data.
 An in memory Redis Server for the task queue.
 
 ### API Functions
-Work in progress...  
 See [localhost:8080/api/v1/ui](http://localhost:8080/api/v1/ui).
-
-| Category | Type | Function Name | Implemented |
-| -------- | ---- | ------------- | ----------- |
-| Project | GET | getProjects | True |
-| Project | POST | createProject | True |
-| Project | GET | getProjectByUuid | True |
-| Training | POST | createTraining | True |
-| Training | GET | getTrainingByVersion | True |
-| Training | PUT | startTrainingByVersion | True |
-| Training | GET | getCorpusOfTraining | True  |
-| Training | GET | downloadModelForTraining | True |
-| Training | POST | assignResourceToTraining | True |
-| Training | DELETE| deleteAssignedResourceFromTraining | True |
-| Training | GET | getCorpusofTrainingResource | True  |
-| Training | PUT | setCorpusOfTraining | True  |
-| User | GET | getUser | **False** |
-| User | POST | createUser | True |
-| User | POST | loginUser | **False** |
-| User | POST | logoutUser | **False** |
-| Decode | GET | getAllAudio| True |
-| Decode | POST | uploadAudio| True |
-| Decode | DELETE | deleteAudioByUuid | True |
-| Decode | GET | getAudioByUuid | True |
-| Decode | GET | getAudioData | True |
-| Decode | GET | getDecodings | True |
-| Decode | POST | assignAudioToDecode | True |
-| Decode | PUT | startDecode | True |
-| Decode | GET | getDecodingResult | True |
-| Global | GET | getAcousticModels | True |
-| Global | GET | downloadAcousticModel | True |
-| Global | GET | getDecodingResult | True |
-| Resource | GET | getResource | True | //Typo in Function Name//
-| Resource | POST | createResource | True |
-| Resource | GET | getResourceByUuid | True |
-| Resource | GET | getResourceData | True |
