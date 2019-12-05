@@ -2,7 +2,9 @@
 
 Contains the `Dockerfile` to build the `kaldi-base` image required by the `kaldi-worker` and `decode-worker`. It might take a while until this image is built (> 30 minutes), so the mentioned workers use the prebuilt `toksicon/kaldi-base` image from Docker Hub.
 
-As this repository is private, a Docker Hub account is required and access has to be granted ([contact](mailto:***REMOVED***)).
+As this repository requires SRILM (and the agreement to their software license and terms), it needs to be built locally.
+
+You need to provide the `srilm.tgz` file in this directory.
 
 
 ## Build Image

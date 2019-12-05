@@ -4,7 +4,7 @@ LABEL maintainer="@toksicon"
 ARG KALDI_ARGS=--shared
 
 
-COPY tools/extras/srilm-1.7.2.tar.gz /tmp/srilm.tgz
+COPY srilm.tgz /tmp/srilm.tgz
 
 # Install deps
 RUN apk add --no-cache --update \
