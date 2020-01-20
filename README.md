@@ -1,6 +1,5 @@
 # Kaldi Customization
-This is the main repository of the IT-Project "Missing Title".
-The [report](https://git.informatik.fh-nuernberg.de/kaldi/documentation/blob/master/report/report.pdf) with additional information is stored in the [documentation repository](https://git.informatik.fh-nuernberg.de/kaldi/documentation).
+This is the main repository of the IT-Project "Cloud Orchestrated Customized Speech Recognition".
 
 ## Quick start & initial setup guide
 ### Requirements
@@ -12,7 +11,7 @@ The [report](https://git.informatik.fh-nuernberg.de/kaldi/documentation/blob/mas
 
 ### Start the compose
  * Open a shell
- * Clone this repository to your local system: `git clone https://git.informatik.fh-nuernberg.de/kaldi/kaldi-customization.git` and switch into the repository folder (first time only)
+ * Clone this repository to your local system: `git clone https://github.com/th-nuernberg/kaldi-customization.git` and switch into the repository folder (first time only)
  * Use the [env.cmd](env.cmd) or [env.sh](env.sh) script in your shell to setup the environment variables for docker-compose
  * Build or import missing docker images (first time only)
     * kaldi-base: See [kaldi/base/README.md](kaldi/base/README.md). Note: Make sure the name of the image matches the name in the corresponding [Dockerfile](worker/kaldi-worker/Dockerfile#L1).
