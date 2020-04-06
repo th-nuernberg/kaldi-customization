@@ -1,8 +1,7 @@
 FROM python:3.7-alpine3.9
-LABEL maintainer="@dinomite94"
 
 RUN mkdir /test_text_prep_worker/ && \
-    mkdir /tools/ && \
+    mkdir -p /opt/tools/ && \
     mkdir /test_text_prep_worker/test-files
 
 ADD worker/text-preparation-worker/requirements.txt /test_text_prep_worker/requirements.txt
@@ -18,6 +17,6 @@ RUN apk update && \
 ADD worker/text-preparation-worker/test/src/ /test_text_prep_worker/
 ADD shared/minio_communication.py /test_text_prep_worker/
 ADD shared/connector/ /test_text_prep_worker/connector/
-ADD shared/wait-for.sh /tools/wait-for.sh
+ADD shared/wait-for.sh /opt/tools/wait-for.sh
 
 CMD ["python", "-u", "/test_text_prep_worker/test_text_preparation.py"]

@@ -1,10 +1,9 @@
 FROM python:2.7-alpine3.10
-LABEL maintainer="@dinomite94"
 
 RUN mkdir /data_prep_worker/ && \
     mkdir /data_prep_worker/in/ && \
     mkdir /data_prep_worker/out/ && \
-    mkdir /tools/
+    mkdir -p /opt/tools/
 
 ADD worker/data-preparation-worker/requirements.txt /data_prep_worker/requirements.txt
 WORKDIR /data_prep_worker
@@ -48,6 +47,6 @@ RUN git clone https://github.com/mitlm/mitlm.git && \
 ADD worker/data-preparation-worker/src /data_prep_worker/
 ADD shared/minio_communication.py  /data_prep_worker/
 ADD shared/connector/ /data_prep_worker/connector/
-ADD shared/wait-for.sh /tools/wait-for.sh
+ADD shared/wait-for.sh /opt/tools/wait-for.sh
 
 CMD ["python", "-u", "/data_prep_worker/data_preparation.py"]

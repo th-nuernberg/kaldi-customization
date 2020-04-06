@@ -1,5 +1,4 @@
 FROM node:8.15.1-alpine
-LABEL maintainer="@toksicon"
 
 EXPOSE 4200
 

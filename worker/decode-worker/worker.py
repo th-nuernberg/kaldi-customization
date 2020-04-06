@@ -153,8 +153,8 @@ if __name__ == "__main__":
             # decode
             try:
                 log_file_handler.write("Decoding of the downloaded audio files starts! \n")
-                os.chdir("/kaldi/scripts/")
-                subprocess.call("/kaldi/scripts/decode.sh"+ " {} {} {}".format(workspace_path, cur_acoustic_model_path, cur_graph_path),shell=True)
+                os.chdir("/opt/kaldi/scripts/")
+                subprocess.call("/opt/kaldi/scripts/decode.sh"+ " {} {} {}".format(workspace_path, cur_acoustic_model_path, cur_graph_path),shell=True)
                 os.chdir("/")
                 decode_path = os.path.join(cur_acoustic_model_path,"decode")
             except Exception as e:

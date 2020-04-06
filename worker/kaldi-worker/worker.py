@@ -87,8 +87,8 @@ if __name__ == "__main__":
             try:
                 log_file_handler.write("Processing continues by creating a new graph with the given training resources! \n")
                 new_graph_dir = os.path.join(script_root_path, "new_graph")
-                os.chdir("/kaldi/scripts/")
-                subprocess.call("/kaldi/scripts/create_new_graph.sh {} {} {} {} {} {}".format(lexicon_path, corpus_path,
+                os.chdir("/opt/kaldi/scripts/")
+                subprocess.call("/opt/kaldi/scripts/create_new_graph.sh {} {} {} {} {} {}".format(lexicon_path, corpus_path,
                                                                                           cur_acoustic_model_path, new_graph_dir, workspace_path, phone_symbol_table), shell=True)
                 os.chdir("/")
             except Exception as e:

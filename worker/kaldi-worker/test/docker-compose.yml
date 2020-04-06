@@ -13,9 +13,9 @@ services:
     depends_on:
       - redis
       - minio
-    command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
-              /bin/sh /tools/wait-for.sh redis:6379 -- \
-              python3 -u /kaldi/worker.py \
+    command: "/bin/sh /opt/tools/wait-for.sh minio:9000 -- \
+              /bin/sh /opt/tools/wait-for.sh redis:6379 -- \
+              python3 -u /opt/kaldi/worker.py \
                 --redis-host=redis --redis-password=${REDIS_PASSWORD} \
                 --minio-host=minio --minio-access-key=${MINIO_ACCESS_KEY} --minio-secret-key=${MINIO_SECRET_KEY}"
 
@@ -29,8 +29,8 @@ services:
     depends_on:
       - redis
       - minio
-    command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
-              /bin/sh /tools/wait-for.sh redis:6379 -- \
+    command: "/bin/sh /opt/tools/wait-for.sh minio:9000 -- \
+              /bin/sh /opt/tools/wait-for.sh redis:6379 -- \
               python -u /text_prep_worker/text_preparation.py \
                 --redis-host=redis --redis-password=${REDIS_PASSWORD} \
                 --minio-host=minio --minio-access-key=${MINIO_ACCESS_KEY} --minio-secret-key=${MINIO_SECRET_KEY}"
@@ -45,8 +45,8 @@ services:
     depends_on:
       - redis
       - minio
-    command: "/bin/sh /tools/wait-for.sh minio:9000 -- \
-              /bin/sh /tools/wait-for.sh redis:6379 -- \
+    command: "/bin/sh /opt/tools/wait-for.sh minio:9000 -- \
+              /bin/sh /opt/tools/wait-for.sh redis:6379 -- \
               python -u /data_prep_worker/data_preparation.py \
                 --redis-host=redis --redis-password=${REDIS_PASSWORD} \
                 --minio-host=minio --minio-access-key=${MINIO_ACCESS_KEY} --minio-secret-key=${MINIO_SECRET_KEY}"
@@ -113,9 +113,9 @@ services:
       - db
       - redis
       - minio
-    command: "/bin/sh /tools/wait-for.sh db:3306 -- \
-              /bin/sh /tools/wait-for.sh minio:9000 -- \
-              /bin/sh /tools/wait-for.sh redis:6379 -- \
+    command: "/bin/sh /opt/tools/wait-for.sh db:3306 -- \
+              /bin/sh /opt/tools/wait-for.sh minio:9000 -- \
+              /bin/sh /opt/tools/wait-for.sh redis:6379 -- \
               python -m flask run --host=0.0.0.0"
 
   web:

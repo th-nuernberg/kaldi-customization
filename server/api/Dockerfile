@@ -1,5 +1,4 @@
 FROM python:3.7-alpine3.9
-LABEL maintainer="@toksicon"
 
 EXPOSE 5000
 
@@ -14,7 +13,7 @@ RUN apk add build-base libffi-dev openssl-dev mariadb-connector-c-dev --no-cache
 
 ADD server/api/src /www
 ADD shared/connector /www/connector
-ADD shared/wait-for.sh /tools/wait-for.sh
+ADD shared/wait-for.sh /opt/tools/wait-for.sh
 ADD shared/minio_communication.py /www/minio_communication.py
 ADD shared/redis_config.py /www/redis_config.py
 
