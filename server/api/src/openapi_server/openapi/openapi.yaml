@@ -462,393 +462,10 @@ paths:
       tags:
       - training
       x-openapi-router-controller: openapi_server.controllers.training_controller
-  /project/{project_uuid}/training/{training_version}/corpus:
-    get:
-      description: Returns the entire corpus of the specified training
-      operationId: get_corpus_of_training
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      responses:
-        200:
-          content:
-            text/plain:
-              schema:
-                description: Corpus of the training
-                example: er horte leise schritte hinter sich das bedeutete nichts
-                  gutes wer wurde ihm schon folgen spat in der nacht und dazu noch
-                  in dieser engen gasse mitten im ubel beleumundeten hafenviertel
-                  gerade jetzt wo er das ding seines lebens gedreht hatte und mit
-                  der beute verschwinden wollte hatte einer seiner zahllosen kollegen
-                  dieselbe idee gehabt ihn beobachtet und abgewartet um ihn nun um
-                  die fruchte seiner arbeit zu erleichtern oder gehorten die schritte
-                  hinter ihm zu einem der unzahligen gesetzeshuter dieser stadt und
-                  die stahlerne acht um seine handgelenke wurde gleich zuschnappen
-                  er konnte die aufforderung stehen zu bleiben schon horen gehetzt
-                  sah er sich um plotzlich erblickte er den schmalen durchgang blitzartig
-                  drehte er sich nach rechts und verschwand zwischen den beiden gebauden
-                  beinahe ware er dabei uber den umgesturzten mulleimer gefallen der
-                  mitten im weg lag
-                type: string
-          description: Corpus as plain text
-        400:
-          content: {}
-          description: Training not prepared
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project or training not found
-      security:
-      - oauth:
-        - read:projects
-      summary: Get the entire corpus of the specified training
-      tags:
-      - training
-      x-openapi-router-controller: openapi_server.controllers.training_controller
-  /project/{project_uuid}/training/{training_version}/decode:
-    get:
-      description: Returns a list of all decodings for this training version
-      operationId: get_decodings
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/DecodeAudio'
-                type: array
-          description: List of decoding messages
-        400:
-          content: {}
-          description: Training not finished
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project or training not found
-      security:
-      - oauth:
-        - decode:projects
-      summary: List of all decodings
-      tags:
-      - decode
-      x-openapi-router-controller: openapi_server.controllers.decode_controller
-    post:
-      description: Assign audio to current decoding session
-      operationId: assign_audio_to_current_session
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AudioReferenceObject'
-        description: Audio that needs to be decoded
-        required: true
-      responses:
-        201:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DecodeAudio'
-          description: Audio successfully added to session
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project or training not found or no active session
-      security:
-      - oauth:
-        - decode:projects
-      summary: Assign Audio to decoding session
-      tags:
-      - decode
-      x-openapi-router-controller: openapi_server.controllers.decode_controller
-  /project/{project_uuid}/training/{training_version}/decode/session:
-    delete:
-      description: Delete the active decoding session
-      operationId: delete_decode_session
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      responses:
-        200:
-          content: {}
-          description: Session deleted
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project or training not found or no active decoding session
-      security:
-      - oauth:
-        - decode:projects
-      summary: Delete the decoding session
-      tags:
-      - decode
-      x-openapi-router-controller: openapi_server.controllers.decode_controller
-    get:
-      description: Get the current decode session
-      operationId: get_all_decode_sessions
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/DecodeSession'
-                type: array
-          description: The decode session for this training
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project or training not found
-      security:
-      - oauth:
-        - decode:projects
-      summary: Get the all sessions
-      tags:
-      - decode
-      x-openapi-router-controller: openapi_server.controllers.decode_controller
-    post:
-      description: Create a new decoding session
-      operationId: create_decode_session
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      responses:
-        201:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DecodeSession'
-          description: The new active DecodeSession
-        400:
-          content: {}
-          description: An active session already exists
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project or training not found
-      security:
-      - oauth:
-        - decode:projects
-      summary: Create a new decoding session
-      tags:
-      - decode
-      x-openapi-router-controller: openapi_server.controllers.decode_controller
-  /project/{project_uuid}/training/{training_version}/decode/session/current:
-    get:
-      description: Get the current decode session
-      operationId: get_current_decode_session
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DecodeSession'
-          description: The active DecodeSession
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project or training not found or session not started
-      security:
-      - oauth:
-        - decode:projects
-      summary: Get the current session
-      tags:
-      - decode
-      x-openapi-router-controller: openapi_server.controllers.decode_controller
-  /project/{project_uuid}/training/{training_version}/decode/session/{session_uuid}:
-    get:
-      description: Gets a specified session
-      operationId: get_decode_session
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      - description: UUID of the session
-        explode: false
-        in: path
-        name: session_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DecodeSession'
-          description: The queried decode session
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project, training or session not found
-      security:
-      - oauth:
-        - decode:projects
-      summary: Get a decode session
-      tags:
-      - decode
-      x-openapi-router-controller: openapi_server.controllers.decode_controller
-  /project/{project_uuid}/training/{training_version}/decode/session/{session_uuid}/commit:
+  /project/{project_uuid}/training/{training_version}/train:
     put:
-      description: Enqueue the currently active session for decoding
-      operationId: start_decode
+      description: Start the training process for the specified training
+      operationId: start_training_by_version
       parameters:
       - description: UUID of the project
         explode: false
@@ -867,249 +484,35 @@ paths:
         required: true
         schema:
           type: integer
-        style: simple
-      - description: UUID of the session
-        explode: false
-        in: path
-        name: session_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
         style: simple
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CallbackObject'
-        description: Callbackobject that gets executed after process
+        description: Callback to be executed after the operation ended
         required: false
       responses:
         202:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DecodeSession'
-          description: Session successfully commited
+                $ref: '#/components/schemas/Training'
+          description: Training successfully queued
         400:
           content: {}
-          description: Training not finished or session already in progress
+          description: training already done or pending
         403:
           content: {}
           description: Forbidden
         404:
           content: {}
           description: Project or training not found
-      security:
-      - oauth:
-        - decode:projects
-      summary: Commits the decode session for decoding
-      tags:
-      - decode
-      x-openapi-router-controller: openapi_server.controllers.decode_controller
-  /project/{project_uuid}/training/{training_version}/decode/session/{session_uuid}/log:
-    get:
-      description: Returns the log of a decoding session
-      operationId: get_decode_session_log
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      - description: UUID of the session
-        explode: false
-        in: path
-        name: session_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      responses:
-        200:
-          content:
-            text/plain:
-              schema:
-                description: Log of the decode session
-                type: string
-          description: log as plain text
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project, training or session not found
-      security:
-      - oauth:
-        - decode:projects
-      summary: Get decode session
-      tags:
-      - logging
-      x-openapi-router-controller: openapi_server.controllers.logging_controller
-  /project/{project_uuid}/training/{training_version}/decode/{audio_uuid}:
-    delete:
-      description: Unassign audio to current decoding session
-      operationId: unassign_audio_to_current_session
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      - description: UUID of the audio
-        explode: false
-        in: path
-        name: audio_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      responses:
-        201:
-          content: {}
-          description: Audio successfully unassigned from session
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project or training not found or no active session or audio
-            not in active session
-      security:
-      - oauth:
-        - decode:projects
-      summary: Unassign Audio to decoding session
-      tags:
-      - decode
-      x-openapi-router-controller: openapi_server.controllers.decode_controller
-    get:
-      description: Returns the result of a decoding task
-      operationId: get_decode_result
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      - description: UUID of the audio
-        explode: false
-        in: path
-        name: audio_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DecodeAudio'
-          description: Result of the decoding task
-        204:
-          content: {}
-          description: Decoding not yet completed
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project or training not found
-        415:
-          content: {}
-          description: Unsupported media type
-      security:
-      - oauth:
-        - decode:projects
-      summary: Get the result of a decoding task
-      tags:
-      - decode
-      x-openapi-router-controller: openapi_server.controllers.decode_controller
-  /project/{project_uuid}/training/{training_version}/model:
-    get:
-      description: Returns the model of the specified training
-      operationId: download_model_for_training
-      parameters:
-      - description: UUID of project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          type: string
-        style: simple
-      - description: Version of training
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      responses:
-        200:
-          content:
-            application/zip:
-              schema:
-                format: binary
-                type: string
-          description: Trained model content
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Page not found
       security:
       - oauth:
         - read:projects
-      summary: Returns the model
+        - train:projects
+      summary: Start the specified training
       tags:
       - training
       x-openapi-router-controller: openapi_server.controllers.training_controller
@@ -1211,6 +614,850 @@ paths:
       tags:
       - logging
       x-openapi-router-controller: openapi_server.controllers.logging_controller
+  /project/{project_uuid}/training/{training_version}/train/log:
+    get:
+      description: Returns the log of a training
+      operationId: get_training_log
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                description: Log of the training
+                type: string
+          description: log as plain text
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Get Training Log
+      tags:
+      - logging
+      x-openapi-router-controller: openapi_server.controllers.logging_controller
+  /project/{project_uuid}/training/{training_version}/stats:
+    get:
+      description: Returns the stats to be reviewed before training
+      operationId: get_training_stats
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataPrepStats'
+          description: Stats for this training
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Get Training Stats
+      tags:
+      - logging
+      x-openapi-router-controller: openapi_server.controllers.logging_controller
+  /project/{project_uuid}/training/{training_version}/corpus:
+    get:
+      description: Returns the entire corpus of the specified training
+      operationId: get_corpus_of_training
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                description: Corpus of the training
+                example: er horte leise schritte hinter sich das bedeutete nichts
+                  gutes wer wurde ihm schon folgen spat in der nacht und dazu noch
+                  in dieser engen gasse mitten im ubel beleumundeten hafenviertel
+                  gerade jetzt wo er das ding seines lebens gedreht hatte und mit
+                  der beute verschwinden wollte hatte einer seiner zahllosen kollegen
+                  dieselbe idee gehabt ihn beobachtet und abgewartet um ihn nun um
+                  die fruchte seiner arbeit zu erleichtern oder gehorten die schritte
+                  hinter ihm zu einem der unzahligen gesetzeshuter dieser stadt und
+                  die stahlerne acht um seine handgelenke wurde gleich zuschnappen
+                  er konnte die aufforderung stehen zu bleiben schon horen gehetzt
+                  sah er sich um plotzlich erblickte er den schmalen durchgang blitzartig
+                  drehte er sich nach rechts und verschwand zwischen den beiden gebauden
+                  beinahe ware er dabei uber den umgesturzten mulleimer gefallen der
+                  mitten im weg lag
+                type: string
+          description: Corpus as plain text
+        400:
+          content: {}
+          description: Training not prepared
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Get the entire corpus of the specified training
+      tags:
+      - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+  /project/{project_uuid}/training/{training_version}/vocabulary:
+    get:
+      description: Returns the entire vocabulary of the specified training
+      operationId: get_vocabulary_of_training
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                description: Vocabulary of the training
+                example: wort
+                  noch
+                  ein
+                  bla
+                type: string
+          description: Vocabulary as line-separated plain text
+        400:
+          content: {}
+          description: Training not prepared
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Get the entire vocabulary of the specified training
+      tags:
+      - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+  /project/{project_uuid}/training/{training_version}/lexicon:
+    get:
+      description: Returns the entire lexicon of the specified training
+      operationId: get_lexicon_of_training
+      parameters:
+        - description: UUID of the project
+          explode: false
+          in: path
+          name: project_uuid
+          required: true
+          schema:
+            example: 550e8400-e29b-11d4-a716-446655440000
+            format: uuid
+            type: string
+          style: simple
+        - description: Training version of the project
+          explode: false
+          in: path
+          name: training_version
+          required: true
+          schema:
+            type: integer
+          style: simple
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                description: Lexicon of the training
+                example: ["wort", "phoneme",
+                  "Anschriften", "a n S r I f t t @ n",
+                  "Bequemlichkeit", "b @ k v e: m l I C k a I t",
+                  "Cocktails", "k O m t a I l s",
+                  "Disco", "d I s k o:",
+                  "Euro", "O Y r o:",
+                  "Freund", "f r O Y n"]
+                type: array
+                items:
+                  type: string
+          description: Lexicon as line-separated plain text
+        400:
+          content: {}
+          description: Training not prepared
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+        - oauth:
+            - read:projects
+      summary: Get the entire lexicon of the specified training
+      tags:
+        - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+  /project/{project_uuid}/training/{training_version}/decode:
+    get:
+      description: Returns a list of all decodings for this training version
+      operationId: get_decodings
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/DecodeAudio'
+                type: array
+          description: List of decoding messages
+        400:
+          content: {}
+          description: Training not finished
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - decode:projects
+      summary: List of all decodings
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+    post:
+      description: Assign audio to current decoding session
+      operationId: assign_audio_to_current_session
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AudioReferenceObject'
+        description: Audio that needs to be decoded
+        required: true
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecodeAudio'
+          description: Audio successfully added to session
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found or no active session
+      security:
+      - oauth:
+        - decode:projects
+      summary: Assign Audio to decoding session
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+  /project/{project_uuid}/training/{training_version}/decode/session:
+    get:
+      description: Get the current decode session
+      operationId: get_all_decode_sessions
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+                schema:
+                  items:
+                    $ref: '#/components/schemas/DecodeSession'
+                  type: array
+          description: The decode session for this training
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - decode:projects
+      summary: Get the all sessions
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+    post:
+      description: Create a new decoding session
+      operationId: create_decode_session
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecodeSession'
+          description: The new active DecodeSession
+        400:
+          content: {}
+          description: An active session already exists
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - decode:projects
+      summary: Create a new decoding session
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+    delete:
+      description:  Delete the active decoding session
+      operationId: delete_decode_session
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content: {}
+          description: Session deleted
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found or no active decoding session
+      security:
+      - oauth:
+        - decode:projects
+      summary: Delete the decoding session
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+  /project/{project_uuid}/training/{training_version}/decode/session/current:
+    get:
+      description: Get the current decode session
+      operationId: get_current_decode_session
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecodeSession'
+          description: The active DecodeSession
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found or session not started
+      security:
+      - oauth:
+        - decode:projects
+      summary: Get the current session
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+  /project/{project_uuid}/training/{training_version}/decode/{audio_uuid}:
+    get:
+      description: Returns the result of a decoding task
+      operationId: get_decode_result
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: UUID of the audio
+        explode: false
+        in: path
+        name: audio_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecodeAudio'
+          description: Result of the decoding task
+        204:
+          content: {}
+          description: Decoding not yet completed
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+        415:
+          content: {}
+          description: Unsupported media type
+      security:
+      - oauth:
+        - decode:projects
+      summary: Get the result of a decoding task
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+    delete:
+      description: Unassign audio to current decoding session
+      operationId: unassign_audio_to_current_session
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: UUID of the audio
+        explode: false
+        in: path
+        name: audio_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        201:
+          content: {}
+          description: Audio successfully unassigned from session
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found or no active session or audio not in active session
+      security:
+      - oauth:
+        - decode:projects
+      summary: Unassign Audio to decoding session
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+  /project/{project_uuid}/training/{training_version}/decode/session/{session_uuid}:
+    get:
+      description: Gets a specified session
+      operationId: get_decode_session
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: UUID of the session
+        explode: false
+        in: path
+        name: session_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecodeSession'
+          description: The queried decode session
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project, training or session not found
+      security:
+      - oauth:
+        - decode:projects
+      summary: Get a decode session
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+  /project/{project_uuid}/training/{training_version}/decode/session/{session_uuid}/log:
+    get:
+      description: Returns the log of a decoding session
+      operationId: get_decode_session_log
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: UUID of the session
+        explode: false
+        in: path
+        name: session_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                description: Log of the decode session
+                type: string
+          description: log as plain text
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project, training or session not found
+      security:
+      - oauth:
+        - decode:projects
+      summary: Get decode session
+      tags:
+      - logging
+      x-openapi-router-controller: openapi_server.controllers.logging_controller
+  /project/{project_uuid}/training/{training_version}/decode/session/{session_uuid}/commit:
+    put:
+      description: Enqueue the currently active session for decoding
+      operationId: start_decode
+      parameters:
+      - description: UUID of the project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      - description: Training version of the project
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: UUID of the session
+        explode: false
+        in: path
+        name: session_uuid
+        required: true
+        schema:
+          example: 550e8400-e29b-11d4-a716-446655440000
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackObject'
+        description: Callbackobject that gets executed after process
+        required: false
+      responses:
+        202:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecodeSession'
+          description: Session successfully commited
+        400:
+          content: {}
+          description: Training not finished or session already in progress
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+      - oauth:
+        - decode:projects
+      summary: Commits the decode session for decoding
+      tags:
+      - decode
+      x-openapi-router-controller: openapi_server.controllers.decode_controller
+  /project/{project_uuid}/training/{training_version}/model:
+    get:
+      description: Returns the model of the specified training
+      operationId: download_model_for_training
+      parameters:
+      - description: UUID of project
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Version of training
+        explode: false
+        in: path
+        name: training_version
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        200:
+          content:
+            application/zip:
+              schema:
+                format: binary
+                type: string
+          description: Trained model content
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Page not found
+      security:
+      - oauth:
+        - read:projects
+      summary: Returns the model
+      tags:
+      - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
   /project/{project_uuid}/training/{training_version}/resource:
     post:
       description: Assign the specified resource to the training
@@ -1462,195 +1709,6 @@ paths:
       tags:
       - training
       x-openapi-router-controller: openapi_server.controllers.training_controller
-  /project/{project_uuid}/training/{training_version}/stats:
-    get:
-      description: Returns the stats to be reviewed before training
-      operationId: get_training_stats
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DataPrepStats'
-          description: Stats for this training
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project or training not found
-      security:
-      - oauth:
-        - read:projects
-      summary: Get Training Stats
-      tags:
-      - logging
-      x-openapi-router-controller: openapi_server.controllers.logging_controller
-  /project/{project_uuid}/training/{training_version}/train:
-    put:
-      description: Start the training process for the specified training
-      operationId: start_training_by_version
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CallbackObject'
-        description: Callback to be executed after the operation ended
-        required: false
-      responses:
-        202:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Training'
-          description: Training successfully queued
-        400:
-          content: {}
-          description: training already done or pending
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project or training not found
-      security:
-      - oauth:
-        - read:projects
-        - train:projects
-      summary: Start the specified training
-      tags:
-      - training
-      x-openapi-router-controller: openapi_server.controllers.training_controller
-  /project/{project_uuid}/training/{training_version}/train/log:
-    get:
-      description: Returns the log of a training
-      operationId: get_training_log
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      responses:
-        200:
-          content:
-            text/plain:
-              schema:
-                description: Log of the training
-                type: string
-          description: log as plain text
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project or training not found
-      security:
-      - oauth:
-        - read:projects
-      summary: Get Training Log
-      tags:
-      - logging
-      x-openapi-router-controller: openapi_server.controllers.logging_controller
-  /project/{project_uuid}/training/{training_version}/vocabulary:
-    get:
-      description: Returns the entire vocabulary of the specified training
-      operationId: get_vocabulary_of_training
-      parameters:
-      - description: UUID of the project
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          example: 550e8400-e29b-11d4-a716-446655440000
-          format: uuid
-          type: string
-        style: simple
-      - description: Training version of the project
-        explode: false
-        in: path
-        name: training_version
-        required: true
-        schema:
-          type: integer
-        style: simple
-      responses:
-        200:
-          content:
-            text/plain:
-              schema:
-                description: Vocabulary of the training
-                example: wort noch ein bla
-                type: string
-          description: Vocabulary as line-separated plain text
-        400:
-          content: {}
-          description: Training not prepared
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Project or training not found
-      security:
-      - oauth:
-        - read:projects
-      summary: Get the entire vocabulary of the specified training
-      tags:
-      - training
-      x-openapi-router-controller: openapi_server.controllers.training_controller
   /resource:
     get:
       operationId: get_resource
@@ -1735,6 +1793,40 @@ paths:
       tags:
       - resource
       x-openapi-router-controller: openapi_server.controllers.resource_controller
+  /resource/{resource_uuid}/log:
+    get:
+      description: Returns the log of a resource
+      operationId: get_resource_log
+      parameters:
+      - description: UUID of resource to return
+        explode: false
+        in: path
+        name: resource_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                description: Log of the training
+                type: string
+          description: log as plain text
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Page not found
+      security:
+      - oauth:
+        - read:resources
+      summary: Find resource by UUID
+      tags:
+      - logging
+      x-openapi-router-controller: openapi_server.controllers.logging_controller
   /resource/{resource_uuid}/data:
     get:
       description: Returns the resource content
@@ -1789,40 +1881,6 @@ paths:
       tags:
       - resource
       x-openapi-router-controller: openapi_server.controllers.resource_controller
-  /resource/{resource_uuid}/log:
-    get:
-      description: Returns the log of a resource
-      operationId: get_resource_log
-      parameters:
-      - description: UUID of resource to return
-        explode: false
-        in: path
-        name: resource_uuid
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        200:
-          content:
-            text/plain:
-              schema:
-                description: Log of the training
-                type: string
-          description: log as plain text
-        403:
-          content: {}
-          description: Forbidden
-        404:
-          content: {}
-          description: Page not found
-      security:
-      - oauth:
-        - read:resources
-      summary: Find resource by UUID
-      tags:
-      - logging
-      x-openapi-router-controller: openapi_server.controllers.logging_controller
   /user:
     get:
       description: Provides info about the logged in user.
@@ -2010,18 +2068,6 @@ components:
       - Decoding_Success
       - Decoding_Failure
     DecodeSession:
-      example:
-        creation_timestamp: 2000-01-23T04:56:07.000+00:00
-        session_uuid: 550e8400-e29b-11d4-a716-446655440000
-        decodings:
-        - transcripts:
-          - '{}'
-          - '{}'
-          session_uuid: 550e8400-e29b-11d4-a716-446655440000
-        - transcripts:
-          - '{}'
-          - '{}'
-          session_uuid: 550e8400-e29b-11d4-a716-446655440000
       properties:
         session_uuid:
           example: 550e8400-e29b-11d4-a716-446655440000
@@ -2364,7 +2410,7 @@ components:
     AudioReferenceWithCallbackObject:
       example:
         audio_uuid: 550e8400-e29b-11d4-a716-446655440000
-        callback: https://my-ci.example.org/callback
+        callback: 'https://my-ci.example.org/callback'
       properties:
         audio_uuid:
           description: UUID of the audio file
@@ -2386,9 +2432,6 @@ components:
       - upfile
       type: object
     CallbackObject:
-      example:
-        method: method
-        url: url
       properties:
         url:
           description: The URL to be called
@@ -2397,8 +2440,8 @@ components:
           description: Action to be performed (GET|POST)
           type: string
       required:
-      - method
       - url
+      - method
   securitySchemes:
     oauth:
       flows:
