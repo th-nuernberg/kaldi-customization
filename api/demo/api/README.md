@@ -115,6 +115,7 @@ Class | Method | HTTP request | Description
 *TrainingApi* | [**get_corpus_of_training**](docs/TrainingApi.md#get_corpus_of_training) | **GET** /project/{project_uuid}/training/{training_version}/corpus | Get the entire corpus of the specified training
 *TrainingApi* | [**get_corpus_of_training_resource**](docs/TrainingApi.md#get_corpus_of_training_resource) | **GET** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/corpus | Get the corpus of the resource
 *TrainingApi* | [**get_current_training_for_project**](docs/TrainingApi.md#get_current_training_for_project) | **GET** /project/{project_uuid}/training/current | Get current training
+*TrainingApi* | [**get_lexicon_of_training**](docs/TrainingApi.md#get_lexicon_of_training) | **GET** /project/{project_uuid}/training/{training_version}/lexicon | Get the entire lexicon of the specified training
 *TrainingApi* | [**get_training_by_version**](docs/TrainingApi.md#get_training_by_version) | **GET** /project/{project_uuid}/training/{training_version} | Find project training results by UUID
 *TrainingApi* | [**get_trainings_for_project**](docs/TrainingApi.md#get_trainings_for_project) | **GET** /project/{project_uuid}/training | Lists all Trainings of a Project
 *TrainingApi* | [**get_vocabulary_of_training**](docs/TrainingApi.md#get_vocabulary_of_training) | **GET** /project/{project_uuid}/training/{training_version}/vocabulary | Get the entire vocabulary of the specified training

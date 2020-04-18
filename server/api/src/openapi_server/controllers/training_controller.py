@@ -371,6 +371,21 @@ def get_current_training_for_project(project_uuid):  # noqa: E501
     return 'do some magic!'
 
 
+def get_lexicon_of_training(project_uuid, training_version):  # noqa: E501
+    """Get the entire lexicon of the specified training
+
+    Returns the entire lexicon of the specified training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid:
+    :param training_version: Training version of the project
+    :type training_version: int
+
+    :rtype: List[str]
+    """
+    return 'do some magic!'
+
+
 def get_training_by_version(project_uuid, training_version):  # noqa: E501
     """Find project training results by UUID
 

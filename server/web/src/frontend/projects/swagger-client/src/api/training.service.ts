@@ -437,6 +437,58 @@ export class TrainingService {
     }
 
     /**
+     * Get the entire lexicon of the specified training
+     * Returns the entire lexicon of the specified training
+     * @param project_uuid UUID of the project
+     * @param training_version Training version of the project
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getLexiconOfTraining(project_uuid: string, training_version: number, observe?: 'body', reportProgress?: boolean): Observable<Array<string>>;
+    public getLexiconOfTraining(project_uuid: string, training_version: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<string>>>;
+    public getLexiconOfTraining(project_uuid: string, training_version: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<string>>>;
+    public getLexiconOfTraining(project_uuid: string, training_version: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (project_uuid === null || project_uuid === undefined) {
+            throw new Error('Required parameter project_uuid was null or undefined when calling getLexiconOfTraining.');
+        }
+        if (training_version === null || training_version === undefined) {
+            throw new Error('Required parameter training_version was null or undefined when calling getLexiconOfTraining.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // authentication (oauth) required
+        if (this.configuration.accessToken) {
+            const accessToken = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken()
+                : this.configuration.accessToken;
+            headers = headers.set('Authorization', 'Bearer ' + accessToken);
+        }
+
+        // to determine the Accept header
+        const httpHeaderAccepts: string[] = [
+            'text/plain'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected !== undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<Array<string>>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/lexicon`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
      * Find project training results by UUID
      * Returns the training object
      * @param project_uuid UUID of the project
