@@ -84,6 +84,13 @@ class TestTrainingApi(unittest.TestCase):
         """
         pass
 
+    def test_get_lexicon_of_training_resource(self):
+        """Test case for get_lexicon_of_training_resource
+
+        Get the lexicon of the resource  # noqa: E501
+        """
+        pass
+
     def test_get_training_by_version(self):
         """Test case for get_training_by_version
 
@@ -116,6 +123,13 @@ class TestTrainingApi(unittest.TestCase):
         """Test case for set_corpus_of_training_resource
 
         Set the corpus of the resource  # noqa: E501
+        """
+        pass
+
+    def test_set_lexicon_of_training_resource(self):
+        """Test case for set_lexicon_of_training_resource
+
+        Set the lexicon of the resource  # noqa: E501
         """
         pass
 

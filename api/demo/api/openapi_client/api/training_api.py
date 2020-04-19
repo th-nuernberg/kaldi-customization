@@ -964,6 +964,130 @@ class TrainingApi(object):
             _request_timeout=local_var_params.get('_request_timeout'),
             collection_formats=collection_formats)
 
+    def get_lexicon_of_training_resource(self, project_uuid, training_version, resource_uuid, **kwargs):  # noqa: E501
+        """Get the lexicon of the resource  # noqa: E501
+
+        Returns the lexicon of the specified resource for this training  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_lexicon_of_training_resource(project_uuid, training_version, resource_uuid, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool: execute request asynchronously
+        :param str project_uuid: UUID of the project (required)
+        :param int training_version: Training version of the project (required)
+        :param str resource_uuid: UUID of the resource (required)
+        :param _preload_content: if False, the urllib3.HTTPResponse object will
+                                 be returned without reading/decoding response
+                                 data. Default is True.
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :return: list[list[str]]
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        return self.get_lexicon_of_training_resource_with_http_info(project_uuid, training_version, resource_uuid, **kwargs)  # noqa: E501
+
+    def get_lexicon_of_training_resource_with_http_info(self, project_uuid, training_version, resource_uuid, **kwargs):  # noqa: E501
+        """Get the lexicon of the resource  # noqa: E501
+
+        Returns the lexicon of the specified resource for this training  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_lexicon_of_training_resource_with_http_info(project_uuid, training_version, resource_uuid, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool: execute request asynchronously
+        :param str project_uuid: UUID of the project (required)
+        :param int training_version: Training version of the project (required)
+        :param str resource_uuid: UUID of the resource (required)
+        :param _return_http_data_only: response data without head status code
+                                       and headers
+        :param _preload_content: if False, the urllib3.HTTPResponse object will
+                                 be returned without reading/decoding response
+                                 data. Default is True.
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :return: tuple(list[list[str]], status_code(int), headers(HTTPHeaderDict))
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        local_var_params = locals()
+
+        all_params = ['project_uuid', 'training_version', 'resource_uuid']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        for key, val in six.iteritems(local_var_params['kwargs']):
+            if key not in all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method get_lexicon_of_training_resource" % key
+                )
+            local_var_params[key] = val
+        del local_var_params['kwargs']
+        # verify the required parameter 'project_uuid' is set
+        if ('project_uuid' not in local_var_params or
+                local_var_params['project_uuid'] is None):
+            raise ApiValueError("Missing the required parameter `project_uuid` when calling `get_lexicon_of_training_resource`")  # noqa: E501
+        # verify the required parameter 'training_version' is set
+        if ('training_version' not in local_var_params or
+                local_var_params['training_version'] is None):
+            raise ApiValueError("Missing the required parameter `training_version` when calling `get_lexicon_of_training_resource`")  # noqa: E501
+        # verify the required parameter 'resource_uuid' is set
+        if ('resource_uuid' not in local_var_params or
+                local_var_params['resource_uuid'] is None):
+            raise ApiValueError("Missing the required parameter `resource_uuid` when calling `get_lexicon_of_training_resource`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'project_uuid' in local_var_params:
+            path_params['project_uuid'] = local_var_params['project_uuid']  # noqa: E501
+        if 'training_version' in local_var_params:
+            path_params['training_version'] = local_var_params['training_version']  # noqa: E501
+        if 'resource_uuid' in local_var_params:
+            path_params['resource_uuid'] = local_var_params['resource_uuid']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['text/plain'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = ['oauth']  # noqa: E501
+
+        return self.api_client.call_api(
+            '/project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/lexicon', 'GET',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='list[list[str]]',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=local_var_params.get('async_req'),
+            _return_http_data_only=local_var_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=local_var_params.get('_preload_content', True),
+            _request_timeout=local_var_params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
     def get_training_by_version(self, project_uuid, training_version, **kwargs):  # noqa: E501
         """Find project training results by UUID  # noqa: E501
 
@@ -1544,6 +1668,138 @@ class TrainingApi(object):
 
         return self.api_client.call_api(
             '/project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/corpus', 'PUT',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type=None,  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=local_var_params.get('async_req'),
+            _return_http_data_only=local_var_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=local_var_params.get('_preload_content', True),
+            _request_timeout=local_var_params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def set_lexicon_of_training_resource(self, project_uuid, training_version, resource_uuid, request_body, **kwargs):  # noqa: E501
+        """Set the lexicon of the resource  # noqa: E501
+
+        Updates the lexicon of the specified resource for this training  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.set_lexicon_of_training_resource(project_uuid, training_version, resource_uuid, request_body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool: execute request asynchronously
+        :param str project_uuid: UUID of the project (required)
+        :param int training_version: Training version of the project (required)
+        :param str resource_uuid: UUID of the resource (required)
+        :param list[list[str]] request_body: New or updated lexicon as array with string-pairs (required)
+        :param _preload_content: if False, the urllib3.HTTPResponse object will
+                                 be returned without reading/decoding response
+                                 data. Default is True.
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :return: None
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        return self.set_lexicon_of_training_resource_with_http_info(project_uuid, training_version, resource_uuid, request_body, **kwargs)  # noqa: E501
+
+    def set_lexicon_of_training_resource_with_http_info(self, project_uuid, training_version, resource_uuid, request_body, **kwargs):  # noqa: E501
+        """Set the lexicon of the resource  # noqa: E501
+
+        Updates the lexicon of the specified resource for this training  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.set_lexicon_of_training_resource_with_http_info(project_uuid, training_version, resource_uuid, request_body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool: execute request asynchronously
+        :param str project_uuid: UUID of the project (required)
+        :param int training_version: Training version of the project (required)
+        :param str resource_uuid: UUID of the resource (required)
+        :param list[list[str]] request_body: New or updated lexicon as array with string-pairs (required)
+        :param _return_http_data_only: response data without head status code
+                                       and headers
+        :param _preload_content: if False, the urllib3.HTTPResponse object will
+                                 be returned without reading/decoding response
+                                 data. Default is True.
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :return: None
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        local_var_params = locals()
+
+        all_params = ['project_uuid', 'training_version', 'resource_uuid', 'request_body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        for key, val in six.iteritems(local_var_params['kwargs']):
+            if key not in all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method set_lexicon_of_training_resource" % key
+                )
+            local_var_params[key] = val
+        del local_var_params['kwargs']
+        # verify the required parameter 'project_uuid' is set
+        if ('project_uuid' not in local_var_params or
+                local_var_params['project_uuid'] is None):
+            raise ApiValueError("Missing the required parameter `project_uuid` when calling `set_lexicon_of_training_resource`")  # noqa: E501
+        # verify the required parameter 'training_version' is set
+        if ('training_version' not in local_var_params or
+                local_var_params['training_version'] is None):
+            raise ApiValueError("Missing the required parameter `training_version` when calling `set_lexicon_of_training_resource`")  # noqa: E501
+        # verify the required parameter 'resource_uuid' is set
+        if ('resource_uuid' not in local_var_params or
+                local_var_params['resource_uuid'] is None):
+            raise ApiValueError("Missing the required parameter `resource_uuid` when calling `set_lexicon_of_training_resource`")  # noqa: E501
+        # verify the required parameter 'request_body' is set
+        if ('request_body' not in local_var_params or
+                local_var_params['request_body'] is None):
+            raise ApiValueError("Missing the required parameter `request_body` when calling `set_lexicon_of_training_resource`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'project_uuid' in local_var_params:
+            path_params['project_uuid'] = local_var_params['project_uuid']  # noqa: E501
+        if 'training_version' in local_var_params:
+            path_params['training_version'] = local_var_params['training_version']  # noqa: E501
+        if 'resource_uuid' in local_var_params:
+            path_params['resource_uuid'] = local_var_params['resource_uuid']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'request_body' in local_var_params:
+            body_params = local_var_params['request_body']
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['text/plain'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = ['oauth']  # noqa: E501
+
+        return self.api_client.call_api(
+            '/project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/lexicon', 'PUT',
             path_params,
             query_params,
             header_params,
