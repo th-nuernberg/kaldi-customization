@@ -444,9 +444,9 @@ export class TrainingService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getLexiconOfTraining(project_uuid: string, training_version: number, observe?: 'body', reportProgress?: boolean): Observable<Array<string>>;
-    public getLexiconOfTraining(project_uuid: string, training_version: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<string>>>;
-    public getLexiconOfTraining(project_uuid: string, training_version: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<string>>>;
+    public getLexiconOfTraining(project_uuid: string, training_version: number, observe?: 'body', reportProgress?: boolean): Observable<Array<Array<string>>>;
+    public getLexiconOfTraining(project_uuid: string, training_version: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Array<string>>>>;
+    public getLexiconOfTraining(project_uuid: string, training_version: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Array<string>>>>;
     public getLexiconOfTraining(project_uuid: string, training_version: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (project_uuid === null || project_uuid === undefined) {
             throw new Error('Required parameter project_uuid was null or undefined when calling getLexiconOfTraining.');
@@ -478,7 +478,7 @@ export class TrainingService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<Array<string>>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/lexicon`,
+        return this.httpClient.get<Array<Array<string>>>(`${this.configuration.basePath}/project/${encodeURIComponent(String(project_uuid))}/training/${encodeURIComponent(String(training_version))}/lexicon`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,

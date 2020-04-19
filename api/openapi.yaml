@@ -842,16 +842,18 @@ paths:
             text/plain:
               schema:
                 description: Lexicon of the training
-                example: ["wort", "phoneme",
-                  "Anschriften", "a n S r I f t t @ n",
-                  "Bequemlichkeit", "b @ k v e: m l I C k a I t",
-                  "Cocktails", "k O m t a I l s",
-                  "Disco", "d I s k o:",
-                  "Euro", "O Y r o:",
-                  "Freund", "f r O Y n"]
+                example: [["wort", "phoneme"],
+                  ["Anschriften", "a n S r I f t t @ n"],
+                  ["Bequemlichkeit", "b @ k v e: m l I C k a I t"],
+                  ["Cocktails", "k O m t a I l s"],
+                  ["Disco", "d I s k o:"],
+                  ["Euro", "O Y r o:"],
+                  ["Freund", "f r O Y n"]]
                 type: array
                 items:
-                  type: string
+                  type: array
+                  items:
+                    type: string
           description: Lexicon as line-separated plain text
         400:
           content: {}

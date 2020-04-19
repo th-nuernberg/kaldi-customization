@@ -381,7 +381,7 @@ def get_lexicon_of_training(project_uuid, training_version):  # noqa: E501
     :param training_version: Training version of the project
     :type training_version: int
 
-    :rtype: List[str]
+    :rtype: List[List[str]]
     """
     return 'do some magic!'
 
