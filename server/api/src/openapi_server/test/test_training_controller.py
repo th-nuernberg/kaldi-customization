@@ -133,6 +133,38 @@ class TestTrainingController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    def test_get_lexicon_of_training(self):
+        """Test case for get_lexicon_of_training
+
+        Get the entire lexicon of the specified training
+        """
+        headers = {
+            'Accept': 'text/plain',
+            'Authorization': 'Bearer special-key',
+        }
+        response = self.client.open(
+            '/api/v1/project/{project_uuid}/training/{training_version}/lexicon'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56),
+            method='GET',
+            headers=headers)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_get_lexicon_of_training_resource(self):
+        """Test case for get_lexicon_of_training_resource
+
+        Get the lexicon of the resource
+        """
+        headers = {
+            'Accept': 'text/plain',
+            'Authorization': 'Bearer special-key',
+        }
+        response = self.client.open(
+            '/api/v1/project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/lexicon'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56, resource_uuid=550e8400-e29b-11d4-a716-446655440000),
+            method='GET',
+            headers=headers)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     def test_get_training_by_version(self):
         """Test case for get_training_by_version
 
@@ -219,6 +251,26 @@ class TestTrainingController(BaseTestCase):
             method='PUT',
             headers=headers,
             data=json.dumps(body),
+            content_type='text/plain')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    @unittest.skip("text/plain not supported by Connexion")
+    def test_set_lexicon_of_training_resource(self):
+        """Test case for set_lexicon_of_training_resource
+
+        Set the lexicon of the resource
+        """
+        request_body = []
+        headers = {
+            'Content-Type': 'text/plain',
+            'Authorization': 'Bearer special-key',
+        }
+        response = self.client.open(
+            '/api/v1/project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/lexicon'.format(project_uuid=550e8400-e29b-11d4-a716-446655440000, training_version=56, resource_uuid=550e8400-e29b-11d4-a716-446655440000),
+            method='PUT',
+            headers=headers,
+            data=json.dumps(request_body),
             content_type='text/plain')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
