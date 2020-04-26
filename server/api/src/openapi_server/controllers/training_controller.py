@@ -410,7 +410,8 @@ def get_lexicon_of_training(project_uuid, training_version):  # noqa: E501
     lex = []
     for entry in entrys:
         # print(entry)
-        lex.append(re.split(r'\t+', entry.rstrip('\t')))
+        #lex.append(re.split(r'\t+', entry.rstrip('\t')))
+        lex.append(entry.split(maxsplit=1))
 
     return lex
 
@@ -464,7 +465,8 @@ def get_lexicon_of_training_resource(project_uuid, training_version, resource_uu
     lex = []
     for entry in entrys:
         # print(entry)
-        lex.append(re.split(r'\t+', entry.rstrip('\t')))
+        #lex.append(re.split(r'\t+', entry.rstrip('\t')))
+        lex.append(entry.split(maxsplit=1))
 
     return lex if status else ""
 
@@ -722,7 +724,8 @@ def set_lexicon_of_training_resource(project_uuid, training_version, resource_uu
 
     tmp = []
     for t in request_body:
-        tmp.append("\t".join(t))
+        #tmp.append("\t".join(t))
+        tmp.append(" ".join(t))
     lex = "\n".join(tmp)
 
     f = tempfile.NamedTemporaryFile()
