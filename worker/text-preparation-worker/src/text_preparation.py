@@ -99,6 +99,8 @@ def process_file(file_type, resource_uuid, minio_client, log_file_handler):
         return (False, "Failed to parse the received file")
 
     # Step 4: Save corpus locally
+    #TODO: Save lexicon locally
+
     try:
         log_file_handler.write("Trying to save the corpus file locally \n")
         corpus_name = resource_uuid + "_corpus"
@@ -111,6 +113,8 @@ def process_file(file_type, resource_uuid, minio_client, log_file_handler):
         return (False, "Failed to save the corpus file")
 
     # Step 5: Upload corpus in bucket
+    #TODO: Upload lexicon in bucket
+
     log_file_handler.write("Trying to upload the corpus file into its corresponding MinIO-bucket \n")
     corpus_path = text_prep_output + corpus_name
     corpus_upload_result = upload_to_bucket(minio_client, minio_buckets["RESOURCE_BUCKET"], resource_uuid + "/corpus.txt", corpus_path)

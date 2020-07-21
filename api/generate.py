@@ -13,7 +13,7 @@ tools_dir = os.path.join(script_dir, 'tools')
 out_dir = os.path.join(script_dir, 'out')
 
 tools = {
-    'openapi-generator-cli.jar': 'http://central.maven.org/maven2/org/openapitools/openapi-generator-cli/4.0.3/openapi-generator-cli-4.0.3.jar'
+    'openapi-generator-cli.jar': 'https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/4.0.3/openapi-generator-cli-4.0.3.jar'
 }
 
 

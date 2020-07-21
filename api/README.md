@@ -9,17 +9,57 @@ The generator uses this file to generate the server and client code. The *client
 As the generated *server only contains empty function bodies*, it is required to *merge* the newly generated code with the already existing implementation of the server. 
 
 
-## Generate a new API Server and Clients (`generate.py`, `generator/`)
+# How to change the API
+
+There are several steps to make changes to the API!
+
+1) **Customize interface** <br> 
+    Make the desired change in the yaml-file in
+    ```
+    kaldi-customization/api/openapi.yaml
+    ```
+2) **CleanUp of old generated files** <br>
+    It is urgently necessary to delete the old generated files to ensure a new clean generation. <br>
+    The following folders must be deleted:
+    ```
+    kaldi-customization/api/out
+    kaldi-customization/api/tools
+    ```
+3) **Generate new interface** <br>
+    Run python-file to generate new interface:
+    ```
+    kaldi-customization/api/generate.py
+    ```
+4) **Check & merge server logic** <br>
+    After generating the new interface, you need to check the differences of all files that contain server-logic in:
+    ```
+    generated:              kaldi-customization/api/out/server/openapi_server
+    existing server-logic:  kaldi-customization/server/api/src/openapi_server
+    ```
+    Merge the generated new functions into the server-logic. <br>
+    *Diff- and merge-tools of an IDEA like PYCharm can assist you.*
+    
+5) **Update server-interface** <br>
+    Apply the interface definition for the server:
+    ```
+    new def.:       kaldi-customization/api/openapi.yaml
+    server def.:    kaldi-customization/server/api/src/openapi_server/openapi/openapi.yaml
+    ```
+   
+
+
+
+# Generate a new API Server and Clients (`generate.py`, `generator/`)
 
 Execute the `generate.py` script to generate the Python API Server and a Python client for the workflow demo and a TypeScript client for the frontend.
 
 ```python3 generate.py``` *or* ```python generate.py``` (assuming `python(.exe)` is Python 3)
 
-### Clients
+## Clients
 
 The clients are moved to the destinations in `kaldi-customization/api/demo/api` and `kaldi-customization/server/web/src/frontend/projects/swagger-client/src` automatically.
 
-### Server
+## Server
 
 As previous mentioned, it is not possible to override the API server. A manual merge of the newly generated code from `out/server/opernapi_server` into the existing code in `kaldi-customization/server/api/src/openapi_server` is required.
 
@@ -28,7 +68,7 @@ To have a look what changed, the `python3 generator/diff.py` script can be execu
 *Nevertheless, it is highly recommended to use a merge tool to perform the API server update.*
 
 
-## API Workflow Demo (`demo/`)
+# API Workflow Demo (`demo/`)
 
 Contains a sample workflow using the generated Python API client (on `http://localhost:8080/api/v1`):
  * Create Project
@@ -39,15 +79,15 @@ Contains a sample workflow using the generated Python API client (on `http://loc
  * Decode Audio Files with Trained Model
 
 
-## Known Issues
+# Known Issues
 
-### Type `File` (OpenAPI Generator Bug)
+## Type `File` (OpenAPI Generator Bug)
 A defined type named `File` is generated to `java.io.File` in Python imports.
 
 **Solution:**  
 Do not define a type named `File`
 
-### Required Positional Argument (OpenAPI Generator Bug)
+## Required Positional Argument (OpenAPI Generator Bug)
 A positional argument has no default value, but will be set in the function body, if no value is passed by the caller.
 
 ```
@@ -58,7 +98,7 @@ if connexion.request.is_json:
 **Solution:**  
 Add a default value `<argument>=None` to the concerned positional argument in the argument list manually.
 
-### Responses of Content Type `text/plain` (OpenAPI Generator Bug)
+## Responses of Content Type `text/plain` (OpenAPI Generator Bug)
 A generated TypeScript client tries to parse responses of content type `text/plain` as JSON.
 
 **Solution:**

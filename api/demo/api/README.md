@@ -115,11 +115,14 @@ Class | Method | HTTP request | Description
 *TrainingApi* | [**get_corpus_of_training**](docs/TrainingApi.md#get_corpus_of_training) | **GET** /project/{project_uuid}/training/{training_version}/corpus | Get the entire corpus of the specified training
 *TrainingApi* | [**get_corpus_of_training_resource**](docs/TrainingApi.md#get_corpus_of_training_resource) | **GET** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/corpus | Get the corpus of the resource
 *TrainingApi* | [**get_current_training_for_project**](docs/TrainingApi.md#get_current_training_for_project) | **GET** /project/{project_uuid}/training/current | Get current training
+*TrainingApi* | [**get_lexicon_of_training**](docs/TrainingApi.md#get_lexicon_of_training) | **GET** /project/{project_uuid}/training/{training_version}/lexicon | Get the entire lexicon of the specified training
+*TrainingApi* | [**get_lexicon_of_training_resource**](docs/TrainingApi.md#get_lexicon_of_training_resource) | **GET** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/lexicon | Get the lexicon of the resource
 *TrainingApi* | [**get_training_by_version**](docs/TrainingApi.md#get_training_by_version) | **GET** /project/{project_uuid}/training/{training_version} | Find project training results by UUID
 *TrainingApi* | [**get_trainings_for_project**](docs/TrainingApi.md#get_trainings_for_project) | **GET** /project/{project_uuid}/training | Lists all Trainings of a Project
 *TrainingApi* | [**get_vocabulary_of_training**](docs/TrainingApi.md#get_vocabulary_of_training) | **GET** /project/{project_uuid}/training/{training_version}/vocabulary | Get the entire vocabulary of the specified training
 *TrainingApi* | [**prepare_training_by_version**](docs/TrainingApi.md#prepare_training_by_version) | **PUT** /project/{project_uuid}/training/{training_version}/prepare | Prepare the specified training
 *TrainingApi* | [**set_corpus_of_training_resource**](docs/TrainingApi.md#set_corpus_of_training_resource) | **PUT** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/corpus | Set the corpus of the resource
+*TrainingApi* | [**set_lexicon_of_training_resource**](docs/TrainingApi.md#set_lexicon_of_training_resource) | **PUT** /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/lexicon | Set the lexicon of the resource
 *TrainingApi* | [**start_training_by_version**](docs/TrainingApi.md#start_training_by_version) | **PUT** /project/{project_uuid}/training/{training_version}/train | Start the specified training
 *UserApi* | [**create_user**](docs/UserApi.md#create_user) | **POST** /user | Create user
 *UserApi* | [**get_user**](docs/UserApi.md#get_user) | **GET** /user | Get current user

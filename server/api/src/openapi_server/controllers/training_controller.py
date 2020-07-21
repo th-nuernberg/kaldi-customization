@@ -26,6 +26,8 @@ import json
 from mapper import mapper
 from flask import stream_with_context, Response
 
+import re
+
 
 def get_db_project_training(project_uuid, training_version):
     """
@@ -371,6 +373,104 @@ def get_current_training_for_project(project_uuid):  # noqa: E501
     return 'do some magic!'
 
 
+def get_lexicon_of_training(project_uuid, training_version):  # noqa: E501
+    """Get the entire lexicon of the specified training
+
+    Returns the entire lexicon of the specified training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid:
+    :param training_version: Training version of the project
+    :type training_version: int
+
+    :rtype: List[List[str]]
+    """
+
+    current_user = connexion.context['token_info']['user']
+
+    db_project = DB_Project.query.filter_by(uuid=project_uuid).first()
+
+    if not db_project:
+        return ("Project not found", 404)
+
+    db_training = DB_Training.query.filter_by(version=training_version, project_id=db_project.id).first()
+
+    if not db_training:
+        return ("Training not found", 404)
+
+    status, stream = download_from_bucket(minio_client,
+                                          bucket=minio_buckets["TRAINING_BUCKET"],
+                                          filename="{}/lexicon.txt".format(db_training.id)
+                                          )
+
+    if not status:  # means no success
+        return ("File not found", 404)
+
+    entrys = stream.read().decode('utf-8').splitlines()
+    lex = []
+    for entry in entrys:
+        # print(entry)
+        #lex.append(re.split(r'\t+', entry.rstrip('\t')))
+        lex.append(entry.split(maxsplit=1))
+
+    return lex
+
+
+def get_lexicon_of_training_resource(project_uuid, training_version, resource_uuid):  # noqa: E501
+    """Get the lexicon of the resource
+
+    Returns the lexicon of the specified resource for this training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid:
+    :param training_version: Training version of the project
+    :type training_version: int
+    :param resource_uuid: UUID of the resource
+    :type resource_uuid:
+
+    :rtype: List[List[str]]
+    """
+    current_user = connexion.context['token_info']['user']
+
+    db_project = DB_Project.query.filter_by(
+        uuid=project_uuid, owner_id=current_user.id).first()
+
+    if db_project is None:
+        return ("Project not found", 404)
+
+    db_training = DB_Training.query.filter_by(version=training_version) \
+        .filter_by(project_id=db_project.id).first()
+
+    if db_training is None:
+        return ("Training not found", 404)
+
+    db_resource = DB_Resource.query.filter(
+        DB_Resource.uuid == resource_uuid).first()
+
+    if db_resource is None:
+        return ("Resource not found", 404)
+
+    db_training_resource = DB_TrainingResource.query.filter_by(origin_id=db_resource.id) \
+        .filter_by(training_id=db_training.id).first()
+
+    if db_training_resource is None:
+        return ("Resource not assigned to this Training", 404)
+
+    status, stream = download_from_bucket(
+        minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], "{}/lexicon.txt".format(db_training_resource.id))
+
+    print(db_training_resource.id)
+
+    entrys = stream.read().decode('utf-8').splitlines()
+    lex = []
+    for entry in entrys:
+        # print(entry)
+        #lex.append(re.split(r'\t+', entry.rstrip('\t')))
+        lex.append(entry.split(maxsplit=1))
+
+    return lex if status else ""
+
+
 def get_training_by_version(project_uuid, training_version):  # noqa: E501
     """Find project training results by UUID
 
@@ -570,6 +670,70 @@ def set_corpus_of_training_resource(project_uuid, training_version, resource_uui
 
     upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], str(
         db_training_resource.id) + "/corpus.txt", f.name)
+
+    f.close()
+    return ("Success", 200)
+
+
+def set_lexicon_of_training_resource(project_uuid, training_version, resource_uuid, request_body):  # noqa: E501
+    """Set the lexicon of the resource
+
+    Updates the lexicon of the specified resource for this training # noqa: E501
+
+    :param project_uuid: UUID of the project
+    :type project_uuid:
+    :param training_version: Training version of the project
+    :type training_version: int
+    :param resource_uuid: UUID of the resource
+    :type resource_uuid:
+    :param request_body: New or updated lexicon as array with string-pairs
+    :type request_body: List[]
+
+    :rtype: None
+    """
+    current_user = connexion.context['token_info']['user']
+
+    db_project = DB_Project.query.filter_by(
+        uuid=project_uuid, owner_id=current_user.id).first()
+
+    if db_project is None:
+        return ("Project not found", 404)
+
+    db_training = DB_Training.query.filter_by(version=training_version) \
+        .filter_by(project_id=db_project.id).first()
+
+    if db_training is None:
+        return ("Training not found", 404)
+
+    if db_training.status not in (
+    DB_TrainingStateEnum.Init, DB_TrainingStateEnum.Trainable, DB_TrainingStateEnum.TextPrep_Pending,
+    DB_TrainingStateEnum.TextPrep_Failure):
+        return ("Training already started or done", 409)
+
+    db_resource = DB_Resource.query.filter(
+        DB_Resource.uuid == resource_uuid).first()
+
+    if db_resource is None:
+        return ("Resource not found", 404)
+
+    db_training_resource = DB_TrainingResource.query.filter_by(origin_id=db_resource.id) \
+        .filter_by(training_id=db_training.id).first()
+
+    if db_training_resource is None:
+        return ("Resource not assigned to this Training", 404)
+
+    tmp = []
+    for t in request_body:
+        #tmp.append("\t".join(t))
+        tmp.append(" ".join(t))
+    lex = "\n".join(tmp)
+
+    f = tempfile.NamedTemporaryFile()
+    f.write(lex)
+    f.flush()
+
+    upload_to_bucket(minio_client, minio_buckets["TRAINING_RESOURCE_BUCKET"], str(
+        db_training_resource.id) + "/lexicon.txt", f.name)
 
     f.close()
     return ("Success", 200)

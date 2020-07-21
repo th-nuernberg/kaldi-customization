@@ -2,6 +2,7 @@ dfs/
 
 .DS_Store
 *.pyc
+srilm.tgz
 
 ### Idea ###
 .idea/

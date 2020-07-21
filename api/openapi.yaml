@@ -813,6 +813,64 @@ paths:
       tags:
       - training
       x-openapi-router-controller: openapi_server.controllers.training_controller
+  /project/{project_uuid}/training/{training_version}/lexicon:
+    get:
+      description: Returns the entire lexicon of the specified training
+      operationId: get_lexicon_of_training
+      parameters:
+        - description: UUID of the project
+          explode: false
+          in: path
+          name: project_uuid
+          required: true
+          schema:
+            example: 550e8400-e29b-11d4-a716-446655440000
+            format: uuid
+            type: string
+          style: simple
+        - description: Training version of the project
+          explode: false
+          in: path
+          name: training_version
+          required: true
+          schema:
+            type: integer
+          style: simple
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                description: Lexicon of the training
+                example: [["wort", "phoneme"],
+                  ["Anschriften", "a n S r I f t t @ n"],
+                  ["Bequemlichkeit", "b @ k v e: m l I C k a I t"],
+                  ["Cocktails", "k O m t a I l s"],
+                  ["Disco", "d I s k o:"],
+                  ["Euro", "O Y r o:"],
+                  ["Freund", "f r O Y n"]]
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: string
+          description: Lexicon as array with string-pairs
+        400:
+          content: {}
+          description: Training not prepared
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+        - oauth:
+            - read:projects
+      summary: Get the entire lexicon of the specified training
+      tags:
+        - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
   /project/{project_uuid}/training/{training_version}/decode:
     get:
       description: Returns a list of all decodings for this training version
@@ -1653,6 +1711,142 @@ paths:
       tags:
       - training
       x-openapi-router-controller: openapi_server.controllers.training_controller
+  /project/{project_uuid}/training/{training_version}/resource/{resource_uuid}/lexicon:
+    get:
+      description: Returns the lexicon of the specified resource for this training
+      operationId: get_lexicon_of_training_resource
+      parameters:
+        - description: UUID of the project
+          explode: false
+          in: path
+          name: project_uuid
+          required: true
+          schema:
+            example: 550e8400-e29b-11d4-a716-446655440000
+            format: uuid
+            type: string
+          style: simple
+        - description: Training version of the project
+          explode: false
+          in: path
+          name: training_version
+          required: true
+          schema:
+            type: integer
+          style: simple
+        - description: UUID of the resource
+          explode: false
+          in: path
+          name: resource_uuid
+          required: true
+          schema:
+            example: 550e8400-e29b-11d4-a716-446655440000
+            format: uuid
+            type: string
+          style: simple
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                description: Lexicon of the training
+                example: [["wort", "phoneme"],
+                  ["Anschriften", "a n S r I f t t @ n"],
+                  ["Bequemlichkeit", "b @ k v e: m l I C k a I t"],
+                  ["Cocktails", "k O m t a I l s"],
+                  ["Disco", "d I s k o:"],
+                  ["Euro", "O Y r o:"],
+                  ["Freund", "f r O Y n"]]
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: string
+          description: Lexicon as array with string-pairs
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Project or training not found
+      security:
+        - oauth:
+            - read:projects
+            - read:resources
+      summary: Get the lexicon of the resource
+      tags:
+        - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
+    put:
+      description: Updates the lexicon of the specified resource for this training
+      operationId: set_lexicon_of_training_resource
+      parameters:
+        - description: UUID of the project
+          explode: false
+          in: path
+          name: project_uuid
+          required: true
+          schema:
+            example: 550e8400-e29b-11d4-a716-446655440000
+            format: uuid
+            type: string
+          style: simple
+        - description: Training version of the project
+          explode: false
+          in: path
+          name: training_version
+          required: true
+          schema:
+            type: integer
+          style: simple
+        - description: UUID of the resource
+          explode: false
+          in: path
+          name: resource_uuid
+          required: true
+          schema:
+            example: 550e8400-e29b-11d4-a716-446655440000
+            format: uuid
+            type: string
+          style: simple
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              description: Lexicon of the training
+              example: [["wort", "phoneme"],
+                ["Anschriften", "a n S r I f t t @ n"],
+                ["Bequemlichkeit", "b @ k v e: m l I C k a I t"],
+                ["Cocktails", "k O m t a I l s"],
+                ["Disco", "d I s k o:"],
+                ["Euro", "O Y r o:"],
+                ["Freund", "f r O Y n"]]
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+        description: New or updated lexicon as array with string-pairs
+        required: true
+      responses:
+        200:
+          description: Success
+        403:
+          description: Forbidden
+        404:
+          description: Project or training not found
+        409:
+          description: Training already started
+      security:
+        - oauth:
+            - read:projects
+            - write:projects
+            - read:resources
+            - write:resources
+      summary: Set the lexicon of the resource
+      tags:
+        - training
+      x-openapi-router-controller: openapi_server.controllers.training_controller
   /resource:
     get:
       operationId: get_resource
@@ -2378,10 +2572,10 @@ components:
     CallbackObject:
       properties:
         url:
-          description: The URL to be called 
+          description: The URL to be called
           type: string
         method:
-          description: Action to be performed (GET|POST) 
+          description: Action to be performed (GET|POST)
           type: string
       required:
       - url
